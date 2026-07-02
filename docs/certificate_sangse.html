@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>자격증 상세 페이지 | Skill Fusion Certificate</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root{
+      --bg:#0b1020;
+      --bg-soft:#121a31;
+      --panel:#111827;
+      --panel-2:#162038;
+      --line:#26324d;
+      --line-soft:#33466b;
+      --text:#e5eefc;
+      --muted:#9fb0cf;
+      --blue:#4f8cff;
+      --blue-soft:#dbeafe;
+      --green:#22c55e;
+      --orange:#f59e0b;
+      --purple:#8b5cf6;
+      --gold:#f5c451;
+      --red:#ef4444;
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --radius-xl:28px;
+      --radius-lg:20px;
+      --radius-md:16px;
+      --radius-sm:12px;
+      --max:1440px;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{
+      background:
+        radial-gradient(circle at top left, rgba(79,140,255,.08), transparent 28%),
+        radial-gradient(circle at top right, rgba(139,92,246,.08), transparent 24%),
+        linear-gradient(180deg, #0a1020, #0d1326 24%, #09101f 100%);
+      color:var(--text);
+      font-family:'Pretendard',sans-serif;
+      scroll-behavior:smooth;
+    }
+
+    body{min-height:100vh}
+    a{text-decoration:none;color:inherit}
+    img{max-width:100%;display:block}
+
+    .container{
+      width:min(var(--max), calc(100% - 32px));
+      margin:0 auto;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:30;
+      backdrop-filter:blur(14px);
+      background:rgba(9,16,31,.74);
+      border-bottom:1px solid rgba(159,176,207,.12);
+    }
+
+    .topbar-inner{
+      height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .brand-badge{
+      width:44px;height:44px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg, var(--blue), #2563eb);
+      color:#fff;font-weight:800;
+      box-shadow:0 12px 24px rgba(79,140,255,.28);
+    }
+
+    .brand-copy h1{
+      font-size:1rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+
+    .brand-copy p{
+      font-size:.8rem;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .top-actions{
+      display:flex;align-items:center;gap:10px;
+    }
+
+    .ghost-btn,.primary-btn,.secondary-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:12px 16px;
+      border-radius:14px;
+      font-size:.92rem;
+      font-weight:700;
+      transition:.2s ease;
+      border:1px solid transparent;
+      cursor:pointer;
+    }
+
+    .ghost-btn{
+      background:rgba(255,255,255,.04);
+      border-color:rgba(159,176,207,.18);
+      color:var(--text);
+    }
+
+    .ghost-btn:hover{
+      transform:translateY(-1px);
+      border-color:rgba(159,176,207,.32);
+    }
+
+    .primary-btn{
+      background:linear-gradient(135deg, var(--blue), #2563eb);
+      color:#fff;
+      box-shadow:0 14px 24px rgba(79,140,255,.18);
+    }
+
+    .primary-btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .secondary-btn{
+      background:rgba(245,196,81,.1);
+      color:#ffd975;
+      border-color:rgba(245,196,81,.28);
+    }
+
+    .secondary-btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .page{
+      padding:28px 0 60px;
+    }
+
+    .section{
+      margin-top:24px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border:1px solid rgba(159,176,207,.14);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .card-header{
+      padding:22px 24px;
+      border-bottom:1px solid rgba(159,176,207,.10);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+    }
+
+    .card-header h2,
+    .card-header h3{
+      font-size:1.06rem;
+      font-weight:800;
+      letter-spacing:-.03em;
+    }
+
+    .card-header p{
+      margin-top:6px;
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.55;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(79,140,255,.20), transparent 26%),
+        radial-gradient(circle at 80% 0%, rgba(139,92,246,.18), transparent 24%),
+        linear-gradient(135deg, rgba(79,140,255,.08), rgba(245,196,81,.06));
+      pointer-events:none;
+    }
+
+    .hero-inner{
+      position:relative;
+      display:grid;
+      grid-template-columns:340px 1fr;
+      gap:24px;
+      padding:28px;
+      align-items:stretch;
+    }
+
+    .hero-emblem{
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:24px;
+      padding:24px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height:280px;
+    }
+
+    .emblem-badge{
+      width:110px;height:110px;border-radius:28px;
+      background:radial-gradient(circle at 30% 30%, #ffe08a, #f5c451 54%, #b8860b);
+      box-shadow:0 20px 40px rgba(245,196,81,.24);
+      display:flex;align-items:center;justify-content:center;
+      color:#3d2a00;
+      font-size:2.2rem;
+      font-weight:900;
+      margin-bottom:18px;
+    }
+
+    .meta-chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.8rem;
+      font-weight:700;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(159,176,207,.14);
+      color:var(--text);
+    }
+
+    .chip.gold{
+      color:#ffdf8a;
+      border-color:rgba(245,196,81,.28);
+      background:rgba(245,196,81,.08);
+    }
+
+    .hero-main{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:18px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:#8db5ff;
+      font-size:.86rem;
+      font-weight:800;
+      margin-bottom:10px;
+    }
+
+    .hero-main h1{
+      font-size:2.3rem;
+      line-height:1.15;
+      letter-spacing:-.04em;
+      font-weight:900;
+      max-width:880px;
+    }
+
+    .hero-main p{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.8;
+      max-width:900px;
+    }
+
+    .hero-stats{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:14px;
+      margin-top:18px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(159,176,207,.14);
+      border-radius:18px;
+      padding:16px;
+    }
+
+    .stat-label{
+      color:var(--muted);
+      font-size:.82rem;
+      font-weight:600;
+    }
+
+    .stat-value{
+      font-size:1.3rem;
+      font-weight:900;
+      margin-top:8px;
+      letter-spacing:-.03em;
+    }
+
+    .hero-bottom{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:12px;
+      margin-top:8px;
+    }
+
+    .progress-panel{
+      flex:1 1 360px;
+      min-width:260px;
+      background:rgba(11,16,32,.42);
+      border:1px solid rgba(159,176,207,.14);
+      padding:16px 18px;
+      border-radius:18px;
+    }
+
+    .progress-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      font-size:.9rem;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
+
+    .progress-bar{
+      height:12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+      border:1px solid rgba(159,176,207,.12);
+    }
+
+    .progress-fill{
+      height:100%;
+      width:68%;
+      background:linear-gradient(90deg, #4f8cff, #8b5cf6 70%, #f5c451);
+      border-radius:999px;
+    }
+
+    .page-grid{
+      display:grid;
+      grid-template-columns:minmax(0, 1.15fr) minmax(340px, .85fr);
+      gap:24px;
+      margin-top:24px;
+    }
+
+    .tree-body{
+      padding:24px;
+    }
+
+    .skill-tree{
+      position:relative;
+      min-height:560px;
+      border-radius:22px;
+      background:
+        linear-gradient(rgba(159,176,207,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(159,176,207,.08) 1px, transparent 1px),
+        radial-gradient(circle at center, rgba(79,140,255,.05), transparent 44%);
+      background-size:36px 36px, 36px 36px, auto;
+      border:1px solid rgba(159,176,207,.10);
+      padding:28px;
+      overflow:hidden;
+    }
+
+    .tree-node{
+      position:absolute;
+      width:132px;
+      min-height:84px;
+      padding:12px;
+      border-radius:18px;
+      border:1px solid rgba(159,176,207,.18);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow:0 10px 24px rgba(0,0,0,.16);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:8px;
+      text-align:center;
+    }
+
+    .tree-node .node-icon{
+      width:34px;height:34px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto;
+      font-size:1rem;font-weight:900;
+      background:rgba(255,255,255,.08);
+    }
+
+    .tree-node strong{
+      font-size:.88rem;
+      line-height:1.3;
+      letter-spacing:-.02em;
+    }
+
+    .tree-node span{
+      font-size:.72rem;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .tree-node.done{
+      border-color:rgba(34,197,94,.30);
+      background:linear-gradient(180deg, rgba(34,197,94,.14), rgba(34,197,94,.06));
+    }
+
+    .tree-node.done .node-icon{background:rgba(34,197,94,.18);color:#87f7b0}
+    .tree-node.active{
+      border-color:rgba(79,140,255,.34);
+      background:linear-gradient(180deg, rgba(79,140,255,.18), rgba(79,140,255,.05));
+      box-shadow:0 0 0 1px rgba(79,140,255,.18), 0 14px 28px rgba(79,140,255,.12);
+    }
+    .tree-node.active .node-icon{background:rgba(79,140,255,.16);color:#dbeafe}
+    .tree-node.locked{
+      opacity:.56;
+      border-style:dashed;
+    }
+    .tree-node.master{
+      width:168px;
+      min-height:106px;
+      border-color:rgba(245,196,81,.36);
+      background:linear-gradient(180deg, rgba(245,196,81,.16), rgba(245,196,81,.05));
+    }
+    .tree-node.master .node-icon{
+      width:42px;height:42px;border-radius:14px;
+      background:rgba(245,196,81,.18);color:#ffe7a1;
+    }
+
+    .tree-lines{
+      position:absolute;inset:0;pointer-events:none;
+    }
+
+    .tree-lines svg{
+      width:100%;height:100%;
+      display:block;
+    }
+
+    .tree-legend{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .legend-item{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:var(--muted);
+      font-size:.82rem;
+      padding:8px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(159,176,207,.12);
+    }
+
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      display:inline-block;
+    }
+
+    .dot.done{background:var(--green)}
+    .dot.active{background:var(--blue)}
+    .dot.locked{background:#64748b}
+    .dot.master{background:var(--gold)}
+
+    .cabinet-body{
+      padding:22px;
+    }
+
+    .cabinet-top{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .filter-pill{
+      padding:10px 12px;
+      border-radius:12px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(159,176,207,.14);
+      color:var(--muted);
+      font-size:.82rem;
+      font-weight:700;
+    }
+
+    .badge-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:14px;
+    }
+
+    .badge-card{
+      position:relative;
+      padding:16px;
+      min-height:164px;
+      border-radius:18px;
+      border:1px solid rgba(159,176,207,.14);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      overflow:hidden;
+    }
+
+    .badge-card::after{
+      content:"";
+      position:absolute;
+      right:-20px;
+      top:-20px;
+      width:72px;height:72px;
+      border-radius:50%;
+      background:rgba(255,255,255,.03);
+    }
+
+    .badge-card.done{
+      border-color:rgba(34,197,94,.28);
+      background:linear-gradient(180deg, rgba(34,197,94,.12), rgba(34,197,94,.04));
+    }
+
+    .badge-card.rare{
+      border-color:rgba(245,196,81,.30);
+      background:linear-gradient(180deg, rgba(245,196,81,.10), rgba(245,196,81,.03));
+    }
+
+    .badge-card.locked{
+      opacity:.5;
+      border-style:dashed;
+    }
+
+    .badge-icon{
+      width:46px;height:46px;border-radius:16px;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;font-size:1.1rem;
+      background:rgba(255,255,255,.08);
+      margin-bottom:12px;
+    }
+
+    .badge-card h4{
+      font-size:.92rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+
+    .badge-card p{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:.79rem;
+      line-height:1.55;
+    }
+
+    .badge-meta{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .tiny-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(159,176,207,.12);
+      color:var(--muted);
+      font-size:.72rem;
+      font-weight:800;
+    }
+
+    .fusion-grid{
+      display:grid;
+      grid-template-columns:1.2fr .75fr 1fr;
+      gap:18px;
+      padding:24px;
+    }
+
+    .fusion-col{
+      border:1px solid rgba(159,176,207,.14);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border-radius:22px;
+      padding:20px;
+      min-height:320px;
+    }
+
+    .fusion-col h3{
+      font-size:1rem;
+      font-weight:800;
+      margin-bottom:14px;
+    }
+
+    .recipe-list{
+      display:grid;
+      gap:12px;
+    }
+
+    .recipe-item{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(159,176,207,.12);
+      background:rgba(255,255,255,.03);
+    }
+
+    .recipe-slot{
+      width:42px;height:42px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,.07);
+      font-weight:900;
+    }
+
+    .recipe-copy strong{
+      display:block;
+      font-size:.88rem;
+      font-weight:800;
+    }
+
+    .recipe-copy span{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-size:.76rem;
+    }
+
+    .fusion-center{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      gap:14px;
+      text-align:center;
+    }
+
+    .fusion-core{
+      width:86px;height:86px;border-radius:24px;
+      display:flex;align-items:center;justify-content:center;
+      background:radial-gradient(circle at 30% 30%, #8db5ff, #4f8cff 58%, #1d4ed8);
+      box-shadow:0 20px 40px rgba(79,140,255,.24);
+      font-size:2rem;
+      font-weight:900;
+    }
+
+    .fusion-center p{
+      color:var(--muted);
+      font-size:.88rem;
+      line-height:1.65;
+    }
+
+    .result-card{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:16px;
+      min-height:100%;
+    }
+
+    .result-crest{
+      width:96px;height:96px;border-radius:26px;
+      background:radial-gradient(circle at 30% 30%, #ffe497, #f5c451 60%, #ba8b17);
+      display:flex;align-items:center;justify-content:center;
+      font-size:2rem;font-weight:900;
+      color:#3b2b04;
+      box-shadow:0 20px 40px rgba(245,196,81,.20);
+    }
+
+    .result-copy h4{
+      font-size:1.2rem;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+
+    .result-copy p{
+      margin-top:10px;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:.9rem;
+    }
+
+    .condition-list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .condition{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(159,176,207,.10);
+      color:var(--muted);
+      font-size:.82rem;
+      font-weight:700;
+    }
+
+    .condition.ok{
+      color:#8df2ae;
+      border-color:rgba(34,197,94,.22);
+      background:rgba(34,197,94,.06);
+    }
+
+    .timeline-body{
+      padding:24px;
+    }
+
+    .timeline{
+      position:relative;
+      display:grid;
+      grid-template-columns:repeat(5, minmax(0,1fr));
+      gap:16px;
+    }
+
+    .timeline::before{
+      content:"";
+      position:absolute;
+      left:8%;
+      right:8%;
+      top:44px;
+      height:4px;
+      background:linear-gradient(90deg, var(--blue), var(--blue), rgba(159,176,207,.18), rgba(159,176,207,.18));
+      border-radius:999px;
+      z-index:0;
+    }
+
+    .level-card{
+      position:relative;
+      z-index:1;
+      text-align:center;
+      padding-top:0;
+    }
+
+    .level-orb{
+      width:88px;height:88px;
+      margin:0 auto 14px;
+      border-radius:24px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.2rem;font-weight:900;
+      border:1px solid rgba(159,176,207,.16);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow:0 12px 24px rgba(0,0,0,.14);
+    }
+
+    .level-card.done .level-orb{
+      background:linear-gradient(180deg, rgba(79,140,255,.20), rgba(79,140,255,.08));
+      border-color:rgba(79,140,255,.34);
+    }
+
+    .level-card.current .level-orb{
+      background:linear-gradient(180deg, rgba(245,196,81,.18), rgba(245,196,81,.06));
+      border-color:rgba(245,196,81,.34);
+    }
+
+    .level-card h4{
+      font-size:.92rem;
+      font-weight:800;
+    }
+
+    .level-card p{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:.8rem;
+      line-height:1.6;
+    }
+
+    .bottom-grid{
+      display:grid;
+      grid-template-columns:.95fr 1.05fr;
+      gap:24px;
+    }
+
+    .quest-body,
+    .evidence-body{
+      padding:22px;
+    }
+
+    .quest-list,
+    .evidence-list{
+      display:grid;
+      gap:14px;
+    }
+
+    .quest-item,
+    .evidence-item{
+      padding:16px;
+      border-radius:18px;
+      border:1px solid rgba(159,176,207,.12);
+      background:rgba(255,255,255,.03);
+    }
+
+    .quest-item strong,
+    .evidence-item strong{
+      display:block;
+      font-size:.92rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+
+    .quest-item p,
+    .evidence-item p{
+      margin-top:8px;
+      color:var(--muted);
+      font-size:.83rem;
+      line-height:1.7;
+    }
+
+    .quest-footer,
+    .share-footer{
+      margin-top:16px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .share-card{
+      margin-top:18px;
+      padding:18px;
+      border-radius:20px;
+      background:
+        radial-gradient(circle at top left, rgba(79,140,255,.18), transparent 34%),
+        linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(159,176,207,.16);
+    }
+
+    .share-card h4{
+      font-size:1rem;
+      font-weight:900;
+      margin-bottom:8px;
+    }
+
+    .share-card p{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:.88rem;
+    }
+
+    .share-preview{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:110px 1fr;
+      gap:14px;
+      align-items:center;
+      padding:14px;
+      border-radius:18px;
+      background:rgba(9,16,31,.46);
+      border:1px solid rgba(159,176,207,.12);
+    }
+
+    .share-badge{
+      width:100px;height:100px;border-radius:24px;
+      background:radial-gradient(circle at 30% 30%, #ffe497, #f5c451 60%, #b8860b);
+      display:flex;align-items:center;justify-content:center;
+      font-size:2rem;font-weight:900;color:#402d03;
+      box-shadow:0 14px 32px rgba(245,196,81,.18);
+    }
+
+    .share-copy h5{
+      font-size:1rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+    }
+
+    .share-copy span{
+      display:block;
+      margin-top:8px;
+      color:var(--muted);
+      font-size:.84rem;
+      line-height:1.7;
+    }
+
+    .mobile-only{
+      display:none;
+    }
+
+    @media (max-width: 1200px){
+      .hero-inner{
+        grid-template-columns:1fr;
+      }
+
+      .hero-stats{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+      }
+
+      .page-grid{
+        grid-template-columns:1fr;
+      }
+
+      .bottom-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 920px){
+      .fusion-grid{
+        grid-template-columns:1fr;
+      }
+
+      .timeline{
+        grid-template-columns:1fr;
+      }
+
+      .timeline::before{
+        left:26px;
+        right:auto;
+        top:0;
+        bottom:0;
+        width:4px;
+        height:auto;
+        background:linear-gradient(180deg, var(--blue), var(--blue), rgba(159,176,207,.18), rgba(159,176,207,.18));
+      }
+
+      .level-card{
+        text-align:left;
+        padding-left:62px;
+        min-height:94px;
+      }
+
+      .level-orb{
+        position:absolute;
+        left:0;
+        top:0;
+        width:52px;
+        height:52px;
+        border-radius:16px;
+        margin:0;
+      }
+    }
+
+    @media (max-width: 768px){
+      .container{
+        width:min(var(--max), calc(100% - 20px));
+      }
+
+      .topbar-inner{
+        height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .top-actions{
+        width:100%;
+        justify-content:flex-start;
+        flex-wrap:wrap;
+      }
+
+      .hero-main h1{
+        font-size:1.7rem;
+      }
+
+      .hero-stats{
+        grid-template-columns:1fr;
+      }
+
+      .badge-grid{
+        grid-template-columns:1fr;
+      }
+
+      .skill-tree{
+        min-height:auto;
+        padding:0;
+        background:none;
+        border:none;
+        display:grid;
+        gap:12px;
+      }
+
+      .tree-lines{
+        display:none;
+      }
+
+      .tree-node{
+        position:relative !important;
+        left:auto !important;
+        top:auto !important;
+        width:100%;
+        min-height:auto;
+        text-align:left;
+        padding:14px 14px 14px 64px;
+      }
+
+      .tree-node .node-icon{
+        position:absolute;
+        left:14px;
+        top:50%;
+        transform:translateY(-50%);
+        margin:0;
+      }
+
+      .card-header{
+        padding:18px 18px;
+      }
+
+      .tree-body,
+      .cabinet-body,
+      .timeline-body,
+      .quest-body,
+      .evidence-body,
+      .fusion-grid{
+        padding:18px;
+      }
+
+      .share-preview{
+        grid-template-columns:1fr;
+      }
+
+      .share-badge{
+        width:88px;height:88px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">🏅</div>
+        <div class="brand-copy">
+          <h1>Certification Evolution</h1>
+          <p>배지 수집 · 역량 조합 · 자격증 승격</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <a href="#" class="ghost-btn">← 목록으로</a>
+        <button class="ghost-btn">배지 도감</button>
+        <button class="primary-btn">다음 배지 추천</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="container">
+
+      <!-- HERO -->
+      <section class="card hero">
+        <div class="hero-inner">
+          <div class="hero-emblem">
+            <div>
+              <div class="emblem-badge">AI</div>
+              <div class="meta-chips">
+                <span class="chip gold">Gold Tier</span>
+                <span class="chip">Level 2</span>
+                <span class="chip">발급률 18%</span>
+              </div>
+            </div>
+
+            <div>
+              <p style="color:var(--muted);font-size:.92rem;line-height:1.7;">
+                여러 개의 역량 배지를 조합해 완성되는 상위 자격증입니다. 필수 역량군과 선택 역량군을 충족하면 자동 승격됩니다.
+              </p>
+            </div>
+          </div>
+
+          <div class="hero-main">
+            <div>
+              <div class="eyebrow">CERTIFICATE DETAIL · EVOLUTION VIEW</div>
+              <h1>AI Software Product Builder Certificate</h1>
+              <p>
+                이 자격증은 Design, Data, API, Frontend, Backend, Auth, Payment, Deployment 역량을 하나의 실전형 자격 증명으로 통합한 구조입니다.
+                개별 배지를 따는 데서 끝나지 않고, 특정 조합과 프로젝트 검증을 만족할 때 상위 레벨로 진화합니다.
+              </p>
+
+              <div class="hero-stats">
+                <div class="stat">
+                  <div class="stat-label">현재 레벨</div>
+                  <div class="stat-value">Lv.2 Builder</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">보유 배지</div>
+                  <div class="stat-value">7 / 10</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">필수 역량 완성</div>
+                  <div class="stat-value">4 / 6</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">다음 승격</div>
+                  <div class="stat-value">3개 배지 필요</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-bottom">
+              <div class="progress-panel">
+                <div class="progress-row">
+                  <span>승격 진행률</span>
+                  <strong style="color:#dbeafe;">68%</strong>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+                <div style="margin-top:10px;color:var(--muted);font-size:.82rem;line-height:1.6;">
+                  필수 미달 역량: <strong style="color:#ffd975;">Payment</strong>, <strong style="color:#ffd975;">Deployment</strong>
+                </div>
+              </div>
+
+              <button class="secondary-btn">승격 시뮬레이션</button>
+              <button class="primary-btn">조합 가능 여부 확인</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TREE + CABINET -->
+      <section class="page-grid section">
+
+        <!-- SKILL TREE -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>역량 스킬트리</h2>
+              <p>현재 자격증에 연결된 핵심 역량 노드와 승격 경로를 확인합니다.</p>
+            </div>
+            <span class="chip">Core Path View</span>
+          </div>
+
+          <div class="tree-body">
+            <div class="skill-tree">
+              <div class="tree-lines">
+                <svg viewBox="0 0 1000 560" preserveAspectRatio="none">
+                  <path d="M500 76 L220 176" stroke="rgba(79,140,255,.25)" stroke-width="4" fill="none"/>
+                  <path d="M500 76 L390 176" stroke="rgba(79,140,255,.25)" stroke-width="4" fill="none"/>
+                  <path d="M500 76 L610 176" stroke="rgba(159,176,207,.18)" stroke-width="4" fill="none"/>
+                  <path d="M500 76 L780 176" stroke="rgba(159,176,207,.18)" stroke-width="4" fill="none"/>
+
+                  <path d="M220 176 L140 340" stroke="rgba(79,140,255,.25)" stroke-width="4" fill="none"/>
+                  <path d="M220 176 L300 340" stroke="rgba(79,140,255,.25)" stroke-width="4" fill="none"/>
+
+                  <path d="M390 176 L390 340" stroke="rgba(79,140,255,.25)" stroke-width="4" fill="none"/>
+                  <path d="M610 176 L610 340" stroke="rgba(159,176,207,.18)" stroke-width="4" fill="none"/>
+                  <path d="M780 176 L700 340" stroke="rgba(159,176,207,.18)" stroke-width="4" fill="none"/>
+                  <path d="M780 176 L860 340" stroke="rgba(159,176,207,.18)" stroke-width="4" fill="none"/>
+                </svg>
+              </div>
+
+              <div class="tree-node master active" style="left:calc(50% - 84px); top:22px;">
+                <div class="node-icon">★</div>
+                <strong>AI Product Builder</strong>
+                <span>Final Certificate</span>
+              </div>
+
+              <div class="tree-node done" style="left:80px; top:150px;">
+                <div class="node-icon">✏</div>
+                <strong>Design</strong>
+                <span>완료</span>
+              </div>
+
+              <div class="tree-node done" style="left:300px; top:150px;">
+                <div class="node-icon">◫</div>
+                <strong>Data & API</strong>
+                <span>완료</span>
+              </div>
+
+              <div class="tree-node locked" style="left:560px; top:150px;">
+                <div class="node-icon">⚙</div>
+                <strong>Service Core</strong>
+                <span>진행 중</span>
+              </div>
+
+              <div class="tree-node locked" style="left:780px; top:150px;">
+                <div class="node-icon">☁</div>
+                <strong>Operation</strong>
+                <span>잠김</span>
+              </div>
+
+              <div class="tree-node done" style="left:0; top:320px;">
+                <div class="node-icon">WF</div>
+                <strong>Wireframing</strong>
+                <span>획득 완료</span>
+              </div>
+
+              <div class="tree-node done" style="left:170px; top:320px;">
+                <div class="node-icon">UX</div>
+                <strong>UI/UX Design</strong>
+                <span>획득 완료</span>
+              </div>
+
+              <div class="tree-node done" style="left:300px; top:320px;">
+                <div class="node-icon">ER</div>
+                <strong>ERD / API</strong>
+                <span>획득 완료</span>
+              </div>
+
+              <div class="tree-node active" style="left:520px; top:320px;">
+                <div class="node-icon">FE</div>
+                <strong>Frontend / Backend</strong>
+                <span>핵심 진행 노드</span>
+              </div>
+
+              <div class="tree-node locked" style="left:700px; top:320px;">
+                <div class="node-icon">₩</div>
+                <strong>Payment</strong>
+                <span>미획득</span>
+              </div>
+
+              <div class="tree-node locked" style="left:860px; top:320px;">
+                <div class="node-icon">DP</div>
+                <strong>Deployment</strong>
+                <span>미획득</span>
+              </div>
+            </div>
+
+            <div class="tree-legend">
+              <span class="legend-item"><span class="dot done"></span>획득 완료</span>
+              <span class="legend-item"><span class="dot active"></span>핵심 진행 중</span>
+              <span class="legend-item"><span class="dot locked"></span>잠김 / 미획득</span>
+              <span class="legend-item"><span class="dot master"></span>최종 자격증</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- BADGE CABINET -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h3>배지 캐비닛</h3>
+              <p>획득한 배지와 아직 비어 있는 슬롯을 함께 보여주는 수집형 인벤토리입니다.</p>
+            </div>
+            <span class="chip">7 / 10 Collected</span>
+          </div>
+
+          <div class="cabinet-body">
+            <div class="cabinet-top">
+              <span class="filter-pill">전체</span>
+              <span class="filter-pill">필수 배지</span>
+              <span class="filter-pill">희귀 배지</span>
+              <span class="filter-pill">최근 획득</span>
+            </div>
+
+            <div class="badge-grid">
+              <article class="badge-card done">
+                <div class="badge-icon">WF</div>
+                <h4>Wireframing Badge</h4>
+                <p>핵심 화면 구조를 User Flow 기반으로 설계한 역량</p>
+                <div class="badge-meta">
+                  <span class="tiny-chip">Design</span>
+                  <span class="tiny-chip">필수</span>
+                </div>
+              </article>
+
+              <article class="badge-card done">
+                <div class="badge-icon">SQ</div>
+                <h4>Sequence Flow Badge</h4>
+                <p>시스템 흐름과 데이터 상호작용을 설계한 역량</p>
+                <div class="badge-meta">
+                  <span class="tiny-chip">Data</span>
+                  <span class="tiny-chip">필수</span>
+                </div>
+              </article>
+
+              <article class="badge-card rare done">
+                <div class="badge-icon">ER</div>
+                <h4>ERD Architect Badge</h4>
+                <p>정규화와 엔티티 관계 설계를 통해 DB 구조를 완성</p>
+                <div class="badge-meta">
+                  <span class="tiny-chip">Rare</span>
+                  <span class="tiny-chip">Core</span>
+                </div>
+              </article>
+
+              <article class="badge-card done">
+                <div class="badge-icon">API</div>
+                <h4>API Design Badge</h4>
+                <p>화면-흐름-데이터 기반 API/Swagger 명세 설계</p>
+                <div class="badge-meta">
+                  <span class="tiny-chip">Backend</span>
+                  <span class="tiny-chip">필수</span>
+                </div>
+              </article>
+
+              <article class="badge-card done">
+                <div class="badge-icon">UI</div>
+                <h4>UI/UX Badge</h4>
+                <p>디자인 시스템과 인터랙션 상태 설계 능력</p>
+                <div class="badge-meta">
+                  <span class="tiny-chip">Design</span>
+                </div>
+              </article>
+
+              <article class="badge-card locked">
+                <div class="badge-icon">₩</div>
+                <h4>Payment Badge</h4>
+                <p>상태 기반 결제 플로우 설계 및 예외 복구 전략</p>
+                <div class="badge-meta">
+                  <span class="tiny-chip">미획득</span>
+                </div>
+              </article>
+
+              <article class="badge-card locked">
+                <div class="badge-icon">DP</div>
+                <h4>Deployment Badge</h4>
+                <p>Docker, CI/CD, Cloud 배포 완료 시 획득</p>
+                <div class="badge-meta">
+                  <span class="tiny-chip">미획득</span>
+                </div>
+              </article>
+
+              <article class="badge-card locked">
+                <div class="badge-icon">★</div>
+                <h4>Certificate Core</h4>
+                <p>필수 배지를 모두 조합하면 해금되는 상위 슬롯</p>
+                <div class="badge-meta">
+                  <span class="tiny-chip">Fusion</span>
+                  <span class="tiny-chip">잠금</span>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- FUSION LAB -->
+      <section class="card section">
+        <div class="card-header">
+          <div>
+            <h2>Certificate Fusion Lab</h2>
+            <p>배지를 재료처럼 조합해 자격증 승격 가능 여부를 확인하는 조합실입니다.</p>
+          </div>
+          <span class="chip gold">조합 가능도 68%</span>
+        </div>
+
+        <div class="fusion-grid">
+          <div class="fusion-col">
+            <h3>필수 재료 배지</h3>
+            <div class="recipe-list">
+              <div class="recipe-item">
+                <div class="recipe-slot">WF</div>
+                <div class="recipe-copy">
+                  <strong>Wireframing</strong>
+                  <span>필수 · 획득 완료</span>
+                </div>
+              </div>
+              <div class="recipe-item">
+                <div class="recipe-slot">ER</div>
+                <div class="recipe-copy">
+                  <strong>ERD / Data</strong>
+                  <span>필수 · 획득 완료</span>
+                </div>
+              </div>
+              <div class="recipe-item">
+                <div class="recipe-slot">API</div>
+                <div class="recipe-copy">
+                  <strong>API Design</strong>
+                  <span>필수 · 획득 완료</span>
+                </div>
+              </div>
+              <div class="recipe-item">
+                <div class="recipe-slot">FE</div>
+                <div class="recipe-copy">
+                  <strong>Frontend</strong>
+                  <span>필수 · 획득 완료</span>
+                </div>
+              </div>
+              <div class="recipe-item">
+                <div class="recipe-slot">BE</div>
+                <div class="recipe-copy">
+                  <strong>Backend</strong>
+                  <span>필수 · 획득 완료</span>
+                </div>
+              </div>
+              <div class="recipe-item">
+                <div class="recipe-slot">DP</div>
+                <div class="recipe-copy">
+                  <strong>Deployment</strong>
+                  <span>필수 · 미획득</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fusion-col fusion-center">
+            <div class="fusion-core">⚗</div>
+            <h3>조합 엔진</h3>
+            <p>
+              필수 배지 6개 + 선택 배지 2개 + 최종 프로젝트 검증 통과 시 자격증이 자동 승격됩니다.
+            </p>
+            <button class="primary-btn">조합 시뮬레이션</button>
+          </div>
+
+          <div class="fusion-col">
+            <div class="result-card">
+              <div>
+                <div class="result-crest">AI</div>
+                <div class="result-copy" style="margin-top:16px;">
+                  <h4>AI Software Product Builder</h4>
+                  <p>
+                    실제 제품 설계부터 구현·운영까지 이어지는 상위 자격증입니다. 현재는 Gold 승격 전 단계입니다.
+                  </p>
+                </div>
+
+                <div class="condition-list">
+                  <div class="condition ok">
+                    <span>필수 배지 5개 이상</span>
+                    <strong>완료</strong>
+                  </div>
+                  <div class="condition">
+                    <span>Deployment 배지 획득</span>
+                    <strong>미완료</strong>
+                  </div>
+                  <div class="condition">
+                    <span>최종 프로젝트 검증</span>
+                    <strong>대기</strong>
+                  </div>
+                  <div class="condition ok">
+                    <span>Frontend / Backend 동시 충족</span>
+                    <strong>완료</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="secondary-btn">부족 배지 보기</button>
+                <button class="primary-btn">승격 조건 확인</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LEVEL PATH -->
+      <section class="card section">
+        <div class="card-header">
+          <div>
+            <h2>레벨업 경로</h2>
+            <p>Starter부터 Master까지 자격증이 어떻게 진화하는지 단계별로 확인합니다.</p>
+          </div>
+          <span class="chip">Evolution Path</span>
+        </div>
+
+        <div class="timeline-body">
+          <div class="timeline">
+            <div class="level-card done">
+              <div class="level-orb">Lv1</div>
+              <h4>Starter</h4>
+              <p>기초 배지 3개 획득<br>입문 인증 활성화</p>
+            </div>
+
+            <div class="level-card current">
+              <div class="level-orb">Lv2</div>
+              <h4>Builder</h4>
+              <p>핵심 배지 6개 조합<br>현재 단계</p>
+            </div>
+
+            <div class="level-card">
+              <div class="level-orb">Lv3</div>
+              <h4>Integrator</h4>
+              <p>FE/BE/API/Auth<br>통합 구조 충족</p>
+            </div>
+
+            <div class="level-card">
+              <div class="level-orb">Lv4</div>
+              <h4>Professional</h4>
+              <p>Payment/Deploy 포함<br>운영형 서비스 완성</p>
+            </div>
+
+            <div class="level-card">
+              <div class="level-orb">Lv5</div>
+              <h4>Master</h4>
+              <p>POC 검증 + 멘토 승인<br>최종 마스터 승격</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUEST + EVIDENCE -->
+      <section class="bottom-grid section">
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>다음 추천 퀘스트</h2>
+              <p>가장 빠르게 승격할 수 있는 다음 행동을 우선순위로 제안합니다.</p>
+            </div>
+            <span class="chip">Quest Planner</span>
+          </div>
+
+          <div class="quest-body">
+            <div class="quest-list">
+              <article class="quest-item">
+                <strong>1. Deployment Badge 획득</strong>
+                <p>현재 승격에서 가장 큰 병목입니다. Docker, CI/CD, Cloud 배포 완료 시 레벨업 조건이 크게 열립니다.</p>
+              </article>
+
+              <article class="quest-item">
+                <strong>2. Payment Flow 실습 제출</strong>
+                <p>상태 기반 결제 흐름과 예외 처리 설계를 완료하면 운영형 자격증 분기로 확장됩니다.</p>
+              </article>
+
+              <article class="quest-item">
+                <strong>3. 최종 프로젝트 검증 통과</strong>
+                <p>핵심 배지를 많이 모았더라도 프로젝트 증빙이 없으면 상위 자격증으로 자동 승격되지 않습니다.</p>
+              </article>
+            </div>
+
+            <div class="quest-footer">
+              <button class="primary-btn">가장 빠른 경로 보기</button>
+              <button class="ghost-btn">퀘스트 핀 고정</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>검증 / 증빙 / 공유</h2>
+              <p>자격증 신뢰도를 높이는 프로젝트 이력과 공유 카드를 함께 보여줍니다.</p>
+            </div>
+            <span class="chip gold">Verified Path</span>
+          </div>
+
+          <div class="evidence-body">
+            <div class="evidence-list">
+              <article class="evidence-item">
+                <strong>프로젝트 검증 기록</strong>
+                <p>최종 POC 제출 완료 · 멘토 리뷰 대기 · API/배포 체크리스트 82% 통과</p>
+              </article>
+
+              <article class="evidence-item">
+                <strong>평가 기준 충족 현황</strong>
+                <p>핵심 배지 조건 충족 / 선택 배지 1개 부족 / 운영형 시나리오 테스트 일부 미완료</p>
+              </article>
+
+              <article class="evidence-item">
+                <strong>발급 이력</strong>
+                <p>최초 발급: 2026.06.04 · 마지막 업데이트: 자동 동기화 · 공개 프로필 연동 가능</p>
+              </article>
+            </div>
+
+            <div class="share-card">
+              <h4>공유용 자격증 카드</h4>
+              <p>프로필, 포트폴리오, LMS 공개 페이지에 붙일 수 있는 축약형 카드입니다.</p>
+
+              <div class="share-preview">
+                <div class="share-badge">AI</div>
+                <div class="share-copy">
+                  <h5>AI Software Product Builder</h5>
+                  <span>
+                    Lv.2 Builder · 7/10 Badges Collected · Verified Skill Fusion Progress 68%
+                  </span>
+                </div>
+              </div>
+
+              <div class="share-footer">
+                <button class="primary-btn">공유 링크 생성</button>
+                <button class="ghost-btn">PNG 카드 다운로드</button>
+                <button class="ghost-btn">프로필에 고정</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+    </div>
+  </main>
+</body>
+</html>
