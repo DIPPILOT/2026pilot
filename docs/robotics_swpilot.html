@@ -1,0 +1,2712 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대구디지털혁신진흥원 ROS 로보틱스 과정 | 10-Step Learning Contents</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background: Deep Black */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Surface/Card: Dark Gray */
+      --text-main: #ffffff; /* Primary: White */
+      --text-muted: #e4e4e7; /* Secondary: Light Gray */
+      --text-desc: #71717a; /* Description: Gray */
+      --border-color: rgba(255, 255, 255, 0.08); /* Thin border with low opacity */
+      --accent-color: #06b6d4; /* Neon Cyan */
+      --accent-purple: #8b5cf6; /* Purple highlight */
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.65;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong { word-break: keep-all; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    section { padding: 80px 0; }
+    .bg-gray { background: transparent; }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 22px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .hero {
+      margin-top: 70px;
+      padding: 120px 0 90px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero h2 {
+      font-size: 1.3rem;
+      font-weight: 500;
+      opacity: 0.92;
+      margin-bottom: 22px;
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      opacity: 0.9;
+      max-width: 720px;
+      margin-bottom: 28px;
+    }
+
+    .hero-box {
+      background: rgba(26, 29, 36, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .hero-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.92rem;
+      color: white;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .hero-badge:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: white;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(59, 130, 246, 0.6), 0 0 15px rgba(6, 182, 212, 0.4);
+    }
+
+    .btn-outline {
+      border: 1.5px solid rgba(255,255,255,0.15);
+      color: white;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.4);
+      transform: translateY(-2px);
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.2rem;
+      color: #ffffff;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .section-title::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      margin: 12px auto 0;
+      border-radius: 999px;
+    }
+
+    .section-desc {
+      max-width: 860px;
+      margin: 0 auto 42px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.02rem;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .overview-card {
+      background: rgba(26, 29, 36, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--card-radius);
+      padding: 26px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .overview-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md), 0 0 15px rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    .overview-card .value {
+      font-size: 1.6rem;
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .overview-card .label {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .curriculum-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+
+    .course-card {
+      background: rgba(26, 29, 36, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 480px; /* Vertically tall cards */
+    }
+
+    .course-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md), 0 0 20px rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .course-card.is-clickable {
+      cursor: pointer;
+      position: relative;
+    }
+
+    .course-card.is-clickable::after {
+      content: "상세보기";
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(4px);
+      color: var(--secondary-color);
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 7px 12px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .course-card.is-clickable:hover::after {
+      background: var(--primary-color);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: var(--glow-blue);
+    }
+
+    .course-thumb {
+      height: 220px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .course-thumb.placeholder {
+      background: linear-gradient(135deg, rgba(26, 29, 36, 0.4), rgba(26, 29, 36, 0.8));
+      color: #71717a;
+      text-shadow: none;
+    }
+
+    .course-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    /* Hide detailed elements inside course-card to keep it simple, clean and concise */
+    .course-card .course-desc,
+    .course-card .meta-grid,
+    .course-card .time-list,
+    .course-card .meta-item {
+      display: none;
+    }
+
+    .day-label {
+      display: inline-block;
+      width: fit-content;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--secondary-color);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+    }
+
+    .course-title {
+      font-size: 1.22rem;
+      line-height: 1.35;
+      font-weight: 800;
+      color: #ffffff;
+      transition: color 0.2s ease;
+    }
+
+    .course-card:hover .course-title {
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .course-subtitle {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .course-desc {
+      color: var(--text-muted);
+      font-size: 0.96rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .meta-item {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px 14px;
+      font-size: 0.93rem;
+      color: var(--text-muted);
+    }
+
+    .meta-item strong {
+      color: var(--secondary-color);
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .time-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .time-row {
+      border-left: 3px solid rgba(6, 182, 212, 0.4);
+      padding-left: 12px;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+    }
+
+    .time-row strong {
+      color: var(--secondary-color);
+      margin-right: 6px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .tag:hover {
+      background: rgba(59, 130, 246, 0.15);
+      color: #ffffff;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .placeholder-note {
+      margin-top: auto;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-desc);
+      font-size: 0.92rem;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-cta {
+      background: #09090b;
+      color: white;
+      text-align: center;
+      padding: 70px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .footer-cta h3 {
+      font-size: 2rem;
+      margin-bottom: 14px;
+    }
+
+    .footer-cta p {
+      max-width: 760px;
+      margin: 0 auto;
+      opacity: 0.8;
+      color: var(--text-muted);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+      z-index: 2000;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 1100px;
+      max-height: 90vh;
+      overflow: auto;
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      transform: translateY(24px) scale(0.98);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: #ffffff;
+      z-index: 4;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: rotate(90deg);
+    }
+
+    .modal-hero {
+      background: linear-gradient(135deg, #09090b, #111827);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: white;
+      padding: 42px 36px 32px;
+      border-radius: 24px 24px 0 0;
+    }
+
+    .modal-day {
+      display: inline-flex;
+      padding: 8px 12px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--primary-color);
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      line-height: 1.2;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .modal-subtitle {
+      font-size: 1.04rem;
+      opacity: 0.92;
+      max-width: 760px;
+      color: var(--text-muted);
+    }
+
+    .modal-body {
+      padding: 34px 36px 36px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .modal-section {
+      margin-bottom: 26px;
+    }
+
+    .modal-section h4 {
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+      margin-bottom: 12px;
+      font-weight: 800;
+      text-shadow: var(--glow-cyan);
+    }
+
+    .modal-section p {
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .info-panel {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .info-panel h5 {
+      font-size: 0.96rem;
+      margin-bottom: 12px;
+      color: var(--secondary-color);
+      font-weight: 800;
+    }
+
+    .info-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .info-list li {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+    }
+
+    .info-list li strong {
+      color: var(--secondary-color);
+      margin-right: 6px;
+    }
+
+    .session-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .session-card {
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.01);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+
+    .session-card:hover {
+      border-color: rgba(59, 130, 246, 0.2);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .session-time {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--secondary-color);
+      background: rgba(6, 182, 212, 0.1);
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin-bottom: 10px;
+    }
+
+    .session-card h5 {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .session-card p {
+      color: #a1a1aa;
+      font-size: 0.95rem;
+    }
+
+    .bullet-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+      padding-left: 18px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .outcome-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .outcome-tag {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--secondary-color);
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid,
+      .overview-grid,
+      .modal-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero-grid,
+      .overview-grid,
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero h1 { font-size: 2.2rem; }
+      .hero h2 { font-size: 1.1rem; }
+      section { padding: 64px 0; }
+      .modal-hero { padding: 34px 22px 24px; }
+      .modal-body { padding: 24px 22px 28px; }
+      .modal-title { font-size: 1.55rem; }
+    }
+
+    .ai-class-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .ai-class-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5), 0 0 10px rgba(6, 182, 212, 0.3);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">대구디지털혁신진흥원 ROS 로보틱스 과정</a>
+      <ul class="nav-links">
+        <li><a href="index.html">과정 홈</a></li>
+        <li><a href="#overview">프로그램 소개</a></li>
+        <li><a href="#curriculum">10일 커리큘럼</a></li>
+        <li><a href="#final">최종 결과</a></li>
+      </ul>
+    </div>
+  </nav>
+
+      <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <h1>ROS2 & TurtleBot3 robotics</h1>
+        <h2>TurtleBot3 로봇 조립부터 ROS2 오픈소스를 활용한 자율 이동 제어까지 다루는 10일 실무 과정</h2>
+        <p>
+          이 과정은 대구디지털혁신진흥원(DIP) 지원 하에, 글로벌 연구 표준 로봇인 TurtleBot3 Burger의 모듈별 조립 및 액추에이터 제어, LiDAR 센서 기반 2D 공간 맵핑(SLAM), 그리고 Navigation2 스택을 결합하여 실시간 실내 공간을 자율 주행하는 프로젝트입니다.
+        </p>
+        <a href="#curriculum" class="btn btn-primary">학습 콘텐츠 보기</a>
+        <a href="#final" class="btn btn-outline">최종 산출물 보기</a>
+      </div>
+      <div class="hero-box">
+        <h3>Program Focus</h3>
+        <div class="hero-badges">
+          <span class="hero-badge">TurtleBot3</span>
+          <span class="hero-badge">ROS2 Foxy/Humble</span>
+          <span class="hero-badge">Dynamixel Servo</span>
+          <span class="hero-badge">LiDAR SLAM</span>
+          <span class="hero-badge">Navigation2</span>
+          <span class="hero-badge">rviz2 & gazebo</span>
+          <span class="hero-badge">Waypoint Follow</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+      <section id="overview">
+    <div class="container">
+      <h2 class="section-title">Program Overview</h2>
+      <p class="section-desc">
+        이 과정은 모바일 로봇 플랫폼 조립부터 ROS2를 기반으로 공간을 학습하고 목적지까지 경로를 계획하는 핵심 지능형 로보틱스 과정입니다.
+      </p>
+
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="value">TurtleBot3</div>
+          <div class="label">연구 표준형 모바일 로봇 조립</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">ROS2 Stack</div>
+          <div class="label">로봇 운영체제 메시지 통신</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">LiDAR SLAM</div>
+          <div class="label">실시간 2D 공간 맵핑</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">10 Days</div>
+          <div class="label">ROS 코어 학습 및 라이다 데이터 분석</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="curriculum" class="bg-gray">
+    <div class="container">
+      <h2 class="section-title">10-Step Learning Contents</h2>
+      <p class="section-desc">
+        모든 단계를 클릭하여 상세 단계별 세부 계획을 모달 팝업으로 확인하실 수 있습니다.
+      </p>
+
+      <div class="curriculum-grid">
+        <!-- Day 1 -->
+        <article class="course-card is-clickable" id="openDay1Modal" tabindex="0" role="button" aria-label="Day 1 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_planning.png'); filter: hue-rotate(0deg);; background-size: cover; background-position: center;">DAY 1</div>
+          <div class="course-content">
+            <span class="day-label">Step 1</span>
+            <h3 class="course-title">로보틱스 기획서 작성 및 임무 범위 정의</h3>
+            <p class="course-subtitle">모바일 로봇의 도입 목적을 정의하고 구체적인 실내 공간 임무 범위를 기획합니다.</p>
+            <p class="course-desc">
+              로봇이 도입되어 문제를 해결할 환경을 규정하고, 모듈러 로보틱스가 제공할 핵심 MVP 기능 가치를 설계하는 첫 번째 기획 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>로봇 서비스 설계 및 기획을 희망하는 학생 수강생</div>
+              <div class="meta-item"><strong>준비물</strong>로봇 서비스 기획서 양식, 필기도구, 노트북</div>
+              <div class="meta-item"><strong>학습 목표</strong>서비스 가치 제안 수립 및 로보틱스 프로젝트 기획서 초안 작성 완료</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 스마트 팩토리 및 물류 로봇 분석</div>
+              <div class="time-row"><strong>3시간</strong> 로봇 MVP 서비스 기획서 구체화</div>
+              <div class="time-row"><strong>1시간</strong> 로보틱스 기획 발표 및 타당성 평가</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Planning</span>
+              <span class="tag">Concept Design</span>
+              <span class="tag">Value Proposition</span>
+              <span class="tag">Problem Statement</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              로보틱스 서비스 기획안 문서 및 기능 요구사양 목록
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day1-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 2 -->
+        <article class="course-card is-clickable" id="openDay2Modal" tabindex="0" role="button" aria-label="Day 2 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_planning.png'); filter: hue-rotate(45deg);; background-size: cover; background-position: center;">DAY 2</div>
+          <div class="course-content">
+            <span class="day-label">Step 2</span>
+            <h3 class="course-title">로봇 운용 오퍼레이터 페르소나 정의 및 이동 시나리오 설정</h3>
+            <p class="course-subtitle">실내 로봇을 운용할 관리자 페르소나를 모델링하고, 로봇 이동 경로 시나리오를 구체화합니다.</p>
+            <p class="course-desc">
+              로봇 관제 오퍼레이터의 요구사양을 페르소나로 도출하고, 로봇이 자율 주행할 경로와 돌발 정지/복귀 이벤트를 다이어그램으로 설계하는 UX/시나리오 설계 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>로봇 UX 디자인 및 유즈케이스 모델링 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>페르소나 분석 시트, 서비스 유즈케이스 가이드라인</div>
+              <div class="meta-item"><strong>학습 목표</strong>핵심 오퍼레이터 페르소나 시트 작성 완료 및 다중 경유 순찰 경로 시나리오 수립</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 로봇 관제 관리자 페르소나 모델링 워크숍</div>
+              <div class="time-row"><strong>3시간</strong> 다중 목적지 이동 시나리오 설계 및 매핑</div>
+              <div class="time-row"><strong>1시간</strong> 유즈케이스 시나리오 교차 검증 피칭</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Persona Modeling</span>
+              <span class="tag">User Journey</span>
+              <span class="tag">Scenario Design</span>
+              <span class="tag">Use Case Chart</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              타겟 오퍼레이터 페르소나 모델 및 순찰 경로 시나리오 문서
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day2-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 3 -->
+        <article class="course-card is-clickable" id="openDay3Modal" tabindex="0" role="button" aria-label="Day 3 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_cover.png'); filter: hue-rotate(90deg);; background-size: cover; background-position: center;">DAY 3</div>
+          <div class="course-content">
+            <span class="day-label">Step 3</span>
+            <h3 class="course-title">TurtleBot3 Burger 플레이트 및 모터 결합 (개발 1단계)</h3>
+            <p class="course-subtitle">터틀봇3 버거의 섀시 플레이트를 레이어링하여 안착시키고 모터 액추에이터를 조립합니다.</p>
+            <p class="course-desc">
+              차동 구동 모바일 로봇 기구 구조를 설계적으로 이해하고 플레이트, 다이나믹셀 XL430 모터를 고정하는 하드웨어 개발 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>로봇 기구 프레임 조립 및 조인트 체결 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>TurtleBot3 Burger Assembly Kit, 드라이버, 고정 리벳</div>
+              <div class="meta-item"><strong>학습 목표</strong>다단 플레이트 수평 체결 및 구동 휠 서보 기합 결합 성공</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 차동 2륜 모바일 로봇 기구학 분석</div>
+              <div class="time-row"><strong>3시간</strong> 레이어 조립 및 모터 결합 실습</div>
+              <div class="time-row"><strong>1시간</strong> 기구 구름 및 볼 캐스터 평형 정렬</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Hardware Build</span>
+              <span class="tag">Chassis Assembly</span>
+              <span class="tag">Differential Drive</span>
+              <span class="tag">Dynamixel Board</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              조립 완성형 TurtleBot3 Burger 섀시 기구부
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day3-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 4 -->
+        <article class="course-card is-clickable" id="openDay4Modal" tabindex="0" role="button" aria-label="Day 4 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_cover.png'); filter: hue-rotate(135deg);; background-size: cover; background-position: center;">DAY 4</div>
+          <div class="course-content">
+            <span class="day-label">Step 4</span>
+            <h3 class="course-title">OpenCR 제어 보드 모터 제어용 펌웨어 아두이노 IDE 업로드 (개발 2단계)</h3>
+            <p class="course-subtitle">다이나믹셀 모터의 고유 ID를 설정하고 OpenCR 보드 제어용 핵심 펌웨어를 업로드합니다.</p>
+            <p class="course-desc">
+              액추에이터 TTL 통신 결선, RoboPlus ID 할당(ID 1, 2), 아두이노 IDE 환경 컴파일 및 펌웨어 다운로드 작업을 다루는 임베디드 펌웨어 개발 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>임베디드 제어 펌웨어 및 다이나믹셀 버스 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>OpenCR 1.0 보드, 모터 ID 설정 PC, Arduino IDE, USB 케이블, 12V SMPS 배터리</div>
+              <div class="meta-item"><strong>학습 목표</strong>OpenCR 펌웨어 배포 완료 및 보드 버튼을 이용한 좌우 모터 구동 캘리브레이션 완료</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 다이나믹셀 TTL 직렬 통신 프로토콜 이해</div>
+              <div class="time-row"><strong>3시간</strong> OpenCR 아두이노 IDE 환경 셋업 및 펌웨어 컴파일</div>
+              <div class="time-row"><strong>1시간</strong> 모터 통신 링크 및 휠 구동 테스트</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">OpenCR 1.0</span>
+              <span class="tag">Arduino IDE</span>
+              <span class="tag">Dynamixel ID</span>
+              <span class="tag">Daisy Chain Wiring</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              모터 제어 펌웨어가 플래싱된 OpenCR 보드 작동 상태
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day4-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 5 -->
+        <article class="course-card is-clickable" id="openDay5Modal" tabindex="0" role="button" aria-label="Day 5 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_cover.png'); filter: hue-rotate(180deg);; background-size: cover; background-position: center;">DAY 5</div>
+          <div class="course-content">
+            <span class="day-label">Step 5</span>
+            <h3 class="course-title">Raspberry Pi SBC 설정 및 ROS2 개발 워크스페이스 구축 (개발 3단계)</h3>
+            <p class="course-subtitle">라즈베리 파이에 로봇 전용 Ubuntu Server OS를 설치하고 ROS2 Foxy/Humble를 설치 빌드합니다.</p>
+            <p class="course-desc">
+              임베디드 OS Etcher 쓰기, 무선 와이파이 자동 연동, ROS2 패키지 저장소 설치 및 개발 colcon 워크스페이스를 설정하는 로봇 환경 개발 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>리눅스 OS 설정 및 ROS2 패키지 설치 수강생</div>
+              <div class="meta-item"><strong>준비물</strong>Raspberry Pi 4, MicroSD 카드(64GB 이상), OS 이미지, Wi-Fi 공유기</div>
+              <div class="meta-item"><strong>학습 목표</strong>SBC OS 구동 성공, ROS2 패키지 설치 완료 및 colcon build 명령어 에러 없이 완수</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> Ubuntu Server 20.04/22.04 LTS 원격 설정 부팅</div>
+              <div class="time-row"><strong>3시간</strong> ROS2 Humble/Foxy 패키지 빌드 셋업</div>
+              <div class="time-row"><strong>1시간</strong> 로봇 워크스페이스 폴더 빌딩 및 bashrc 환경 동기화</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Ubuntu Server</span>
+              <span class="tag">ROS2 Installation</span>
+              <span class="tag">Colcon Build</span>
+              <span class="tag">Environment Profiles</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              ROS2 개발 런타임이 완전히 셋업된 라즈베리 파이 시스템
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day5-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 6 -->
+        <article class="course-card is-clickable" id="openDay6Modal" tabindex="0" role="button" aria-label="Day 6 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_cover.png'); filter: hue-rotate(225deg);; background-size: cover; background-position: center;">DAY 6</div>
+          <div class="course-content">
+            <span class="day-label">Step 6</span>
+            <h3 class="course-title">Bringup 노드 가동 및 Teleoperation 키보드 원격 조종 테스트 (개발 4단계)</h3>
+            <p class="course-subtitle">OpenCR보드와 SBC 간 통신을 활성화하고 PC에서 무선 키보드로 로봇을 수동 조종합니다.</p>
+            <p class="course-desc">
+              로봇 상태 노드(turtlebot3_node) 구동, 원격 메시지 통신을 통한 /cmd_vel 토픽 발행 및 키보드 조종 실습을 수행하는 통신 및 제어 연동 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>ROS2 통신 아키텍처 및 토픽 퍼블리싱 학습자</div>
+              <div class="meta-item"><strong>준비물</strong>SBC-OpenCR 연동 케이블, 호스트 PC, 무선 Wi-Fi 환경</div>
+              <div class="meta-item"><strong>학습 목표</strong>bringup 노드 성공 실행, /cmd_vel Twist 메시지 연동에 의한 로봇 조종 주행 성공</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> SBC-OpenCR 직렬 포트 오픈 및 노드 가동</div>
+              <div class="time-row"><strong>3시간</strong> DDS 기반 원격 PC 통신 설정 및 cmd_vel 토픽 제어</div>
+              <div class="time-row"><strong>1시간</strong> 키보드 Teleop 노드 구동 및 수동 랩 주행</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">LDS Bringup</span>
+              <span class="tag">cmd_vel Message</span>
+              <span class="tag">DDS Communication</span>
+              <span class="tag">Teleop Key</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              키보드 입력에 실시간 기동 제어되는 터틀봇3 로봇
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day6-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 7 -->
+        <article class="course-card is-clickable" id="openDay7Modal" tabindex="0" role="button" aria-label="Day 7 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_cover.png'); filter: hue-rotate(270deg);; background-size: cover; background-position: center;">DAY 7</div>
+          <div class="course-content">
+            <span class="day-label">Step 7</span>
+            <h3 class="course-title">LiDAR 센서 데이터 연동 및 rviz2 3D 점군 시각화 셋업 (개발 5단계)</h3>
+            <p class="course-subtitle">LiDAR 센서 드라이버 패키지를 활성화하고 rviz2 3D 그래픽 도구로 거리 측정 점군 데이터를 매핑합니다.</p>
+            <p class="course-desc">
+              LiDAR 노드 가동, LaserScan 토픽 구조 분석, rviz2 시각화 좌표 매핑 레이아웃 설정을 훈련하는 데이터 가공 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>라이다 센서 통신 및 3D 데이터 분석 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>RPLiDAR 또는 LDS-01/02 센서, 호스트 PC rviz2 런타임</div>
+              <div class="meta-item"><strong>학습 목표</strong>라이다 스캔 토픽(5Hz 이상) 데이터 수신 완료, rviz2 상 360도 점군 공간 매핑 렌더링</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> LDS 드라이버 구동 및 LaserScan 토픽 수신</div>
+              <div class="time-row"><strong>3시간</strong> rviz2 GUI 레이아웃 설정 및 TF 좌표 트래킹</div>
+              <div class="time-row"><strong>1시간</strong> 센서 거리 정확도 평가 및 반사율 측정</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">LiDAR Sensor</span>
+              <span class="tag">LaserScan</span>
+              <span class="tag">rviz2 GUI</span>
+              <span class="tag">TF Coordinate</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              라이다 3D 스캔 점군 시각화 구성 설정 파일(.rviz)
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day7-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 8 -->
+        <article class="course-card is-clickable" id="openDay8Modal" tabindex="0" role="button" aria-label="Day 8 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_cover.png'); filter: hue-rotate(315deg);; background-size: cover; background-position: center;">DAY 8</div>
+          <div class="course-content">
+            <span class="day-label">Step 8</span>
+            <h3 class="course-title">rclpy 파이썬 기반 실시간 장애물 비상 제동 안전 노드 개발 (개발 6단계)</h3>
+            <p class="course-subtitle">라이다 스캔 토픽 거리 데이터를 파이썬으로 가공하여 장애물 감지 시 강제 비상 제동합니다.</p>
+            <p class="course-desc">
+              rclpy 기반 데이터 구독 코드 작성, 감지 각도 범위 임계값 필터 구현, 속도 제어 인터럽트 융합을 훈련하는 소프트웨어 코딩 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>파이썬 ROS2 프로그래밍 및 로봇 판단 로직 학습자</div>
+              <div class="meta-item"><strong>준비물</strong>파이썬 ROS2 패키지 개발 환경, rclpy 툴셋</div>
+              <div class="meta-item"><strong>학습 목표</strong>거리 판단 비상 제동 노드 파이썬 코드 완성, 전방 30cm 이내 장애물 진입 즉시 강제 0m/s 정지 가동</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> rclpy LaserScan 토픽 서브스크라이버 작성</div>
+              <div class="time-row"><strong>3시간</strong> 장애물 제동 /cmd_vel 속도 차단 발행 구현</div>
+              <div class="time-row"><strong>1시간</strong> 실물 장애물 충돌 방지 제동 검증</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">rclpy Custom Node</span>
+              <span class="tag">LaserScan Filter</span>
+              <span class="tag">Emergency Brake</span>
+              <span class="tag">Velocity Override</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              장애물 감지 및 실시간 제동이 동작하는 파이썬 ROS2 노드 스크립트
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day8-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 9 -->
+        <article class="course-card is-clickable" id="openDay9Modal" tabindex="0" role="button" aria-label="Day 9 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_cover.png'); filter: hue-rotate(60deg);; background-size: cover; background-position: center;">DAY 9</div>
+          <div class="course-content">
+            <span class="day-label">Step 9</span>
+            <h3 class="course-title">Cartographer SLAM 2D 실내 공간 맵핑 및 Navigation2 경로 계획 (개발 7단계)</h3>
+            <p class="course-subtitle">실시간 SLAM 기술로 실내 2D 지도를 제작하고 Navigation2 스택을 구성하여 자율주행을 설계합니다.</p>
+            <p class="course-desc">
+              Cartographer SLAM 노드 구동, 2D 맵 파일(.pgm, .yaml) 저장, Nav2 스택 가동 및 AMCL 위치 추정을 셋업하는 소프트웨어 개발 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>SLAM 맵 빌딩 및 자율 경로 추종 주행 설계 실무자</div>
+              <div class="meta-item"><strong>준비물</strong>작성용 공간 장애물 트랙, Navigation2 패키지</div>
+              <div class="meta-item"><strong>학습 목표</strong>실내 공간 2D 격자 맵 구축 성공 및 Nav2 연동 목적지 추종 자율 경로 주행 가동 완료</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> Cartographer SLAM 실시간 지도 빌드 및 저장</div>
+              <div class="time-row"><strong>3시간</strong> Navigation2 스택 가동 및 AMCL 파티클 캘리브레이션</div>
+              <div class="time-row"><strong>1시간</strong> 자율 경로 생성(Global Path Planning) 확인</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">SLAM Mapping</span>
+              <span class="tag">Cartographer Map</span>
+              <span class="tag">Navigation2</span>
+              <span class="tag">AMCL Config</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              공간 2D 맵 파일 및 Navigation2 구성 설정 파일
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day9-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 10 -->
+        <article class="course-card is-clickable" id="openDay10Modal" tabindex="0" role="button" aria-label="Day 10 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/robotics_planning.png'); filter: hue-rotate(180deg);; background-size: cover; background-position: center;">DAY 10</div>
+          <div class="course-content">
+            <span class="day-label">Step 10</span>
+            <h3 class="course-title">다중 웨이포인트(Waypoint) 순찰 자율 운행 및 동적 장애물 우회 관제 (검증 및 테스트)</h3>
+            <p class="course-subtitle">다중 경유지 순찰 코드를 작성하고 실시간 장애물 회피 기동 성능을 최종 검증합니다.</p>
+            <p class="course-desc">
+              순차적 다중 경유지(Waypoint Follower) 액션 클라이언트 빌드, 돌발 장애물 투입 시 자율 경로 우회(Re-planning) 및 피칭 발표를 운영하는 최종 수료 평가 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>수강생 프로젝트 최종 성과 검증자</div>
+              <div class="meta-item"><strong>준비물</strong>데모 부스 트랙, 경유 지점 위치 태그, 관제 타이머</div>
+              <div class="meta-item"><strong>학습 목표</strong>지정 경유지 3곳 순찰 후 시작 지점 복귀 자율주행 완수 및 최종 프로젝트 스피치 피칭</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 다중 웨이포인트 순찰(Waypoint Follower) 파이썬 액션 코드 작성</div>
+              <div class="time-row"><strong>3시간</strong> 돌발 장애물 자율주행 우회 및 제동 데모</div>
+              <div class="time-row"><strong>1시간</strong> 최종 프로젝트 피칭 및 교육 수료 회고</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Action Client</span>
+              <span class="tag">Waypoint Patrol</span>
+              <span class="tag">Dynamic Re-planning</span>
+              <span class="tag">Final Pitching</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              2D 지도 파일 및 다중 웨이포인트 완주 성공 기록, 최종 요약 발표 자료
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day10-ai-classroom_robotics.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+  </section>
+
+      <section id="final">
+    <div class="container">
+      <h2 class="section-title">Final Outcome</h2>
+      <p class="section-desc">
+        이 과정의 목표는 단순 학습이 아니라, 실제로 동작하는 ROS2 로봇 노드들을 구성하고 실내 정밀 자율 운행을 시연하는 것입니다.
+      </p>
+
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="value">SLAM Map</div>
+          <div class="label">2D 격자 실내 정밀 지도</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">Nav2 Stack</div>
+          <div class="label">장애물 회피 자율 이동 경로</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">ROS Nodes</div>
+          <div class="label">센서-액추에이터 데이터 토픽</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">Demo Pitch</div>
+          <div class="label">다중 웨이포인트 관제 데모</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-cta">
+    <h3>From Nodes to Fleet Control</h3>
+    <p>
+      10일 과정에 걸쳐 모바일 로봇을 조립하고, ROS2 핵심 통신 및 센서 기반 SLAM, 자율 네비게이션을 설계하고 연동하는 지능형 로보틱스 하드웨어 융합 과정입니다.
+    </p>
+  </footer>
+
+
+
+
+
+  <!-- Day 1 Modal -->
+  <div class="modal-overlay" id="day1Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day1ModalTitle">
+      <button class="modal-close" id="closeDay1Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 1 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day1ModalTitle">로보틱스 기획서 작성 및 임무 범위 정의</h3>
+        <p class="modal-subtitle">
+          모바일 로봇의 도입 목적을 정의하고 구체적인 실내 공간 임무 범위를 기획합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                로봇이 도입되어 문제를 해결할 환경을 규정하고, 모듈러 로보틱스가 제공할 핵심 MVP 기능 가치를 설계하는 첫 번째 기획 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>스마트 팩토리 및 물류 로봇 분석</h5>
+                  <p>
+                    ROS2 기반 모바일 로봇이 사용되고 있는 물류 배송, 병원 자율 이송 사례를 벤치마킹합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>글로벌 AMR(Autonomous Mobile Robot) 및 물류 자동화 트렌드 분석</li>
+                    <li>터틀봇3 하드웨어 사양 내 구현할 수 있는 실내 순찰/배달 임무 탐색</li>
+                    <li>팀별 로보틱스 아이디어 피드 공유</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>로봇 MVP 서비스 기획서 구체화</h5>
+                  <p>
+                    해결하려는 문제를 설정하고 로봇 스택이 사용자에게 줄 기능 구조를 문서로 정의합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>문제 정의서(Problem Definition) 및 로봇 솔루션 가치 제안 기술</li>
+                    <li>터틀봇3 기하 크기 및 전력 한계를 파악한 기획 제약 조건 명세</li>
+                    <li>최종 10단계 맵핑 및 자율 주행 데모 수행을 위한 코스 환경 정의</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>로보틱스 기획 발표 및 타당성 평가</h5>
+                  <p>
+                    팀별 기획안을 피칭하고, ROS2 및 LDS 센서 역량 범위 내에서 실현 가능한지 튜닝 평가를 수행합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>로보틱스 서비스 컨셉 피칭 스피치</li>
+                    <li>로봇 기구 동작 범위 및 센서 제약에 의한 구현 범위 피드백</li>
+                    <li>기획 요구사양 최종 수정 및 마일스톤 확정</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Planning</span>
+                <span class="outcome-tag">Concept Design</span>
+                <span class="outcome-tag">Value Proposition</span>
+                <span class="outcome-tag">Problem Statement</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>기획 세션 + 발표 피드백</li>
+                <li><strong>실습 기반</strong>Robotics Planning Guide</li>
+                <li><strong>목표 결과</strong>로봇 서비스 목적 정의 및 기획 문서 작성 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>모바일 로보틱스 도메인의 시장 비즈니스 기회 발굴 및 문제 정의 능력 배양</li>
+                <li>기획 단계에서의 로봇 하드웨어 스펙 한계점과 타당성을 조율하는 능력 습득</li>
+                <li>아이디어를 기능 요구사항으로 전환하고 아키텍처 범위로 문서화하는 기술 획득</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>로보틱스 프로젝트 기획서(PPT 또는 PDF)</li>
+                <li>하드웨어 및 센서 필요 사양 명세서</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>본 기획서는 최종 10단계 자율 순찰 데모 주행 시 목표 달성률 평가의 기준이 됨</li>
+                <li>정의된 기능 요구사항을 기반으로 2단계의 구체적인 페르소나 사용자 유즈케이스 설정을 수행함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day1-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 2 Modal -->
+  <div class="modal-overlay" id="day2Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day2ModalTitle">
+      <button class="modal-close" id="closeDay2Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 2 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day2ModalTitle">로봇 운용 오퍼레이터 페르소나 정의 및 이동 시나리오 설정</h3>
+        <p class="modal-subtitle">
+          실내 로봇을 운용할 관리자 페르소나를 모델링하고, 로봇 이동 경로 시나리오를 구체화합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                로봇 관제 오퍼레이터의 요구사양을 페르소나로 도출하고, 로봇이 자율 주행할 경로와 돌발 정지/복귀 이벤트를 다이어그램으로 설계하는 UX/시나리오 설계 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>로봇 관제 관리자 페르소나 모델링 워크숍</h5>
+                  <p>
+                    로봇의 위치 상태를 확인하고 경로를 하달하는 관제사 페르소나 프로필을 작성합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>오퍼레이터의 하루 과업(Task), 주 통제 환경, 페인 포인트 식별</li>
+                    <li>페르소나가 로봇과 상호작용하는 접점(인증, 알림, 명령) 분류</li>
+                    <li>사용자 요구에 기반한 로봇 제어 기능의 인터랙션 수준 정의</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>다중 목적지 이동 시나리오 설계 및 매핑</h5>
+                  <p>
+                    터틀봇3가 실내 격자 공간을 자율 주행하며 경유할 핵심 타겟 위치를 정의합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>로봇 주행 시작점, 순찰 웨이포인트(A, B, C) 및 최종 홈 복귀 경로 시점 구상</li>
+                    <li>장애물 돌발 상황 시 로봇의 인지 한계 속도 가이드 및 사용자 알림 흐름 작성</li>
+                    <li>가상 맵 크기 규격 및 장애물 배치 규칙 정의</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>유즈케이스 시나리오 교차 검증 피칭</h5>
+                  <p>
+                    작성된 페르소나와 주행 경로 시나리오를 공유하고 유효성 타당성을 검증합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>팀별 페르소나 스토리보드 기획 발표</li>
+                    <li>로봇 제어 상태 전이와 사용자 관리 로직 간의 피드백 교류</li>
+                    <li>시나리오 캘리브레이션 완료 및 3단계 하드웨어 조립 조건 연결</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Persona Modeling</span>
+                <span class="outcome-tag">User Journey</span>
+                <span class="outcome-tag">Scenario Design</span>
+                <span class="outcome-tag">Use Case Chart</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>UX 설계 실습 + 팀 피드백 토론</li>
+                <li><strong>실습 기반</strong>Persona Design Toolkit</li>
+                <li><strong>목표 결과</strong>타겟 페르소나 정의 및 시나리오 셋업 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>로봇 사용자의 작업 상황(Context)에 입각하여 로봇의 동작을 맞춤 설계하는 UX 설계 기술 습득</li>
+                <li>공간 맵 조건과 센서 융합 관점에서 논리적으로 타당한 다중 주행 시나리오 스토리보딩 역량 획득</li>
+                <li>비상 정지 및 복구 시나리오 전개에 따른 로봇 제어 흐름 설계 기법 이해</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>타겟 페르소나 프로필 명세서</li>
+                <li>로봇 순찰 경로 시나리오 흐름 다이어그램</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>본 시나리오는 6단계 무선 텔레오프 조종 주행 및 9단계 다중 웨이포인트 순찰 API의 목적지가 됨</li>
+                <li>10단계 자율 경로 주행 데모 시, 오퍼레이터 페르소나가 요구한 위치 제어 품질을 입증함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day2-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 3 Modal -->
+  <div class="modal-overlay" id="day3Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day3ModalTitle">
+      <button class="modal-close" id="closeDay3Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 3 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day3ModalTitle">TurtleBot3 Burger 플레이트 및 모터 결합 (개발 1단계)</h3>
+        <p class="modal-subtitle">
+          터틀봇3 버거의 섀시 플레이트를 레이어링하여 안착시키고 모터 액추에이터를 조립합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                차동 구동 모바일 로봇 기구 구조를 설계적으로 이해하고 플레이트, 다이나믹셀 XL430 모터를 고정하는 하드웨어 개발 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>차동 2륜 모바일 로봇 기구학 분석</h5>
+                  <p>
+                    로봇의 회전 중심과 바퀴 속도 차이 운동 모델인 차동 구동 기구학을 설명합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>선속도(Linear) 및 각속도(Angular) 결합 휠 스피드 변환 이론 이해</li>
+                    <li>터틀봇3 버거 장비 다단 플레이트별 전압 분배 및 하중 균형 설계 방식 학습</li>
+                    <li>기구부 파츠 구성 검사 및 조립 시 파손 예방 가이드</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>레이어 조립 및 모터 결합 실습</h5>
+                  <p>
+                    섀시 베이스에 다이나믹셀 서보 마운트를 고정하고 적층 플레이트 기둥을 올립니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>최하단 1층 플레이트에 DYNAMIXEL 모터 브래킷 및 휠 고정 체결</li>
+                    <li>2층 플레이트에 전원 배전판 및 제어기 보드 장착 나사 구멍 매핑 체결</li>
+                    <li>서포터 기둥 조립을 통한 각 플레이트 층별 수직 정렬 체결</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>기구 구름 및 볼 캐스터 평형 정렬</h5>
+                  <p>
+                    물리 섀시 결합 완성 상태를 확인하고 하단 보조 휠 평형 캘리브레이션을 진행합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>다단 레이블 구조 뒤틀림 확인 및 나사 토크 보강</li>
+                    <li>하단 캐스터 볼 휠 마찰 회전 작동 상태 피드백 조율</li>
+                    <li>상단 LDS 센서 기둥 프레임 조립 마무리</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Hardware Build</span>
+                <span class="outcome-tag">Chassis Assembly</span>
+                <span class="outcome-tag">Differential Drive</span>
+                <span class="outcome-tag">Dynamixel Board</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>기구부 조립 실습 + 구조 기하학 교육</li>
+                <li><strong>실습 기반</strong>TurtleBot3 Burger Kit</li>
+                <li><strong>목표 결과</strong>로봇 물리 섀시 조립 및 평형 검수 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>모바일 로봇의 자유도(Degree of Freedom)와 차동 구동 주행의 물리 기학적 원리 습득</li>
+                <li>다단 플레이트와 액추에이터 결합 시 대칭 균형을 유지하는 정밀 조립 능력 획득</li>
+                <li>기구 조립 오차가 자율주행 주행 정합도 오도메트리에 미치는 물리적 영향 학습</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>조립 완료된 터틀봇3 버거 물리 섀시</li>
+                <li>기구 조립 정렬 체크리스트 결과 카드</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>플레이트가 휘어 체결되면 주행 시 오도메트리 회전각 오차가 생기므로 조립 수평 캘리브레이션 필수</li>
+                <li>4단계 OpenCR 모터 제어 펌웨어 테스트를 진행할 수 있는 하드웨어 기구 토대를 제공함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day3-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 4 Modal -->
+  <div class="modal-overlay" id="day4Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day4ModalTitle">
+      <button class="modal-close" id="closeDay4Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 4 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day4ModalTitle">OpenCR 제어 보드 모터 제어용 펌웨어 아두이노 IDE 업로드 (개발 2단계)</h3>
+        <p class="modal-subtitle">
+          다이나믹셀 모터의 고유 ID를 설정하고 OpenCR 보드 제어용 핵심 펌웨어를 업로드합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                액추에이터 TTL 통신 결선, RoboPlus ID 할당(ID 1, 2), 아두이노 IDE 환경 컴파일 및 펌웨어 다운로드 작업을 다루는 임베디드 펌웨어 개발 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>다이나믹셀 TTL 직렬 통신 프로토콜 이해</h5>
+                  <p>
+                    데이지 체인 방식으로 연결되는 서보 모터의 제어 패킷 구조와 통신을 학습합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>다이나믹셀 버스 프로토콜 규격 및 UART 보드 레이트 설정 파악</li>
+                    <li>RoboPlus 매니저 툴 연동을 통한 좌측 모터(ID: 1), 우측 모터(ID: 2) 할당 라이팅</li>
+                    <li>OpenCR 1.0 보드의 전원 단자 설계 사양 파악</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>OpenCR 아두이노 IDE 환경 셋업 및 펌웨어 컴파일</h5>
+                  <p>
+                    OpenCR 보드 셋업 라이브러리를 추가하고 제어 예제 코드를 업로드합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>아두이노 IDE 보드 매니저 OpenCR URL 등록 및 패키지 설치</li>
+                    <li>터틀봇3 버거용 모터 드라이버 핵심 예제 펌웨어 로드</li>
+                    <li>USB 직렬 포트 다운로드 경로 설정 및 컴파일 다운로드 실행</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>모터 통신 링크 및 휠 구동 테스트</h5>
+                  <p>
+                    12V 전원을 보드에 인가하고 내장 휠 테스트 버튼을 이용해 속도 회전을 테스트합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>12V 배터리 포트 전원 공급 및 레귤레이터 동작 5V/12V LED 체크</li>
+                    <li>보드 구동 스위치 1/2 클릭에 의한 좌/우 다이나믹셀 개별 휠 회전 캘리브레이션 점검</li>
+                    <li>ROS 직렬 프로토콜 패킷 통신 준비 체크</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">OpenCR 1.0</span>
+                <span class="outcome-tag">Arduino IDE</span>
+                <span class="outcome-tag">Dynamixel ID</span>
+                <span class="outcome-tag">Daisy Chain Wiring</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>보드 설정 실습 + 펌웨어 컴파일 업로드</li>
+                <li><strong>실습 기반</strong>OpenCR Arduino Lib</li>
+                <li><strong>목표 결과</strong>OpenCR 제어 보드 펌웨어 플래싱 및 모터 구동 캘리브레이션 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>산업용 액추에이터의 직렬 통신 데이지 체인 설계 및 제어 패킷 버스 구조 이해</li>
+                <li>MCU 계열 컨트롤 보드의 크로스 컴파일 환경 구축 및 다운로드 플래싱 절차 숙달</li>
+                <li>모터 피드백 엔코더 캘리브레이션 값의 펌웨어 연동 및 수동 회전 제어 기법 습득</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>펌웨어 플래싱이 끝난 OpenCR 제어 보드 모듈</li>
+                <li>다이나믹셀 모터 바인딩 설정 레코드</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>서보 모터 ID(1, 2)가 뒤바뀌어 체결되면 6단계 조종에서 로봇 동작이 뒤바뀌므로 점검 필요</li>
+                <li>5단계 SBC 설정 후 로봇 노드 통신을 시작할 수 있는 최하단 임베디드 펌웨어 엔진 역할을 함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day4-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 5 Modal -->
+  <div class="modal-overlay" id="day5Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day5ModalTitle">
+      <button class="modal-close" id="closeDay5Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 5 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day5ModalTitle">Raspberry Pi SBC 설정 및 ROS2 개발 워크스페이스 구축 (개발 3단계)</h3>
+        <p class="modal-subtitle">
+          라즈베리 파이에 로봇 전용 Ubuntu Server OS를 설치하고 ROS2 Foxy/Humble를 설치 빌드합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                임베디드 OS Etcher 쓰기, 무선 와이파이 자동 연동, ROS2 패키지 저장소 설치 및 개발 colcon 워크스페이스를 설정하는 로봇 환경 개발 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>Ubuntu Server 20.04/22.04 LTS 원격 설정 부팅</h5>
+                  <p>
+                    SBC용 로봇 컴퓨터 이미지를 마이크로 SD 카드에 쓰고 원격 네트워크를 셋업합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>SBC 타겟 우분투 서버 64비트 이미지 다운로드 및 Etcher 라이팅</li>
+                    <li>network-config 파일 SSID 등록 작성을 통한 무선 통신 고정 IP 설정</li>
+                    <li>호스트 PC 터미널에서 SBC 원격 SSH 쉘 접속 세션 연결</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>ROS2 Humble/Foxy 패키지 빌드 셋업</h5>
+                  <p>
+                    ROS2 소프트웨어 저장소를 리눅스 패키지 관리자에 연동하고 핵심 모듈을 설치합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>우분투 apt 소스 리스트에 ROS2 공식 패키지 서명 키 등록 및 업데이트</li>
+                    <li>ros-base 및 ros-dev-tools 컴파일러 apt 패키지 자동 설치 실행</li>
+                    <li>setup.bash 쉘 소싱 매핑 설정</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>로봇 워크스페이스 폴더 빌딩 및 bashrc 환경 동기화</h5>
+                  <p>
+                    개발 패키지 빌드를 위한 colcon 워크스페이스 디렉토리를 구축하고 컴파일합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>로컬 개발 경로(~/turtlebot3_ws/src) 생성 및 드라이버 소스 클론</li>
+                    <li>colcon build --symlink-install 빌드 프로세서 가동 검수</li>
+                    <li>bashrc 환경 파일 내의 로봇 타입(export TURTLEBOT3_MODEL=burger) 및 도메인 ID 세팅</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Ubuntu Server</span>
+                <span class="outcome-tag">ROS2 Installation</span>
+                <span class="outcome-tag">Colcon Build</span>
+                <span class="outcome-tag">Environment Profiles</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>SBC 운영체제 셋업 + ROS2 라이브러리 빌드</li>
+                <li><strong>실습 기반</strong>Raspberry Pi Ubuntu & ROS2</li>
+                <li><strong>목표 결과</strong>SBC 환경 내 ROS2 라이브러리 설치 및 개발 워크스페이스 구성 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>로보틱스 개발용 리눅스 OS 빌드 설계 및 Headless 원격 접속 인프라 설정 스킬 습득</li>
+                <li>ROS2 패키지 분산 리포지토리 구성 방식 및 데비안 패키지 관리 유틸리티 기술 숙달</li>
+                <li>로봇 컴파일러 colcon 빌드 툴 사용법 및 환경 파일 동기화 명령어 활용</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>ROS2 프레임워크가 가동 준비된 SD 카드</li>
+                <li>워크스페이스 colcon build 통과 로그 파일</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>SBC의 메모리가 부족하면 colcon 빌드 중 중단되므로 스왑 메모리 설정이 강력히 요구됨</li>
+                <li>6단계 Bringup 노드 가동 시, 본 단계에서 빌드된 드라이버 실행 패키지가 구동 모듈로 사용됨</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day5-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 6 Modal -->
+  <div class="modal-overlay" id="day6Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day6ModalTitle">
+      <button class="modal-close" id="closeDay6Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 6 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day6ModalTitle">Bringup 노드 가동 및 Teleoperation 키보드 원격 조종 테스트 (개발 4단계)</h3>
+        <p class="modal-subtitle">
+          OpenCR보드와 SBC 간 통신을 활성화하고 PC에서 무선 키보드로 로봇을 수동 조종합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                로봇 상태 노드(turtlebot3_node) 구동, 원격 메시지 통신을 통한 /cmd_vel 토픽 발행 및 키보드 조종 실습을 수행하는 통신 및 제어 연동 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>SBC-OpenCR 직렬 포트 오픈 및 노드 가동</h5>
+                  <p>
+                    SBC 하드웨어 포트를 연결하고 로봇 제어 코어 프로세스를 실행합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>SBC USB 직렬 포트 장치 권한 바인딩 및 udev rules 규칙 자동 등록 설정</li>
+                    <li>터틀봇3 하드웨어 인터페이스 노드(turtlebot3_bringup) 런칭 파일 가동</li>
+                    <li>모터 동작 센서 토픽(/odom, /joint_states) 주기적 발행 상태 모니터링</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>DDS 기반 원격 PC 통신 설정 및 cmd_vel 토픽 제어</h5>
+                  <p>
+                    호스트 PC 환경에서 ROS2 네트워크 통신을 활성화하고 속도 제어 메시지 포맷을 익힙니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>로컬 와이파이 라우터 기반 ROS_DOMAIN_ID 환경 변수 동기화 바인딩</li>
+                    <li>geometry_msgs/msg/Twist (선속도/각속도 축) 토픽 메시지 데이터 상세 분석</li>
+                    <li>ros2 topic pub 툴을 통한 모터 속도 값 강제 주입 주행 동작 테스트</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>키보드 Teleop 노드 구동 및 수동 랩 주행</h5>
+                  <p>
+                    원격 키보드 조종 노드를 실행하여 모바일 로봇을 움직여 보고 기구 운동 반응성을 관찰합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>ros2 run turtlebot3_teleop teleop_keyboard 노드 실행</li>
+                    <li>방향타 키 지정을 통한 선속도/각속도 명령 송수신 테스트</li>
+                    <li>코너 선회 반응성 조율 및 바퀴 오도메트리 수신 데이터 로그 체크</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">LDS Bringup</span>
+                <span class="outcome-tag">cmd_vel Message</span>
+                <span class="outcome-tag">DDS Communication</span>
+                <span class="outcome-tag">Teleop Key</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>직렬 포트 권한 바인딩 + 원격 ROS2 메시지 조종</li>
+                <li><strong>실습 기반</strong>TurtleBot3 Bringup Node</li>
+                <li><strong>목표 결과</strong>로봇 하드웨어-SBC 연동 및 원격 수동 제어 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>ROS2 노드 간 분산 발행/구독(Publish/Subscribe) 통신 아키텍처 및 DDS 네트워킹 구축 기술 습득</li>
+                <li>Twist 메시지 속도 선형 대수와 모바일 로봇 기구학 휠 스피드 변환 공식 매커니즘 이해</li>
+                <li>리눅스 udev 장치 규칙 작성을 통한 안정적인 임베디드 통신 드라이버 바인딩 역량 강화</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>ROS2 네트워크 통신 토픽 리스트 덤프 데이터</li>
+                <li>수동 주행 오도메트리 센서 피드 데이터 로그</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>네트워크 대역폭 불안정 시 키보드 입력이 늦게 반영되어 로봇이 계속 전진할 수 있으므로 주의해야 함</li>
+                <li>배터리 방전 시 모터가 오동작하므로 OpenCR LED에 전압 강하 경고가 뜨는지 주행 시 확인해야 함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day6-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 7 Modal -->
+  <div class="modal-overlay" id="day7Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day7ModalTitle">
+      <button class="modal-close" id="closeDay7Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 7 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day7ModalTitle">LiDAR 센서 데이터 연동 및 rviz2 3D 점군 시각화 셋업 (개발 5단계)</h3>
+        <p class="modal-subtitle">
+          LiDAR 센서 드라이버 패키지를 활성화하고 rviz2 3D 그래픽 도구로 거리 측정 점군 데이터를 매핑합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                LiDAR 노드 가동, LaserScan 토픽 구조 분석, rviz2 시각화 좌표 매핑 레이아웃 설정을 훈련하는 데이터 가공 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>LDS 드라이버 구동 및 LaserScan 토픽 수신</h5>
+                  <p>
+                    SBC에서 라이다 회전 모터를 기동하고 센서 패키지를 런칭합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>lds_flat_node 패키지 실행 및 라이다 스캔 모터 가동 검수</li>
+                    <li>sensor_msgs/msg/LaserScan 토픽의 ranges[] 거리 배열 인덱스 맵 분석</li>
+                    <li>각도별(0도 ~ 360도) 분해능 및 스캔 데이터 주기(Hz) 최적화</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>rviz2 GUI 레이아웃 설정 및 TF 좌표 트래킹</h5>
+                  <p>
+                    호스트 PC에서 rviz2를 실행하여 공간 데이터 레이어 좌표계를 구성합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>rviz2 실행 및 base_link / base_scan 로봇 중심 고정 프레임 지정</li>
+                    <li>LaserScan 디스플레이 모듈 추가 및 점군 포인트 크기/색상 시각 튜닝</li>
+                    <li>로봇의 회전 및 이동 시 각 관절 좌표계(TF 트리) 동적 동기화 모니터링</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>센서 거리 정확도 평가 및 반사율 측정</h5>
+                  <p>
+                    로봇 주변에 판자 장벽을 배치하여 rviz2 화면 계측 픽셀 거리값 정확도를 검증합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>라이다 측정 픽셀 점군 형상과 실물 기구 거리 오차(cm 오차) 검증</li>
+                    <li>라이다 센서 미세 렌즈 클리닝 및 감지 방해 인자(유리창 등) 특성 체크</li>
+                    <li>좌표 파일 셋업 프로필 저장 및 시각화 구성 완료</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">LiDAR Sensor</span>
+                <span class="outcome-tag">LaserScan</span>
+                <span class="outcome-tag">rviz2 GUI</span>
+                <span class="outcome-tag">TF Coordinate</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>라이다 드라이버 구동 + Rviz 시각화 실습</li>
+                <li><strong>실습 기반</strong>rviz2 3D graphical system</li>
+                <li><strong>목표 결과</strong>라이다 센서 가동 및 3D 점군 데이터 정합 셋업 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>LiDAR 레이저 거리 계측 하드웨어의 센서 동작 원리 및 극좌표계 변환 이해</li>
+                <li>rviz2 시각화 툴 환경 설계 및 3D 로봇 데이터 연동 기술 습득</li>
+                <li>모바일 로봇 좌표 변환 프레임(TF) 구조의 노드 관계 이해 및 디버깅 능력 배양</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>rviz2 그래픽 레이아웃 구성 파일</li>
+                <li>실시간 공간 점군 매핑 디스플레이 캡처 스크린</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>라이다 센서 렌즈에 스크래치나 먼지가 끼면 반사 점군이 튀는 계측 오차가 생기므로 청소 필요</li>
+                <li>네트워크 지연율이 높아지면 Rviz 화면에서 데이터가 끊어져 깜빡이는 현상이 발생함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day7-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 8 Modal -->
+  <div class="modal-overlay" id="day8Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day8ModalTitle">
+      <button class="modal-close" id="closeDay8Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 8 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day8ModalTitle">rclpy 파이썬 기반 실시간 장애물 비상 제동 안전 노드 개발 (개발 6단계)</h3>
+        <p class="modal-subtitle">
+          라이다 스캔 토픽 거리 데이터를 파이썬으로 가공하여 장애물 감지 시 강제 비상 제동합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                rclpy 기반 데이터 구독 코드 작성, 감지 각도 범위 임계값 필터 구현, 속도 제어 인터럽트 융합을 훈련하는 소프트웨어 코딩 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>rclpy LaserScan 토픽 서브스크라이버 작성</h5>
+                  <p>
+                    라이다 토픽 데이터를 수집하고 가공하기 위한 파이썬 구독 노드를 작성합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>rclpy.node.Node 기반 커스텀 안전 노드 클래스 생성 코딩</li>
+                    <li>거리 측정 배열(ranges)에서 전방각 영역(-15도 ~ +15도) 인덱스 필터링</li>
+                    <li>비계측 무한대 값 예외 처리 조건 추가</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>장애물 제동 /cmd_vel 속도 차단 발행 구현</h5>
+                  <p>
+                    위험 거리 도달 시 속도 명령을 차단하고 강제 스톱 Twist 토픽을 쏘는 로직을 설계합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>전방 최단 거리(minimum distance) 실시간 비교 연산 기능 작성</li>
+                    <li>비상 정지 플래그(E-Stop Flag) 상태에 의한 cmd_vel 속도 0 발행 로직 코딩</li>
+                    <li>키보드 조종 속도 명령 수신 가로채기 안전 필터 코드 설계</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>실물 장애물 충돌 방지 제동 검증</h5>
+                  <p>
+                    로봇을 수동 조종하여 벽에 진입시키고 충돌 없는 긴급 정지가 가동되는지 피드백 튜닝합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>장애물 감지 시점부터 실제 모터 속도가 차단되는 지연 시간 측정</li>
+                    <li>제동 감쇠 가중치 튜닝을 통해 모터 기어 충격을 감소시키는 감속 펄스 보정</li>
+                    <li>안전 스크립트 최종 가동 테스트</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">rclpy Custom Node</span>
+                <span class="outcome-tag">LaserScan Filter</span>
+                <span class="outcome-tag">Emergency Brake</span>
+                <span class="outcome-tag">Velocity Override</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>ROS2 파이썬 코딩 + 제동 임계 거리 실무 튜닝</li>
+                <li><strong>실습 기반</strong>rclpy ROS2 Library</li>
+                <li><strong>목표 결과</strong>실시간 충돌 방지 제어 안전 스크립트 구현 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>ROS2 rclpy 파이썬 프레임워크 기반 발행/구독(Publish/Subscribe) 제어 노드 제작 기법 마스터</li>
+                <li>라이다 센서의 raw LaserScan 빔 거리 값 배열을 물리적 공간 판단용 기하 신호로 전환하는 필터링 기술 숙달</li>
+                <li>로봇 수동 드라이브 신호 채널 사이에 비상 제동 우선순위를 할당하는 스키마 설계 역량 획득</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>안전 제동 노드 파이썬 소스(obstacle_stop.py)</li>
+                <li>제동 시 거리 측정값 기록 로그 텍스트 파일</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>센서 난반사 물체(검은색 등) 감지 시 임계 거리를 넓혀 보정 제어를 수행해야 함</li>
+                <li>10단계 실전 데모 수행 시, 본 안전 제동 코드가 백그라운드로 실행되어 충돌을 원천 차단함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day8-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 9 Modal -->
+  <div class="modal-overlay" id="day9Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day9ModalTitle">
+      <button class="modal-close" id="closeDay9Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 9 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day9ModalTitle">Cartographer SLAM 2D 실내 공간 맵핑 및 Navigation2 경로 계획 (개발 7단계)</h3>
+        <p class="modal-subtitle">
+          실시간 SLAM 기술로 실내 2D 지도를 제작하고 Navigation2 스택을 구성하여 자율주행을 설계합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Cartographer SLAM 노드 구동, 2D 맵 파일(.pgm, .yaml) 저장, Nav2 스택 가동 및 AMCL 위치 추정을 셋업하는 소프트웨어 개발 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>Cartographer SLAM 실시간 지도 빌드 및 저장</h5>
+                  <p>
+                    로봇을 수동 주행시켜 점군 스캔 매칭 기반 2D 실내 공간 지도를 작성합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>Cartographer SLAM 노드 실행 및 /map 토픽 활성화 확인</li>
+                    <li>루프 클로저(Loop Closure) 발생 유도로 주행 누적 오도메트리 오차 수정</li>
+                    <li>nav2_map_server map_saver_cli 유틸리티를 활용한 2D 격자 맵(.pgm, .yaml) 저장</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>Navigation2 스택 가동 및 AMCL 파티클 캘리브레이션</h5>
+                  <p>
+                    내비게이션 모듈들을 구동하고 로봇 실시간 정적 위치 캘리브레이션을 수행합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>Nav2 Bringup 스크립트 실행으로 전역 플래너 및 지역 컨트롤러 노드 런칭</li>
+                    <li>AMCL 파티클 필터를 지도 상에 캘리브레이션하기 위한 2D Pose Estimate 지정</li>
+                    <li>이동 궤적에 따른 코스트맵(Costmap) Inflation 안전 영역 계층 지정</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>자율 경로 생성(Global Path Planning) 확인</h5>
+                  <p>
+                    rviz2에서 목적지(2D Nav Goal)를 드래그하여 로봇의 자율 회피 경로가 정상적으로 계산되는지 평가합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>목적지 지정에 따른 글로벌 경로 시각 라인 파악</li>
+                    <li>DWA/TEB 로컬 패스 알고리즘에 따른 장애물 회피 궤적 계산 성능 진단</li>
+                    <li>로봇의 최고 이동 속도 제한 및 도착 정밀도 캘리브레이션 튜닝</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">SLAM Mapping</span>
+                <span class="outcome-tag">Cartographer Map</span>
+                <span class="outcome-tag">Navigation2</span>
+                <span class="outcome-tag">AMCL Config</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>SLAM 맵 빌딩 + Nav2 자율 경로 제어 튜닝</li>
+                <li><strong>실습 기반</strong>Cartographer & Navigation2 Stack</li>
+                <li><strong>목표 결과</strong>실내 2D 맵 생성 및 내비게이션 경로 자율 구동 성공</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>SLAM(Simultaneous Localization and Mapping) 이론 이해 및 누적 거리 왜곡 제어 능력 배양</li>
+                <li>AMCL(Adaptive Monte Carlo Localization) 기반 파티클 필터링 로봇 위치 확률적 추정 원리 학습</li>
+                <li>안전 반경을 포함하는 격자 지도 코스트맵(Costmap) 파라미터 튜닝 능력 확보</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>2D 공간 지도 파일 세트(map.yaml, map.pgm)</li>
+                <li>내비게이션 설정 파라미터 백업 파일</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>로봇 이동 속도를 너무 빠르게 조작하면 점군 매칭 왜곡으로 지도가 일그러지므로 정속 서행 주행해야 함</li>
+                <li>로봇 반경 대비 안전 마진 두께(Inflation Radius)가 좁으면 회전 기동 중 벽면에 충돌하게 됨</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day9-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 10 Modal -->
+  <div class="modal-overlay" id="day10Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day10ModalTitle">
+      <button class="modal-close" id="closeDay10Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 10 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day10ModalTitle">다중 웨이포인트(Waypoint) 순찰 자율 운행 및 동적 장애물 우회 관제 (검증 및 테스트)</h3>
+        <p class="modal-subtitle">
+          다중 경유지 순찰 코드를 작성하고 실시간 장애물 회피 기동 성능을 최종 검증합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                순차적 다중 경유지(Waypoint Follower) 액션 클라이언트 빌드, 돌발 장애물 투입 시 자율 경로 우회(Re-planning) 및 피칭 발표를 운영하는 최종 수료 평가 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>다중 웨이포인트 순찰(Waypoint Follower) 파이썬 액션 코드 작성</h5>
+                  <p>
+                    동적 경유지 좌표 리스트를 순서대로 하달하고 수신 피드백을 받는 노드를 개발합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>BasicNavigator API 래퍼 클래스를 이용한 다중 Pose 메시지 정의</li>
+                    <li>ROS2 Action 인터페이스 기반 도달 여부 및 이동 시간(ETA) 피드백 덤프 연동</li>
+                    <li>목적지 도착 시 로봇 동작 태스크(스핀 턴 또는 동작 정지) 스크립트 작성</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>돌발 장애물 자율주행 우회 및 제동 데모</h5>
+                  <p>
+                    관객들 앞에서 로봇의 자율 회피 우회 경로 생성 능력을 정량 평가합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>동적 장애물 출현 시 Local Costmap 실시간 갱신 및 우회 궤적 성공도 기록</li>
+                    <li>8단계 안전 제동 스크립트 가동에 의한 돌발 출돌 100% 방지 검증</li>
+                    <li>웨이포인트 순찰 미션 최단 시간 완주 및 목적지 정지 위치 정밀 오차 검수</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>최종 프로젝트 피칭 및 교육 수료 회고</h5>
+                  <p>
+                    기획서 및 페르소나가 요구한 기능 요건의 충족 여부를 최종 스피치로 증명하고 회고를 공유합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>조별 개발 로보틱스 스택 구성 및 공간 SLAM 맵 아웃풋 최종 피칭</li>
+                    <li>비동기 노드 통신 세션 및 TF 프레임 뒤틀림 문제 해결 트러블슈팅 지식 교류</li>
+                    <li>수수 평가 리워드 시상 및 전체 과정 수료 완료</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Action Client</span>
+                <span class="outcome-tag">Waypoint Patrol</span>
+                <span class="outcome-tag">Dynamic Re-planning</span>
+                <span class="outcome-tag">Final Pitching</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>비동기 액션 프로그래밍 + 실물 자율주행 데모</li>
+                <li><strong>실습 기반</strong>Completed TurtleBot3 Burger</li>
+                <li><strong>목표 결과</strong>로봇 자율 경유 순찰 데모 완수 및 성과 발표 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>비동기식 서비스 제어 인터페이스인 ROS2 Action 통신 아키텍처 설계 역량 마스터</li>
+                <li>실시간 맵 데이터와 Costmap 갱신을 융합하는 로봇 자율 임무 오케스트레이션 설계 기술 획득</li>
+                <li>기획서의 타겟 페르소나와 임무 시나리오 요구사양을 최종 작동 기기로 입증하는 엔지니어링 마인드 확립</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>다중 경유 순찰 제어 노드 파이썬 코드(patrol_fleet.py)</li>
+                <li>최종 2D 맵 데이터 및 데모 결과 평가서</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>목적지 허용 오차 반경(Tolerance)을 적절히 설정해야 휠이 헛돌며 동작이 멈추는 오작동을 예방함</li>
+                <li>동적으로 움직이는 장애물 진입 시 Costmap 업데이트 지연 레이턴시를 고려하여 비상 감속 게인을 조절해야 함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day10-ai-classroom_robotics.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function setupModal(openButtonId, modalId, closeButtonId) {
+      const openButton = document.getElementById(openButtonId);
+      const modal = document.getElementById(modalId);
+      const closeButton = document.getElementById(closeButtonId);
+
+      if (!openButton || !modal || !closeButton) return;
+
+      function openModal() {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      openButton.addEventListener('click', openModal);
+
+      openButton.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openModal();
+        }
+      });
+
+      closeButton.addEventListener('click', closeModal);
+
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+          closeModal();
+        }
+      });
+    }
+
+            setupModal('openDay1Modal', 'day1Modal', 'closeDay1Modal');
+    setupModal('openDay2Modal', 'day2Modal', 'closeDay2Modal');
+    setupModal('openDay3Modal', 'day3Modal', 'closeDay3Modal');
+    setupModal('openDay4Modal', 'day4Modal', 'closeDay4Modal');
+    setupModal('openDay5Modal', 'day5Modal', 'closeDay5Modal');
+    setupModal('openDay6Modal', 'day6Modal', 'closeDay6Modal');
+    setupModal('openDay7Modal', 'day7Modal', 'closeDay7Modal');
+    setupModal('openDay8Modal', 'day8Modal', 'closeDay8Modal');
+    setupModal('openDay9Modal', 'day9Modal', 'closeDay9Modal');
+    setupModal('openDay10Modal', 'day10Modal', 'closeDay10Modal');
+  </script>
+</body>
+</html>

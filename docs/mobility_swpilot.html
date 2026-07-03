@@ -1,0 +1,2712 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대구디지털혁신진흥원 AI 자율주행 모빌리티 과정 | 10-Step Learning Contents</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background: Deep Black */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Surface/Card: Dark Gray */
+      --text-main: #ffffff; /* Primary: White */
+      --text-muted: #e4e4e7; /* Secondary: Light Gray */
+      --text-desc: #71717a; /* Description: Gray */
+      --border-color: rgba(255, 255, 255, 0.08); /* Thin border with low opacity */
+      --accent-color: #06b6d4; /* Neon Cyan */
+      --accent-purple: #8b5cf6; /* Purple highlight */
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.65;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong { word-break: keep-all; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    section { padding: 80px 0; }
+    .bg-gray { background: transparent; }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 22px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .hero {
+      margin-top: 70px;
+      padding: 120px 0 90px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero h2 {
+      font-size: 1.3rem;
+      font-weight: 500;
+      opacity: 0.92;
+      margin-bottom: 22px;
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      opacity: 0.9;
+      max-width: 720px;
+      margin-bottom: 28px;
+    }
+
+    .hero-box {
+      background: rgba(26, 29, 36, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .hero-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.92rem;
+      color: white;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .hero-badge:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: white;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(59, 130, 246, 0.6), 0 0 15px rgba(6, 182, 212, 0.4);
+    }
+
+    .btn-outline {
+      border: 1.5px solid rgba(255,255,255,0.15);
+      color: white;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.4);
+      transform: translateY(-2px);
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.2rem;
+      color: #ffffff;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .section-title::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      margin: 12px auto 0;
+      border-radius: 999px;
+    }
+
+    .section-desc {
+      max-width: 860px;
+      margin: 0 auto 42px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.02rem;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .overview-card {
+      background: rgba(26, 29, 36, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--card-radius);
+      padding: 26px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .overview-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md), 0 0 15px rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    .overview-card .value {
+      font-size: 1.6rem;
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .overview-card .label {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .curriculum-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+
+    .course-card {
+      background: rgba(26, 29, 36, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 480px; /* Vertically tall cards */
+    }
+
+    .course-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md), 0 0 20px rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .course-card.is-clickable {
+      cursor: pointer;
+      position: relative;
+    }
+
+    .course-card.is-clickable::after {
+      content: "상세보기";
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(4px);
+      color: var(--secondary-color);
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 7px 12px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .course-card.is-clickable:hover::after {
+      background: var(--primary-color);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: var(--glow-blue);
+    }
+
+    .course-thumb {
+      height: 220px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .course-thumb.placeholder {
+      background: linear-gradient(135deg, rgba(26, 29, 36, 0.4), rgba(26, 29, 36, 0.8));
+      color: #71717a;
+      text-shadow: none;
+    }
+
+    .course-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    /* Hide detailed elements inside course-card to keep it simple, clean and concise */
+    .course-card .course-desc,
+    .course-card .meta-grid,
+    .course-card .time-list,
+    .course-card .meta-item {
+      display: none;
+    }
+
+    .day-label {
+      display: inline-block;
+      width: fit-content;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--secondary-color);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+    }
+
+    .course-title {
+      font-size: 1.22rem;
+      line-height: 1.35;
+      font-weight: 800;
+      color: #ffffff;
+      transition: color 0.2s ease;
+    }
+
+    .course-card:hover .course-title {
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .course-subtitle {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .course-desc {
+      color: var(--text-muted);
+      font-size: 0.96rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .meta-item {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px 14px;
+      font-size: 0.93rem;
+      color: var(--text-muted);
+    }
+
+    .meta-item strong {
+      color: var(--secondary-color);
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .time-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .time-row {
+      border-left: 3px solid rgba(6, 182, 212, 0.4);
+      padding-left: 12px;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+    }
+
+    .time-row strong {
+      color: var(--secondary-color);
+      margin-right: 6px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .tag:hover {
+      background: rgba(59, 130, 246, 0.15);
+      color: #ffffff;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .placeholder-note {
+      margin-top: auto;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-desc);
+      font-size: 0.92rem;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-cta {
+      background: #09090b;
+      color: white;
+      text-align: center;
+      padding: 70px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .footer-cta h3 {
+      font-size: 2rem;
+      margin-bottom: 14px;
+    }
+
+    .footer-cta p {
+      max-width: 760px;
+      margin: 0 auto;
+      opacity: 0.8;
+      color: var(--text-muted);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+      z-index: 2000;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 1100px;
+      max-height: 90vh;
+      overflow: auto;
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      transform: translateY(24px) scale(0.98);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: #ffffff;
+      z-index: 4;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: rotate(90deg);
+    }
+
+    .modal-hero {
+      background: linear-gradient(135deg, #09090b, #111827);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: white;
+      padding: 42px 36px 32px;
+      border-radius: 24px 24px 0 0;
+    }
+
+    .modal-day {
+      display: inline-flex;
+      padding: 8px 12px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--primary-color);
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      line-height: 1.2;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .modal-subtitle {
+      font-size: 1.04rem;
+      opacity: 0.92;
+      max-width: 760px;
+      color: var(--text-muted);
+    }
+
+    .modal-body {
+      padding: 34px 36px 36px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .modal-section {
+      margin-bottom: 26px;
+    }
+
+    .modal-section h4 {
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+      margin-bottom: 12px;
+      font-weight: 800;
+      text-shadow: var(--glow-cyan);
+    }
+
+    .modal-section p {
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .info-panel {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .info-panel h5 {
+      font-size: 0.96rem;
+      margin-bottom: 12px;
+      color: var(--secondary-color);
+      font-weight: 800;
+    }
+
+    .info-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .info-list li {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+    }
+
+    .info-list li strong {
+      color: var(--secondary-color);
+      margin-right: 6px;
+    }
+
+    .session-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .session-card {
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.01);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+
+    .session-card:hover {
+      border-color: rgba(59, 130, 246, 0.2);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .session-time {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--secondary-color);
+      background: rgba(6, 182, 212, 0.1);
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin-bottom: 10px;
+    }
+
+    .session-card h5 {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .session-card p {
+      color: #a1a1aa;
+      font-size: 0.95rem;
+    }
+
+    .bullet-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+      padding-left: 18px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .outcome-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .outcome-tag {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--secondary-color);
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid,
+      .overview-grid,
+      .modal-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .hero-grid,
+      .overview-grid,
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero h1 { font-size: 2.2rem; }
+      .hero h2 { font-size: 1.1rem; }
+      section { padding: 64px 0; }
+      .modal-hero { padding: 34px 22px 24px; }
+      .modal-body { padding: 24px 22px 28px; }
+      .modal-title { font-size: 1.55rem; }
+    }
+
+    .ai-class-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .ai-class-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5), 0 0 10px rgba(6, 182, 212, 0.3);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">대구디지털혁신진흥원 AI 자율주행 모빌리티 과정</a>
+      <ul class="nav-links">
+        <li><a href="index.html">과정 홈</a></li>
+        <li><a href="#overview">프로그램 소개</a></li>
+        <li><a href="#curriculum">10일 커리큘럼</a></li>
+        <li><a href="#final">최종 결과</a></li>
+      </ul>
+    </div>
+  </nav>
+
+      <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <h1>Self-Driving Mobility Kit Build</h1>
+        <h2>동키카(Donkey Car) 키트와 컴퓨터 비전을 활용하여 자율주행 알고리즘을 구현하는 10일 실무 과정</h2>
+        <p>
+          이 과정은 대구디지털혁신진흥원(DIP) 지원 하에, 소형 모빌리티 플랫폼 하드웨어 조립부터 임베디드 OS 환경 구축, OpenCV 기반 컴퓨터 비전 처리, 그리고 딥러닝(CNN) 주행 학습 모델의 실제 구동까지 경험하는 융합형 프로젝트입니다.
+        </p>
+        <a href="#curriculum" class="btn btn-primary">학습 콘텐츠 보기</a>
+        <a href="#final" class="btn btn-outline">최종 산출물 보기</a>
+      </div>
+      <div class="hero-box">
+        <h3>Program Focus</h3>
+        <div class="hero-badges">
+          <span class="hero-badge">Donkey Car</span>
+          <span class="hero-badge">Autonomous Drive</span>
+          <span class="hero-badge">Computer Vision</span>
+          <span class="hero-badge">TensorFlow/Keras</span>
+          <span class="hero-badge">Embedded Linux</span>
+          <span class="hero-badge">Track Racing</span>
+          <span class="hero-badge">Sensor Fusion</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+      <section id="overview">
+    <div class="container">
+      <h2 class="section-title">Program Overview</h2>
+      <p class="section-desc">
+        이 과정은 하드웨어와 AI 자율주행 기술을 결합하여 트랙 주행 성능을 최적화하는 10일 집중 실전형 과정입니다.
+      </p>
+
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="value">Donkey Car</div>
+          <div class="label">자율주행 RC카 하드웨어 플랫폼</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">Deep Learning</div>
+          <div class="label">주행 데이터 기반 실시간 CNN 학습</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">OpenCV</div>
+          <div class="label">컴퓨터 비전 차선 검출 필터</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">10 Days</div>
+          <div class="label">조립부터 실전 주행 및 랩타임 기록</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="curriculum" class="bg-gray">
+    <div class="container">
+      <h2 class="section-title">10-Step Learning Contents</h2>
+      <p class="section-desc">
+        모든 단계를 클릭하여 상세 단계별 세부 계획을 모달 팝업으로 확인하실 수 있습니다.
+      </p>
+
+      <div class="curriculum-grid">
+        <!-- Day 1 -->
+        <article class="course-card is-clickable" id="openDay1Modal" tabindex="0" role="button" aria-label="Day 1 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_planning.png'); filter: hue-rotate(0deg);; background-size: cover; background-position: center;">DAY 1</div>
+          <div class="course-content">
+            <span class="day-label">Step 1</span>
+            <h3 class="course-title">모빌리티 기획서 작성 및 서비스 목적 정의</h3>
+            <p class="course-subtitle">자율주행 모빌리티의 비즈니스 가치와 아이디어를 구체화하고 기획서를 작성합니다.</p>
+            <p class="course-desc">
+              서비스 개념을 정의하고 소형 자율주행 모빌리티가 필요한 문제 상황(예: 실내 스마트 물류, 자동 야간 순찰)을 설계하는 첫 번째 기획 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>모빌리티 기획 및 설계를 공부하는 수강생</div>
+              <div class="meta-item"><strong>준비물</strong>기획안 작성용 템플릿, 노트북</div>
+              <div class="meta-item"><strong>학습 목표</strong>핵심 가치 제안 및 모빌리티 서비스 기획서 초안 작성 완료</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 자율주행 모빌리티 트렌드 분석</div>
+              <div class="time-row"><strong>3시간</strong> 모빌리티 서비스 기획서 구체화</div>
+              <div class="time-row"><strong>1시간</strong> 기획안 발표 및 적합성 피드백</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Planning</span>
+              <span class="tag">Concept Design</span>
+              <span class="tag">Value Proposition</span>
+              <span class="tag">Problem Statement</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              모빌리티 서비스 기획서 파일 및 요약 보고서
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day1-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 2 -->
+        <article class="course-card is-clickable" id="openDay2Modal" tabindex="0" role="button" aria-label="Day 2 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_planning.png'); filter: hue-rotate(45deg);; background-size: cover; background-position: center;">DAY 2</div>
+          <div class="course-content">
+            <span class="day-label">Step 2</span>
+            <h3 class="course-title">가상 주행 트랙 환경 및 타겟 페르소나 설정</h3>
+            <p class="course-subtitle">로봇/차량 운용 시나리오를 구체화하기 위해 관리자 페르소나와 사용자 유즈케이스를 도출합니다.</p>
+            <p class="course-desc">
+              최종 사용자와 차량 운용 관리자의 페르소나를 모델링하고, 주행 트랙 규격과 주행 중 발생할 상태 이벤트 시나리오를 설계하는 분석 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>UX 설계 및 고객 가치 모델링 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>페르소나 템플릿, 사용자 여정 지도 가이드라인</div>
+              <div class="meta-item"><strong>학습 목표</strong>핵심 사용자 페르소나 정의 완료 및 주행 시나리오 스토리보드 수립</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 타겟 페르소나 모델링 워크숍</div>
+              <div class="time-row"><strong>3시간</strong> 사용자 여정 및 주행 시나리오 상세 설계</div>
+              <div class="time-row"><strong>1시간</strong> 시나리오 정의 피칭 및 피드백</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Persona Modeling</span>
+              <span class="tag">User Journey</span>
+              <span class="tag">Scenario Design</span>
+              <span class="tag">Use Case Chart</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              페르소나 정의 문서 및 주행 시나리오 스토리보드
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day2-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 3 -->
+        <article class="course-card is-clickable" id="openDay3Modal" tabindex="0" role="button" aria-label="Day 3 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_hardware.png'); filter: hue-rotate(90deg);; background-size: cover; background-position: center;">DAY 3</div>
+          <div class="course-content">
+            <span class="day-label">Step 3</span>
+            <h3 class="course-title">Donkey Car 하드웨어 섀시 및 조향 모터 조립 (개발 1단계)</h3>
+            <p class="course-subtitle">동키카 차량 플랫폼의 물리 섀시 프레임과 조향 링키지를 결합하여 기구부를 완성합니다.</p>
+            <p class="course-desc">
+              모빌리티 차량의 뼈대가 되는 하단 플레이트, 구동 DC 모터, 아커만 조향 기어 및 서스펜션을 조립하는 하드웨어 개발 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>기구 조립 및 소형 차체 조립 입문 수강생</div>
+              <div class="meta-item"><strong>준비물</strong>Donkey Car Chassis Kit, 조립 공구 세트</div>
+              <div class="meta-item"><strong>학습 목표</strong>물리 차량 섀시 조립 완료 및 휠 구동 기어 맞물림 검수 성공</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> Ackermann 조향 기하 구조 분석</div>
+              <div class="time-row"><strong>3시간</strong> 섀시 플레이트 및 서보 마운트 조립 실습</div>
+              <div class="time-row"><strong>1시간</strong> 조립부 작동 유격 및 마찰 점검</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Hardware Assembly</span>
+              <span class="tag">Chassis Build</span>
+              <span class="tag">Ackermann Steering</span>
+              <span class="tag">Mechanical Gear</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              조립 완성된 동키카 차량 물리 섀시 기구부
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day3-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 4 -->
+        <article class="course-card is-clickable" id="openDay4Modal" tabindex="0" role="button" aria-label="Day 4 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_planning.png'); filter: hue-rotate(135deg);; background-size: cover; background-position: center;">DAY 4</div>
+          <div class="course-content">
+            <span class="day-label">Step 4</span>
+            <h3 class="course-title">Raspberry Pi OS 플래싱 및 원격 SSH 연결 구축 (개발 2단계)</h3>
+            <p class="course-subtitle">SBC에 모빌리티용 리눅스 OS 이미지를 쓰고 무선 Wi-Fi 접속 및 SSH 원격 제어 환경을 셋업합니다.</p>
+            <p class="course-desc">
+              Etcher를 활용한 OS 쓰기, wpa_supplicant 네트워크 기술 설정 및 원격 터미널 명령 대기 환경을 완성하는 임베디드 리눅스 개발 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>리눅스 OS 설정 및 네트워크 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>Raspberry Pi 4, MicroSD 카드, Balena Etcher, wpa_supplicant 파일</div>
+              <div class="meta-item"><strong>학습 목표</strong>SBC OS 플래싱 완료 및 공유기 연결 기반 원격 SSH 쉘 접속 가동</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 동키카 최적화 리눅스 OS 이미지 라이팅</div>
+              <div class="time-row"><strong>3시간</strong> Wi-Fi 프로필 주입 및 원격 제어 포트 개방</div>
+              <div class="time-row"><strong>1시간</strong> SSH 원격 접속 확인 및 명령 콘솔 가동</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Linux OS Flashing</span>
+              <span class="tag">Headless Setting</span>
+              <span class="tag">SSH Connection</span>
+              <span class="tag">Network Profile</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              자동 네트워크 바인딩이 활성화된 SD 카드 탑재 보드
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day4-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 5 -->
+        <article class="course-card is-clickable" id="openDay5Modal" tabindex="0" role="button" aria-label="Day 5 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_hardware.png'); filter: hue-rotate(180deg);; background-size: cover; background-position: center;">DAY 5</div>
+          <div class="course-content">
+            <span class="day-label">Step 5</span>
+            <h3 class="course-title">PCA9685 I2C 모터 드라이버 배선 및 전기 캘리브레이션 (개발 3단계)</h3>
+            <p class="course-subtitle">SBC와 모터 드라이버 간 전기 신호 라인을 결선하고 조향 서보/스로틀 캘리브레이션을 튜닝합니다.</p>
+            <p class="course-desc">
+              I2C 통신 핀맵 결선, 모터 회로 전원 이중화 설계 및 서보 모터 동작 펄스 제한값을 미세 조정하는 제어 회로 개발 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>임베디드 제어 회로 결선 및 서보 제어 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>PCA9685 드라이버 보드, GPIO 결선 와이어, 멀티미터, 니켈수소 배터리</div>
+              <div class="meta-item"><strong>학습 목표</strong>I2C 결선 완료 및 조향 서보 최대 선회 조향 범위 캘리브레이션 파일 저장</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> PCA9685 통신 구조 및 파워 루프 설계</div>
+              <div class="time-row"><strong>3시간</strong> 전기 결선 및 브레드보드 전원 인터페이스 구축</div>
+              <div class="time-row"><strong>1시간</strong> 서보 모터 펄스 캘리브레이션 튜닝</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">I2C Bus Wiring</span>
+              <span class="tag">PCA9685 Board</span>
+              <span class="tag">Servo Calibration</span>
+              <span class="tag">Power Separation</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              조향각/스로틀 캘리브레이션 설정이 갱신된 myconfig.py 소스
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day5-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 6 -->
+        <article class="course-card is-clickable" id="openDay6Modal" tabindex="0" role="button" aria-label="Day 6 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_planning.png'); filter: hue-rotate(225deg);; background-size: cover; background-position: center;">DAY 6</div>
+          <div class="course-content">
+            <span class="day-label">Step 6</span>
+            <h3 class="course-title">무선 조종 서버 구동 및 매뉴얼 주행 드라이브 테스트 (개발 4단계)</h3>
+            <p class="course-subtitle">원격 주행 서버를 구동하고 스마트폰 또는 무선 게임패드를 결합해 수동 트랙 주행을 훈련합니다.</p>
+            <p class="course-desc">
+              로컬 구동 스크립트 실행, 웹 브라우저 조이스틱 UI 접속, 블루투스 게임패드 매핑 최적화 작업을 진행하는 인터페이스 설계 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>웹 소켓 실시간 통신 및 블루투스 연동 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>스마트폰 또는 블루투스 게임패드, 테스트 트랙</div>
+              <div class="meta-item"><strong>학습 목표</strong>웹 제어 콘솔 정상 가동, 무선 조종기 연동을 통한 트랙 코스 수동 완주 성공</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 로컬 드라이브 웹 서버 실행 및 카메라 연동</div>
+              <div class="time-row"><strong>3시간</strong> 블루투스 무선 조종 패드 바인딩 및 매퍼 튜닝</div>
+              <div class="time-row"><strong>1시간</strong> 수동 트랙 주행 훈련 및 드라이브 로그 분석</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Web Controller UI</span>
+              <span class="tag">Bluetooth Gamepad</span>
+              <span class="tag">Drive Server</span>
+              <span class="tag">Manual Drive Test</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              원격 조종에 매끄럽게 응답하는 동키카 시스템
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day6-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 7 -->
+        <article class="course-card is-clickable" id="openDay7Modal" tabindex="0" role="button" aria-label="Day 7 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_vision.png'); filter: hue-rotate(270deg);; background-size: cover; background-position: center;">DAY 7</div>
+          <div class="course-content">
+            <span class="day-label">Step 7</span>
+            <h3 class="course-title">OpenCV 기반 카메라 영상 전처리 및 차선 감지 구현 (개발 5단계)</h3>
+            <p class="course-subtitle">차선 추종을 위해 OpenCV 라이브러리로 차선을 인지하는 이미지 처리 파이프라인을 구축합니다.</p>
+            <p class="course-desc">
+              카메라 ROI 마스킹, 색공간(HSV) 이진화 필터링, Edge 감지 및 허프 변환을 통해 차선을 수학적 선으로 추출하는 컴퓨터 비전 개발 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>파이썬 이미지 프로세싱 및 컴퓨터 비전 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>호스트 PC, 파이썬 OpenCV IDE 환경, 샘플 트랙 비디오</div>
+              <div class="meta-item"><strong>학습 목표</strong>비전 처리 모듈 코딩 완료, 녹화본 이미지 기반 차선 인식 성공률 90% 달성</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 비디오 프레임 변환 및 색상 마스킹 필터링</div>
+              <div class="time-row"><strong>3시간</strong> 관심 영역(ROI) 필터링 및 캐니 엣지 차선 추출</div>
+              <div class="time-row"><strong>1시간</strong> 실시간 차선 탐색 가이드 오버레이 합성</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">OpenCV</span>
+              <span class="tag">Canny Edge</span>
+              <span class="tag">Hough Transform</span>
+              <span class="tag">Lane Filter</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              OpenCV 차선 감지 알고리즘 파이썬 모듈 코드
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day7-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 8 -->
+        <article class="course-card is-clickable" id="openDay8Modal" tabindex="0" role="button" aria-label="Day 8 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_vision.png'); filter: hue-rotate(315deg);; background-size: cover; background-position: center;">DAY 8</div>
+          <div class="course-content">
+            <span class="day-label">Step 8</span>
+            <h3 class="course-title">AI 모델 학습용 자율주행 데이터(Tub) 수집 및 정제 가공 (개발 6단계)</h3>
+            <p class="course-subtitle">차선 추종 인공지능을 훈련하기 위한 고품질 학습 이미지 및 조향 값 데이터셋을 적재합니다.</p>
+            <p class="course-desc">
+              트랙 정/역방향 주행 캡처, 탈선 복구 복귀 궤적 로깅 및 노이즈 데이터 삭제 스크립트 처리를 다루는 데이터 엔지니어링 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>데이터 설계 및 기계학습 전처리 입문자</div>
+              <div class="meta-item"><strong>준비물</strong>Donkey Car 차량, 학습용 트랙, 데이터 분석 툴셋</div>
+              <div class="meta-item"><strong>학습 목표</strong>총 1.5만 장 이상의 정제 주행 이미지 프레임 캡처 및 학습 데이터팩 압축 성공</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 동키카 Tub 디렉토리 및 메타 파일 분석</div>
+              <div class="time-row"><strong>3시간</strong> 트랙 정/역방향 및 복귀 수동 드라이빙 로깅</div>
+              <div class="time-row"><strong>1시간</strong> 데이터 분포 시각화 및 불량 프레임 정제</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Data Capture</span>
+              <span class="tag">Dataset Cleaning</span>
+              <span class="tag">Histogram Analysis</span>
+              <span class="tag">Tub Storage</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              학습 무결성이 확보된 1.5만 장 크기의 자율주행 데이터셋 zip 파일
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day8-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 9 -->
+        <article class="course-card is-clickable" id="openDay9Modal" tabindex="0" role="button" aria-label="Day 9 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_planning.png'); filter: hue-rotate(60deg);; background-size: cover; background-position: center;">DAY 9</div>
+          <div class="course-content">
+            <span class="day-label">Step 9</span>
+            <h3 class="course-title">TensorFlow CNN 자율주행 모델 학습 및 TFLite 가중치 업로드 (개발 7단계)</h3>
+            <p class="course-subtitle">학습된 데이터를 기반으로 CNN 인공신경망 가중치 모델을 훈련시키고 차량에 배포합니다.</p>
+            <p class="course-desc">
+              GPU 기반 신경망 학습 파이프라인 가동, Loss 오차 분석, 가중치 최적화 변환(TFLite) 및 임베디드 파일럿 가동을 실행하는 인공지능 융합 개발 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>머신러닝 신경망 학습 및 모델 최적화 개발자</div>
+              <div class="meta-item"><strong>준비물</strong>호스트 GPU 서버 또는 Google Colab, TensorFlow 라이브러리, SCP 전송 툴</div>
+              <div class="meta-item"><strong>학습 목표</strong>CNN 학습 검증 손실(Val Loss) 0.05 이하 달성 및 TFLite 변환 가중치 탑재 추론 실행 완료</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> Keras CNN 아키텍처 설정 및 학습 커널 가동</div>
+              <div class="time-row"><strong>3시간</strong> 모델 트레이닝 실행 및 Loss 훈련 오차 그래프 진단</div>
+              <div class="time-row"><strong>1시간</strong> TensorFlow Lite 변환 및 자율주행 인스턴스 런칭</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Keras CNN</span>
+              <span class="tag">Model Training</span>
+              <span class="tag">Loss Chart</span>
+              <span class="tag">TFLite Quantize</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              임베디드 보드에 배포 가동된 자율주행 인공지능 가중치(pilot.tflite)
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day9-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+        <!-- Day 10 -->
+        <article class="course-card is-clickable" id="openDay10Modal" tabindex="0" role="button" aria-label="Day 10 상세 커리큘럼 열기">
+          <div class="course-thumb" style="background-image: url('img/mobility_race.png');; background-size: cover; background-position: center;">DAY 10</div>
+          <div class="course-content">
+            <span class="day-label">Step 10</span>
+            <h3 class="course-title">자율주행 트랙 장애물 회피 테스트 및 랩타임 검증 (검증 및 테스트)</h3>
+            <p class="course-subtitle">센서 융합 전방 장애물 안전 정지 테스트를 진행하고 공식 트랙 레이스로 최종 모델 성능을 검증합니다.</p>
+            <p class="course-desc">
+              거리 센서 GPIO 하드웨어 결합, 비상 브레이크 감속 제어 노드 연동 및 공식 트랙 랩타임 대회를 통해 성과를 정량 수료하는 최종 평가 단계입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>수강생 프로젝트 최종 성과 검증 평가팀</div>
+              <div class="meta-item"><strong>준비물</strong>공식 규격 트랙 코스, 비상 감지 장애물, 랩타임 기록 게이트</div>
+              <div class="meta-item"><strong>학습 목표</strong>장애물 충돌 없는 완전 자율주행 트랙 완주 성공 및 최종 프로젝트 성과 보고 피칭</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 초음파/라이다 장애물 센서 물리 결합 및 제동 FSM 설계</div>
+              <div class="time-row"><strong>3시간</strong> 공식 자율주행 트랙 랩타임 토너먼트 대회</div>
+              <div class="time-row"><strong>1시간</strong> 최종 프로젝트 피치 및 전체 회고</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Sensor Integration</span>
+              <span class="tag">Emergency Stop</span>
+              <span class="tag">Laptime Race</span>
+              <span class="tag">Final Milestone Pitch</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              자율주행 성공 공식 랩타임 인증 데이터 및 프로젝트 발표 요약지
+            </div>
+
+            <div style="margin-top: 14px;">
+              <a href="day10-ai-classroom_mobility.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+  </section>
+
+      <section id="final">
+    <div class="container">
+      <h2 class="section-title">Final Outcome</h2>
+      <p class="section-desc">
+        이 과정의 목표는 단순 학습이 아니라, 실제로 동작하는 임베디드 AI 자율주행 모빌리티를 튜닝하고 검증하는 것입니다.
+      </p>
+
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="value">Auto-Drive</div>
+          <div class="label">자율주행 트랙 주행 완료</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">Dataset</div>
+          <div class="label">트랙 주행 학습용 데이터셋</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">Deep Model</div>
+          <div class="label">최적화된 CNN 제어 가중치</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">Demo Pitch</div>
+          <div class="label">최종 랩타임 대회 및 발표</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-cta">
+    <h3>From Assembly to Autonomous Run</h3>
+    <p>
+      10일 과정에 걸쳐 소형 모빌리티 하드웨어를 직접 조립하고, 컴퓨터 비전 및 AI 기반의 자율주행 소프트웨어를 결합하여 트랙 주행을 성공시키는 실물 융합형 프로젝트 과정입니다.
+    </p>
+  </footer>
+
+
+
+
+
+  <!-- Day 1 Modal -->
+  <div class="modal-overlay" id="day1Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day1ModalTitle">
+      <button class="modal-close" id="closeDay1Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 1 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day1ModalTitle">모빌리티 기획서 작성 및 서비스 목적 정의</h3>
+        <p class="modal-subtitle">
+          자율주행 모빌리티의 비즈니스 가치와 아이디어를 구체화하고 기획서를 작성합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                서비스 개념을 정의하고 소형 자율주행 모빌리티가 필요한 문제 상황(예: 실내 스마트 물류, 자동 야간 순찰)을 설계하는 첫 번째 기획 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>자율주행 모빌리티 트렌드 분석</h5>
+                  <p>
+                    물류 및 유통 부문에서의 자율주행 모빌리티 도입 사례와 비즈니스 모델을 연구합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>라스트 마일 배송 및 스마트 팩토리 물류 트렌드 파악</li>
+                    <li>동키카 아키텍처에 구현 가능한 모빌리티 서비스 후보군 도출</li>
+                    <li>기획 아이디어 구조 설계</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>모빌리티 서비스 기획서 구체화</h5>
+                  <p>
+                    해결하고자 하는 문제 상황을 규정하고, 모빌리티가 제공할 솔루션 구조를 명문화합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>문제 정의서(Problem Statement) 및 서비스 가치 명세서 작성</li>
+                    <li>차량의 필수 하드웨어 요구사양 리스트 정리</li>
+                    <li>최종 평가 트랙 랩타임 목표 및 서비스 가이드라인 정의</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>기획안 발표 및 적합성 피드백</h5>
+                  <p>
+                    각 조별 기획안을 피칭하고, 실물 하드웨어 제약 내 구현 가능한지 검수 피드백을 공유합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>모빌리티 서비스 컨셉 요약 스피치</li>
+                    <li>구현 타당성 및 센서 사양 제한에 따른 설계 범위 수정</li>
+                    <li>기획서 업데이트 및 피드백 회고</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Planning</span>
+                <span class="outcome-tag">Concept Design</span>
+                <span class="outcome-tag">Value Proposition</span>
+                <span class="outcome-tag">Problem Statement</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>기획 세션 + 발표 피드백</li>
+                <li><strong>실습 기반</strong>Service Planning Guide</li>
+                <li><strong>목표 결과</strong>서비스 목적 정의 및 기획 문서 작성 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>자율주행 모빌리티 도메인의 핵심 비즈니스 니즈 발굴 및 문제 정의 능력 배양</li>
+                <li>기획 단계에서의 하드웨어적 제약 사항과 타당성을 조율하는 실무 프로세스 이해</li>
+                <li>아이디어를 명확히 요약하여 설계 요구안으로 전환하는 문서화 역량 강화</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>모빌리티 서비스 기획서(PPT 또는 PDF)</li>
+                <li>하드웨어 및 센서 부품 필요 검토서</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>작성한 기획서는 최종 10단계에서 실제 결과물과 비교 및 검증 지표로 사용함</li>
+                <li>사용자 요구사항 정의를 바탕으로 2단계의 구체적인 사용자 시나리오 설계로 연결됨</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day1-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 2 Modal -->
+  <div class="modal-overlay" id="day2Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day2ModalTitle">
+      <button class="modal-close" id="closeDay2Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 2 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day2ModalTitle">가상 주행 트랙 환경 및 타겟 페르소나 설정</h3>
+        <p class="modal-subtitle">
+          로봇/차량 운용 시나리오를 구체화하기 위해 관리자 페르소나와 사용자 유즈케이스를 도출합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                최종 사용자와 차량 운용 관리자의 페르소나를 모델링하고, 주행 트랙 규격과 주행 중 발생할 상태 이벤트 시나리오를 설계하는 분석 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>타겟 페르소나 모델링 워크숍</h5>
+                  <p>
+                    모빌리티 차량의 운행 상태를 실시간 제어하거나 서비스를 제공받는 페르소나를 작성합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>가상 고객 및 관제 관리자 프로필(성격, 작업 흐름, 페인 포인트) 설정</li>
+                    <li>페르소나 관점에서의 모빌리티 운행 필요성 분석 및 정의</li>
+                    <li>페르소나 요구사항의 우선순위 정렬</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>사용자 여정 및 주행 시나리오 상세 설계</h5>
+                  <p>
+                    차량의 주차, 주행 기동, 장애물 출현 시 긴급 정지 등의 주행 스토리보드를 세부 설계합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>출발지부터 도착지까지의 모빌리티 주행 상태 다이어그램 작성</li>
+                    <li>오동작 상황 및 수동 긴급 차단(E-Stop)이 필요한 유즈케이스 시나리오 구체화</li>
+                    <li>트랙 레이아웃 규격 검토 및 가상의 주행 장애물 상황 명세 작성</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>시나리오 정의 피칭 및 피드백</h5>
+                  <p>
+                    구축한 페르소나 및 주행 유즈케이스를 팀 간 교차 검증하고 수정 사항을 정리합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>팀별 페르소나 스토리보드 기획 발표</li>
+                    <li>사용자 동선과 모빌리티 동작의 논리적 모순점 피드백 정리</li>
+                    <li>주행 시나리오 최종 승인 및 3단계 하드웨어 조립 요구 조건 매핑</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Persona Modeling</span>
+                <span class="outcome-tag">User Journey</span>
+                <span class="outcome-tag">Scenario Design</span>
+                <span class="outcome-tag">Use Case Chart</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>UX 설계 실습 + 팀 피드백 토론</li>
+                <li><strong>실습 기반</strong>Persona Design Toolkit</li>
+                <li><strong>목표 결과</strong>타겟 페르소나 정의 및 시나리오 셋업 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>사용자 중심 설계(UCD) 관점에서 페르소나의 요구사항과 동작 제약을 맵핑하는 감각 체득</li>
+                <li>실물 트랙의 물리적 배치와 사용자 동선에 입각한 현실적인 가상 주행 시나리오 설계 역량 획득</li>
+                <li>예외 상황(장애물, 탈선) 발생 시 사용자의 대처 프로세스 시뮬레이션 기법 숙달</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>타겟 페르소나 시트</li>
+                <li>주행 시나리오 유즈케이스 명세서</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>도출된 시나리오는 5단계의 모터 제어 및 7단계의 이미지 차선 검출 필터 설계의 기준이 됨</li>
+                <li>10단계 장애물 비상 제동 실전 시연 시 본 페르소나 스토리의 임무 완성도 지표를 체크함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day2-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 3 Modal -->
+  <div class="modal-overlay" id="day3Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day3ModalTitle">
+      <button class="modal-close" id="closeDay3Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 3 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day3ModalTitle">Donkey Car 하드웨어 섀시 및 조향 모터 조립 (개발 1단계)</h3>
+        <p class="modal-subtitle">
+          동키카 차량 플랫폼의 물리 섀시 프레임과 조향 링키지를 결합하여 기구부를 완성합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                모빌리티 차량의 뼈대가 되는 하단 플레이트, 구동 DC 모터, 아커만 조향 기어 및 서스펜션을 조립하는 하드웨어 개발 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>Ackermann 조향 기하 구조 분석</h5>
+                  <p>
+                    차량 조향 바퀴의 회전 각도 차이를 만들어내는 아커만 조향의 물리 구조를 설명합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>아커만 스티어링 링키지 링크 작동 원리 규명</li>
+                    <li>DC 구동 모터 파워트레인 및 디퍼렌셜 기어박스 분해도 분석</li>
+                    <li>기구부 조립 체크리스트 작성</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>섀시 플레이트 및 서보 마운트 조립 실습</h5>
+                  <p>
+                    프레임에 모터 가이드와 휠 링키지를 기하 규격에 맞춰 체결합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>디퍼렌셜 기어 박스 조립 및 DC 모터 구동 축 결합</li>
+                    <li>조향 서보 모터 안착 및 스티어링 로드 수평 결합</li>
+                    <li>타이어 및 서스펜션 스프링 결합 및 휠 평행 정렬</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>조립부 작동 유격 및 마찰 점검</h5>
+                  <p>
+                    바퀴의 구름성과 조향 링크의 작동 범위를 수동 테스트하여 보정합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>수동 휠 회전을 통한 디퍼렌셜 기어 간섭 마찰 확인</li>
+                    <li>좌/우 최대 조향 시 기구 구조물 충돌 범위 점검 및 나사 유격 보강</li>
+                    <li>차체 상단 지지 마운트 가이드 조립 마무리</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Hardware Assembly</span>
+                <span class="outcome-tag">Chassis Build</span>
+                <span class="outcome-tag">Ackermann Steering</span>
+                <span class="outcome-tag">Mechanical Gear</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>기구부 조립 실습 + 구조 역학 교육</li>
+                <li><strong>실습 기반</strong>Donkey Car Mechanical Kit</li>
+                <li><strong>목표 결과</strong>물리 차체 섀시 조립 및 조향 링키지 셋업 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>RC 차량 기반의 서스펜션, 동력 전달 구조 및 아커만 조향의 물리적 기학 원리 습득</li>
+                <li>기구 부품 조립 시 마찰 저항을 조절하고 정밀 수평 정렬을 유지하는 캘리브레이션 능력 획득</li>
+                <li>하드웨어 조립 강성 확보가 자율주행 성능 안정화에 기여하는 연관성 학습</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>조립 완성형 동키카 섀시 차량</li>
+                <li>물리 기구 조립 무결성 체크 결과서</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>기구 유격 조립이 미흡하면 주행 중 직진 제어가 튀므로 나사를 튼튼히 조여야 함</li>
+                <li>5단계 I2C 모터 드라이브 배선 및 보드 장착을 위한 프레임 지지 기반을 제공함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day3-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 4 Modal -->
+  <div class="modal-overlay" id="day4Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day4ModalTitle">
+      <button class="modal-close" id="closeDay4Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 4 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day4ModalTitle">Raspberry Pi OS 플래싱 및 원격 SSH 연결 구축 (개발 2단계)</h3>
+        <p class="modal-subtitle">
+          SBC에 모빌리티용 리눅스 OS 이미지를 쓰고 무선 Wi-Fi 접속 및 SSH 원격 제어 환경을 셋업합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Etcher를 활용한 OS 쓰기, wpa_supplicant 네트워크 기술 설정 및 원격 터미널 명령 대기 환경을 완성하는 임베디드 리눅스 개발 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>동키카 최적화 리눅스 OS 이미지 라이팅</h5>
+                  <p>
+                    임베디드 리눅스 기반 커스텀 이미지를 마이크로 SD 카드에 탑재합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>TensorFlow 및 Python 라이브러리가 포함된 임베디드 이미지 로드</li>
+                    <li>Balena Etcher 툴을 이용한 SD 카드 플래싱 및 파티션 테이블 확인</li>
+                    <li>Headless 부팅 설정을 위한 boot 영역 디렉토리 마운트 분석</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>Wi-Fi 프로필 주입 및 원격 제어 포트 개방</h5>
+                  <p>
+                    로컬 공유기 환경에 자동 부팅 시 연동되도록 무선 네트워크 프로필을 설정합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>boot/wpa_supplicant.conf 파일 내 무선 대역폭 정보 설정 기입</li>
+                    <li>SSH 보안 접속 활성화를 위한 ssh.txt 빈 파일 생성 작성</li>
+                    <li>SBC 고정 IP 셋업을 위한 IP 예약 설정 및 공유기 할당 이력 검사</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>SSH 원격 접속 확인 및 명령 콘솔 가동</h5>
+                  <p>
+                    호스트 PC에서 원격 SSH 접속을 실행하고 환경 라이브러리 작동 여부를 테스트합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>원격 명령 포지션(ssh pi@ip_address) 쉘 런칭 점검</li>
+                    <li>리눅스 시스템 로그(dmesg) 분석 및 I2C 디바이스 버스 포트 상태 점검</li>
+                    <li>파이썬 패키지 및 동키 프레임워크 임포트 구동 검사</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Linux OS Flashing</span>
+                <span class="outcome-tag">Headless Setting</span>
+                <span class="outcome-tag">SSH Connection</span>
+                <span class="outcome-tag">Network Profile</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>OS 플래싱 + 리눅스 설정 실습</li>
+                <li><strong>실습 기반</strong>Donkey OS Linux</li>
+                <li><strong>목표 결과</strong>SBC 원격 접속 및 명령 실행 제어 환경 완성</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>모니터/마우스 없이 임베디드 기기 환경을 제어하는 Headless 설치 및 셋업 스킬 획득</li>
+                <li>리눅스 운영체제 부트 프로세스 및 네트워크 인터페이스 제어 쉘 명령어 이해</li>
+                <li>보안 직렬 원격 쉘(SSH) 통신 채널에 대한 이해 및 실무 터미널 활용</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>OS 설정이 탑재된 MicroSD 카드</li>
+                <li>원격 SSH 접속 명령 세션 아웃풋 로그</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>무선 접속이 불안정하면 주행 중 데이터 프레임 전송 유실이 일어나므로 와이파이 감도 체크 필요</li>
+                <li>5단계 I2C 모터 드라이버 테스트 시 명령 제어를 보낼 수 있는 리눅스 콘솔 터미널 역할을 함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day4-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 5 Modal -->
+  <div class="modal-overlay" id="day5Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day5ModalTitle">
+      <button class="modal-close" id="closeDay5Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 5 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day5ModalTitle">PCA9685 I2C 모터 드라이버 배선 및 전기 캘리브레이션 (개발 3단계)</h3>
+        <p class="modal-subtitle">
+          SBC와 모터 드라이버 간 전기 신호 라인을 결선하고 조향 서보/스로틀 캘리브레이션을 튜닝합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                I2C 통신 핀맵 결선, 모터 회로 전원 이중화 설계 및 서보 모터 동작 펄스 제한값을 미세 조정하는 제어 회로 개발 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>PCA9685 통신 구조 및 파워 루프 설계</h5>
+                  <p>
+                    I2C 버스 제어를 담당하는 PCA9685의 레지스터 구조와 핀 결선을 학습합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>라즈베리파이 I2C (SDA, SCL) 포트 배선 및 전원 신호선 정의</li>
+                    <li>서보 모터 채널 1, ESC 변속기 채널 0 결선 핀 정의</li>
+                    <li>급격한 전력 모터 가동 시 전압 강하(Drop) 예방을 위한 Pi 전원 분리 이중화 설계</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>전기 결선 및 브레드보드 전원 인터페이스 구축</h5>
+                  <p>
+                    차량 배터리와 변속기를 연결하고 제어 와이어를 조립 장착합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>쇼트 방지 캡슐을 사용한 점퍼 결선 및 ESC 모터 배선 체결</li>
+                    <li>NiMH 전지 변속기 주 전원 체결 및 피드백 상태 램프 체크</li>
+                    <li>i2cdetect -y 1 명령을 통한 I2C 통신 주소 0x40 인식 성공 검증</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>서보 모터 펄스 캘리브레이션 튜닝</h5>
+                  <p>
+                    동키카 CLI 도구를 사용해 스티어링 중립 및 좌우 최대 펄스 임계치를 보정합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>donkey calibrate 명령어로 조향 장치 가동 및 최대 좌/우 회전 펄스값 측정</li>
+                    <li>스로틀 전진 동작 개시 최소 펄스 및 후진 제동 펄스 캘리브레이션</li>
+                    <li>추출된 펄스값을 myconfig.py 환경 파일 설정 값에 영구 저장</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">I2C Bus Wiring</span>
+                <span class="outcome-tag">PCA9685 Board</span>
+                <span class="outcome-tag">Servo Calibration</span>
+                <span class="outcome-tag">Power Separation</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>회로 결선 실습 + CLI 캘리브레이션 튜닝</li>
+                <li><strong>실습 기반</strong>Raspberry Pi & PCA9685 Drive</li>
+                <li><strong>목표 결과</strong>임베디드 회로 연동 및 차량 모터 제어 보정 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>임베디드 제어의 기본 직렬 I2C 통신 및 GPIO 결선 레이아웃 설계 기술 습득</li>
+                <li>모터 동작 전류와 제어 논리 전원을 격리하는 파워 세퍼레이션 원리 학습</li>
+                <li>물리 액추에이터 동작 임계 펄스를 튜닝하고 제어 환경 파일에 매핑하는 과정 숙달</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>배선 조립이 완료된 동키카 전기 회로부</li>
+                <li>스티어링/스로틀 최종 보정 제어 가중치 데이터셋</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>캘리브레이션 조향 값이 틀어지면 직진 주행 시 차선을 이탈하므로 미세 보정이 매우 중요함</li>
+                <li>6단계 무선 조종 서버 구동 시, 본 단계에서 수립된 캘리브레이션 펄스가 기준 제어로 출력됨</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day5-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 6 Modal -->
+  <div class="modal-overlay" id="day6Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day6ModalTitle">
+      <button class="modal-close" id="closeDay6Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 6 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day6ModalTitle">무선 조종 서버 구동 및 매뉴얼 주행 드라이브 테스트 (개발 4단계)</h3>
+        <p class="modal-subtitle">
+          원격 주행 서버를 구동하고 스마트폰 또는 무선 게임패드를 결합해 수동 트랙 주행을 훈련합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                로컬 구동 스크립트 실행, 웹 브라우저 조이스틱 UI 접속, 블루투스 게임패드 매핑 최적화 작업을 진행하는 인터페이스 설계 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>로컬 드라이브 웹 서버 실행 및 카메라 연동</h5>
+                  <p>
+                    SBC 환경에서 조종서버 명령을 켜고 실시간 비디오 스트리밍을 모니터링합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>python manage.py drive 실행을 통한 로컬 웹 서버(8887 포트) 런칭</li>
+                    <li>모바일 기기로 웹 조종 UI 접속 및 카메라 영상 FPS 전송 지연 평가</li>
+                    <li>웹 화면 상의 가상 조이스틱 터치 조종 반응도 확인</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>블루투스 무선 조종 패드 바인딩 및 매퍼 튜닝</h5>
+                  <p>
+                    게임패드의 조이스틱 아날로그 전압 축을 스티어링/스로틀 채널에 일관되게 결합합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>linux bluetoothctl 유틸리티를 이용한 게임패드 페어링 및 신뢰 등록</li>
+                    <li>조향각 스케일 팩터(Scale Factor) 설정으로 오버스티어 현상 감쇄 튜닝</li>
+                    <li>조이스틱 버튼 입력에 맞춘 비상 동력 차단 제어 코드 구현</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>수동 트랙 주행 훈련 및 드라이브 로그 분석</h5>
+                  <p>
+                    트랙을 따라 차량을 수동 주행시키며 랩타임을 분석하고 차선 이탈 반응을 기록합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>곡선 코너 구간 통과 속도 및 스티어링 정밀 감도 조율</li>
+                    <li>안정적인 데이터셋 수집을 위한 차선 중심 주행 드라이빙 훈련</li>
+                    <li>배터리 전압 변화에 따른 모터 반응 감쇠 체크</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Web Controller UI</span>
+                <span class="outcome-tag">Bluetooth Gamepad</span>
+                <span class="outcome-tag">Drive Server</span>
+                <span class="outcome-tag">Manual Drive Test</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>웹 서버 가동 + 무선 기기 페어링 주행 실습</li>
+                <li><strong>실습 기반</strong>Donkeycar Local Drive Engine</li>
+                <li><strong>목표 결과</strong>수동 무선 조종 연동 및 조종 반응 파라미터 튜닝 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>웹소켓 프로토콜 기반 저지연 데이터 피드 및 제어 패킷 전송 메커니즘 파악</li>
+                <li>리눅스 블루투스 통신 인프라 제어 및 물리 장치 드라이버 신호 바인딩 스킬 체득</li>
+                <li>실물 기기 운행 테스트를 통한 스티어링 스케일 및 스로틀 제한 최적화 튜닝 역량 확보</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>무선 조종 캘리브레이션이 설정된 myconfig.py</li>
+                <li>트랙 수동 완주 랩타임 데이터 기록지</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>데이터 수집 시 수동 주행 완성도가 기계학습 모델의 성능에 직접 반영됨을 인지함</li>
+                <li>8단계 주행 데이터셋 기록 시 수동 조종 서버 인터페이스를 직접 활용함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day6-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 7 Modal -->
+  <div class="modal-overlay" id="day7Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day7ModalTitle">
+      <button class="modal-close" id="closeDay7Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 7 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day7ModalTitle">OpenCV 기반 카메라 영상 전처리 및 차선 감지 구현 (개발 5단계)</h3>
+        <p class="modal-subtitle">
+          차선 추종을 위해 OpenCV 라이브러리로 차선을 인지하는 이미지 처리 파이프라인을 구축합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                카메라 ROI 마스킹, 색공간(HSV) 이진화 필터링, Edge 감지 및 허프 변환을 통해 차선을 수학적 선으로 추출하는 컴퓨터 비전 개발 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>비디오 프레임 변환 및 색상 마스킹 필터링</h5>
+                  <p>
+                    카메라 입력을 이진 이미지로 전환하여 차선 색상을 분리합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>RGB 채널 대비 조명 변화에 강한 HSV(Hue, Saturation, Value) 전환</li>
+                    <li>임계 영역 필터를 통한 차선 노란색/흰색 픽셀 영역 검출</li>
+                    <li>가우시안 블러 처리를 통한 노이즈 픽셀 감쇠 전처리</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>관심 영역(ROI) 필터링 및 캐니 엣지 차선 추출</h5>
+                  <p>
+                    차량 상단의 불필요한 배경 요소를 제거하고 차선 경계선을 검출합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>다각형 관심영역(Region of Interest) 마스킹 연산 코드 작성</li>
+                    <li>Canny Edge Detection 임계치 설정을 통한 외곽 경계선 검출</li>
+                    <li>Hough Transform Line Detection 기반 격자 벡터 차선 후보군 도출</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>실시간 차선 탐색 가이드 오버레이 합성</h5>
+                  <p>
+                    추출한 양방향 차선 라인을 캡처 영상 프레임 위에 겹쳐 렌더링하고 시각적 정확성을 테스트합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>검출된 좌우 차선 평균값 추정 및 중앙 궤적 차선 오버레이 렌더링</li>
+                    <li>곡선 코너 구간에서의 차선 소실 예외 처리 코드 추가</li>
+                    <li>SBC에서의 실시간 처리를 위한 알고리즘 연산량 튜닝</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">OpenCV</span>
+                <span class="outcome-tag">Canny Edge</span>
+                <span class="outcome-tag">Hough Transform</span>
+                <span class="outcome-tag">Lane Filter</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>비전 프로그래밍 + 오버레이 시뮬레이션</li>
+                <li><strong>실습 기반</strong>OpenCV OpenCV Library</li>
+                <li><strong>목표 결과</strong>컴퓨터 비전 차선 검출 필터 개발 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>화소 변환, 색공간 모델링 등 컴퓨터 비전 기본 이미지 전처리 지식 획득</li>
+                <li>Canny 엣지 및 Hough 선 검출을 융합하는 공간 인식 알고리즘 논리 구현</li>
+                <li>동적 이미지 프로세싱 시 프레임 레이트(FPS) 최적화의 기술적 기여점 체득</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>차선 검출 파이썬 소스 코드(.py)</li>
+                <li>차선 오버레이 합성 주행 테스트 비디오</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>코스 환경의 바닥 조도에 맞춰 HSV 마스킹 최소/최대 값을 캘리브레이션 튜닝해야 함</li>
+                <li>이 비전 파이프라인 지식은 딥러닝 자율주행 모델이 수집할 원천 이미지의 가이드라인 역할을 함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day7-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 8 Modal -->
+  <div class="modal-overlay" id="day8Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day8ModalTitle">
+      <button class="modal-close" id="closeDay8Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 8 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day8ModalTitle">AI 모델 학습용 자율주행 데이터(Tub) 수집 및 정제 가공 (개발 6단계)</h3>
+        <p class="modal-subtitle">
+          차선 추종 인공지능을 훈련하기 위한 고품질 학습 이미지 및 조향 값 데이터셋을 적재합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                트랙 정/역방향 주행 캡처, 탈선 복구 복귀 궤적 로깅 및 노이즈 데이터 삭제 스크립트 처리를 다루는 데이터 엔지니어링 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>동키카 Tub 디렉토리 및 메타 파일 분석</h5>
+                  <p>
+                    데이터가 파일시스템에 어떤 규격으로 쓰이는지 확인합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>카메라 프레임(.jpg) 저장 경로 및 이미지 번호 인덱싱 파악</li>
+                    <li>기록 카탈로그 JSON 내의 user/angle 및 user/throttle 매칭 구조 학습</li>
+                    <li>SD 카드 쓰기 속도 병목을 방지하기 위한 최적 프레임 속도(20fps) 설정</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>트랙 정/역방향 및 복귀 수동 드라이빙 로깅</h5>
+                  <p>
+                    안정적인 자율주행 차선 추종 학습을 위해 코스 데이터를 골고루 수집합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>정방향 트랙 코스 주행 데이터 로깅 (5000 프레임 이상)</li>
+                    <li>모델 조향 쏠림 편향 방지를 위한 역방향 주행 데이터 로깅 (5000 프레임 이상)</li>
+                    <li>차선 이탈 임계 영역에서 중앙 복귀 기동을 훈련하기 위한 Recovery 데이터셋 캡처</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>데이터 분포 시각화 및 불량 프레임 정제</h5>
+                  <p>
+                    불필요한 정지 상황 데이터나 조향 쏠림 픽셀 데이터를 지우고 정제합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>Python Pandas를 이용한 조향각 데이터 히스토그램 시각화</li>
+                    <li>차량이 벽에 충돌했거나 정지한 구간의 불필요 대기 프레임 자동 삭제 스크립트 구동</li>
+                    <li>호스트 훈련 서버 업로드를 위한 주행 데이터팩 압축 아카이브(.zip) 생성</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Data Capture</span>
+                <span class="outcome-tag">Dataset Cleaning</span>
+                <span class="outcome-tag">Histogram Analysis</span>
+                <span class="outcome-tag">Tub Storage</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>실전 트랙 주행 수집 + 데이터 정제 코딩</li>
+                <li><strong>실습 기반</strong>Donkey Car Tub Database</li>
+                <li><strong>목표 결과</strong>학습 모델용 트랙 주행 데이터셋 수집 및 아카이브 완료</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>지도학습 기반 인공지능 자율주행에서 고품질 데이터의 조건과 편향성 극복 원리 학습</li>
+                <li>대용량 시계열 이미지 및 라벨 데이터셋의 히스토그램 분포 정제 전처리 기법 습득</li>
+                <li>노이즈 데이터를 필터링하여 딥러닝 훈련 수렴도를 가속화하는 최적화 프로세스 체득</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>수집된 주행 데이터 요약 시각화 플롯</li>
+                <li>가공 완료된 학습용 압축 데이터셋 아카이브</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>곡선 트랙 특징을 편향 없이 수집해야 9단계 CNN 트레이닝 시 학습 오차가 급격히 낮아짐</li>
+                <li>잘못 운전해 차선을 들이받은 상황의 로그는 반드시 제거해야 올바른 자율주행 추론이 보장됨</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day8-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 9 Modal -->
+  <div class="modal-overlay" id="day9Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day9ModalTitle">
+      <button class="modal-close" id="closeDay9Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 9 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day9ModalTitle">TensorFlow CNN 자율주행 모델 학습 및 TFLite 가중치 업로드 (개발 7단계)</h3>
+        <p class="modal-subtitle">
+          학습된 데이터를 기반으로 CNN 인공신경망 가중치 모델을 훈련시키고 차량에 배포합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                GPU 기반 신경망 학습 파이프라인 가동, Loss 오차 분석, 가중치 최적화 변환(TFLite) 및 임베디드 파일럿 가동을 실행하는 인공지능 융합 개발 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>Keras CNN 아키텍처 설정 및 학습 커널 가동</h5>
+                  <p>
+                    케라스 기반 자율주행 CNN 모델의 전결합층 구조와 데이터 파이프라인을 연동합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>5개 Conv(합성곱) 필터 레이어 및 Fully Connected 레이어 탑재 설계</li>
+                    <li>TensorFlow GPU 실행 가속 커널 바인딩 및 데이터 Generator 동기화</li>
+                    <li>오버피팅 방지를 위한 Early Stopping 및 모델 체크포인트 콜백 적용</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>모델 트레이닝 실행 및 Loss 훈련 오차 그래프 진단</h5>
+                  <p>
+                    데이터 학습을 실행하여 에포크 변화에 따른 학습 정확성을 추종합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>모델 학습 스크립트 실행 및 스티어링/스로틀 손실(Loss) 추이 추적</li>
+                    <li>Training Loss와 Validation Loss의 하강 그래프 비교 분석 및 과적합 진단</li>
+                    <li>에포크 최적 지점 가중치 파일(.h5) 아웃풋 생성</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>TensorFlow Lite 변환 및 자율주행 인스턴스 런칭</h5>
+                  <p>
+                    가중치를 경량 TFLite 모델로 변환하여 동키카 임베디드 메모리에 배포 가동합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>tflite_convert 유틸리티를 활용한 모델 경량 변환</li>
+                    <li>원격 SCP 명령어를 통한 임베디드 pi 보드로 가중치 파일 전송</li>
+                    <li>자율주행 모드(--model ./models/pilot.tflite) 쉘 스크립트 구동</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Keras CNN</span>
+                <span class="outcome-tag">Model Training</span>
+                <span class="outcome-tag">Loss Chart</span>
+                <span class="outcome-tag">TFLite Quantize</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>신경망 모델 트레이닝 + 가중치 임베디드 배포</li>
+                <li><strong>실습 기반</strong>TensorFlow/Keras Framework</li>
+                <li><strong>목표 결과</strong>CNN 자율주행 가중치 생성 및 차량 탑재 추론 기동 성공</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>합성곱 신경망(CNN)을 이용한 이미지 공간 특징 추출 및 회귀 예측 모델 설계 역량 획득</li>
+                <li>손실 곡선 오차 그래프 디버깅을 통한 학습 에포크 최적화 및 파라미터 최적화 기법 습득</li>
+                <li>임베디드 디바이스 리소스 한계를 제어하기 위해 TFLite 경량화 최적 배포 기술 구현</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>자율주행 가중치 파일(pilot.tflite)</li>
+                <li>학습 손실 진단 시각화 그래프 아웃풋</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>자율주행 가중치가 올바르더라도 캘리브레이션 속도가 안 맞으면 이탈하므로 파라미터 조율 필요</li>
+                <li>10단계 실전 검증 주행 시, 본 모델 추론을 백그라운드로 자율주행을 시작하게 됨</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day9-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 10 Modal -->
+  <div class="modal-overlay" id="day10Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day10ModalTitle">
+      <button class="modal-close" id="closeDay10Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Step 10 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day10ModalTitle">자율주행 트랙 장애물 회피 테스트 및 랩타임 검증 (검증 및 테스트)</h3>
+        <p class="modal-subtitle">
+          센서 융합 전방 장애물 안전 정지 테스트를 진행하고 공식 트랙 레이스로 최종 모델 성능을 검증합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                거리 센서 GPIO 하드웨어 결합, 비상 브레이크 감속 제어 노드 연동 및 공식 트랙 랩타임 대회를 통해 성과를 정량 수료하는 최종 평가 단계입니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>초음파/라이다 장애물 센서 물리 결합 및 제동 FSM 설계</h5>
+                  <p>
+                    차량 전방에 충돌 방지용 거리 측정 센서를 안착하고 제어 파이프라인을 융합합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>HC-SR04/LiDAR 보드 고정 마운팅 및 신호 라인 배선 체결</li>
+                    <li>거리 정보 파이프라인 처리를 위한 비동기 멀티스레드 제어 적용</li>
+                    <li>거리 임계값 도달 시 스로틀 강제 제동을 담당하는 유한상태기계(FSM) 인터럽트 결합</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>공식 자율주행 트랙 랩타임 토너먼트 대회</h5>
+                  <p>
+                    지정된 코스에 차량을 안착하고 자율주행 모드를 활성화하여 랩타임을 정량 계측합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>3회 공식 주행 기회 제공 하에 최단 랩타임 기록 달성 도전</li>
+                    <li>동적 돌발 장애물 투입 시 무충돌 비상 긴급 정지 검증</li>
+                    <li>코스 탈선에 따른 페널티 감점 규칙 계산 및 안정성 인자 종합 평가</li>
+                  </ul>
+                </div>
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>최종 프로젝트 피치 및 전체 회고</h5>
+                  <p>
+                    기획서의 타겟 페르소나 및 주행 요건 부합 정도를 종합 피칭하고 교육을 종결 수료합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>팀별 자율주행 가중치 개선 지표 및 센서 회피 로직 발표</li>
+                    <li>동적 노면 및 마찰 오차 극복 캘리브레이션 트러블슈팅 지식 교류</li>
+                    <li>공식 순위 리워드 및 전체 수료 회고</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Sensor Integration</span>
+                <span class="outcome-tag">Emergency Stop</span>
+                <span class="outcome-tag">Laptime Race</span>
+                <span class="outcome-tag">Final Milestone Pitch</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>거리 센서 소프트웨어 통합 + 공식 랩타임 레이싱</li>
+                <li><strong>실습 기반</strong>Completed Autonomous Vehicle</li>
+                <li><strong>목표 결과</strong>실물 모빌리티 주행 검증 통과 및 성과 발표 완수</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>AI 딥러닝 차선 추종 알고리즘 위에 거리 센서의 물리 회피 로직을 융합하는 실시간 복합 제어 설계 완성</li>
+                <li>정해진 성능 시험(랩타임) 조건에 맞춘 가중치 모델 튜닝 및 기구 보정 정적 최적화 경험 획득</li>
+                <li>기획부터 조립, 코딩, AI 모델 구축, 캘리브레이션, 현장 평가를 거친 전체 제품 주기 엔지니어링 마인드 수립</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>공식 랩타임 기록 데이터 명세 카드</li>
+                <li>모빌리티 프로젝트 최종 완주 보고서</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>배터리 전압 상태에 따라 모터 회전 출력이 변하므로 랩타임 측정 직전 전압 균일화 정비가 중요함</li>
+                <li>기획서에서 약속한 페르소나(예: 배송 관리자) 시나리오 가치 충족 여부를 최종 스피치로 입증함</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px;">
+          <a href="day10-ai-classroom_mobility.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function setupModal(openButtonId, modalId, closeButtonId) {
+      const openButton = document.getElementById(openButtonId);
+      const modal = document.getElementById(modalId);
+      const closeButton = document.getElementById(closeButtonId);
+
+      if (!openButton || !modal || !closeButton) return;
+
+      function openModal() {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      openButton.addEventListener('click', openModal);
+
+      openButton.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openModal();
+        }
+      });
+
+      closeButton.addEventListener('click', closeModal);
+
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+          closeModal();
+        }
+      });
+    }
+
+            setupModal('openDay1Modal', 'day1Modal', 'closeDay1Modal');
+    setupModal('openDay2Modal', 'day2Modal', 'closeDay2Modal');
+    setupModal('openDay3Modal', 'day3Modal', 'closeDay3Modal');
+    setupModal('openDay4Modal', 'day4Modal', 'closeDay4Modal');
+    setupModal('openDay5Modal', 'day5Modal', 'closeDay5Modal');
+    setupModal('openDay6Modal', 'day6Modal', 'closeDay6Modal');
+    setupModal('openDay7Modal', 'day7Modal', 'closeDay7Modal');
+    setupModal('openDay8Modal', 'day8Modal', 'closeDay8Modal');
+    setupModal('openDay9Modal', 'day9Modal', 'closeDay9Modal');
+    setupModal('openDay10Modal', 'day10Modal', 'closeDay10Modal');
+  </script>
+</body>
+</html>

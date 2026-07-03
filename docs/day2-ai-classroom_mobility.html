@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 2 AI 강의실 | 대구디지털혁신진흥원 AI 자율주행 모빌리티 과정</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary: #3b82f6;      /* DIP Electric Blue */
+      --primary-dark: #1d4ed8; /* DIP Dark Blue */
+      --primary-soft: rgba(59, 130, 246, 0.1);
+      --accent: #06b6d4;       /* Neon Cyan */
+      --accent-soft: rgba(6, 182, 212, 0.12);
+      --green: #8b5cf6;        /* Purple highlight - minimal use */
+      --bg: #09090b;
+      --panel: #111827;
+      --text: #ffffff;
+      --muted: #e4e4e7;
+      --line: rgba(255, 255, 255, 0.08);
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      font-family: 'Pretendard', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .topbar-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(0, 64, 152, 0.16);
+    }
+
+    .brand-text h1 {
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .brand-text p {
+      font-size: 0.78rem;
+      color: #71717a;
+      margin-top: 2px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .page-wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px 32px;
+    }
+
+    .hero-card {
+      background: rgba(26, 29, 36, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 24px;
+      color: #ffffff;
+    }
+
+    .hero-meta {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .hero-card h2 {
+      font-size: 2rem;
+      line-height: 1.25;
+      margin-bottom: 12px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .hero-card p {
+      font-size: 1rem;
+      color: #e4e4e7;
+      line-height: 1.7;
+      max-width: 900px;
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .hero-stat {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      font-size: 0.92rem;
+      color: #e4e4e7;
+      font-weight: 600;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.25fr 0.85fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .left-col,
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .right-col {
+      position: sticky;
+      top: 96px;
+    }
+
+    .card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 20px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-head h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .video-wrap {
+      padding: 18px;
+    }
+
+    .video-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+
+    .video-frame iframe,
+    .video-frame video {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #000;
+    }
+
+    .video-note {
+      padding: 0 18px 18px;
+      color: #a1a1aa;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .playlist-wrap {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(26, 29, 36, 0.95);
+    }
+
+    .playlist-header {
+      padding: 16px 22px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: rgba(17, 24, 39, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .playlist {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .playlist-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 22px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background 0.2s ease;
+    }
+
+    .playlist-item:last-child {
+      border-bottom: none;
+    }
+
+    .playlist-item:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .playlist-item.active {
+      background: rgba(59, 130, 246, 0.12);
+      border-left: 4px solid var(--primary);
+      padding-left: 18px;
+    }
+
+    .play-icon {
+      color: #cbd5e1;
+      font-size: 1rem;
+    }
+
+    .playlist-item.active .play-icon {
+      color: var(--primary);
+    }
+
+    .playlist-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .playlist-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #e4e4e7;
+    }
+
+    .playlist-item.active .playlist-title {
+      color: #ffffff;
+    }
+
+    .playlist-duration {
+      font-size: 0.82rem;
+      color: #71717a;
+    }
+
+    .note-body {
+      padding: 22px;
+    }
+
+    .note-body h4 {
+      font-size: 1rem;
+      color: var(--accent);
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+
+    .note-body p {
+      color: #e4e4e7;
+      line-height: 1.75;
+      margin-bottom: 14px;
+    }
+
+    .note-body ul {
+      padding-left: 18px;
+      color: #e4e4e7;
+      line-height: 1.8;
+      display: grid;
+      gap: 10px;
+    }
+
+    .tip-box {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: rgba(6, 182, 212, 0.06);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+      color: #a5f3fc;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+
+    .assistant-panel {
+      height: calc(100vh - 120px);
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .wip-overlay {
+      position: absolute;
+      top: 72px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: 0 0 20px 20px;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .wip-badge {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .wip-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .wip-desc {
+      font-size: 0.82rem;
+      color: #71717a;
+      line-height: 1.45;
+      max-width: 250px;
+      word-break: keep-all;
+    }
+
+    .assistant-head {
+      padding: 18px 20px;
+      background: rgba(17, 24, 39, 0.8);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .assistant-head-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .assistant-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .assistant-head h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .assistant-head p {
+      font-size: 0.82rem;
+      color: var(--accent);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .online-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .chat-area {
+      flex: 1;
+      background: rgba(9, 9, 11, 0.6);
+      padding: 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .message-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      max-width: 88%;
+    }
+
+    .message-row.user {
+      margin-left: auto;
+      flex-direction: row-reverse;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .avatar.bot {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--primary);
+    }
+
+    .avatar.user {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+    }
+
+    .bubble {
+      padding: 13px 15px;
+      border-radius: 18px;
+      line-height: 1.7;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      word-break: keep-all;
+    }
+
+    .bubble.bot {
+      background: rgba(26, 29, 36, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border-top-left-radius: 6px;
+    }
+
+    .bubble.user {
+      background: linear-gradient(135deg, var(--accent), var(--primary)) !important;
+      color: #ffffff;
+      border-top-right-radius: 6px;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+    }
+
+    .typing {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .typing span {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+      animation: bounce 1s infinite;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.7; }
+      40% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    .chat-input-wrap {
+      padding: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(17, 24, 39, 0.9);
+    }
+
+    .chat-form {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      background: rgba(9, 9, 11, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 10px;
+    }
+
+    .chat-form:focus-within {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15) !important;
+    }
+
+    .chat-textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      resize: none;
+      min-height: 44px;
+      max-height: 140px;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: #ffffff;
+      line-height: 1.5;
+      padding: 10px 8px;
+    }
+
+    .send-btn {
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      color: #fff;
+      border-radius: 12px;
+      min-width: 48px;
+      height: 48px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    }
+
+    .send-btn:disabled {
+      background: #bfdbfe;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .disclaimer {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .assistant-panel {
+        height: 640px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .topbar-inner,
+      .page-wrap {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .hero-card {
+        padding: 22px 18px;
+      }
+
+      .hero-card h2 {
+        font-size: 1.5rem;
+      }
+
+      .message-row {
+        max-width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">AI</div>
+        <div class="brand-text">
+          <h1>대구디지털혁신진흥원 AI 자율주행 모빌리티 과정</h1>
+          <p>Day 2 AI Mobility Classroom</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <a href="mobility_swpilot.html" class="back-btn">← 커리큘럼 페이지로 돌아가기</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <section class="hero-card">
+      <div class="hero-meta">
+        <span class="chip">Day 2</span>
+        <span class="chip">가상 주행 트랙 환경 및 타겟 페르소나 설정</span>
+        <span class="chip">영상 + AI 챗봇 학습</span>
+      </div>
+      <h2>가상 주행 트랙 환경 및 타겟 페르소나 설정 및 AI 학습도우미</h2>
+      <p>
+        이 페이지는 모빌리티 Day 2 학습용 상세 페이지입니다. 상단 영상으로 핵심 내용을 학습하고,
+        오른쪽 AI 챗봇에게 가상 주행 트랙 환경 및 타겟 페르소나 설정 주제에 대해 실시간 질문을 보낼 수 있습니다.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">대상: UX 설계 및 고객 가치 모델링 입문자</div>
+        <div class="hero-stat">준비물: 페르소나 템플릿, 사용자 여정 지도 가이드라인</div>
+        <div class="hero-stat">구성: 2시간 이론 / 3시간 실습 / 1시간 발표 및 검수</div>
+      </div>
+    </section>
+
+    <main class="layout">
+      <section class="left-col">
+        <div class="card">
+          <div class="card-head">
+            <h3>Day 2 가상 주행 트랙 환경 및 타겟 페르소나 설정 학습 영상</h3>
+            <span class="chip">유튜브 추천 강의</span>
+          </div>
+
+          <div class="video-wrap">
+            <div class="video-frame">
+              <iframe id="mainVideo" src="https://www.youtube.com/embed/quiKmBm-LeQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+          </div>
+
+          <div class="video-note">
+            Day 2 커리큘럼 핵심 주제(Persona Modeling, User Journey, Scenario Design)에 해당하는 유튜브 추천 강의 리스트입니다.
+          </div>
+
+          <div class="playlist-wrap">
+            <div class="playlist-header">📚 전체 강의 목록 (3개)</div>
+            <ul class="playlist">
+              <li class="playlist-item active" data-src="https://www.youtube.com/embed/quiKmBm-LeQ">
+                <span class="play-icon">▶</span>
+                <div class="playlist-info">
+                  <div class="playlist-title">1. 타겟 페르소나 모델링 워크숍</div>
+                  <div class="playlist-duration">2시간</div>
+                </div>
+              </li>
+              <li class="playlist-item" data-src="https://www.youtube.com/embed/L4E1yupkISI">
+                <span class="play-icon">▶</span>
+                <div class="playlist-info">
+                  <div class="playlist-title">2. 사용자 여정 및 주행 시나리오 상세 설계</div>
+                  <div class="playlist-duration">3시간</div>
+                </div>
+              </li>
+              <li class="playlist-item" data-src="https://www.youtube.com/embed/DJ4leA33Bpk">
+                <span class="play-icon">▶</span>
+                <div class="playlist-info">
+                  <div class="playlist-title">3. 시나리오 정의 피칭 및 피드백</div>
+                  <div class="playlist-duration">1시간</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>핵심 요약 노트</h3>
+            <span class="chip">Day 2 Summary</span>
+          </div>
+
+          <div class="note-body">
+            <h4>오늘의 핵심 목표</h4>
+            <p>
+              Day 2에서는 로봇/차량 운용 시나리오를 구체화하기 위해 관리자 페르소나와 사용자 유즈케이스를 도출합니다.
+            </p>
+
+            <ul>
+              <li><strong>타겟 페르소나 모델링 워크숍:</strong> 모빌리티 차량의 운행 상태를 실시간 제어하거나 서비스를 제공받는 페르소나를 작성합니다.</li>
+              <li><strong>사용자 여정 및 주행 시나리오 상세 설계:</strong> 차량의 주차, 주행 기동, 장애물 출현 시 긴급 정지 등의 주행 스토리보드를 세부 설계합니다.</li>
+              <li><strong>시나리오 정의 피칭 및 피드백:</strong> 구축한 페르소나 및 주행 유즈케이스를 팀 간 교차 검증하고 수정 사항을 정리합니다.</li>
+            </ul>
+
+            <div class="tip-box">
+              학습 팁: 오른쪽 AI 챗봇에게  
+              “Persona Modeling와 관련된 유용한 핵심 개념을 설명해줘”  
+              또는 “핵심 사용자 페르소나 정의 완료 및 주행 시나리오 스토리보드 수립 목표를 더 효율적으로 달성하는 방법은?”  
+              같은 질문을 해보세요.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right-col">
+        <div class="card assistant-panel">
+          <div class="assistant-head">
+            <div class="assistant-head-left">
+              <div class="assistant-icon">🤖</div>
+              <div>
+                <h3>학습 도우미 AI</h3>
+                <p><span class="online-dot"></span>온라인 상태</p>
+              </div>
+            </div>
+            <span class="chip">ko-KR</span>
+          </div>
+
+          <div class="chat-area" id="chatArea">
+          </div>
+
+          <div class="chat-input-wrap">
+            <form class="chat-form" id="chatForm">
+              <textarea
+                id="chatInput"
+                class="chat-textarea"
+                placeholder="강의 내용 중 궁금한 점을 질문해보세요..."
+                rows="1"
+              ></textarea>
+              <button type="submit" class="send-btn" id="sendBtn">➤</button>
+            </form>
+            <div class="disclaimer">
+              AI 응답은 참고용입니다. 중요한 학습 내용은 강의 자료와 교안을 함께 확인해주세요.
+            </div>
+          </div>
+          <div class="wip-overlay">
+            <div class="wip-badge">🛠️ 작업 중</div>
+            <div class="wip-title">AI 학습 도우미 준비 중</div>
+            <div class="wip-desc">현재 AI 채팅 답변 기능 및 맞춤형 질의응답 시스템을 구축하고 있습니다. 더 유용한 기능으로 곧 찾아뵙겠습니다.</div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    // 운영 시에는 브라우저 직접 노출 대신 서버 프록시 사용 권장
+    const apiKey = "";
+
+    const messages = [
+      {
+        role: "model",
+        text: "안녕하세요! Day 2 '가상 주행 트랙 환경 및 타겟 페르소나 설정' 학습 도우미 AI입니다. 핵심 주제인 Persona Modeling, User Journey, Scenario Design, Use Case Chart에 대해 무엇이든 질문해주세요 😊"
+      }
+    ];
+
+    const chatArea = document.getElementById("chatArea");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function renderMessages(isLoading = false) {
+      chatArea.innerHTML = "";
+
+      messages.forEach(msg => {
+        const row = document.createElement("div");
+        row.className = `message-row ${msg.role === "user" ? "user" : ""}`;
+
+        const avatar = document.createElement("div");
+        avatar.className = `avatar ${msg.role === "user" ? "user" : "bot"}`;
+        avatar.textContent = msg.role === "user" ? "나" : "AI";
+
+        const bubble = document.createElement("div");
+        bubble.className = `bubble ${msg.role === "user" ? "user" : "bot"}`;
+        bubble.innerHTML = escapeHtml(msg.text).replace(/\n/g, "<br>");
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        chatArea.appendChild(row);
+      });
+
+      if (isLoading) {
+        const row = document.createElement("div");
+        row.className = "message-row";
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar bot";
+        avatar.textContent = "AI";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble bot";
+        bubble.innerHTML = `
+          <div class="typing">
+            <span></span><span></span><span></span>
+          </div>
+        `;
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        chatArea.appendChild(row);
+      }
+
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    async function callGeminiAPI(userMessage, currentHistory, attempt = 0) {
+      const delays = [1000, 2000, 4000, 8000, 16000];
+
+      const formattedHistory = currentHistory.map(msg => ({
+        role: msg.role === "model" ? "model" : "user",
+        parts: [{ text: msg.text }]
+      }));
+
+      const payload = {
+        contents: [
+          ...formattedHistory,
+          { role: "user", parts: [{ text: userMessage }] }
+        ],
+        systemInstruction: {
+          parts: [{
+            text: "당신은 Day 2 '가상 주행 트랙 환경 및 타겟 페르소나 설정'을 돕는 친절한 한국어 AI 조교입니다. 학생들에게 Persona Modeling, User Journey, Scenario Design, Use Case Chart에 관련된 질문을 친절하고 상세하게 답변하세요. 짧은 문단과 불릿을 적절히 사용하고, 격려하는 어조를 유지하세요."
+          }]
+        }
+      };
+
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`API Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "답변을 생성하지 못했습니다.";
+      } catch (error) {
+        if (attempt < 5) {
+          await new Promise(resolve => setTimeout(resolve, delays[attempt]));
+          return callGeminiAPI(userMessage, currentHistory, attempt + 1);
+        }
+        throw new Error("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      }
+    }
+
+    async function handleSendMessage(e) {
+      e.preventDefault();
+      const userMsg = chatInput.value.trim();
+      if (!userMsg) return;
+
+      messages.push({ role: "user", text: userMsg });
+      chatInput.value = "";
+      sendBtn.disabled = true;
+      renderMessages(true);
+
+      try {
+        const responseText = await callGeminiAPI(userMsg, messages.slice(0, -1));
+        messages.push({ role: "model", text: responseText });
+      } catch (error) {
+        messages.push({
+          role: "model",
+          text: "⚠️ 죄송합니다. 답변을 생성하는 중 오류가 발생했습니다. API 키 또는 네트워크 상태를 확인해주세요."
+        });
+      } finally {
+        sendBtn.disabled = false;
+        renderMessages(false);
+      }
+    }
+
+    chatForm.addEventListener("submit", handleSendMessage);
+
+    chatInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage(e);
+      }
+    });
+
+    chatInput.addEventListener("input", function() {
+      this.style.height = "auto";
+      this.style.height = Math.min(this.scrollHeight, 140) + "px";
+    });
+
+    renderMessages(false);
+
+    // Video Playlist Logic (YouTube Embed Support)
+    const mainVideo = document.getElementById("mainVideo");
+    const playlistItems = document.querySelectorAll(".playlist-item");
+
+    playlistItems.forEach(item => {
+      item.addEventListener("click", function() {
+        // 모든 아이템에서 active 클래스 제거 후 클릭한 항목에 추가
+        playlistItems.forEach(el => el.classList.remove("active"));
+        this.classList.add("active");
+        
+        // 유튜브 임베드 소스 변경 및 자동 재생 추가
+        let newSrc = this.getAttribute("data-src");
+        if (newSrc.indexOf("?") > -1) {
+          newSrc += "&autoplay=1";
+        } else {
+          newSrc += "?autoplay=1";
+        }
+        mainVideo.src = newSrc;
+      });
+    });
+  </script>
+</body>
+</html>
