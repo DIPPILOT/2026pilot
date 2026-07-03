@@ -7,18 +7,18 @@
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <style>
     :root {
-      --primary: #059669;      /* DIP Emerald */
-      --primary-dark: #064e3b; /* DIP Dark Slate Green */
-      --primary-soft: rgba(5, 150, 105, 0.08); /* Emerald soft tint */
-      --accent: #10b981;       /* Bright Green */
-      --accent-soft: rgba(20, 184, 166, 0.12);  /* Green soft tint */
-      --green: #84cc16;        /* Lime Green */
-      --bg: #f4fbf7;
-      --panel: #ffffff;
-      --text: #064e3b;
-      --muted: #4b5563;
-      --line: rgba(167, 243, 208, 0.5);
-      --shadow: 0 12px 30px rgba(6, 78, 59, 0.06);
+      --primary: #3b82f6;      /* DIP Electric Blue */
+      --primary-dark: #1d4ed8; /* DIP Dark Blue */
+      --primary-soft: rgba(59, 130, 246, 0.1);
+      --accent: #06b6d4;       /* Neon Cyan */
+      --accent-soft: rgba(6, 182, 212, 0.12);
+      --green: #8b5cf6;        /* Purple highlight - minimal use */
+      --bg: #09090b;
+      --panel: #111827;
+      --text: #ffffff;
+      --muted: #e4e4e7;
+      --line: rgba(255, 255, 255, 0.08);
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
       --radius: 18px;
     }
 
@@ -654,6 +654,174 @@
       .message-row {
         max-width: 95%;
       }
+    }
+
+    /* Cyber Modern AI Style Dark Theme Override */
+    body {
+      background: var(--bg) !important;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%) !important;
+      background-attachment: fixed !important;
+      color: #ffffff !important;
+    }
+    .topbar {
+      background: rgba(9, 9, 11, 0.7) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .brand-text h1 { color: #ffffff !important; }
+    .brand-text p { color: #71717a !important; }
+    .back-btn {
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: #ffffff !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+      transition: all 0.2s ease;
+    }
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: rgba(59, 130, 246, 0.3) !important;
+    }
+    .hero-card {
+      background: rgba(26, 29, 36, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+      color: #ffffff !important;
+    }
+    .hero-card h2 { color: #ffffff !important; }
+    .hero-card p { color: #e4e4e7 !important; }
+    .hero-stat {
+      background: rgba(255, 255, 255, 0.02) !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+      color: #e4e4e7 !important;
+    }
+    .chip {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #93c5fd !important;
+    }
+    .card {
+      background: rgba(26, 29, 36, 0.85) !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+    }
+    .card-head {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .card-head h3 {
+      color: #ffffff !important;
+    }
+    .video-frame {
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      background: #000000 !important;
+    }
+    .video-note {
+      color: #a1a1aa !important;
+    }
+    .playlist-wrap {
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      background: rgba(26, 29, 36, 0.95) !important;
+    }
+    .playlist-header {
+      color: #ffffff !important;
+      background: rgba(17, 24, 39, 0.8) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .playlist-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    }
+    .playlist-item:hover {
+      background: rgba(255, 255, 255, 0.03) !important;
+    }
+    .playlist-item.active {
+      background: rgba(59, 130, 246, 0.12) !important;
+      border-left-color: var(--primary) !important;
+    }
+    .playlist-item.active .playlist-title {
+      color: #ffffff !important;
+    }
+    .playlist-title {
+      color: #e4e4e7 !important;
+    }
+    .playlist-duration {
+      color: #71717a !important;
+    }
+    .tip-box {
+      background: rgba(6, 182, 212, 0.06) !important;
+      border: 1px solid rgba(6, 182, 212, 0.15) !important;
+      color: #a5f3fc !important;
+    }
+    .note-body h4 {
+      color: var(--accent) !important;
+    }
+    .note-body p, .note-body ul {
+      color: #e4e4e7 !important;
+    }
+    .assistant-head {
+      background: rgba(17, 24, 39, 0.8) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .assistant-head h3 {
+      color: #ffffff !important;
+    }
+    .assistant-head p {
+      color: var(--accent) !important;
+    }
+    .assistant-icon {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: var(--primary) !important;
+    }
+    .chat-area {
+      background: rgba(9, 9, 11, 0.6) !important;
+    }
+    .avatar.bot {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: var(--primary) !important;
+    }
+    .avatar.user {
+      background: rgba(59, 130, 246, 0.2) !important;
+      color: #93c5fd !important;
+    }
+    .bubble.bot {
+      background: rgba(26, 29, 36, 0.9) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      color: #ffffff !important;
+    }
+    .bubble.user {
+      background: linear-gradient(135deg, var(--accent), var(--primary)) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2) !important;
+    }
+    .chat-input-wrap {
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      background: rgba(17, 24, 39, 0.9) !important;
+    }
+    .chat-form {
+      background: rgba(9, 9, 11, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+    .chat-form:focus-within {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15) !important;
+    }
+    .chat-textarea {
+      color: #ffffff !important;
+    }
+    .send-btn {
+      background: linear-gradient(135deg, var(--accent), var(--primary)) !important;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2) !important;
+    }
+    .wip-overlay {
+      background: rgba(9, 9, 11, 0.85) !important;
+    }
+    .wip-title {
+      color: #ffffff !important;
+    }
+    .wip-desc {
+      color: #71717a !important;
     }
   </style>
 </head>
