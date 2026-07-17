@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대구 AI SW 파일럿</title>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      /* Electric Blue */
+      --secondary-color: #06b6d4;
+      /* Neon Cyan */
+      --bg-dark: #09090b;
+      /* Deep Black */
+      --bg-charcoal: #111827;
+      /* Secondary Background */
+      --bg-card: rgba(26, 29, 36, 0.75);
+      /* Surface/Card: Glass dark */
+      --text-main: #ffffff;
+      --text-muted: #e4e4e7;
+      --text-desc: #71717a;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-color: #06b6d4;
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px;
+    }
+
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.65;
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong {
+      word-break: keep-all;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .nav-links-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 22px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .user-credit-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.2);
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffc107;
+      box-shadow: 0 0 10px rgba(255, 193, 7, 0.15);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 70px;
+      padding: 60px 0 30px;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    /* Top 3 Podium */
+    .podium-container {
+      padding: 30px 0 50px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .podium-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 30px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      transition: all 0.3s;
+      width: 250px;
+    }
+
+    .podium-card:hover {
+      transform: translateY(-8px);
+    }
+
+    /* Podium relative heights */
+    .podium-card.first {
+      height: 350px;
+      border-color: rgba(255, 193, 7, 0.3);
+      box-shadow: 0 12px 40px rgba(255, 193, 7, 0.12);
+      order: 2;
+    }
+
+    .podium-card.second {
+      height: 290px;
+      border-color: rgba(148, 163, 184, 0.3);
+      box-shadow: 0 8px 30px rgba(148, 163, 184, 0.08);
+      order: 1;
+    }
+
+    .podium-card.third {
+      height: 270px;
+      border-color: rgba(217, 119, 6, 0.3);
+      box-shadow: 0 8px 30px rgba(217, 119, 6, 0.08);
+      order: 3;
+    }
+
+    /* Crown / Medal */
+    .podium-rank {
+      position: absolute;
+      top: -24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 800;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .first .podium-rank {
+      background: linear-gradient(135deg, #ffe082, #ffc107);
+      color: #7f5f00;
+      border: 2px solid #ffe082;
+      animation: pulse 2s infinite;
+    }
+
+    .second .podium-rank {
+      background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+      color: #334155;
+      border: 2px solid #e2e8f0;
+    }
+
+    .third .podium-rank {
+      background: linear-gradient(135deg, #ffedd5, #d97706);
+      color: #7c2d12;
+      border: 2px solid #ffedd5;
+    }
+
+    .podium-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      margin-top: 10px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .first .podium-avatar {
+      width: 86px;
+      height: 86px;
+      border-color: #ffc107;
+      box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+    }
+
+    .podium-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .podium-team {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-desc);
+      margin-bottom: 16px;
+    }
+
+    .podium-score {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffc107;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .podium-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .badge-icon {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* Ranking Grid Layout: Left Table, Right Widget */
+    .ranking-section {
+      padding: 20px 0 80px;
+    }
+
+    .ranking-layout {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    /* Control Panel */
+    .filter-panel {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .search-wrapper {
+      flex-grow: 1;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 18px;
+      color: #ffffff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+    }
+
+    .team-select {
+      background: rgba(26, 29, 36, 0.95);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 18px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      min-width: 150px;
+    }
+
+    /* Leaderboard Table */
+    .leaderboard-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .leaderboard-table th {
+      background: rgba(9, 9, 11, 0.5);
+      padding: 18px 24px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-desc);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .leaderboard-table td {
+      padding: 16px 24px;
+      font-size: 0.92rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+    }
+
+    .leaderboard-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .leaderboard-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .leaderboard-table tr.my-rank td {
+      background: rgba(59, 130, 246, 0.08);
+      border-top: 1px solid rgba(59, 130, 246, 0.3);
+      border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+    }
+
+    .my-rank-badge {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+
+    .rank-cell {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .student-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .my-rank .student-cell {
+      color: #93c5fd;
+    }
+
+    .avatar-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .score-cell {
+      font-weight: 800;
+      color: #ffc107;
+    }
+
+    .trend-cell {
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .trend-cell.up {
+      color: #34d399;
+    }
+
+    .trend-cell.down {
+      color: #f87171;
+    }
+
+    .trend-cell.flat {
+      color: var(--text-desc);
+    }
+
+    /* Right Widget Panels */
+    .widget-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 30px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 30px;
+    }
+
+    .widget-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      border-left: 3px solid var(--primary-color);
+      padding-left: 10px;
+      color: #ffffff;
+    }
+
+    .team-standing-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .team-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .team-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .team-avg-score {
+      color: #ffc107;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: width 1s ease;
+      width: 0%; /* Dynamic animation target */
+    }
+
+    .progress-bar-fill.alpha {
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      box-shadow: var(--glow-cyan);
+    }
+
+    .progress-bar-fill.beta {
+      background: linear-gradient(90deg, #8b5cf6, #ec4899);
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+    }
+
+    .progress-bar-fill.gamma {
+      background: linear-gradient(90deg, #f59e0b, #ef4444);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+    }
+
+    .progress-bar-fill.delta {
+      background: linear-gradient(90deg, #10b981, #06b6d4);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Keyframe animations */
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 12px rgba(255, 193, 7, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+      }
+    }
+
+    @media (max-width: 992px) {
+      .ranking-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .podium-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .podium-card {
+        width: 100%;
+        max-width: 320px;
+      }
+
+      .podium-card.first {
+        height: auto;
+        order: 1;
+      }
+
+      .podium-card.second {
+        height: auto;
+        order: 2;
+      }
+
+      .podium-card.third {
+        height: auto;
+        order: 3;
+      }
+
+      .podium-rank {
+        top: 15px;
+        left: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">DIP SW 파일럿 과정</a>
+      <div class="nav-links-wrapper">
+        <ul class="nav-links">
+          <li><a href="index.html#programs">과정 선택</a></li>
+          <li><a href="credit-store.html">크래딧 상점</a></li>
+          <li><a href="credit-ranking.html" class="active">크래딧 랭킹</a></li>
+          <li><a href="certificate.html">인증서 확인</a></li>
+        </ul>
+        <div class="user-credit-badge" id="userCreditBadge">
+          <span>🪙</span>
+          <span id="userBadgeText">로드 중...</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">부트캠프 실시간 리더보드</h1>
+    </div>
+  </section>
+
+  <!-- Top 3 Podium (Honor of Fame) -->
+  <div class="container">
+    <div class="podium-container" id="podiumContainer">
+      <!-- Generated dynamically -->
+    </div>
+  </div>
+
+  <!-- Main Rankings Layout -->
+  <section class="ranking-section">
+    <div class="container ranking-layout">
+      <!-- Left Leaderboard Table -->
+      <div>
+        <div class="filter-panel">
+          <div class="search-wrapper">
+            <input type="text" class="search-input" id="rankSearch" placeholder="학생 이름을 입력하세요..." />
+          </div>
+          <select class="team-select" id="teamSelect">
+            <option value="all">전체 팀</option>
+            <option value="Alpha">Team Alpha</option>
+            <option value="Beta">Team Beta</option>
+            <option value="Gamma">Team Gamma</option>
+            <option value="Delta">Team Delta</option>
+          </select>
+        </div>
+
+        <div class="leaderboard-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th style="width: 80px;">순위</th>
+                <th>학생</th>
+                <th>소속 팀</th>
+                <th>누적 크래딧</th>
+                <th>대표 뱃지</th>
+                <th style="width: 100px;">순위 변동</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+              <!-- Dynamically populated rows via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Right Widget Sidebars -->
+      <div>
+        <!-- Team Standing comparative statistics -->
+        <div class="widget-panel">
+          <h4 class="widget-title">팀별 평균 크래딧 현황</h4>
+          <div class="team-standing-list" id="teamStandingList">
+            <!-- Dynamically populated team stats -->
+          </div>
+        </div>
+
+        <!-- Self status info panel -->
+        <div class="widget-panel">
+          <h4 class="widget-title">나의 크래딧 상태</h4>
+          <ul style="list-style:none; line-height: 2;">
+            <li style="display:flex; justify-content:space-between;">
+              <span style="color:var(--text-desc);">내 전체 랭킹</span>
+              <strong style="color:#ffffff;" id="myGlobalRank">-위</strong>
+            </li>
+            <li style="display:flex; justify-content:space-between;">
+              <span style="color:var(--text-desc);">내 누적 크래딧</span>
+              <strong style="color:#ffc107;" id="myCredits">🪙 -</strong>
+            </li>
+            <li style="display:flex; justify-content:space-between;">
+              <span style="color:var(--text-desc);">배정된 소속 팀</span>
+              <strong style="color:#ffffff;" id="myAssignedTeam">-</strong>
+            </li>
+            <li style="display:flex; justify-content:space-between;">
+              <span style="color:var(--text-desc);">보유한 대표 뱃지</span>
+              <span style="color:var(--text-muted);" id="myBadge">-</span>
+            </li>
+            <li style="display:flex; justify-content:space-between;">
+              <span style="color:var(--text-desc);">마지막 갱신일</span>
+              <span style="color:var(--text-desc);">오늘 18:30</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Embedded JSON fallback for file:// CORS limits
+    const fallbackData = [
+  {
+    "순번": "1",
+    "성명": "강모세",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-2168-7160",
+    "생년월일": "2003.03.12",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "2",
+    "성명": "고성모",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-6844-6895",
+    "생년월일": "19980617",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "3",
+    "성명": "권성현",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-2882-8374",
+    "생년월일": "2000.07.10",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "1,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "4",
+    "성명": "권재영",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-4338-3841",
+    "생년월일": "2000.05.16",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "5",
+    "성명": "김건우",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-3754-8322",
+    "생년월일": "2005.07.06",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "1,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "1,500"
+  },
+  {
+    "순번": "6",
+    "성명": "김규범",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-7423-1278",
+    "생년월일": "2003.05.09",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "7",
+    "성명": "김동건",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-8972-6870",
+    "생년월일": "2003.08.19",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "2,000",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "5,000"
+  },
+  {
+    "순번": "8",
+    "성명": "김봉만",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-29",
+    "연락처": "010-3968-9548",
+    "생년월일": "2000.05.02",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "9",
+    "성명": "김선이",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-4827-9695",
+    "생년월일": "2002.12.31",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "10",
+    "성명": "김승진",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-2772-6469",
+    "생년월일": "2001.04.10",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "1,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "1,500"
+  },
+  {
+    "순번": "11",
+    "성명": "김용범",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-27",
+    "연락처": "010-9757-0588",
+    "생년월일": "2004.03.04",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "12",
+    "성명": "김일여",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-26",
+    "연락처": "010-7939-0231",
+    "생년월일": "2006.08.02",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "13",
+    "성명": "김주엽",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-6419-5807",
+    "생년월일": "2001.07.28",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "1,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "1,500"
+  },
+  {
+    "순번": "14",
+    "성명": "김준한",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-7453-0513",
+    "생년월일": "1996.05.13",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "15",
+    "성명": "김지훈",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-5576-6938",
+    "생년월일": "1997.12.07",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "1,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "1,500"
+  },
+  {
+    "순번": "16",
+    "성명": "김하민",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-4133-1537",
+    "생년월일": "2004.12.22",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "17",
+    "성명": "김한민",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-9665-6479",
+    "생년월일": "2001.02.21",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "18",
+    "성명": "니스타",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-2647-1671",
+    "생년월일": "2001.05.07",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "19",
+    "성명": "모상진",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-5530-7118",
+    "생년월일": "2000.06.03",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "20",
+    "성명": "문상우",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-2230-2325",
+    "생년월일": "2002.11.01",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "21",
+    "성명": "박동훈",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-9704-9165",
+    "생년월일": "1997.03.09",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "22",
+    "성명": "박민재",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-23",
+    "연락처": "010-6451-0861",
+    "생년월일": "1996.05.30",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "23",
+    "성명": "박소정",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-4247-6542",
+    "생년월일": "2001.07.23",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "24",
+    "성명": "박준호",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-4100-6367",
+    "생년월일": "1999.10.31",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "25",
+    "성명": "박창희",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-6830-5535",
+    "생년월일": "2001.03.02",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "26",
+    "성명": "배진수",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-6211-8166",
+    "생년월일": "2004.03.06",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "27",
+    "성명": "백경민",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-07-03",
+    "연락처": "010-4833-1197",
+    "생년월일": "1999.05.28",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "28",
+    "성명": "서경섭",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-9123-9818",
+    "생년월일": "1999.05.25",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "1,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "1,500"
+  },
+  {
+    "순번": "29",
+    "성명": "서상호",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-3272-8868",
+    "생년월일": "2001.08.17",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "0",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "1,000"
+  },
+  {
+    "순번": "30",
+    "성명": "서준호",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-8671-2346",
+    "생년월일": "2000.09.27",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "1,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "31",
+    "성명": "서지희",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-9941-9747",
+    "생년월일": "1999.09.28",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "32",
+    "성명": "유다경",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-26",
+    "연락처": "010-9958-1075",
+    "생년월일": "2000.02.11",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "33",
+    "성명": "유서준",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-29",
+    "연락처": "010-8285-3230",
+    "생년월일": "1998.05.25",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "34",
+    "성명": "윤상원",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-3382-2165",
+    "생년월일": "1998.08.17",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "35",
+    "성명": "은대영",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-6494-7051",
+    "생년월일": "2002.06.05",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "36",
+    "성명": "이상민",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-27",
+    "연락처": "010-2725-3734",
+    "생년월일": "2002.09.03",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "37",
+    "성명": "이세용",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-2842-6472",
+    "생년월일": "2006.05.22",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "38",
+    "성명": "이수인",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-6664-6391",
+    "생년월일": "2004.05.14",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "39",
+    "성명": "이우진",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-4886-6951",
+    "생년월일": "2003.06.27",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "40",
+    "성명": "이유진",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-5469-6995",
+    "생년월일": "2001.03.05",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "41",
+    "성명": "이윤지",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-8706-4531",
+    "생년월일": "2002.01.16",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "42",
+    "성명": "이지민",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-9829-8908",
+    "생년월일": "1998.08.08",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "43",
+    "성명": "이지성",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-8518-8359",
+    "생년월일": "1995.07.03",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "44",
+    "성명": "이지용",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-5031-7016",
+    "생년월일": "2000.04.24",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "45",
+    "성명": "이진호",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-07-02",
+    "연락처": "010-4455-4829",
+    "생년월일": "2004.05.24",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "46",
+    "성명": "이치헌",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-3086-0335",
+    "생년월일": "2003.06.10",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "47",
+    "성명": "임정민",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-8832-7864",
+    "생년월일": "2006.06.09",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "48",
+    "성명": "장문경",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-23",
+    "연락처": "010-4511-6358",
+    "생년월일": "2002.06.04",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "49",
+    "성명": "장유진",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-6693-6268",
+    "생년월일": "2000.11.25",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "50",
+    "성명": "장재호",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-5412-1960",
+    "생년월일": "1994.09.16",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "51",
+    "성명": "장현준",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-3376-3511",
+    "생년월일": "1993.09.17",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "52",
+    "성명": "정리나",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-23",
+    "연락처": "010-9174-3016",
+    "생년월일": "2001.06.26",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "53",
+    "성명": "정세진",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-9981-9995",
+    "생년월일": "19970309",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "54",
+    "성명": "주건희",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-24",
+    "연락처": "010-6769-8935",
+    "생년월일": "2005.12.29",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "55",
+    "성명": "진유나",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-24",
+    "연락처": "010-9797-5615",
+    "생년월일": "2006.08.11",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "56",
+    "성명": "천동욱",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-2472-5256",
+    "생년월일": "2001.05.16",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "57",
+    "성명": "한재연",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-8379-5314",
+    "생년월일": "2000.03.21",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "58",
+    "성명": "한지은",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-4695-5836",
+    "생년월일": "2003.12.17",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,500"
+  },
+  {
+    "순번": "59",
+    "성명": "한형준",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-4803-0454",
+    "생년월일": "2001.06.12",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "60",
+    "성명": "허진수",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-2606-6751",
+    "생년월일": "2000.09.08",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "1,000",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "3,000"
+  },
+  {
+    "순번": "61",
+    "성명": "황재준",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "010-4171-7596",
+    "생년월일": "2001.03.23",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "62",
+    "성명": "황종원",
+    "과정포기여부": "O",
+    "과정포기날짜": "2026-06-26",
+    "연락처": "010-6223-8571",
+    "생년월일": "2000.12.31",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "",
+    "밋업 출석(1,000점x7회)": "2,000",
+    "동료학습(500점x9회)": "0",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "2,000"
+  },
+  {
+    "순번": "합계",
+    "성명": "",
+    "과정포기여부": "",
+    "과정포기날짜": "",
+    "연락처": "",
+    "생년월일": "",
+    "밋업 얼리버드 (1인 1회, 2,000점)": "2,000",
+    "밋업 출석(1,000점x7회)": "115,000",
+    "동료학습(500점x9회)": "31,500",
+    "프로젝트 1등 제출팀(5,000점)": "",
+    "합계": "148,500"
+  }
+];
+
+    const myName = "강모세";
+    let rawStudents = [];
+    let processedStudents = [];
+    let teamStats = {};
+
+    // Process raw JSON entries to student objects
+    function processData(data) {
+      const teams = ["Alpha", "Beta", "Gamma", "Delta"];
+      const trends = ["up", "down", "flat"];
+      
+      // Filter out withdrawn students, headers, and sum rows
+      let filtered = data.filter(x => 
+        x["순번"] && 
+        x["순번"] !== "합계" && 
+        !x["과정포기여부"] && 
+        x["성명"]
+      );
+
+      // Convert scores to integer and sort
+      let parsed = filtered.map(x => {
+        const name = x["성명"];
+        const scoreStr = (x["합계"] || "0").replace(/,/g, '');
+        const score = parseInt(scoreStr, 10) || 0;
+        return {
+          name: name,
+          score: score,
+          isSelf: name === myName
+        };
+      });
+
+      // Sort by score descending, then by name ascending (stable sort)
+      parsed.sort((a, b) => {
+        if (b.score !== a.score) {
+          return b.score - a.score;
+        }
+        return a.name.localeCompare(b.name, 'ko');
+      });
+
+      // Assign Rank and other virtual parameters (teams, badges, trend)
+      processedStudents = parsed.map((s, idx) => {
+        const rank = idx + 1;
+        const team = teams[idx % 4];
+        
+        // Dynamic badges based on score
+        let badge = "🤝 소통형인재";
+        if (s.score >= 5000) {
+          badge = "👑 MVP 뱃지";
+        } else if (s.score >= 3000) {
+          badge = "⚡ 스피드왕";
+        } else if (s.score >= 2500) {
+          badge = "🔍 디버깅 귀재";
+        }
+
+        // Dynamic pseudo-trends
+        let trend = "flat";
+        let change = "";
+        if (idx % 3 === 0) {
+          trend = "up";
+          change = `+${(idx % 2) + 1}`;
+        } else if (idx % 5 === 0) {
+          trend = "down";
+          change = "-1";
+        }
+
+        return {
+          rank: rank,
+          name: s.name,
+          score: s.score,
+          team: team,
+          badge: badge,
+          trend: trend,
+          change: change,
+          isSelf: s.isSelf
+        };
+      });
+
+      // Calculate Team Averages
+      const teamSums = { "Alpha": 0, "Beta": 0, "Gamma": 0, "Delta": 0 };
+      const teamCounts = { "Alpha": 0, "Beta": 0, "Gamma": 0, "Delta": 0 };
+
+      processedStudents.forEach(s => {
+        teamSums[s.team] += s.score;
+        teamCounts[s.team]++;
+      });
+
+      teamStats = {};
+      Object.keys(teamSums).forEach(team => {
+        const count = teamCounts[team];
+        teamStats[team] = count > 0 ? Math.round(teamSums[team] / count) : 0;
+      });
+    }
+
+    // Render HTML Views
+    function renderPage() {
+      renderGNBAndSelfPanel();
+      renderPodium();
+      renderLeaderboard();
+      renderTeamStandings();
+    }
+
+    function renderGNBAndSelfPanel() {
+      const me = processedStudents.find(s => s.name === myName);
+      if (me) {
+        // Update GNB badge
+        document.getElementById('userBadgeText').textContent = `${me.name} (${me.rank}위) | 🪙 ${me.score.toLocaleString()} Credits`;
+        
+        // Update Self panel widget
+        document.getElementById('myGlobalRank').textContent = `${me.rank}위`;
+        document.getElementById('myCredits').textContent = `🪙 ${me.score.toLocaleString()}`;
+        document.getElementById('myAssignedTeam').textContent = `Team ${me.team}`;
+        document.getElementById('myBadge').textContent = me.badge;
+      }
+    }
+
+    function renderPodium() {
+      const podiumContainer = document.getElementById('podiumContainer');
+      podiumContainer.innerHTML = '';
+
+      // Get Top 3
+      const top3 = processedStudents.slice(0, 3);
+      if (top3.length === 0) return;
+
+      const avatars = ["🏆", "🥈", "🥉"];
+      const classes = ["first", "second", "third"];
+      const ranks = ["👑", "2", "3"];
+
+      // Sort Top 3 elements for layout order: 2nd place (idx 1), 1st place (idx 0), 3rd place (idx 2)
+      const layoutOrder = [];
+      if (top3[1]) layoutOrder.push({ ...top3[1], cardClass: 'second', rankText: '2', avatar: '🥈' });
+      if (top3[0]) layoutOrder.push({ ...top3[0], cardClass: 'first', rankText: '👑', avatar: '🏆' });
+      if (top3[2]) layoutOrder.push({ ...top3[2], cardClass: 'third', rankText: '3', avatar: '🥉' });
+
+      layoutOrder.forEach(p => {
+        const card = document.createElement('div');
+        card.className = `podium-card ${p.cardClass}`;
+        card.innerHTML = `
+          <div class="podium-rank">${p.rankText}</div>
+          <div class="podium-avatar">${p.avatar}</div>
+          <h4 class="podium-name">${p.name}</h4>
+          <span class="podium-team">Team ${p.team}</span>
+          <div class="podium-score">🪙 ${p.score.toLocaleString()}</div>
+          <div class="podium-badges">
+            <span class="badge-icon">${p.badge}</span>
+          </div>
+        `;
+        podiumContainer.appendChild(card);
+      });
+    }
+
+    function renderLeaderboard() {
+      const searchVal = document.getElementById('rankSearch').value.trim();
+      const teamVal = document.getElementById('teamSelect').value;
+      const leaderboardBody = document.getElementById('leaderboardBody');
+      leaderboardBody.innerHTML = '';
+
+      // Filter
+      const filtered = processedStudents.slice(3).filter(s => {
+        const matchesSearch = s.name.includes(searchVal);
+        const matchesTeam = teamVal === 'all' || s.team === teamVal;
+        return matchesSearch && matchesTeam;
+      });
+
+      if (filtered.length === 0) {
+        leaderboardBody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 40px 0; color: var(--text-desc);">
+              검색 조건에 맞는 학생이 존재하지 않습니다.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      filtered.forEach(s => {
+        let trendHTML = '➖';
+        let trendClass = 'flat';
+        if (s.trend === 'up') {
+          trendHTML = `🔺 ${s.change}`;
+          trendClass = 'up';
+        } else if (s.trend === 'down') {
+          trendHTML = `🔻 ${s.change}`;
+          trendClass = 'down';
+        }
+
+        const row = document.createElement('tr');
+        if (s.isSelf) {
+          row.className = 'my-rank';
+        }
+
+        row.innerHTML = `
+          <td class="rank-cell">${s.rank}위</td>
+          <td>
+            <div class="student-cell">
+              <span class="avatar-sm">👤</span>
+              <span>${s.name}</span>
+              ${s.isSelf ? '<span class="my-rank-badge">나</span>' : ''}
+            </div>
+          </td>
+          <td>Team ${s.team}</td>
+          <td class="score-cell">🪙 ${s.score.toLocaleString()}</td>
+          <td><span class="badge-icon">${s.badge}</span></td>
+          <td class="trend-cell ${trendClass}">${trendHTML}</td>
+        `;
+        leaderboardBody.appendChild(row);
+      });
+    }
+
+    function renderTeamStandings() {
+      const teamStandingList = document.getElementById('teamStandingList');
+      teamStandingList.innerHTML = '';
+
+      // Sort teams by average score descending
+      const sortedTeams = Object.keys(teamStats).map(name => ({
+        name: name,
+        avg: teamStats[name]
+      })).sort((a, b) => b.avg - a.avg);
+
+      // Max score to normalize percentage width (avoid division by 0)
+      const maxScore = Math.max(...sortedTeams.map(t => t.avg), 1);
+
+      sortedTeams.forEach((t, idx) => {
+        const percent = Math.max(Math.round((t.avg / maxScore) * 100), 20); // Minimum 20% for visibility
+        const barClass = t.name.toLowerCase();
+        
+        const row = document.createElement('div');
+        row.className = 'team-row';
+        row.innerHTML = `
+          <div class="team-info">
+            <span>${idx + 1}. Team ${t.name}</span>
+            <span class="team-avg-score">🪙 ${t.avg.toLocaleString()}</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill ${barClass}" style="width: ${percent}%;"></div>
+          </div>
+        `;
+        teamStandingList.appendChild(row);
+      });
+    }
+
+    // Filter Listeners
+    document.getElementById('rankSearch').addEventListener('input', renderLeaderboard);
+    document.getElementById('teamSelect').addEventListener('change', renderLeaderboard);
+
+    // Initial Load
+    fetch('data_json/credit_data.json')
+      .then(res => res.json())
+      .then(data => {
+        processData(data);
+        renderPage();
+      })
+      .catch(err => {
+        console.warn('Dynamic fetch failed, utilizing pre-embedded fallback JSON data.', err);
+        processData(fallbackData);
+        renderPage();
+      });
+  </script>
+</body>
+
+</html>

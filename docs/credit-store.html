@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대구 AI SW 파일럿</title>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      /* Electric Blue */
+      --secondary-color: #06b6d4;
+      /* Neon Cyan */
+      --bg-dark: #09090b;
+      /* Deep Black */
+      --bg-charcoal: #111827;
+      /* Secondary Background */
+      --bg-card: rgba(26, 29, 36, 0.75);
+      /* Surface/Card: Glass dark */
+      --text-main: #ffffff;
+      --text-muted: #e4e4e7;
+      --text-desc: #71717a;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-color: #06b6d4;
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px;
+    }
+
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.65;
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong {
+      word-break: keep-all;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .nav-links-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 22px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .user-credit-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.2);
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffc107;
+      box-shadow: 0 0 10px rgba(255, 193, 7, 0.15);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 70px;
+      padding: 80px 0 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-title {
+      font-size: 2.8rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* Control Panel */
+    .control-panel {
+      padding: 30px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .category-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 30px;
+      padding: 8px 18px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: var(--glow-blue);
+    }
+
+    .filters-right {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-grow: 1;
+      justify-content: flex-end;
+      max-width: 500px;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex-grow: 1;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: #ffffff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
+    }
+
+    .sort-select {
+      background: rgba(26, 29, 36, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      min-width: 140px;
+    }
+
+    /* Product Grid */
+    .product-section {
+      padding: 50px 0 80px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 30px;
+    }
+
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+    }
+
+    .product-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--card-radius);
+      padding: 1px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .product-card:hover::before {
+      opacity: 0.4;
+    }
+
+    .card-thumb {
+      height: 180px;
+      position: relative;
+      background: #181b22;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+
+    .product-card:hover .card-thumb img {
+      transform: scale(1.06);
+    }
+
+    .out-of-stock-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .out-of-stock-badge {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #f87171;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .card-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .product-cat {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .product-desc {
+      font-size: 0.85rem;
+      color: var(--text-desc);
+      margin-bottom: 20px;
+      line-height: 1.5;
+      flex-grow: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 16px;
+      margin-top: auto;
+    }
+
+    .product-price {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffc107;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stock-badge {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .stock-badge.in-stock {
+      background: rgba(16, 185, 129, 0.1);
+      color: #34d399;
+    }
+
+    .stock-badge.low-stock {
+      background: rgba(245, 158, 11, 0.1);
+      color: #fbbf24;
+    }
+
+    .detail-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 16px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .detail-btn:hover {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-color: transparent;
+      box-shadow: var(--glow-blue);
+    }
+
+    /* Out of stock product specific card styles */
+    .product-card.out-of-stock {
+      opacity: 0.6;
+    }
+
+    .product-card.out-of-stock .detail-btn {
+      cursor: not-allowed;
+      background: rgba(255, 255, 255, 0.01);
+      color: var(--text-desc);
+    }
+
+    .product-card.out-of-stock .detail-btn:hover {
+      background: rgba(255, 255, 255, 0.01);
+      border-color: var(--border-color);
+      box-shadow: none;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(9, 9, 11, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 760px;
+      background: #15181f;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      position: relative;
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      color: #ffffff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .modal-content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 440px;
+    }
+
+    .modal-img-area {
+      background: #0d0f13;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+      border-right: 1px solid var(--border-color);
+    }
+
+    .modal-img-area img {
+      max-width: 100%;
+      max-height: 350px;
+      object-fit: contain;
+    }
+
+    .modal-info-area {
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .modal-cat {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 16px;
+    }
+
+    .modal-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .modal-policy-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      font-size: 0.8rem;
+      color: var(--text-desc);
+      margin-bottom: 24px;
+    }
+
+    .modal-policy-box h5 {
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .modal-policy-box ul {
+      list-style: none;
+    }
+
+    .modal-policy-box li::before {
+      content: "•";
+      color: var(--secondary-color);
+      display: inline-block;
+      width: 1em;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 20px;
+    }
+
+    .modal-price-label {
+      font-size: 0.85rem;
+      color: var(--text-desc);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .modal-price {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #ffc107;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modal-action-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 24px;
+      color: var(--text-desc);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      .modal-content-grid {
+        grid-template-columns: 1fr;
+      }
+      .modal-img-area {
+        height: 240px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .modal-info-area {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">DIP SW 파일럿 과정</a>
+      <div class="nav-links-wrapper">
+        <ul class="nav-links">
+          <li><a href="index.html#programs">과정 선택</a></li>
+          <li><a href="credit-store.html" class="active">크래딧 상점</a></li>
+          <li><a href="credit-ranking.html">크래딧 랭킹</a></li>
+          <li><a href="certificate.html">인증서 확인</a></li>
+        </ul>
+        <div class="user-credit-badge">
+          <span>🪙</span>
+          <span>450 Credits</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">Spend Your Hard-Earned Credits!</h1>
+      <p class="hero-subtitle">
+        부트캠프 실습 퀴즈, 과제 완료, 적극적인 피드백 등으로 획득한 크래딧을 활용해 가상의 상품들을 교환 리스트에서 둘러보세요.
+      </p>
+    </div>
+  </section>
+
+  <!-- Control Panel -->
+  <div class="container">
+    <div class="control-panel">
+      <div class="category-tabs" id="categoryTabs">
+        <button class="tab-btn active" data-category="all">전체</button>
+        <button class="tab-btn" data-category="it">IT 기기</button>
+        <button class="tab-btn" data-category="gift">기프티콘</button>
+        <button class="tab-btn" data-category="goods">부트캠프 굿즈</button>
+        <button class="tab-btn" data-category="snack">간식/음료</button>
+      </div>
+
+      <div class="filters-right">
+        <div class="search-wrapper">
+          <input type="text" class="search-input" id="searchInput" placeholder="상품명을 입력하세요..." />
+        </div>
+        <select class="sort-select" id="sortSelect">
+          <option value="default">기본 정렬</option>
+          <option value="price-asc">낮은 크래딧순</option>
+          <option value="price-desc">높은 크래딧순</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Section -->
+  <section class="product-section">
+    <div class="container">
+      <div class="product-grid" id="productGrid">
+        <!-- Products generated dynamically via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Detail Modal Overlay -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">×</button>
+      <div class="modal-content-grid">
+        <div class="modal-img-area">
+          <img id="modalImg" src="" alt="Product Image" />
+        </div>
+        <div class="modal-info-area">
+          <div>
+            <span class="modal-cat" id="modalCat">CATEGORY</span>
+            <h4 class="modal-title" id="modalTitle">Product Title</h4>
+            <p class="modal-desc" id="modalDesc">Detailed description...</p>
+            <div class="modal-policy-box">
+              <h5>교환 정책 및 안내사항</h5>
+              <ul>
+                <li>가상 상품권으로 실제 금액 인출이 불가합니다.</li>
+                <li>크래딧 교환은 1인당 항목별 1회로 한정됩니다.</li>
+                <li>본 화면은 교육 실습용 시연 카탈로그입니다.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div>
+              <span class="modal-price-label">소모 크래딧</span>
+              <div class="modal-price">
+                <span>🪙</span>
+                <span id="modalPrice">0</span>
+              </div>
+            </div>
+            <button class="modal-action-btn" disabled>교환 준비 중</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Product data set
+    const products = [
+      {
+        id: 1,
+        title: "스타벅스 아메리카노 Tall",
+        category: "gift",
+        categoryName: "기프티콘",
+        desc: "지친 학습 중에 시원한 활력을 불어넣는 스타벅스 아메리카노 모바일 쿠폰.",
+        price: 30,
+        stock: 15,
+        img: "img/giftcard.png", // Fallback text/icon styling will be used if image not found
+        color: "#1e3a8a"
+      },
+      {
+        id: 2,
+        title: "DIP SW 파일럿 로고 후드티",
+        category: "goods",
+        categoryName: "부트캠프 굿즈",
+        desc: "고급 자수가 놓인 2026 DIP SW 파일럿 한정판 에코 테크웨어 후드티셔츠.",
+        price: 150,
+        stock: 5,
+        img: "img/hoodie.png",
+        color: "#5b21b6"
+      },
+      {
+        id: 3,
+        title: "로지텍 MX Master 3S 마우스",
+        category: "it",
+        categoryName: "IT 기기",
+        desc: "최적의 프로그래밍 환경을 제공하는 무소음 무한 스크롤 최고급 개발용 마우스.",
+        price: 350,
+        stock: 2,
+        img: "img/mouse.png",
+        color: "#0f172a"
+      },
+      {
+        id: 4,
+        title: "허니버터칩 + 콜라 세트",
+        category: "snack",
+        categoryName: "간식/음료",
+        desc: "실습 중 당 보충을 책임질 달콤하고 바삭한 허니버터칩과 탄산 음료 단짝 구성.",
+        price: 10,
+        stock: 50,
+        img: "img/snack.png",
+        color: "#065f46"
+      },
+      {
+        id: 5,
+        title: "키크론 K2 기계식 키보드",
+        category: "it",
+        categoryName: "IT 기기",
+        desc: "최고의 타건감을 자랑하는 코딩용 무선 기계식 키보드 (청축/적축 옵션 제공).",
+        price: 300,
+        stock: 0, // Out of Stock
+        img: "img/keyboard.png",
+        color: "#1f2937"
+      },
+      {
+        id: 6,
+        title: "DIP 메탈 이중진공 텀블러",
+        category: "goods",
+        categoryName: "부트캠프 굿즈",
+        desc: "하루 종일 얼음이 녹지 않는 이중 진공 스테인리스 메탈 마감 대용량 텀블러.",
+        price: 80,
+        stock: 8,
+        img: "img/tumbler.png",
+        color: "#3730a3"
+      },
+      {
+        id: 7,
+        title: "BHC 뿌링클 + 콜라 1.25L",
+        category: "gift",
+        categoryName: "기프티콘",
+        desc: "팀 과제 우승 기념이나 주말 야식에 완벽한 BHC 치킨 인기 No.1 뿌링클 치킨.",
+        price: 70,
+        stock: 10,
+        img: "img/chicken.png",
+        color: "#854d0e"
+      },
+      {
+        id: 8,
+        title: "페레로로쉐 8구 선물세트",
+        category: "snack",
+        categoryName: "간식/음료",
+        desc: "부트캠프 발표 날 기분 좋은 긴장 완화를 선사하는 프리미엄 초콜릿 선물세트.",
+        price: 20,
+        stock: 25,
+        img: "img/chocolate.png",
+        color: "#9a3412"
+      }
+    ];
+
+    const productGrid = document.getElementById('productGrid');
+    const categoryTabs = document.getElementById('categoryTabs');
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+
+    const productModal = document.getElementById('productModal');
+    const modalClose = document.getElementById('modalClose');
+
+    let currentCategory = 'all';
+    let searchQuery = '';
+    let currentSort = 'default';
+
+    // Render products list based on filters
+    function renderProducts() {
+      // Filter products
+      let filtered = products.filter(p => {
+        const matchesCategory = currentCategory === 'all' || p.category === currentCategory;
+        const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      });
+
+      // Sort products
+      if (currentSort === 'price-asc') {
+        filtered.sort((a, b) => a.price - b.price);
+      } else if (currentSort === 'price-desc') {
+        filtered.sort((a, b) => b.price - a.price);
+      }
+
+      // Build HTML
+      productGrid.innerHTML = '';
+      if (filtered.length === 0) {
+        productGrid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 60px 0; color: var(--text-desc);">
+            <h4>검색 결과에 맞는 상품이 존재하지 않습니다.</h4>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(p => {
+        const isOutOfStock = p.stock === 0;
+        const stockText = isOutOfStock ? '품절' : `${p.stock}개 남음`;
+        const stockClass = isOutOfStock ? '' : (p.stock <= 5 ? 'low-stock' : 'in-stock');
+
+        // Create standard card
+        const card = document.createElement('article');
+        card.className = `product-card ${isOutOfStock ? 'out-of-stock' : ''}`;
+
+        // Inline CSS layout for items since we don't have actual static image files in the directory
+        card.innerHTML = `
+          <div class="card-thumb" style="background: linear-gradient(135deg, ${p.color}aa, #09090b 90%);">
+            ${isOutOfStock ? '<div class="out-of-stock-overlay"><span class="out-of-stock-badge">OUT OF STOCK</span></div>' : ''}
+            <div style="font-size: 3rem;">🛍️</div>
+          </div>
+          <div class="card-body">
+            <span class="product-cat">${p.categoryName}</span>
+            <h4 class="product-title">${p.title}</h4>
+            <p class="product-desc">${p.desc}</p>
+            <div class="card-footer">
+              <span class="product-price">🪙 ${p.price}</span>
+              ${!isOutOfStock ? `<span class="stock-badge ${stockClass}">${stockText}</span>` : ''}
+            </div>
+            <button class="detail-btn" onclick="openDetail(${p.id})">상세 보기</button>
+          </div>
+        `;
+        productGrid.appendChild(card);
+      });
+    }
+
+    // Modal control
+    function openDetail(id) {
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+
+      document.getElementById('modalCat').textContent = product.categoryName;
+      document.getElementById('modalTitle').textContent = product.title;
+      document.getElementById('modalDesc').textContent = product.desc;
+      document.getElementById('modalPrice').textContent = product.price;
+
+      const modalImgArea = document.querySelector('.modal-img-area');
+      modalImgArea.style.background = `linear-gradient(135deg, ${product.color}bb, #09090b)`;
+
+      productModal.classList.add('active');
+      productModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      productModal.classList.remove('active');
+      productModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    // Event Listeners for Filters
+    categoryTabs.addEventListener('click', (e) => {
+      if (e.target.classList.contains('tab-btn')) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        e.target.classList.add('active');
+        currentCategory = e.target.dataset.category;
+        renderProducts();
+      }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderProducts();
+    });
+
+    sortSelect.addEventListener('change', (e) => {
+      currentSort = e.target.value;
+      renderProducts();
+    });
+
+    modalClose.addEventListener('click', closeModal);
+
+    productModal.addEventListener('click', (e) => {
+      if (e.target === productModal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && productModal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    // Initial render
+    renderProducts();
+  </script>
+</body>
+
+</html>
