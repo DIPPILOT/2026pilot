@@ -95,14 +95,31 @@
   <div class="overlay" id="overlay" aria-hidden="true"><div class="photo-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="close" id="close" aria-label="닫기">×</button><img id="modalImage" src="" alt=""><h2 id="modalTitle"></h2></div></div>
   <script>
     const products=[
-      [1,'플라이토 LED 100W 초고속 충전 케이블 C-to-C 1.5M',3],[1,'고양이 젤리 발바닥 컴퓨터 키보드 실리콘 키캡',2],[1,'마우스패드 해낸다햄스터',1],[1,'톰토 마우스패드',4],[1,'냥므라이스 마우스패드',5],
-      [2,'이불 곰돌이 플레이트'],[2,'스팀 온열안대 눈 찜질팩 아이마스크 1BOX (5매)'],[2,'힐링 휴대용 마사지 귀여운 문어괄사'],[2,'방울토마토 머그컵 (+키링 증정)'],[2,'엔젯오리진 식물성 멀티비타민 피치레몬맛 60구미'],
-      [3,'행복 질문 일기 365 Q&A 자문자답 데일리 다이어리',11],[3,'자문자답 나를 찾는 3년 질문일기',14],[3,'춘식이 안전벨트 커버',12],[3,'블랙춘 안전벨트 커버',13],[3,'킨토 텀블러 워터보틀 300ml',15],
-      [4,'코리락쿠마 미니선풍기'],[4,'초소형 초경량 5단 접이식 미니 우양산'],[4,'로이체 미니 버티컬 무선 마우스 RX-650V 저소음 인체공학'],[4,'햄찌마우스 귀여운 햄스터 무소음 무선 마우스'],[4,'엑토 접이식 블루투스 키보드 BTK-13 저소음 슬림'],[4,'엑토 가죽 데스크패드 장패드 QMP84'],[4,'방수 다회용 필름 카메라']
+      [1,'플라이토 LED 100W 초고속 충전 케이블 C-to-C 1.5M','flyto_charging_cable.jpg'],
+      [1,'고양이 젤리 발바닥 컴퓨터 키보드 실리콘 키캡','cat_keycap.jpg'],
+      [1,'마우스패드 해낸다햄스터','hamster_mousepad.jpg'],
+      [1,'톰토 마우스패드','tomto_mousepad.jpg'],
+      [1,'냥므라이스 마우스패드','nyang_omurice_mousepad.jpg'],
+      [2,'이불 곰돌이 플레이트','bear_plate.jpg'],
+      [2,'스팀 온열안대 눈 찜질팩 아이마스크 1BOX (5매)','steam_eye_mask.jpg'],
+      [2,'힐링 휴대용 마사지 귀여운 문어괄사','octopus_massage_guasha.jpg'],
+      [2,'방울토마토 머그컵 (+키링 증정)','cherry_tomato_mug_keyring.jpg'],
+      [2,'엔젯오리진 식물성 멀티비타민 피치레몬맛 60구미','multivitamin_gummies.jpg'],
+      [3,'행복 질문 일기 365 Q&A 자문자답 데일리 다이어리','happy_qna_diary.png'],
+      [3,'자문자답 나를 찾는 3년 질문일기','indigo_3year_journal.png'],
+      [3,'춘식이 안전벨트 커버','chunsik_seatbelt_cover.jpg'],
+      [3,'블랙춘 안전벨트 커버','black_chunsik_seatbelt_cover.jpg'],
+      [3,'킨토 텀블러 워터보틀 300ml','kinto_tumbler.jpg'],
+      [4,'코리락쿠마 미니선풍기','korilakkuma_mini_fan.jpg'],
+      [4,'초소형 초경량 5단 접이식 미니 우양산','mini_folding_umbrella.png'],
+      [4,'로이체 미니 버티컬 무선 마우스 RX-650V 저소음 인체공학','royce_vertical_mouse.jpg'],
+      [4,'햄찌마우스 귀여운 햄스터 무소음 무선 마우스','hamster_wireless_mouse.jpg'],
+      [4,'엑토 접이식 블루투스 키보드 BTK-13 저소음 슬림','actto_bluetooth_keyboard.png'],
+      [4,'엑토 가죽 데스크패드 장패드 QMP84','actto_desk_pad.jpg'],
+      [4,'방수 다회용 필름 카메라','waterproof_film_camera.jpg']
     ];
     const characters=['⚡🔌','🐾⌨️','🐹🟦','🍅🟦','🐱🟦','🧸🍽️','👀😴','🐙💆','🍅☕','🐻💊','📔🖊️','📔❓','🚗💛','🚗🖤','💧🥛','🐻🌀','☂️☀️','🖱️✋','🖱️🐹','⌨️🚶','🖥️🟫','📷💧'];
-    const photoExtensions={11:'png',14:'png',17:'png',20:'png'};
-    const productList=products.map(([tier,title,imageIndex],i)=>{const photo=imageIndex||i+1;const ext=photoExtensions[photo]||'jpg';return {id:i+1,tier,title,character:characters[i],tone:['#38bdf8','#2563eb','#8b5cf6','#ec4899'][tier-1],image:`credit-store-assets/product-${String(photo).padStart(2,'0')}.${ext}`}});
+    const productList=products.map(([tier,title,imageFile],i)=>({id:i+1,tier,title,character:characters[i],tone:['#38bdf8','#2563eb','#8b5cf6','#ec4899'][tier-1],image:`image/${imageFile}`}));
     const tierInfo={1:{label:'5,000 크레딧을 사용하여 get할 수 있는 선물🎁',color:'#38bdf8'},2:{label:'10,000 크레딧을 사용하여 get할 수 있는 선물🎁',color:'#2563eb'},3:{label:'15,000 크레딧을 사용하여 get할 수 있는 선물🎁',color:'#8b5cf6'},4:{label:'20,000 크레딧을 사용하여 get할 수 있는 선물🎁',color:'#ec4899'}};
     const sections=document.querySelector('#sections'),overlay=document.querySelector('#overlay'),modalImage=document.querySelector('#modalImage'),modalTitle=document.querySelector('#modalTitle'),closeButton=document.querySelector('#close');
     function render(query=''){const q=query.toLowerCase();sections.innerHTML=[1,2,3,4].map(tier=>{const list=productList.filter(p=>p.tier===tier&&p.title.toLowerCase().includes(q));const info=tierInfo[tier];return `<section class="tier-section ${list.length?'':'empty-section'}" style="--tier-color:${info.color}"><header class="tier-heading"><div class="tier-number">${tier}구간</div><div class="tier-copy"><h2>${info.label}</h2></div><div class="tier-line"></div></header><div class="grid">${list.map(p=>`<article class="card"><div class="thumb" style="--tone:${p.tone}"><span class="character" aria-hidden="true">${p.character}</span></div><div class="body"><h3 class="title">${p.title}</h3><button class="detail" onclick="openDetail(${p.id})">상세보기</button></div></article>`).join('')}</div></section>`}).join('');if(!sections.querySelector('.tier-section:not(.empty-section)'))sections.innerHTML='<div class="empty">검색 결과가 없습니다.</div>'}
