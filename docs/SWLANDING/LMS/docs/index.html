@@ -1,0 +1,3307 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACE AI Startup Bootcamp | 10-Day Learning Contents</title>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      /* Electric Blue */
+      --secondary-color: #06b6d4;
+      /* Neon Cyan */
+      --bg-dark: #09090b;
+      /* Primary Background: Deep Black */
+      --bg-charcoal: #111827;
+      /* Secondary Background */
+      --bg-card: #1a1d24;
+      /* Surface/Card: Dark Gray */
+      --text-main: #ffffff;
+      /* Primary: White */
+      --text-muted: #e4e4e7;
+      /* Secondary: Light Gray */
+      --text-desc: #71717a;
+      /* Description: Gray */
+      --border-color: rgba(255, 255, 255, 0.08);
+      /* Thin border with low opacity */
+      --accent-color: #06b6d4;
+      /* Neon Cyan */
+      --accent-purple: #8b5cf6;
+      /* Purple highlight */
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 70px;
+    }
+
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.65;
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    p,
+    li,
+    span,
+    strong {
+      word-break: keep-all;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    section {
+      padding: 80px 0;
+    }
+
+    .bg-gray {
+      background: transparent;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 22px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .hero {
+      margin-top: 70px;
+      padding: 120px 0 90px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    @keyframes gradientBG {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 30%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero h2 {
+      font-size: 1.3rem;
+      font-weight: 500;
+      opacity: 0.92;
+      margin-bottom: 22px;
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      opacity: 0.9;
+      max-width: 720px;
+      margin-bottom: 28px;
+    }
+
+    .hero-box {
+      background: rgba(26, 29, 36, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .hero-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      font-weight: 700;
+      color: #93c5fd;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.92rem;
+      color: white;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .hero-badge:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: white;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(59, 130, 246, 0.6), 0 0 15px rgba(6, 182, 212, 0.4);
+    }
+
+    .btn-outline {
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      color: white;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.2rem;
+      color: #ffffff;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .section-title::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      margin: 12px auto 0;
+      border-radius: 999px;
+    }
+
+    .section-desc {
+      max-width: 860px;
+      margin: 0 auto 42px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.02rem;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .overview-card {
+      background: rgba(26, 29, 36, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--card-radius);
+      padding: 26px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    .overview-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md), 0 0 15px rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    .overview-card .value {
+      font-size: 1.6rem;
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .overview-card .label {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .curriculum-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+
+    .course-card {
+      background: rgba(26, 29, 36, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 480px;
+      /* Vertically tall cards */
+    }
+
+    .course-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md), 0 0 20px rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .course-card.is-clickable {
+      cursor: pointer;
+      position: relative;
+    }
+
+    .course-card.is-clickable::after {
+      content: "상세보기";
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(4px);
+      color: var(--secondary-color);
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 7px 12px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .course-card.is-clickable:hover::after {
+      background: var(--primary-color);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: var(--glow-blue);
+    }
+
+    .course-thumb {
+      height: 220px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .course-thumb.placeholder {
+      background: linear-gradient(135deg, rgba(26, 29, 36, 0.4), rgba(26, 29, 36, 0.8));
+      color: #71717a;
+      text-shadow: none;
+    }
+
+    .course-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    /* Hide detailed elements inside course-card to keep it simple, clean and concise */
+    .course-card .course-desc,
+    .course-card .meta-grid,
+    .course-card .time-list,
+    .course-card .meta-item {
+      display: none;
+    }
+
+    .day-label {
+      display: inline-block;
+      width: fit-content;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--secondary-color);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+    }
+
+    .course-title {
+      font-size: 1.22rem;
+      line-height: 1.35;
+      font-weight: 800;
+      color: #ffffff;
+      transition: color 0.2s ease;
+    }
+
+    .course-card:hover .course-title {
+      color: var(--secondary-color);
+      text-shadow: var(--glow-cyan);
+    }
+
+    .course-subtitle {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .course-desc {
+      color: var(--text-muted);
+      font-size: 0.96rem;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 2px;
+    }
+
+    .meta-item {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px 14px;
+      font-size: 0.93rem;
+      color: var(--text-muted);
+    }
+
+    .meta-item strong {
+      color: var(--secondary-color);
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .time-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .time-row {
+      border-left: 3px solid rgba(6, 182, 212, 0.4);
+      padding-left: 12px;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+    }
+
+    .time-row strong {
+      color: var(--secondary-color);
+      margin-right: 6px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .tag:hover {
+      background: rgba(59, 130, 246, 0.15);
+      color: #ffffff;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .placeholder-note {
+      margin-top: auto;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-desc);
+      font-size: 0.92rem;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .footer-cta {
+      background: #09090b;
+      color: white;
+      text-align: center;
+      padding: 70px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .footer-cta h3 {
+      font-size: 2rem;
+      margin-bottom: 14px;
+    }
+
+    .footer-cta p {
+      max-width: 760px;
+      margin: 0 auto;
+      opacity: 0.8;
+      color: var(--text-muted);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+      z-index: 2000;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 1100px;
+      max-height: 90vh;
+      overflow: auto;
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      transform: translateY(24px) scale(0.98);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: #ffffff;
+      z-index: 4;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: rotate(90deg);
+    }
+
+    .modal-hero {
+      background: linear-gradient(135deg, #09090b, #111827);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: white;
+      padding: 42px 36px 32px;
+      border-radius: 24px 24px 0 0;
+    }
+
+    .modal-day {
+      display: inline-flex;
+      padding: 8px 12px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 999px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--primary-color);
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      line-height: 1.2;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .modal-subtitle {
+      font-size: 1.04rem;
+      opacity: 0.92;
+      max-width: 760px;
+      color: var(--text-muted);
+    }
+
+    .modal-body {
+      padding: 34px 36px 36px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .modal-section {
+      margin-bottom: 26px;
+    }
+
+    .modal-section h4 {
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+      margin-bottom: 12px;
+      font-weight: 800;
+      text-shadow: var(--glow-cyan);
+    }
+
+    .modal-section p {
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .info-panel {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+
+    .info-panel h5 {
+      font-size: 0.96rem;
+      margin-bottom: 12px;
+      color: var(--secondary-color);
+      font-weight: 800;
+    }
+
+    .info-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .info-list li {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.94rem;
+      color: var(--text-muted);
+    }
+
+    .info-list li strong {
+      color: var(--secondary-color);
+      margin-right: 6px;
+    }
+
+    .session-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .session-card {
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.01);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .session-card:hover {
+      border-color: rgba(59, 130, 246, 0.2);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .session-time {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--secondary-color);
+      background: rgba(6, 182, 212, 0.1);
+      border-radius: 999px;
+      padding: 6px 10px;
+      margin-bottom: 10px;
+    }
+
+    .session-card h5 {
+      font-size: 1rem;
+      margin-bottom: 8px;
+      color: #ffffff;
+    }
+
+    .session-card p {
+      color: #a1a1aa;
+      font-size: 0.95rem;
+    }
+
+    .bullet-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+      padding-left: 18px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .outcome-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .outcome-tag {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--secondary-color);
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    @media (max-width: 1024px) {
+
+      .hero-grid,
+      .overview-grid,
+      .modal-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero-grid,
+      .overview-grid,
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+
+      .hero h2 {
+        font-size: 1.1rem;
+      }
+
+      section {
+        padding: 64px 0;
+      }
+
+      .modal-hero {
+        padding: 34px 22px 24px;
+      }
+
+      .modal-body {
+        padding: 24px 22px 28px;
+      }
+
+      .modal-title {
+        font-size: 1.55rem;
+      }
+    }
+
+    .ai-class-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .ai-class-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5), 0 0 10px rgba(6, 182, 212, 0.3);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">대구 SW 랜딩</a>
+      <ul class="nav-links">
+        <li><a href="index.html">과정 홈</a></li>
+        <li><a href="homework_week1.html" style="color: #c084fc !important; font-weight: 700 !important; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 12px; border-radius: 8px;">1주차 과제</a></li>
+        <li><a href="homework_week2.html" style="color: #22d3ee !important; font-weight: 700 !important; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); padding: 6px 12px; border-radius: 8px;">2주차 과제</a></li>
+        <li><a href="#overview">프로그램 소개</a></li>
+        <li><a href="#curriculum">10일 커리큘럼</a></li>
+        <li><a href="#final">최종 결과</a></li>
+        <li><a href="login/login.html" style="color: var(--secondary-color); text-shadow: var(--glow-cyan);">로그인</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <h1>Build an AI Startup in 10 Days</h1>
+        <h2>AI를 활용해 아이디어를 실제 POC 가능한 서비스로 구현하는 10일 실전 프로그램</h2>
+        <p>
+          ACE Startup 프로그램은 AI SW를 활용해 창업 프로젝트를 설계하고,
+          화면 기획부터 프로토타입, 개발, 배포, 데모까지 이어지는 제품 제작 경험을 목표로 합니다.
+        </p>
+        <a href="#curriculum" class="btn btn-primary">학습 콘텐츠 보기</a>
+        <a href="#final" class="btn btn-outline">최종 산출물 보기</a>
+      </div>
+      <div class="hero-box">
+        <h3>Program Focus</h3>
+        <div class="hero-badges">
+          <span class="hero-badge">AI Startup</span>
+          <span class="hero-badge">POC Product</span>
+          <span class="hero-badge">UX / Wireframe</span>
+          <span class="hero-badge">Prototype</span>
+          <span class="hero-badge">MVP Build</span>
+          <span class="hero-badge">Deployment</span>
+          <span class="hero-badge">Demo Pitch</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="overview">
+    <div class="container">
+      <h2 class="section-title">Program Overview</h2>
+      <p class="section-desc">
+        이 페이지는 AI 기반 창업형 SW 교육과정을 10일 학습 콘텐츠 중심으로 소개하기 위한 HTML 구조입니다.
+      </p>
+
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="value">10 Days</div>
+          <div class="label">집중형 제품 개발 과정</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">1 POC</div>
+          <div class="label">실제 동작 가능한 결과물 목표</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">AI + SW</div>
+          <div class="label">AI 활용 서비스 설계와 구현</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">Team Build</div>
+          <div class="label">협업 기반 실전 프로젝트 진행</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="curriculum" class="bg-gray">
+    <div class="container">
+      <h2 class="section-title">10-Day Learning Contents</h2>
+      <p class="section-desc">
+        각 카드를 클릭하면 10일간 진행되는 일차별 상세 커리큘럼(세션 구성, 학습 목표, 기대 산출물 등)을 확인하실 수 있습니다.
+      </p>
+
+      <div class="curriculum-grid">
+        <!-- Day 1 -->
+        <article class="course-card is-clickable" id="openDay1Modal" tabindex="0" role="button"
+          aria-label="Day 1 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day1_wireframe.png'); background-size: cover; background-position: center;">
+            DAY 1</div>
+          <div class="course-content">
+            <span class="day-label">Day 1</span>
+            <h3 class="course-title">Codex 요구사항 명세 &amp; Figma 화면 설계</h3>
+            <p class="course-subtitle">Figma 기초를 익히고 Codex Client를 활용해 요구사항 명세 및 보고 체계를 자동화하는 융합 실습</p>
+            <p class="course-desc">
+              비정형화된 회의록 원본에서 시작하여 Codex Client를 통한 기능 명세(FR), 정상 및 예외 흐름 정의, Gmail 연동 발송을 진행하고, 동시에 Figma 화면 와이어프레임 설계
+              기초를 이해하는 1일차 학습 콘텐츠입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>대상</strong>기획자, 개발 입문자, 예비 창업가</div>
+              <div class="meta-item"><strong>준비물</strong>노트북, Codex Client, Figma 계정</div>
+              <div class="meta-item"><strong>학습 목표</strong>Codex AI 기획 자동화 실습 및 Figma를 활용한 서비스 화면 설계 기초 습득</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> Codex AI 기획 가이드 및 Figma 기본 인터페이스 이해</div>
+              <div class="time-row"><strong>3시간</strong> 기능 요구사항(FR) 테이블 및 예외 흐름 설계 실습</div>
+              <div class="time-row"><strong>1시간</strong> Gmail 플러그인 실제 발송 및 결과물 공유</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Requirements</span>
+              <span class="tag">Codex AI</span>
+              <span class="tag">Gmail Plugin</span>
+              <span class="tag">Figma Grid</span>
+              <span class="tag">Wireframe</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              requirements-specification.md, 보낸메일함 내 최종 공유 메일, Figma 화면 기초 시안
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day1/day1-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day1/day1-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 1일차 교재 (PDF)
+              </a>
+            </div>
+
+          </div>
+        </article>
+
+        <!-- Day 2 -->
+        <article class="course-card is-clickable" id="openDay2Modal" tabindex="0" role="button"
+          aria-label="Day 2 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day2_dataflow.png'); background-size: cover; background-position: center;">
+            DAY 2</div>
+          <div class="course-content">
+            <span class="day-label">Day 2</span>
+            <h3 class="course-title">Sequence Diagram & Data Flow Design</h3>
+            <p class="course-subtitle">화면 설계를 시스템 동작 흐름으로 연결하는 데이터 플로우 설계 실습</p>
+            <p class="course-desc">
+              Figma 화면 설계를 바탕으로 사용자 행동, 데이터 흐름, 시스템 상호작용을
+              시퀀스 다이어그램으로 시각화하고, 예외 상황까지 함께 설계하는 2일차 학습 콘텐츠입니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>Sequence Diagram, Data Flow, System Interaction, Exception
+                Handling</div>
+              <div class="meta-item"><strong>학습 목표</strong>사용자-클라이언트-서버-DB 간 상호작용을 시간 순서대로 이해하고 설계</div>
+              <div class="meta-item"><strong>실습 방향</strong>화면 구조를 기능 흐름과 데이터 흐름으로 전환하여 시스템 관점으로 확장</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 시퀀스 다이어그램과 데이터 흐름 개념 이해</div>
+              <div class="time-row"><strong>3시간</strong> 핵심 기능 시나리오 작성 및 다이어그램 실습</div>
+              <div class="time-row"><strong>1시간</strong> 결과 공유 및 예외 처리 리뷰</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Sequence Diagram</span>
+              <span class="tag">Data Flow</span>
+              <span class="tag">System Interaction</span>
+              <span class="tag">Exception Handling</span>
+              <span class="tag">Hands-on</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              핵심 기능 시나리오, 데이터 매핑 테이블, 시퀀스 다이어그램, 예외 대응 매트릭스
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day2/day2-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day2/day2-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 2일차 교재 (PDF)
+              </a>
+            </div>
+
+          </div>
+        </article>
+
+        <!-- Day 3 -->
+        <article class="course-card is-clickable" id="openDay3Modal" tabindex="0" role="button"
+          aria-label="Day 3 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day3_frontend.png'); background-size: cover; background-position: center;">
+            DAY 3</div>
+          <div class="course-content">
+            <span class="day-label">Day 3</span>
+            <h3 class="course-title">Data Normalization & ERD Design with Codex AI</h3>
+            <p class="course-subtitle">화면과 사용자 흐름을 데이터 구조와 ERD로 전환하고 Codex AI를 활용해 설계를 정밀화하는 실습</p>
+            <p class="course-desc">
+              화면 설계와 사용자 흐름을 바탕으로 필요한 데이터를 추출하고, 정규화를 거쳐 ERD를 정의하는 과정에 Codex Client Workspace를 연계합니다. 기획-개발 간 데이터 이해 불일치
+              해결(Task 01), 프로젝트 전반의 용어 표준 사전 구축(Task 02), 스키마 수정 시 API/UI 연쇄 영향 분석(Task 03) 및 설계 결정 이력 로깅(Mission 01),
+              동시성/무결성 오류 예외 케이스 발굴(Mission 02)을 실무 수준으로 수행합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>Data Extraction, Entity Definition, Relationship Design,
+                Normalization, ERD, Codex Workspace</div>
+              <div class="meta-item"><strong>학습 목표</strong>화면과 흐름에 맞는 데이터 구조를 설계하고 Codex AI를 활용해 정규화 및 ERD 정밀 검증</div>
+              <div class="meta-item"><strong>실습 방향</strong>스크린 → 유저 플로우 → 데이터 → ERD 연결 및 Codex 기반 설계 자동 오디팅</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> ERD 설계 이해 및 데이터 구조 설계 정렬 (Task 01)</div>
+              <div class="time-row"><strong>3시간</strong> 용어 표준화 (Task 02) 및 스키마 변경 영향 범위 분석 (Task 03)</div>
+              <div class="time-row"><strong>1시간</strong> 설계 의사결정 로깅 (Mission 01) 및 예외 시나리오 발굴 (Mission 02)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">ERD</span>
+              <span class="tag">Normalization</span>
+              <span class="tag">Codex AI</span>
+              <span class="tag">Glossary</span>
+              <span class="tag">Impact Analysis</span>
+              <span class="tag">Decision Log</span>
+              <span class="tag">Edge Case</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              ERD 다이어그램, 정규화 분석 문서(erd-schema.md), 표준 용어 사전(project-glossary.md), 변경 영향도 보고서, 설계 의사결정 이력(DDL), 예외 시나리오
+              분석서
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day3/day3-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day3/day3-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 3일차 교재 (PDF)
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Day 4 -->
+        <article class="course-card is-clickable" id="openDay4Modal" tabindex="0" role="button"
+          aria-label="Day 4 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day4_uicomponents.png'); background-size: cover; background-position: center;">
+            DAY 4</div>
+          <div class="course-content">
+            <span class="day-label">Day 4</span>
+            <h3 class="course-title">API Design & Swagger Specification with Codex AI</h3>
+            <p class="course-subtitle"><strong>[Codex AI 연계]</strong> 화면과 데이터 구조를 실제 개발 가능한 API 명세로 전환하고 Codex AI를 활용해
+              인터페이스 계약과 정합성을 오디팅하는 실습</p>
+            <p class="course-desc">
+              화면 설계, 사용자 흐름, 데이터 구조를 바탕으로 실제 서비스 기능을 API 형태로 정의하고 Swagger/OpenAPI 형식으로 문서화하는 과정에 <strong>Codex Client
+                Workspace</strong>를 연계합니다. AI 기반 API 계약서 자동 생성(Task 01), 기획 명세서와 실제 API 구조 간 정합성 불일치 검출(Task 02), API 명세
+              변경 시 UI/DB 연쇄 파급 영향 분석(Task 03) 및 RESTful API 표준 규격 자율 감사(Mission 01), 경계값 에지 케이스 테스트 시나리오 설계(Mission 02)를
+              실무 수준으로 수행합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>API Design, Request/Response, Swagger, OpenAPI, Codex
+                Workspace, Consistency Audit, Impact Analysis</div>
+              <div class="meta-item"><strong>학습 목표</strong>화면과 데이터 구조를 기반으로 API 명세를 정의하고 Codex AI를 연계하여 정합성 및 REST 규격 정밀
+                오디팅 수행</div>
+              <div class="meta-item"><strong>실습 방향</strong>Screen ➔ Flow ➔ Data ➔ API ➔ Swagger 구조 설계 연결 및 Codex Client
+                기반 설계 결함 자율 감사</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> API 개념 이해 및 Codex 기반 API 계약서 자동 생성 (Task 01)</div>
+              <div class="time-row"><strong>3시간</strong> 기획-API 간 정합성 검사 (Task 02) 및 API 변경 영향 범위 오디팅 (Task 03)</div>
+              <div class="time-row"><strong>1시간</strong> RESTful 규격 자율 리뷰 (Mission 01) 및 에지 케이스 테스트 시나리오 작성 (Mission 02)
+              </div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Codex AI</span>
+              <span class="tag">API Design</span>
+              <span class="tag">Swagger</span>
+              <span class="tag">OpenAPI</span>
+              <span class="tag">Consistency Audit</span>
+              <span class="tag">Impact Analysis</span>
+              <span class="tag">API Review</span>
+              <span class="tag">Test Scenario</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              API 계약서(api-contract.md), API 정합성 보고서(api-consistency-report.md), 변경 영향도 분석서(api-impact-analysis.md), REST
+              규격 검토서(api-review-report.md), 에지 테스트 시나리오(api-test-scenario.md)
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day4/day4-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day4/day4-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 4일차 교재 (PDF)
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Day 5 -->
+        <article class="course-card is-clickable" id="openDay5Modal" tabindex="0" role="button"
+          aria-label="Day 5 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day5_ai_integration.png'); background-size: cover; background-position: center;">
+            DAY 5</div>
+          <div class="course-content">
+            <span class="day-label">Day 5</span>
+            <h3 class="course-title">UI/UX Design & Interaction Design with Codex AI</h3>
+            <p class="course-subtitle"><strong>[Codex AI 연계]</strong> 와이어프레임을 바탕으로 Codex AI와 함께 사용자 편의성을 오디팅하고 인터페이스 사용성
+              품질을 보증하는 UI/UX 리뷰 실습</p>
+            <p class="course-desc">
+              구축된 화면 기획과 사용자 동선을 바탕으로 객관적인 인지 마찰 지점(Friction Points)을 검출하고 UI 일관성을 보완하는 데 <strong>Codex Client
+                Workspace</strong>를 연계합니다. 사용자가 쉽게 이해할 수 있는지 분석하는 사용성 검토(Task 01), 다중 화면 간 UI 규격 및 용어 일관성 감사(Task 02),
+              뎁스 단축을 통한 Journey 동선 최적화(Task 03) 및 고연령 소외층 페르소나 적용 곤경 로그 수집(Mission 01), 다차원 평점 기반 종합 서비스 품질 평가(Mission
+              02)를 수행합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>UI/UX Review, UI Consistency, User Journey Map, AI Persona,
+                Usability Score, Codex Workspace</div>
+              <div class="meta-item"><strong>학습 목표</strong>기획 화면의 사용 편의성을 객관적으로 분석하고 Codex AI를 활용해 직관적인 UI/UX 및 단축 동선
+                최적화안 도출</div>
+              <div class="meta-item"><strong>실습 방향</strong>Wireframe ➔ UX Audit ➔ UI Consistency ➔ Journey Optimization
+                구조 설계 및 Codex 기반 사용성 품질 보증</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 사용자 관점 화면 검토 (Task 01)</div>
+              <div class="time-row"><strong>3시간</strong> 화면 간 일관성 검토 (Task 02) 및 사용자 동선 개선 (Task 03)</div>
+              <div class="time-row"><strong>1시간</strong> 페르소나 사용성 리뷰 (Mission 01) 및 종합 서비스 품질 평가 (Mission 02)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Codex AI</span>
+              <span class="tag">UI/UX Review</span>
+              <span class="tag">UX Flow</span>
+              <span class="tag">Friction Audit</span>
+              <span class="tag">UI Consistency</span>
+              <span class="tag">User Journey</span>
+              <span class="tag">AI Persona</span>
+              <span class="tag">Usability Score</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              UX 검토 보고서(ux-review-report.md), UI 일관성 보고서(ui-consistency-report.md), 동선 개선 보고서(user-journey-report.md), 첫
+              사용자 리뷰(first-user-review.md), 종합 서비스 품질 평가서(usability-evaluation.md)
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day5/day5-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day5/day5-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 5일차 교재 (PDF)
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Day 6 -->
+        <article class="course-card is-clickable" id="openDay6Modal" tabindex="0" role="button"
+          aria-label="Day 6 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day6_backend.png'); background-size: cover; background-position: center;">
+            DAY 6</div>
+          <div class="course-content">
+            <span class="day-label">Day 6</span>
+            <h3 class="course-title">Front-End Development & API Integration with Codex AI</h3>
+            <p class="course-subtitle"><strong>[Codex AI 연계]</strong> Figma 화면을 실제 동작하는 서비스 화면으로 구현하고 Codex AI와 함께 디버깅하며 API 데이터를 연결하는 개발 실습</p>
+            <p class="course-desc">
+              Figma UI를 실제 서비스 화면으로 구현하고, fetch/AJAX 기반 API 연동을 통해 서버 데이터를 화면에 바인딩하며 로딩·에러·빈 상태까지 처리하는 개발 전 과정에 <strong>Codex Client Workspace</strong>를 연계합니다. 화면 명세를 기반으로 가동 가능한 화면 초안 빌드(Task 01), 런타임 TypeError 등의 콘솔 오류 원인 판독 및 방어 코드 패치(Task 02), 중복 제거 및 가독성 변수명으로 정돈하는 리팩토링(Task 03)과 CORS 정책 및 JSON 파싱 에러를 트러블슈팅하는 보고서 빌드(Mission 01), 전역 오염 차단 등 코드 품질 검토 및 캡슐화(Mission 02)를 수행합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>Prototype Generation, Stack Trace Debugging, Defensive Coding, Code Refactoring, Error Troubleshooting, Code Quality review, Codex Workspace</div>
+              <div class="meta-item"><strong>학습 목표</strong>Codex AI 페어 프로그래머와 협업하여 빈 화면에서 화면 프로토타입을 빠르게 빌드하고, 콘솔 에러를 해결하며, 가독성 높은 소스코드로 정돈 및 API 연동 이해</div>
+              <div class="meta-item"><strong>실습 방향</strong>Figma UI ➔ 화면 초안 빌드 ➔ 에러 디버깅 ➔ 코드 리팩토링 ➔ 예외 대응 및 캡슐화 품질 보증</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 화면 초안 빠르게 만들기 (Task 01)</div>
+              <div class="time-row"><strong>3시간</strong> 오류 해결 도우미 (Task 02) 및 코드 개선하기 (Task 03)</div>
+              <div class="time-row"><strong>1시간</strong> AI와 함께 오류 해결 (Mission 01) 및 AI 코드 리뷰 받기 (Mission 02)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Codex AI</span>
+              <span class="tag">Prototype</span>
+              <span class="tag">AI Debug</span>
+              <span class="tag">TypeError Guard</span>
+              <span class="tag">Refactoring</span>
+              <span class="tag">Troubleshooting</span>
+              <span class="tag">Code Review</span>
+              <span class="tag">IIFE Encapsulation</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              반응형 대시보드(index.html, layout.css), 디버깅 스크립트(day6_debug_solution.js), 리팩토링 소스코드(day6_clean_code.js), 디버깅 결과 보고서(day6_error_report.md), 최종 감사 결과 보고서(day6_code_review.md)
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day6/day6-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day6/day6-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 6일차 교재 (PDF)
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Day 7 -->
+        <article class="course-card is-clickable" id="openDay7Modal" tabindex="0" role="button"
+          aria-label="Day 7 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day7_database.png'); background-size: cover; background-position: center;">
+            DAY 7</div>
+          <div class="course-content">
+            <span class="day-label">Day 7</span>
+            <h3 class="course-title">Development: Completing Features with Codex AI</h3>
+            <p class="course-subtitle"><strong>[Codex AI 연계]</strong> 화면과 기능을 연결하고 사용자 가입·예약 시나리오를 점검하며 이상 입력 예외를 검증 및 차단하는 기능 완성 실습</p>
+            <p class="course-desc">
+              Figma 화면 뼈대 구현을 넘어 실제 동작이 수행되도록 정적 UI에 이벤트 매핑 및 데이터 스토리지를 엮고, 연쇄 시나리오의 작동 안정성을 확보하는 개발 과정에 <strong>Codex Client Workspace</strong>를 연계합니다. 화면 마크업 이벤트 연결 및 로컬 저장소 적재(Task 01), 다중 화면 이동 시 필터 설정값 유지 보존 가드(Task 02), 중복 연타 등록 방지 및 과거 날짜 차단 검증(Task 03)과 로딩 피드백 누락 품질 평정서(Mission 01), E2E 유저 모의주행 검증 보고서(Mission 02)를 조립합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>Feature Integration, JavaScript Event, LocalStorage, User Flow review, SessionStorage, Debounce Lock, Logic Validation, Codex Workspace</div>
+              <div class="meta-item"><strong>학습 목표</strong>Codex AI 시나리오 코치와 협업하여 정적 마크업에 이벤트를 매핑하고 데이터 보존성을 확보하며 이상 입력 에러를 완벽히 통제하는 완성도 높은 서비스 기능 조립</div>
+              <div class="meta-item"><strong>실습 방향</strong>화면 뼈대 ➔ 기능 매핑 ➔ 여정 보존 ➔ 연타 차단 예외 가드 ➔ E2E 완성도 오디팅</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 기능 연결하기 (Task 01)</div>
+              <div class="time-row"><strong>3시간</strong> 사용자 시나리오 검증 (Task 02) 및 기능 오류 찾기 (Task 03)</div>
+              <div class="time-row"><strong>1시간</strong> 서비스 완성도 점검 (Mission 01) 및 E2E 모의 주행 검증 (Mission 02)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Codex AI</span>
+              <span class="tag">Integration</span>
+              <span class="tag">Event Map</span>
+              <span class="tag">LocalStorage</span>
+              <span class="tag">State Backups</span>
+              <span class="tag">Validation</span>
+              <span class="tag">Submit Lock</span>
+              <span class="tag">E2E Verification</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              기능 연동 페이지(day7_connected_feature.html), 세션 복원 스크립트(day7_scenario_solution.js), 보안 가드 완성본(day7_robust_validation.js), 완성도 보고서(day7_service_audit.md), 시나리오 검증서(day7_e2e_validation.md)
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day7/day7-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day7/day7-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 7일차 교재 (PDF)
+              </a>
+            </div>
+
+          </div>
+        </article>
+
+        <!-- Day 8 -->
+        <article class="course-card is-clickable" id="openDay8Modal" tabindex="0" role="button"
+          aria-label="Day 8 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day8_auth.png'); background-size: cover; background-position: center;">DAY
+            8</div>
+          <div class="course-content">
+            <span class="day-label">Day 8</span>
+            <h3 class="course-title">User Management: Membership & Onboarding UX</h3>
+            <p class="course-subtitle"><strong>[Codex AI 연계]</strong> 회원 서비스 설계부터 온보딩 사용자 여정 마찰 검토 및 중복 가입·보안 취약 예외 가드 구현 실습</p>
+            <p class="course-desc">
+              로그인 기술 모듈 구현에만 국한되지 않고, 가입 절차를 사용자 편의 관점으로 최적화하고 계정 정합성을 탄탄히 다지기 위해 <strong>Codex Client Workspace</strong>를 밀접하게 조율합니다. 필수 회원 기능 획득 우선순위 기획(Task 01), 입력 폼 단계별 분산 및 이탈 장벽 제거 흐름 설계(Task 02), 중복 가입 차단 정합성 검증 및 이메일 포맷 Regex 가드 코딩(Task 03)과 실버 고객 대상 모의 가입 감정 피드백 보고서(Mission 01), 해킹 무작위 대입 방지 정보 은폐 패치를 담은 품질 평가서(Mission 02)를 구축합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>User Feature Planning, Onboarding UX, Form Friction Audit, Progressive Profiling, Database Integrity, Duplicate Account Guard, Info Hide, Usability Evaluation</div>
+              <div class="meta-item"><strong>학습 목표</strong>Codex AI 사용자 경험 코치 및 감사 파트너와 함께 가입 마찰을 최소화하고 계정 무결성을 확보하며 보안 예외 요소를 차단하는 사용자 친화적 회원 경험 조립</div>
+              <div class="meta-item"><strong>실습 방향</strong>기능 도출 ➔ 장벽 검토 ➔ 스토리지 무결성 가딩 ➔ 초보 가상 체험 ➔ 평점 및 보안 평가</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 회원 기능 설계 (Task 01)</div>
+              <div class="time-row"><strong>3시간</strong> 사용자 폼 검토 (Task 02) 및 데이터 정합성 가드 코딩 (Task 03)</div>
+              <div class="time-row"><strong>1시간</strong> 실버 페르소나 온보딩 오디팅 (Mission 01) 및 에러 메시지 은폐 보안 패치 (Mission 02)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Codex AI</span>
+              <span class="tag">Membership</span>
+              <span class="tag">UX Audit</span>
+              <span class="tag">Integrity</span>
+              <span class="tag">Email Regex</span>
+              <span class="tag">Duplicate Guard</span>
+              <span class="tag">Usability Evaluation</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              기능 우선순위표(day8_feature_checklist.md), 온보딩 개선 보고서(day8_ux_improvement_report.md), 중복 방지 가드 코드(day8_robust_user_service.js), 첫 사용자 리뷰서(day8_first_user_review.md), 품질 평가서(day8_usability_evaluation.md)
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day8/day8-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day8/day8-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 8일차 교재 (PDF)
+              </a>
+            </div>
+          </div>
+        </article>
+
+                <!-- Day 9 -->
+        <article class="course-card is-clickable" id="openDay9Modal" tabindex="0" role="button"
+          aria-label="Day 9 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day9_deployment.png'); background-size: cover; background-position: center;">
+            DAY 9</div>
+          <div class="course-content">
+            <span class="day-label">Day 9</span>
+            <h3 class="course-title">Payment Service: Experience & Trust Audit</h3>
+            <p class="course-subtitle"><strong>[Codex AI 연계]</strong> 사용자 중심의 결제 여정 간소화 설계와 금융 예외 시나리오 한글 안심 처리 및 신뢰성 UI 오디팅</p>
+            <p class="course-desc">
+              기술 중심의 PG API 호출 성공을 넘어 사용자가 한 치의 불안 없이 안심하고 결제할 수 있도록 <strong>Codex Client Workspace</strong>를 밀접히 활용합니다. 다단계 이탈 동선을 병합하는 3단계 이하 결제 흐름 기획(Task 01), 카드 한도 초과/지연 등 에러 코드 한글 변환 및 연타 이중 과금 차단 설계(Task 02), 영수증 가격 세분화 할인 및 보안 통신 배지 이식(Task 03)과 점검 시간 대기 메시지(Mission 01), 쿠폰 탐색 폼 유실 피크 마찰을 교정하는 여정 진단서(Mission 02)를 구축합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>Payment Flow Planning, Trust Auditing, Exception Playbook, Friendly Error Mapping, Receipt Breakdowns, Idempotency Guard, Friction Peak Auditing</div>
+              <div class="meta-item"><strong>학습 목표</strong>Codex AI 결제 동선 컨설턴트 및 품질 감사관과 협업하여 사용자 결제 포기 이탈률을 획기적으로 낮추고 금융 장애 수습 피드백을 수립하는 안전한 지불 구조 기획</div>
+              <div class="meta-item"><strong>실습 방향</strong>동선 병합 ➔ 에러 치환 ➔ 안심 배지 주입 ➔ 장애 수습 대응 ➔ 여정 피크 교정</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 결제 흐름 설계 (Task 01)</div>
+              <div class="time-row"><strong>3시간</strong> 예외 시나리오 검토 (Task 02) 및 안심 결제 UI 개선 (Task 03)</div>
+              <div class="time-row"><strong>1시간</strong> 장애 안심 문구 작성 (Mission 01) 및 E2E 여정 피크 감사 (Mission 02)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Codex AI</span>
+              <span class="tag">Payment UX</span>
+              <span class="tag">Trust Audit</span>
+              <span class="tag">Friendly Error</span>
+              <span class="tag">Idempotency</span>
+              <span class="tag">Friction Peak</span>
+              <span class="tag">Mitigation Playbook</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              간소 주문 결제 플로우(day9_optimized_flow.md), 안심 에러 문구집(day9_error_mitigation_guide.md), 개정 안심 결제 UI(day9_robust_payment_ui.html), 실패 대응 명세서(day9_failure_scenarios.md), 고객 여정 진단서(day9_checkout_journey.md)
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day9/day9-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day9/day9-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 9일차 교재 (PDF)
+              </a>
+            </div>
+
+          </div>
+        </article>
+
+        <!-- Day 10 -->
+        <article class="course-card is-clickable" id="openDay10Modal" tabindex="0" role="button"
+          aria-label="Day 10 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/day10_presentation.png'); background-size: cover; background-position: center;">
+            DAY 10</div>
+          <div class="course-content">
+            <span class="day-label">Day 10</span>
+            <h3 class="course-title">Service Launch: 서비스 런칭하기</h3>
+            <p class="course-subtitle">서비스 소개서 제작부터 사용자 지원 준비, 프로젝트 성과 정리, Version 2.0 로드맵 수립까지 실제 서비스 기획자의 마지막 업무 완성</p>
+            <p class="course-desc">
+              개발의 마침표가 아닌 서비스의 시작점입니다. Codex AI와 함께 런칭 소개서와 오픈 공지를 작성하고, 사용자가 겪을 어려움을 예측하여 FAQ와 고객 응대 가이드를 준비하며, 프로젝트 결과보고서와 Version 2.0 로드맵을 수립하는 실제 서비스 기획자의 마지막 업무 흐름을 경험합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>Launch Prep, FAQ, Customer Support, Retrospective, MoSCoW, Roadmap, Presentation, Sprint Plan</div>
+              <div class="meta-item"><strong>학습 목표</strong>사용자 런칭 패키지와 성과 보고서 및 Version 2.0 기획 로드맵 수립</div>
+              <div class="meta-item"><strong>실습 방향</strong>Launch prep → Customer Support → Performance Reporting → Version 2.0 Roadmap</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>2시간</strong> 서비스 런칭 준비 및 사용자 지원 설계 (Task 01 &amp; Task 02)</div>
+              <div class="time-row"><strong>2시간</strong> 프로젝트 성과 정리 및 Version 2.0 로드맵 (Task 03)</div>
+              <div class="time-row"><strong>2시간</strong> 런칭 패키지 완성 및 최종 발표 (Mission 01 &amp; Mission 02)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Launch Prep</span>
+              <span class="tag">FAQ 20</span>
+              <span class="tag">KPT Retrospective</span>
+              <span class="tag">MoSCoW Roadmap</span>
+              <span class="tag">Final Presentation</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              런칭 자료(day10_launch_materials.md), FAQ &amp; 응대 가이드(day10_faq_guide.md), 결과보고서 &amp; 로드맵(day10_retrospective.md), 통합 런칭 패키지(day10_launch_package.md), 최종 발표자료(day10_presentation.md)
+            </div>
+            <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="day10/day10-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+              <a href="day10/day10-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+                📘 10일차 교재 (PDF)
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project Day -->
+        <article class="course-card is-clickable" id="openProjectDayModal" tabindex="0" role="button"
+          aria-label="Project Day 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/project_day_cover.png'); background-size: cover; background-position: center;">
+            PROJECT DAY</div>
+          <div class="course-content">
+            <span class="day-label" style="background: linear-gradient(135deg, #3b82f6, #06b6d4); color: #fff;">Project Day</span>
+            <h3 class="course-title">Markdown 기획서 기반 웹사이트 구축 (Project Day)</h3>
+            <p class="course-subtitle">코덱스(Codex)와 대화하며 아이디어를 Markdown 기획서로 작성하고 실제 웹사이트로 구현하는 6단계 정석 프로젝트 실습</p>
+            <p class="course-desc">
+              아이디어 구체화(Phase 1), 5대 Markdown 기획서 작성(Phase 2), 코덱스 웹사이트 코드 생성(Phase 3), 학생/선생님 시나리오 테스트(Phase 4), 피드백 반영 문서·코드 개선(Phase 5), 대화 이력 기록 및 5분 발표(Phase 6)를 경험합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>Idea Definition, Markdown Specifications, Codex Implementation, Scenario Testing, Iterative Spec-First Refinement, History Logging</div>
+              <div class="meta-item"><strong>학습 목표</strong>대화와 표준 기획 명세를 바탕으로 코덱스 AI와 완벽히 협업하여 실행 가능한 웹 앱을 완성하는 프로세스 마스터</div>
+              <div class="meta-item"><strong>실습 방향</strong>아이디어 정의 ➔ 기획 문서화 ➔ 코덱스 구현 ➔ 시나리오 검증 ➔ 문서 연쇄 개선 ➔ 이력 기록 &amp; 발표</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>30분</strong> 아이디어 구체화 &amp; 5대 Markdown 기획서 작성 (Phase 1 &amp; 2)</div>
+              <div class="time-row"><strong>45분</strong> 코덱스 웹사이트 생성 &amp; 역할별 시나리오 테스트 (Phase 3 &amp; 4)</div>
+              <div class="time-row"><strong>45분</strong> 문서·코드 개선 &amp; 대화 이력 작성 및 결과 발표 (Phase 5 &amp; 6)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Project Day</span>
+              <span class="tag">Codex Website</span>
+              <span class="tag">Markdown Specs</span>
+              <span class="tag">Scenario Test</span>
+              <span class="tag">Spec-First</span>
+              <span class="tag">CONVERSATION.md</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              사이트 명세서(SITE_SPEC.md), 이용 동선(USER_FLOWS.md), 데이터 모델(DATA_MODEL.md), 구현 계획서(IMPLEMENTATION_PLAN.md), 대화 기록지(CONVERSATION.md), 완성 웹사이트(website/)
+            </div>
+            <div style="margin-top: 14px;">
+              <a href="project_day/project_day-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Final Survey & Graduation Card (KR) -->
+        <article class="course-card" id="openSurveyModal" tabindex="0" role="region" aria-label="최종 설문조사 및 수료 안내">
+          <div class="course-thumb" style="background-image: url('img/survey_card_cover.png'); background-size: cover; background-position: center; color: #fff;">
+            SURVEY & GRADUATION</div>
+          <div class="course-content">
+            <span class="day-label" style="background: linear-gradient(135deg, #f59e0b, #ec4899); color: #fff;">최종 설문조사 · 수료 안내</span>
+            <h3 class="course-title">AI TOT 트랙의 모든 수업이 종료되었습니다. 감사합니다.</h3>
+            <p class="course-subtitle">AI TOT 트랙의 모든 수업이 종료되었습니다. 감사합니다. 마지막 설문을 부탁 드립니다.</p>
+            <p class="course-desc">
+              수강생 여러분의 앞날에 축복과 행복이 가득하기를 기원합니다. 아래 버튼을 클릭하여 수료 축하 메시지와 2가지 설문조사(사후 설문조사 및 AI 트랙 사전 학습 진단) QR 코드 안내 페이지로 이동하세요.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 안내</strong>사후 설문조사 &amp; AI 트랙 사전 학습 진단 QR 코드 안내</div>
+              <div class="meta-item"><strong>참여 목적</strong>수업 만족도 개선 및 학습 성과 역량 평가</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">최종 설문조사</span>
+              <span class="tag">수료 안내</span>
+              <span class="tag">QR 코드</span>
+              <span class="tag">사후 설문</span>
+              <span class="tag">사전 학습 진단</span>
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <a href="survey.html" class="ai-class-btn" style="background: linear-gradient(135deg, #f59e0b, #ec4899);">
+                📋 설문조사 QR 코드 페이지 열기
+              </a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section id="final">
+    <div class="container">
+      <h2 class="section-title">Final Outcome</h2>
+      <p class="section-desc">
+        이 과정의 목표는 단순 학습이 아니라, 실제로 보여줄 수 있는 POC 제품과 데모 흐름을 완성하는 것입니다.
+      </p>
+
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="value">Wireframe</div>
+          <div class="label">핵심 화면 구조 설계</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">Prototype</div>
+          <div class="label">클릭 가능한 사용자 흐름</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">POC Build</div>
+          <div class="label">실제 동작 가능한 제품 시연</div>
+        </div>
+        <div class="overview-card">
+          <div class="value">Demo Pitch</div>
+          <div class="label">최종 발표 및 확장 가능성 검토</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer-cta">
+    <div class="container">
+      <h3>From Learning to Launch</h3>
+      <p style="margin-top: 10px;">
+        10일 동안 아이디어를 구체화하고, AI를 활용한 실제 서비스 형태의 결과물로 연결하는 집중형 창업 프로젝트 과정을 위한 웹 페이지 구조입니다.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Day 1 Modal -->
+  <div class="modal-overlay" id="day1Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day1ModalTitle">
+      <button class="modal-close" id="closeDay1Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 1 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day1ModalTitle">Codex 요구사항 명세 &amp; Figma 화면 설계</h3>
+        <p class="modal-subtitle">
+          Figma 기초를 익히고 Codex Client를 활용해 요구사항 명세 및 보고 체계를 자동화하는 융합 실습
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 1은 서비스 아이디어를 실제 제품 화면 구조로 전환하는 첫 단계입니다.
+                참가자는 Figma의 기본 사용법을 익히고, Landing / Dashboard / Auth와 같은 핵심 화면의 구조를 설계합니다.
+              </p>
+              <p>
+                동시에 비정형화된 회의록 원본에서 시작하여 Codex Client를 통한 기능 명세(FR), 정상 및 예외 흐름 정의, Gmail 연동 발송을 진행하여 요구사항 관리 및 기획 자동화
+                실습을 병행합니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>Codex AI 기획 가이드 및 Figma 기본 인터페이스 이해</h5>
+                  <p>
+                    Figma의 기본 인터페이스와 핵심 도구를 익히고, Codex Client를 통한 기획 자동화 기초 개념을 학습합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>Figma 프레임, 오토레이아웃 기초</li>
+                    <li>Codex AI를 활용한 기획 검토 방법론</li>
+                    <li>비정형 회의록에서 요구사항 추출 원리</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>핵심 화면 와이어프레임 제작 및 기능 요구사항(FR) 설계</h5>
+                  <p>
+                    실제 서비스의 주요 흐름을 바탕으로 핵심 화면을 직접 설계하고 Codex를 통해 요구사항 정의서를 자동 도출합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>Landing / Dashboard / Auth 화면 설계</li>
+                    <li>기능 요구사항(FR) 테이블 작성 및 정상/예외 흐름 설계</li>
+                    <li>사용자 이동 흐름에 맞춘 화면 연결 구조 정리</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>Gmail 플러그인 실제 발송 및 결과물 공유</h5>
+                  <p>
+                    작성된 명세서를 Gmail 플러그인을 활용해 실제 메일로 전송하고 결과를 공유하여 피드백을 정리합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>Gmail API 플러그인 연동 및 메일 발송</li>
+                    <li>보낸메일함 내 최종 승인 요청 메일 점검</li>
+                    <li>실습 결과물 발표 및 다음 단계 개발을 위한 보완 포인트 정리</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Requirements</span>
+                <span class="outcome-tag">Codex AI</span>
+                <span class="outcome-tag">Gmail Plugin</span>
+                <span class="outcome-tag">Figma Grid</span>
+                <span class="outcome-tag">Wireframe</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>교육 대상</strong>기획자, 개발 입문자, 예비 창업가</li>
+                <li><strong>준비물</strong>노트북, Codex Client, Figma 계정</li>
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>이론 강의 + 실습 + 결과 공유</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>Figma를 활용한 서비스 화면 설계 기초 습득</li>
+                <li>비정형 회의록에서 AI 요구사항 요약 및 구조화</li>
+                <li>오류 상황 대비 정상/예외 흐름 설계 역량 확보</li>
+                <li>Gmail API 플러그인 연동 및 승인 메일 자동 발송</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>requirements-specification.md 명세서</li>
+                <li>보낸메일함 내 최종 승인 요청 메일</li>
+                <li>Figma 화면 기초 시안</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>AI 서비스 아이디어를 실제 제품 화면 구조로 구체화</li>
+                <li>기획과 개발 단계의 격차를 해소하는 자동화 파이프라인 구축</li>
+                <li>이메일을 통한 효율적인 의사결정권자 소통 역량 강화</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day1/day1-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day1/day1-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 1일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 2 Modal -->
+  <div class="modal-overlay" id="day2Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day2ModalTitle">
+      <button class="modal-close" id="closeDay2Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 2 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day2ModalTitle">Sequence Diagram &amp; Data Flow Design with Codex AI</h3>
+        <p class="modal-subtitle">
+          Figma 화면 설계를 기반으로 사용자 행동과 시스템 상호작용을 시각화하고, Codex AI를 프로젝트 검토자(Reviewer)로 활용하여 설계 모순 검출(Task 01), 변경 영향도
+          관리(Task 02), 의사결정 추적(Task 03) 및 변경 영향도 분석(Task 06), 프로젝트 이슈 리포트 작성(Task 07)을 수행하는 2일차 학습 모듈입니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 2는 전날 설계한 화면 구조를 실제 시스템 동작 흐름으로 확장하고, Codex AI를 통한 설계 문서 정합성 자동화 검토를 습득하는 단계입니다.
+                참가자는 시퀀스 다이어그램과 DFD를 활용해 시스템 컴포넌트 간 상호작용 및 예외 흐름을 시각화하는 한편, Codex AI를 활용해 회의록-요구사항-화면설계 간의 모순을 감지하고, 기획
+                변경에 따른 화면/API 영향 분석 및 회의 의사결정 로그를 자동 추출해 봅니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>시퀀스 다이어그램 &amp; DFD 설계</h5>
+                  <p>
+                    사용자와 시스템 사이에서 동작하는 기능 흐름을 시간 순서대로 시각화하고, DFD 개념을 통해 데이터 전달 구조를 정의합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>시퀀스 다이어그램의 기본 구조 및 액터, 라이프라인 이해</li>
+                    <li>User / Client / Server / Database 역할 구분 및 메시지 흐름</li>
+                    <li>Mermaid JS를 이용한 코드 기반의 다이어그램 작성법 실습</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>Codex AI 기반 설계 정합성 검증</h5>
+                  <p>
+                    Codex Workspace를 활용해 3대 기획서 간 불일치(Task 01)를 검출하고, 요구사항 변경에 따른 UI 및 API 영향 분석(Task 02)을 수행합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>회의록, 요구사항 정의서, 화면 정의서 간의 기획 정합성 불일치 분석</li>
+                    <li>Google 로그인/SMS 인증 추가 등 요건 변경에 따른 수정 영향 범위 산출</li>
+                    <li>v1.0 화면 및 API 명세서 동기화 조치 사항 정리</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>의사결정 이력 추적 및 예외 복구</h5>
+                  <p>
+                    비정형 구두/메신저 대화록에서 의사결정 로그(Task 03)를 자동 아카이빙하고, 시스템 예외 상황에 대한 예외 흐름 및 장애 복구 전략을 설계합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>개발 단톡방 대화록에서 의사결정 사항(Why) 및 미결 사항 추출</li>
+                    <li>결제 한도 초과, 타임아웃, 중복 입력 등 예외 상황 및 복구 흐름 설계</li>
+                    <li>실습 결과 공유 및 PM-Dev 협업 피드백 정리</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Sequence &amp; DFD</span>
+                <span class="outcome-tag">Mermaid JS</span>
+                <span class="outcome-tag">Codex Consistency Check</span>
+                <span class="outcome-tag">Change Management</span>
+                <span class="outcome-tag">Decision Tracking</span>
+                <span class="outcome-tag">Exception Handling</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>이론 강의 + 실습 + 결과 공유</li>
+                <li><strong>실습 기반</strong>Figma 화면 설계 &amp; Codex Workspace</li>
+                <li><strong>핵심 도구</strong>Mermaid JS, Codex Client Workspace</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>시퀀스 다이어그램 및 DFD 기반 데이터 상호작용 설계</li>
+                <li>Codex AI를 활용한 설계 문서 간 기획 오류 및 모순 검증</li>
+                <li>요구사항 변경에 따른 UI 화면 및 API 명세 영향 범위 분석</li>
+                <li>비정형 대화록 내 의사결정 배경 추출 및 예외 대응 전략 수립</li>
+                <li>휴대폰 인증 추가 시나리오에 따른 아키텍처 영향도 분석</li>
+                <li>프로젝트 이슈 및 리스크를 정제한 보고서 자동화 습득</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>시퀀스 다이어그램 및 ERD 데이터 매핑</li>
+                <li>consistency-report.md (불일치 리포트)</li>
+                <li>impact-analysis.md (변경 영향도 분석서)</li>
+                <li>decision-log.md (의사결정 및 미결 로그)</li>
+                <li>impact-analysis-report.md (영향도 분석 보고서)</li>
+                <li>project-issue-report.md (프로젝트 이슈 리포트)</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>Figma 화면 설계를 실제 서버 로직과 API 흐름으로 정교화</li>
+                <li>설계 모순 전수 검사를 통해 개발 단계 리워크(재작업) 최소화</li>
+                <li>의사결정 히스토리를 아카이빙하여 정보 불일치로 인한 커뮤니케이션 오차 근절</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day2/day2-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day2/day2-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 2일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Day 3 Modal -->
+  <div class="modal-overlay" id="day3Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day3ModalTitle">
+      <button class="modal-close" id="closeDay3Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 3 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day3ModalTitle">Data Normalization & ERD Design with Codex AI</h3>
+        <p class="modal-subtitle">
+          화면 설계와 사용자 흐름을 기반으로 필요한 데이터를 구조화하고, 핵심 엔티티와 관계를 정의하여 정규화된 데이터 구조와 ERD를 완성하며 Codex AI로 설계를 검증 및 보완하는 3일차 학습
+          모듈입니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 3는 앞선 화면 설계와 데이터 흐름 설계를 실제 데이터베이스 구조로 연결하는 단계입니다.
+                참가자는 화면과 사용자 흐름에서 필요한 데이터를 추출하고, 이를 엔티티와 속성 단위로 정리하게 됩니다.
+              </p>
+              <p>
+                이후 엔티티 간 관계를 정의하고, 1NF부터 3NF까지의 정규화 과정을 적용하여 중복을 줄이고 무결성을 높인 데이터 구조를 설계합니다. 최종적으로는 서비스 구현에 활용 가능한 ERD를
+                완성합니다.
+              </p>
+              <p>
+                이 과정에서 Codex AI를 프로젝트 아키텍트 및 감사자(Auditor)로 활용하여, 기획-개발 간 데이터 정렬(Task 01), 프로젝트 전반의 용어 표준 사전 구축(Task 02),
+                스키마 수정에 따른 연쇄 영향도 분석(Task 03)을 자동화하고, 기술 아키텍처 결정을 기록하는 DDL 작성(Mission 01) 및 동시성/무결성 오류 등의 예외 케이스
+                발굴(Mission 02)을 수행합니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>ERD 설계 이해 및 데이터 구조 정렬 (Task 01)</h5>
+                  <p>
+                    화면과 사용자 흐름을 기준으로 어떤 데이터가 필요한지 파악하고, 이를 구조화 가능한 데이터 항목으로 정리합니다. Codex AI를 활용해 기획 회의록에서 핵심 엔티티와 관계를
+                    정밀하게 추출하고 Mermaid ERD 스크립트를 생성합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>스크린과 유저 플로우 기반 데이터 추출</li>
+                    <li>데이터 필드 정의 및 그룹화 (ERD 개념)</li>
+                    <li>Codex AI를 활용한 데이터 구조 이해 차이 해결 (Task 01)</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>용어 표준화 (Task 02) 및 변경 영향 분석 (Task 03)</h5>
+                  <p>
+                    추출한 데이터를 엔티티로 전환하고, 정규화 과정을 적용하며 프로젝트 내 혼용 어휘(회원/고객/User/Member) 표준 사전을 구축합니다. 또한, DB 스키마 변경 시 API 및
+                    화면 영향 범위를 전수 분석합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>1NF → 2NF → 3NF 정규화 적용</li>
+                    <li>Codex AI 기반 용어 파편화 표준 사전 (Glossary) 구축 (Task 02)</li>
+                    <li>DB 스키마 수정 시 API/UI 연쇄 영향 분석 리포트 자동 생성 (Task 03)</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>아키텍처 결정 기록 (Mission 01) 및 예외 케이스 발굴 (Mission 02)</h5>
+                  <p>
+                    정규화 및 DB 구조 의사결정 배경을 로그(DDL)로 영구 보존하고, 동시성 오류 및 외래키 무결성 붕괴 같은 치명적인 Edge Case를 발굴해 대응책을 수립합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>Codex AI 기반 Design Decision Log (Why) 작성 (Mission 01)</li>
+                    <li>물리 스키마 기준 동시성/참조 무결성 Edge Case 감지 및 대처 (Mission 02)</li>
+                    <li>최종 ERD 및 산출물 종합 검토 피드백</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Data Extraction</span>
+                <span class="outcome-tag">Entity Definition</span>
+                <span class="outcome-tag">Relationship Design</span>
+                <span class="outcome-tag">Normalization</span>
+                <span class="outcome-tag">ERD Modeling</span>
+                <span class="outcome-tag">Codex AI Auditor</span>
+                <span class="outcome-tag">Glossary Dictionary</span>
+                <span class="outcome-tag">Change Impact</span>
+                <span class="outcome-tag">Design Decision Log</span>
+                <span class="outcome-tag">Edge Case Discovery</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>강의 + Codex 실습 + 결과 공유</li>
+                <li><strong>실습 기반</strong>화면 설계 + 유저 플로우 + Codex Workspace</li>
+                <li><strong>핵심 결과</strong>정규화된 데이터 구조, ERD, 설계 표준 및 분석서</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>화면 및 사용자 흐름에 따른 데이터 구조화</li>
+                <li>핵심 엔티티 및 관계 정의를 통한 ERD 작성</li>
+                <li>데이터 중복 제거 및 정규화된 데이터 구조 설계</li>
+                <li>Codex AI를 통한 데이터 정렬, 표준화 및 변경 영향도 추적 수행</li>
+                <li>의사결정 보존(Why) 및 예외 대응으로 무결성 높은 DB 설계 구축</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>ERD 다이어그램 (PNG/PDF/Mermaid)</li>
+                <li>데이터 정규화 분석 문서 (erd-schema.md)</li>
+                <li>프로젝트 표준 용어 사전 (project-glossary.md)</li>
+                <li>변경 영향도 분석서 (change-impact-report.md)</li>
+                <li>설계 의사결정 기록 (design-decision-log.md)</li>
+                <li>예외 시나리오 리포트 (edge-case-analysis.md)</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>기획 화면을 실제 데이터베이스 구조로 연결</li>
+                <li>중복 없는 효율적 데이터 구조 설계</li>
+                <li>어휘 표준화로 팀원 간 커뮤니케이션 코스트 제거</li>
+                <li>변경 발생 시 영향도 자동 감지로 장애 예방</li>
+                <li>이후 백엔드/API 개발을 위한 기반 마련</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day3/day3-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day3/day3-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 3일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Day 4 Modal -->
+  <div class="modal-overlay" id="day4Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day4ModalTitle">
+      <button class="modal-close" id="closeDay4Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 4 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day4ModalTitle">API Design & Swagger Specification</h3>
+        <p class="modal-subtitle">
+          화면 설계와 사용자 흐름, 시퀀스 다이어그램, ERD를 바탕으로 실제 서비스 기능을 API 형태로 정의하고,
+          Codex AI를 활용해 API 명세서를 자동 검증 및 오디팅하는 4일차 학습 모듈입니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 4는 앞서 설계한 화면, 흐름, 데이터 구조를 실제 개발 문서로 연결하며 Codex Client Workspace를 연계하는 단계입니다.
+                참가자는 서비스 기능을 API 단위로 분해하고, 프론트엔드와 백엔드가 함께 사용할 수 있는 형태로 요청과 응답 구조를 정의하며, AI를 통해 정합성을 검증받습니다.
+              </p>
+              <p>
+                또한 Swagger/OpenAPI 형식을 활용해 API를 문서화하고 변동 시 발생할 수 있는 영향 범위를 Codex AI와 분석함으로써,
+                단순 코딩 수준을 넘어 실무 프로덕트 개발과 시스템 안정성 분석 프로세스를 익힙니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성 (Codex AI 연계)</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>API 계약서 생성 및 설계 원칙 (Task 01)</h5>
+                  <p>
+                    화면과 데이터 구조가 어떻게 API 명세로 연결되는지 이해하고, Codex AI를 연계하여 API 계약서(API Contract)를 자동 추출합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>API의 역할과 협업에서의 중요성 이해</li>
+                    <li>엔드포인트 매핑 및 Request/Response 구조화</li>
+                    <li>RESTful API 설계 원칙 및 에러 핸들링 구성</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>API 정합성 감사 및 영향 범위 분석 (Task 02 & 03)</h5>
+                  <p>
+                    기존 기획 명세와 작성된 API 간의 미스매치 오류를 Codex AI로 자동 검출하고, API 변경 시 UI와 데이터베이스에 미치는 연쇄 파급 효과를 오디팅합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>API 불일치 검사 및 데이터 포맷 오디팅 (Task 02)</li>
+                    <li>스키마/엔드포인트 변경에 따른 파급 경로 추적 (Task 03)</li>
+                    <li>오류 방지를 위한 연쇄 변경 조치 정의 및 문서 갱신</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>API 자율 리뷰 및 테스트 시나리오 작성 (Mission 01 & 02)</h5>
+                  <p>
+                    설계한 API의 REST 규격 부합도를 최종 평가하고 개선안을 도출하며, 에지 케이스 검증을 위한 경계값 기반의 테스트 시나리오를 설계합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>RESTful 규칙 자율 평가 및 개선 보고서 생성 (Mission 01)</li>
+                    <li>경계값, 특수문자, 동시성 오류 테스트 케이스 도출 (Mission 02)</li>
+                    <li>결과 발표 및 피드백</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">RESTful API</span>
+                <span class="outcome-tag">Codex AI Audit</span>
+                <span class="outcome-tag">Swagger/OpenAPI</span>
+                <span class="outcome-tag">Consistency Check</span>
+                <span class="outcome-tag">Impact Analysis</span>
+                <span class="outcome-tag">Test Scenario</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>강의 + Codex 실습 + 결과 공유</li>
+                <li><strong>연계 구조</strong>Screen → Flow → ERD → API → Swagger</li>
+                <li><strong>목표 결과</strong>실제 개발 가능한 API 명세서 및 품질 보고서</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>화면과 ERD를 기반으로 실제 서비스 기능을 API 형태로 정의</li>
+                <li>Codex AI를 활용해 API 정합성 검사 및 영향 범위 보고서 자동화</li>
+                <li>REST 규격 오디팅 및 예외 테스트 시나리오 자율 발굴</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>API 계약서 (api-contract.md)</li>
+                <li>API 검토 보고서 (api-consistency-report.md)</li>
+                <li>API 변경 영향도 보고서 (api-impact-analysis.md)</li>
+                <li>API 리뷰 및 개선 보고서 (api-review-report.md)</li>
+                <li>경계값 테스트 시나리오 (api-test-scenario.md)</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>화면 기획을 실제 개발 명세로 신속하게 전환</li>
+                <li>기획과 개발 간 데이터 명칭 및 스키마 이해 불일치 해소</li>
+                <li>구현 전 잠재적 설계 결함 및 에지 케이스 사전 차단</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day4/day4-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day4/day4-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 4일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- Day 5 Modal -->
+  <div class="modal-overlay" id="day5Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day5ModalTitle">
+      <button class="modal-close" id="closeDay5Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 5 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day5ModalTitle">UI/UX Design & Interaction Design</h3>
+        <p class="modal-subtitle">
+          와이어프레임을 바탕으로 Codex AI와 함께 사용자 편의성을 오디팅하고,
+          사용자 중심의 인터페이스 품질과 단축 동선을 검토해 최적화하는 5일차 UI/UX 리뷰 학습 모듈입니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 5는 앞서 구성한 화면 구조와 사용자 흐름을 바탕으로 실제 사용성이 높은 서비스 경험으로 오디팅하며 Codex Client Workspace를 연계하는 단계입니다.
+                참가자는 사용자 관점과 일관성 유지 원칙에 따라 화면 기획서를 분석하고, AI와의 협업을 통해 설계 결함을 찾아냅니다.
+              </p>
+              <p>
+                또한 화면 전환 뎁스를 축약하는 동선 효율화와 노약자 등 디지털 소외계층 페르소나를 반영한 실감 나는 장벽 검증을 진행함으로써,
+                실무 기획 직무에서 활용도 높은 정량/정성적 사용성 평가 역량을 확보합니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성 (Codex AI 연계)</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>사용자 관점 화면 검토 (Task 01)</h5>
+                  <p>
+                    인터페이스 사용성의 기본 개념을 학습하고, 초보 사용자의 관점에서 기존 화면 설계서의 불편 유발 영역을 검출합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>UI와 UX의 실무적 연결 구조 분석</li>
+                    <li>사용자 맥락 중심의 마찰 지점(Friction Point) 도출</li>
+                    <li>Codex AI를 활용한 사용성 문제점 검출 및 문서화</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>UI 일관성 및 사용자 동선 개선 (Task 02 & 03)</h5>
+                  <p>
+                    여러 화면에 걸친 UI 컴포넌트 규격/용어 비대칭성을 확인하고, 목적지 도달 경로의 뎁스를 줄이는 UX 동선 개선안을 도출합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>화면 간 버튼 위치, 아이콘, 텍스트 일관성 정렬 (Task 02)</li>
+                    <li>기존 동선의 흐름 뎁스 분석 및 축약 설계 제안 (Task 03)</li>
+                    <li>Codex AI와의 협업을 통한 UI 일관성 보고서 작성</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>페르소나 분석 및 품질 평가 (Mission 01 & 02)</h5>
+                  <p>
+                    특정 사용자 페르소나를 투영해 생생한 가입 장벽 검증 로그를 수집하고, 수치화된 다차원 사용성 평점을 적용해 종합 품질 개선 보고서를 작성합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>고연령 사용자 페르소나 기반 '곤경 로그' 작성 (Mission 01)</li>
+                    <li>가독성, 회복력, 효율성 3대 지표 수치 평점화 (Mission 02)</li>
+                    <li>결과 발표 및 피드백</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">UI/UX Audit</span>
+                <span class="outcome-tag">UI Consistency</span>
+                <span class="outcome-tag">User Journey Map</span>
+                <span class="outcome-tag">AI Persona Testing</span>
+                <span class="outcome-tag">Usability Metrics</span>
+                <span class="outcome-tag">Friction Reduction</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>사례 분석 + Codex 실습 + 결과 공유</li>
+                <li><strong>실습 기반</strong>기존 기획 화면 명세 및 사용자 동선</li>
+                <li><strong>목표 결과</strong>사용성 개선 중심의 고해상도 UI/UX 리뷰서</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>초보자 입장에서 화면의 정보 설계 및 배치 결함을 객관적으로 오디팅</li>
+                <li>다수 화면 간의 UI/용어 비대칭성을 해소하여 일관성 유지</li>
+                <li>고연령 페르소나 적용 및 수치적 사용성 평가 역량 확보</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>UX 검토 보고서 (ux-review-report.md)</li>
+                <li>UI 일관성 보고서 (ui-consistency-report.md)</li>
+                <li>동선 개선 보고서 (user-journey-report.md)</li>
+                <li>첫 사용자 리뷰 로그 (first-user-review.md)</li>
+                <li>종합 서비스 품질 평가서 (usability-evaluation.md)</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>개발 전 단계에서 기획 상의 치명적 동선 이탈 결함 방지</li>
+                <li>기획 디자인의 직관성을 높여 가입 전환율과 결제 잔존율 극대화</li>
+                <li>UX 문제점을 수치적 지표로 계량화해 의사결정 설득력 확보</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day5/day5-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day5/day5-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 5일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Day 6 Modal -->
+  <div class="modal-overlay" id="day6Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day6ModalTitle">
+      <button class="modal-close" id="closeDay6Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 6 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day6ModalTitle">Front-End Development & API Integration with Codex AI</h3>
+        <p class="modal-subtitle">
+          <strong>[Codex AI 연계]</strong> Figma UI를 실제 서비스 화면으로 구현하고, API 연동을 통해 데이터를 표시하며 로딩·에러·빈 상태까지 처리하는 개발 전 과정에 Codex AI를 연계하여 개발을 진행합니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 6는 지금까지 설계한 화면과 API 명세를 실제 동작하는 프론트엔드 화면으로 연결하는 단계입니다.
+                참가자는 HTML, CSS, JavaScript의 역할을 분리해 효율적인 코드 구조를 만들고, Figma 디자인을 실제 웹 화면으로 구현합니다.
+              </p>
+              <p>
+                또한 fetch/AJAX 기반 비동기 통신을 통해 서버 데이터를 화면에 바인딩하고,
+                로딩·실패·데이터 없음과 같은 다양한 상태를 처리하면서 실제 서비스 수준의 사용자 경험을 구현합니다.
+              </p>
+              <p>
+                특히 이번 세션에서는 <strong>Codex Client Workspace</strong>를 밀접하게 연동하여 빈 화면에서 시작하는 보일러플레이트 화면 뼈대 초안 구성(Task 01), TypeError: Cannot read properties of undefined (reading 'map') 크래시 등 콘솔 로그에 나타난 stack trace 기반 디버깅 조언 및 옵셔널 체이닝 방어 코드 가미(Task 02), 모호한 변수명 교정 및 공통 템플릿 렌더러 함수 추출 코드 개선(Task 03), 서버 호출 404 및 JSON 파싱 SyntaxError 배경 분석 보고서 작성(Mission 01), 전역 오염 차단 등 코드 품질 검토 및 캡슐화(Mission 02)를 수행합니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>프론트엔드 구조 설계 및 초안 생성</h5>
+                  <p>
+                    효율적인 코드 구조를 위해 화면, 스타일, 동작을 역할별로 분리하고,
+                    Codex AI를 사용하여 기획서 사양을 가동 가능한 웹 화면으로 신속히 초기화합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>HTML / CSS / JS 역할 분리</li>
+                    <li>보일러플레이트 및 레이아웃 그리드 초고속 구성 (Task 01)</li>
+                    <li>프로젝트 폴더 구조와 기본 아키텍처 설계</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>오류 디버깅 및 코드 클린 리팩토링</h5>
+                  <p>
+                    콘솔 에러 해결 및 스파게티 코드 클린화 작업을 Codex AI 페어 프로그래머와 함께 수행합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>TypeError: Cannot read properties of undefined 해결 (Task 02)</li>
+                    <li>중복 로직 공통화 및 협업용 Naming Convention 리팩토링 (Task 03)</li>
+                    <li>fetch API를 이용한 데이터 렌더링 및 디버깅</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>상태 관리, 예외 처리 및 결과 공유</h5>
+                  <p>
+                    로딩, 오류, 빈 상태 같은 예외 상황을 처리하고, CORS 및 JSON 파싱 예외 리포트를 작성합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>Loading / Error / Empty 상태 처리</li>
+                    <li>서버 예외 및 CORS 트러블슈팅 분석 보고서 (Mission 01)</li>
+                    <li>전역 스코프 방지 IIFE 캡슐화 및 다차원 코드 품질 감사 (Mission 02)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">HTML/CSS/JS Structure</span>
+                <span class="outcome-tag">API Integration</span>
+                <span class="outcome-tag">Data Binding</span>
+                <span class="outcome-tag">State Management</span>
+                <span class="outcome-tag">Error Handling</span>
+                <span class="outcome-tag">Codex AI Assistant</span>
+                <span class="outcome-tag">Defensive Programming</span>
+                <span class="outcome-tag">Code Refactoring</span>
+                <span class="outcome-tag">IIFE Encapsulation</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>이론 + AI 협업 실습 + 결과 공유</li>
+                <li><strong>실습 기반</strong>Figma 화면 + API 명세 + Codex Client</li>
+                <li><strong>목표 결과</strong>실제 동작하는 고품질 프론트엔드 화면 구현</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>HTML/CSS/JS 역할 분리와 Codex AI를 통한 초고속 뼈대 생성</li>
+                <li>AJAX/fetch를 이용한 서버 데이터 바인딩 및 디버깅 역량 강화</li>
+                <li>로딩·에러·데이터 없음 상태 관리 및 예외 처리 습득</li>
+                <li>코드 스멜 감사 의견을 반영하여 주도적으로 코드 품질 높이기</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>표준화된 프로젝트 폴더 구조 및 반응형 대시보드 화면(index.html, layout.css)</li>
+                <li>로딩 / 에러 / 데이터 없음 상태가 포함된 UI 결과물 및 디버깅 코드(day6_debug_solution.js)</li>
+                <li>리팩토링 소스코드(day6_clean_code.js) 및 디버깅 보고서(day6_error_report.md)</li>
+                <li>다차원 평정 코드 품질 감사 보고서(day6_code_review.md)</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>디자인 산출물을 실제 서비스 화면으로 전환</li>
+                <li>API 연동을 통한 데이터 중심 UI 구현 경험 확보</li>
+                <li>AI를 페어 프로그래머로 사용하여 에러 원인 해설 및 패치 사이클 단축</li>
+                <li>스파게티 코드를 타인이 이해하기 쉬운 클린 코드로 개선하는 습관 배양</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day6/day6-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day6/day6-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 6일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Day 7 Modal -->
+  <div class="modal-overlay" id="day7Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day7ModalTitle">
+      <button class="modal-close" id="closeDay7Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 7 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day7ModalTitle">Development: Completing Features with Codex AI</h3>
+        <p class="modal-subtitle">
+          <strong>[Codex AI 연계]</strong> 정적인 마크업 요소에 이벤트 매핑 및 스토리지를 연결하고, 사용자 여정 동선의 보완 및 비정상 조작 오류 가드를 설정하는 개발 완성 모듈입니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 7은 퍼블리싱된 프로토타입 화면을 실제 동작하는 가동형 기능으로 승격시키는 단계입니다.
+                참가자는 클릭 이벤트 매핑, 양식 데이터 적재, 스토리지를 활용한 세션 제어 구조를 정립합니다.
+              </p>
+              <p>
+                또한 사용자의 E2E 여정 경로 내에서 이탈 및 정보 유실을 유발하는 지점을 진단해 sessionStorage로 복원하고,
+                연타 입력으로 인한 데이터 중복 적재 버그와 과거일자 예외 등을 가드로 차단하여 소프트웨어 완성도를 한계까지 끌어올립니다.
+              </p>
+              <p>
+                특히 이번 세션에서는 <strong>Codex Client Workspace</strong>를 밀접하게 연동하여 가입 폼 제출 이벤트 바인딩 및 localStorage 동기화(Task 01), 다중 화면 이동 시 검색 필터 정보 복원 sessionStorage 캐싱(Task 02), `isSubmitting` 중복 차단 락 변수 설정 및 과거 날짜 가드(Task 03), 로딩 스피너 부재 감지 품질 평정 점검 보고서 작성(Mission 01), E2E 유저 모의주행 검증서 작성(Mission 02)을 수행합니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>기능 연결 및 데이터 영속화</h5>
+                  <p>
+                    HTML 마크업 양식 전송 이벤트를 가로채 입력 검증을 거친 뒤 브라우저 로컬 저장소에 영구 적재하는 흐름을 학습합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>이벤트 리스너 부착 및 가입 양식 제어 (Task 01)</li>
+                    <li>LocalStorage 데이터 영속화 처리</li>
+                    <li>성공 시 화면 강제 전환 처리</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>사용자 시나리오 검증 및 이상 동작 예외 차단</h5>
+                  <p>
+                    단절 없는 사용자 여정을 위한 세션 보존과 무결성을 파괴하는 비정상 조작 가드 스크립트를 조립합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>sessionStorage 활용 뒤로가기 필터값 회복 (Task 02)</li>
+                    <li>이중 제출 락(`isSubmitting`, `disabled`) 설정 (Task 03)</li>
+                    <li>과거일자 신청 가드 비교식 조립</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>품질 오디팅 점검 및 E2E 완주 증명</h5>
+                  <p>
+                    AI를 QA 파트너로 삼아 사용성 품질 진단을 받고 모의 유저 시나리오 완주 결과를 도출합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>대기 로딩 스피너 부재 리스크 감사 리포트 (Mission 01)</li>
+                    <li>가상 초보 사용자 E2E 장애 지점 추적 및 대응 검증 (Mission 02)</li>
+                    <li>기능 검증 결과 발표 및 피드백</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Feature Integration</span>
+                <span class="outcome-tag">Event Handling</span>
+                <span class="outcome-tag">LocalStorage</span>
+                <span class="outcome-tag">State Backups</span>
+                <span class="outcome-tag">SessionStorage</span>
+                <span class="outcome-tag">Double Submit Locks</span>
+                <span class="outcome-tag">Logic Validation</span>
+                <span class="outcome-tag">E2E Verification</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>이론 + AI 협업 실습 + 결과 공유</li>
+                <li><strong>실습 기반</strong>LocalStorage/SessionStorage + Codex Client</li>
+                <li><strong>목표 결과</strong>안정적으로 E2E 완주 가능한 동적 기능 연동</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>HTML 컴포넌트에 자바스크립트 이벤트를 매핑하는 기능 조립</li>
+                <li>세션 스토리지를 조작하여 다중 화면 간 검색 정보 소실 복원</li>
+                <li>이중 서브밋 락 및 예외 날짜 대조문을 통한 이상 거동 예방</li>
+                <li>E2E 가상 주행 피드백을 통해 인지 마찰 요인을 제거하는 법 습득</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>이벤트가 연결된 가동형 회원 페이지(day7_connected_feature.html)</li>
+                <li>필터 정보 세션 복원 스크립트(day7_scenario_solution.js)</li>
+                <li>중복 연타 방지 가드가 추가된 검증 코드(day7_robust_validation.js)</li>
+                <li>서비스 품질 점검 보고서(day7_service_audit.md) 및 E2E 검증 결과서(day7_e2e_validation.md)</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>정적 퍼블리싱 화면을 가동형 웹 서비스로 전환</li>
+                <li>AI를 코치 삼아 사용자 시나리오의 흐름 단절을 예방</li>
+                <li>락 제어와 조건 가드를 포함한 견고하고 튼튼한 프론트엔드 기능 구현</li>
+                <li>가상 유저 E2E 롤플레잉 피드백을 수렴해 서비스 사용성 개선</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day7/day7-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day7/day7-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 7일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 8 Modal -->
+  <div class="modal-overlay" id="day8Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day8ModalTitle">
+      <button class="modal-close" id="closeDay8Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 8 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day8ModalTitle">User Management: Membership & Onboarding UX</h3>
+        <p class="modal-subtitle">
+          <strong>[Codex AI 연계]</strong> 회원 가입 및 로그인 프로세스를 기획하고, 이탈을 유발하는 마찰 요소를 폼 간소화로 격퇴하며, 스토리지 정합성 보안 검증을 수행하는 8일차 실습 모듈입니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 8은 비개발 기획자부터 주니어 개발자까지 아울러 서비스의 첫인상인 회원가입 및 온보딩 사용자 여정을 기획하고 오디팅하는 날입니다.
+                참가자는 불필요한 우편번호, 상세 주소 등의 과도한 양식 필드를 점진적 가입 구조로 쪼개어 가입 성공율을 극대화하는 방법을 습득합니다.
+              </p>
+              <p>
+                또한 중복 메일 가입으로 인한 결제/예약 데이터 꼬임 현상을 자바스크립트 중복 가드 검증으로 안전하게 차단하고, 이메일 주소 형식 위배 필터를 조립합니다.
+              </p>
+              <p>
+                특히 본 세션에서는 <strong>Codex Client Workspace</strong>를 밀접하게 연동하여 가입/로그인 우선순위 체크리스트 기획(Task 01), 입력 폼 필드 간소화 유저 플로우 도출 보고서 작성(Task 02), 중복 가입 차단 가드 및 정규식 검증 탑재(Task 03), 실버 고객 페르소나 모의 체험 실시간 안내 교정서(Mission 01), 무작위 계정 스캐닝 힌트 노출을 방지하는 실패 에러 메시지 통합 보안 패치(Mission 02)를 구축합니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>회원 기능 우선순위 및 가입 장벽 제거</h5>
+                  <p>
+                    예약 비즈니스 특징을 대조하여 필수 가입 수단과 부가 기능을 구분하고, 다중 입력창의 이탈 유발 구간을 진사합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>필수(Must-Have) 및 선택(Nice-to-Have) 회원 목록 기획 (Task 01)</li>
+                    <li>Friction Point(가입 인지 장벽) 및 비밀번호 리셋 문제 진사</li>
+                    <li>1단계 가입(간소) 및 2단계 수집(대시보드 진입 후) 분할 흐름 제안 (Task 02)</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>스토리지 무결성 가딩 및 오류 조건 패치</h5>
+                  <p>
+                    데이터가 꼬이지 않도록 이메일 중복 체크를 적용하고, 이메일 정규식 유효 처리와 보안 메시지 처리를 적용합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>userDatabase 내 some 중복 이메일 체크 가드 조립 (Task 03)</li>
+                    <li>잘못된 이메일 주소 주입 차단 Regex 필터 설계</li>
+                    <li>비밀번호 찾기 시 활성 상태 비교 비즈니스 룰 예외 가이드 획득</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>페르소나 모의 테스트 및 보안 정보 은폐 평가</h5>
+                  <p>
+                    가상 실버 유저의 입장으로 가입 흐름을 점검하고, 실패 알림 보안 취약점을 해결합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>초보 고객 페르소나 모의 가입 감정 마찰 곤경 채집서 (Mission 01)</li>
+                    <li>이메일 blur 포커스 아웃 시 자동 비동기 중복 확인 설계</li>
+                    <li>아이디/비번 실패 메시지를 통합해 정보 유출(Information Leak) 방지 (Mission 02)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">User Feature Planning</span>
+                <span class="outcome-tag">Onboarding UX</span>
+                <span class="outcome-tag">Form Friction Audit</span>
+                <span class="outcome-tag">Progressive Profiling</span>
+                <span class="outcome-tag">Database Integrity</span>
+                <span class="outcome-tag">Duplicate Account Guard</span>
+                <span class="outcome-tag">Info Hide</span>
+                <span class="outcome-tag">Usability Evaluation</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>기획 분석 + AI 협업 실습 + 결과 공유</li>
+                <li><strong>실습 기반</strong>LocalStorage + 자바스크립트 가드 + Codex</li>
+                <li><strong>목표 결과</strong>가입 이탈이 낮고 정합성이 견고한 사용자 관리 구현</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>신규 비즈니스 목적에 맞는 최소주의(Minimalism) 가입 요구 설계</li>
+                <li>다단계 입력 양식의 시점 연기를 통한 이탈 장벽 제거 기법 습득</li>
+                <li>이중 가입 차단 체크와 정규식 조건을 코딩에 통합하는 룰 수립</li>
+                <li>안내 메시지 모호화를 통한 무작위 해킹 공격 예방 지식 확보</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>우선순위 체크리스트 표(day8_feature_checklist.md)</li>
+                <li>온보딩 개선 보고서(day8_ux_improvement_report.md)</li>
+                <li>중복 방지 가드 코딩 스크립트(day8_robust_user_service.js)</li>
+                <li>첫 사용자 리뷰서(day8_first_user_review.md)</li>
+                <li>품질 감사 평가서(day8_usability_evaluation.md)</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>런칭 전 가입 양식 피로도를 정량 평가해 유입 증대</li>
+                <li>중복 데이터 삽입으로 인한 데이터베이스 오염을 기획선에서 완벽 예방</li>
+                <li>실시간 규칙 충족 피드백 제공으로 가입 좌절 경험 무력화</li>
+                <li>에러 피드백 단일화를 통한 해킹 시나리오 무력화</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day8/day8-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day8/day8-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 8일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Day 9 Modal -->
+  <div class="modal-overlay" id="day9Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day9ModalTitle">
+      <button class="modal-close" id="closeDay9Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 9 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day9ModalTitle">Payment Service: Experience & Trust Audit</h3>
+        <p class="modal-subtitle">
+          <strong>[Codex AI 연계]</strong> 결제 흐름을 최적화하여 구매 포기를 줄이고, 예외 상황에 대한 친절한 안내 카피와 기술 가드를 수립하며, 신뢰 요소를 극대화하여 안심 결제 모델을 구축하는 9일차 실습 모듈입니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 9은 비즈니스의 수익화가 완결되는 결제 프로세스를 사용자 관점으로 기획하고, 이탈 리스크를 전수 차단하는 품질 평가를 진행하는 세션입니다.
+                참가자는 다단계에 걸친 확인창과 이중인증 동선을 요약 오버레이 시트로 통폐합하여 마찰을 획기적으로 낮춥니다.
+              </p>
+              <p>
+                또한 외부 PG사의 난해한 영문 에러코드를 유저 친화적 안심 한글로 치환하고, 연타 중복 과금을 차단하는 스피너 및 주문 멱등키를 구현하며, 피싱 불안을 날리는 보안 배지 및 VAT 세분화 요소를 결제창에 이식합니다.
+              </p>
+              <p>
+                특히 본 세션에서는 <strong>Codex Client Workspace</strong>를 밀접하게 연동하여 간소 주문 결제 플로우 기획(Task 01), 안심 에러 문구집 및 중복 차단 락(disabled) 설계(Task 02), 개정 안심 결제 UI CSS/HTML 구조 보완(Task 03), 창 강제 종료 및 점검 대응 실패 명세서(Mission 01), 쿠폰 탐색 폼 초기화 차단 고객 여정 진단서(Mission 02)를 구축합니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>주문-결제 여정 간소화 설계</h5>
+                  <p>
+                    다단계 이탈 지점을 전수 조사하고, 배송지와 수단을 단일 주문 시트에 통합하여 이탈률을 방어하는 단선 여정을 설계합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>Friction Point(결제 인지 장벽) 2대 요인 도출</li>
+                    <li>본인인증 중복 등 불필요 단계 축소 기획 (Task 01)</li>
+                    <li>3단계 이하 간소 결제 흐름 모델(TO-BE Flow) 수립</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 3시간</span>
+                  <h5>예외 상황 한글화 및 중복 과금 차단</h5>
+                  <p>
+                    한도초과, 지연 등 오류를 안심 조치 문구집으로 교정하고 이중 클릭을 제어할 안전 락을 코딩합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>PG 원시 에러 코드의 사용자 조치 중심 한글 번역 (Task 02)</li>
+                    <li>연타 이중 과금을 차단할 버튼 비활성화(disabled) 및 스피너 이식</li>
+                    <li>최종 실결제액 VAT 상세 공제 영수증 및 보안 배지 HTML 결합 (Task 03)</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 1시간</span>
+                  <h5>금융 장애 사후 대응 및 여정 피크 교정</h5>
+                  <p>
+                    PG창 이탈, 점검 시간 장애 등 금융 불안을 차단하는 대응 수습서와 폼 유실 방지 보고서를 제출합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>출금 유무를 확실하게 판단해 공포를 해소하는 수습 메시지집 (Mission 01)</li>
+                    <li>쿠폰 탐색 시 배송지 폼 소실 등의 마찰 피크 구간 진사 (Mission 02)</li>
+                    <li>개선 우선순위 A/B 할당 및 피드백</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Payment Flow Planning</span>
+                <span class="outcome-tag">Trust Auditing</span>
+                <span class="outcome-tag">Exception Playbook</span>
+                <span class="outcome-tag">Friendly Error Mapping</span>
+                <span class="outcome-tag">Receipt Breakdowns</span>
+                <span class="outcome-tag">Idempotency Guard</span>
+                <span class="outcome-tag">Friction Peak Auditing</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>여정 분석 + AI 오디팅 실습 + 결과 공유</li>
+                <li><strong>실습 기반</strong>PG 원시 에러 + 결제 UI 구조 + Codex</li>
+                <li><strong>목표 결과</strong>지불 피로도가 제로에 가깝고 안심 결제가 가능한 최적 화면 조립</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>고객의 결제 행위 전반의 마찰 지점을 도표로 도식화하는 능력</li>
+                <li>사용자의 금전적 불안을 해소하는 행동형 오류 가이던스 작성</li>
+                <li>영수증 세분화 및 보안 문구를 이식하는 결제 신뢰 보완법 체득</li>
+                <li>모의 E2E 가상 테스트를 통해 이탈 피크 요소를 교정하는 법 습득</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>간소 주문 결제 플로우(day9_optimized_flow.md)</li>
+                <li>안심 에러 문구집(day9_error_mitigation_guide.md)</li>
+                <li>개정 안심 결제 UI(day9_robust_payment_ui.html)</li>
+                <li>실패 대응 명세서(day9_failure_scenarios.md)</li>
+                <li>고객 여정 진단서(day9_checkout_journey.md)</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>활용 포인트</h5>
+              <ul class="info-list">
+                <li>결제 수동 팝업 이탈율을 극단적으로 낮추는 여정 통폐합 설계</li>
+                <li>결제 실패 항의전화를 자가 회복 안내 문구집으로 무력화</li>
+                <li>보안 라이선스 락 표시를 통한 사이트 신뢰 가치 극대화</li>
+                <li>폼 리셋 버그를 예방하여 장바구니 탈출 완료율 방어</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            영상 강의와 AI 챗봇 질의응답을 함께 진행
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day9/day9-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day9/day9-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 9일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 10 Modal -->
+  <div class="modal-overlay" id="day10Modal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="day10ModalTitle">
+      <button class="modal-close" id="closeDay10Modal" aria-label="모달 닫기">×</button>
+
+      <div class="modal-hero">
+        <span class="modal-day">Day 10 Detailed Curriculum</span>
+        <h3 class="modal-title" id="day10ModalTitle">Service Launch: 서비스 런칭하기</h3>
+        <p class="modal-subtitle">
+          <strong>[Codex AI 연계]</strong> 개발의 마침표가 아닌 서비스의 시작점 — 서비스 소개서 제작부터 사용자 지원 준비, 프로젝트 성과 정리, Version 2.0 로드맵 수립까지 실제 서비스 기획자의 마지막 업무 흐름을 Codex AI와 함께 완성하는 10일차 실습 모듈입니다.
+        </p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-grid">
+          <div>
+            <div class="modal-section">
+              <h4>학습 개요</h4>
+              <p>
+                Day 10은 코드를 한 줄도 작성하지 않습니다. 9일간의 개발로 완성된 서비스를 세상에 공개하는 데 필요한 모든 준비를 <strong>Codex Client Workspace</strong>와 함께 수행합니다. "서비스를 가장 잘 설명하는 사람이 되는 것"이 오늘의 목표입니다.
+              </p>
+              <p>
+                5초 안에 이해되는 서비스 소개서와 채널별(이메일·홈페이지·SNS) 오픈 공지를 제작하고, 사용자가 겪을 어려움을 예측하여 FAQ와 고객 응대 가이드를 준비하며, 투자자에게 전달 가능한 결과보고서와 차기 버전 로드맵을 완성합니다.
+              </p>
+              <p>
+                특히 본 세션에서는 <strong>Codex Client Workspace</strong>를 밀접하게 연동하여 서비스 런칭 자료 패키지 완성(Task 01), 사용자 관점 FAQ 20개 및 응대 시나리오 구성(Task 02), MoSCoW 우선순위 Version 2.0 로드맵 수립(Task 03), 통합 런칭 패키지 제작(Mission 01), 최종 발표 및 Q&A 준비(Mission 02)를 구축합니다.
+              </p>
+            </div>
+
+            <div class="modal-section">
+              <h4>주요 세션 구성 (Codex AI 연계)</h4>
+              <div class="session-list">
+                <div class="session-card">
+                  <span class="session-time">Session 1 · 2시간</span>
+                  <h5>서비스 런칭 준비 및 사용자 지원 설계</h5>
+                  <p>
+                    처음 접하는 사용자가 5초 안에 이해할 수 있는 소개서를 만들고, 첫날 쏟아질 고객 문의를 사전에 준비합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>서비스 한 줄 설명 및 핵심 기능 3가지 기술 (Task 01)</li>
+                    <li>이메일·홈페이지·SNS 채널별 오픈 공지 제작</li>
+                    <li>FAQ 20개 (회원가입·서비스이용·결제·오류·기타 5카테고리) 작성 (Task 02)</li>
+                    <li>고객 불만 시나리오 5가지 및 응대 스크립트 구성</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 2 · 2시간</span>
+                  <h5>프로젝트 성과 정리 및 Version 2.0 로드맵</h5>
+                  <p>
+                    10일간의 개발을 객관적으로 정리하고 투자자에게 전달 가능한 보고서와 차기 기획을 완성합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>결과보고서 (배경·목표·핵심 기능·성과·개선 과제) 작성 (Task 03)</li>
+                    <li>Keep/Problem/Try 회고 — 잘된 점 3가지·아쉬운 점 3가지 분석</li>
+                    <li>MoSCoW(Must/Should/Could/Won't) 우선순위 Version 2.0 로드맵 수립</li>
+                  </ul>
+                </div>
+
+                <div class="session-card">
+                  <span class="session-time">Session 3 · 2시간</span>
+                  <h5>런칭 패키지 완성 및 최종 발표</h5>
+                  <p>
+                    전체 자료를 통합한 런칭 패키지를 완성하고, Codex의 피드백으로 발표 자료를 점검한 뒤 팀별 10분 발표를 진행합니다.
+                  </p>
+                  <ul class="bullet-list">
+                    <li>소개서·FAQ·공지·매뉴얼 통합 런칭 패키지 완성 (Mission 01)</li>
+                    <li>Codex에게 "가장 설득력이 부족한 부분" 피드백 요청</li>
+                    <li>팀별 10분 발표 + 5분 Q&A 및 3개월 스프린트 계획 발표 (Mission 02)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-section">
+              <h4>핵심 학습 요소</h4>
+              <div class="outcome-tags">
+                <span class="outcome-tag">Launch Prep</span>
+                <span class="outcome-tag">Service Intro Design</span>
+                <span class="outcome-tag">FAQ 20 (5 Categories)</span>
+                <span class="outcome-tag">Customer Support Script</span>
+                <span class="outcome-tag">Retrospective (KPT)</span>
+                <span class="outcome-tag">MoSCoW Roadmap</span>
+                <span class="outcome-tag">Version 2.0 Planning</span>
+                <span class="outcome-tag">Final Presentation</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-panel">
+              <h5>기본 정보</h5>
+              <ul class="info-list">
+                <li><strong>총 학습 시간</strong>6시간</li>
+                <li><strong>학습 방식</strong>AI 문서 작성 + 팀 통합 + 최종 발표</li>
+                <li><strong>실습 기반</strong>Codex Workspace + 서비스 개요 파일 + 프로젝트 요약</li>
+                <li><strong>목표 결과</strong>오늘 당장 사용자에게 배포 가능한 런칭 패키지와 투자자용 보고서 완성</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>학습 목표</h5>
+              <ul class="info-list">
+                <li>AI를 활용해 서비스의 핵심 가치를 5초 안에 전달하는 소개서 작성</li>
+                <li>사용자 관점에서 어려움을 예측하고 FAQ·응대 가이드를 구성하는 역량</li>
+                <li>MoSCoW 우선순위로 논리적인 Version 2.0 로드맵을 수립하는 방법 습득</li>
+                <li>Codex를 단순 도구가 아닌 "다음 프로젝트를 함께 기획하는 파트너"로 경험</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>기대 산출물</h5>
+              <ul class="info-list">
+                <li>서비스 소개서 + 채널별 공지(day10_launch_materials.md)</li>
+                <li>FAQ 20개 + 응대 가이드(day10_faq_guide.md)</li>
+                <li>결과보고서 + 회고 + 로드맵(day10_retrospective.md)</li>
+                <li>통합 런칭 패키지(day10_launch_package.md)</li>
+                <li>최종 발표자료 + 스프린트 계획(day10_presentation.md)</li>
+              </ul>
+            </div>
+
+            <div class="info-panel">
+              <h5>Codex AI 연계 활용 포인트</h5>
+              <ul class="info-list">
+                <li>"이 소개서를 읽은 사람이 바로 서비스를 사용하고 싶게 만들어줘" — 설득력 강화</li>
+                <li>"이 발표자료에서 설득력이 부족한 부분은 어디인가요?" — 발표 자료 피드백</li>
+                <li>"팀 2명·기획자 1명 3개월 스프린트 계획을 세워줘" — Version 2.0 구체화</li>
+                <li>"투자자가 가장 궁금해할 Q&A 5가지를 준비해줘" — Q&A 리허설</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-panel">
+        <h5>AI 학습 페이지</h5>
+        <ul class="info-list">
+          <li>
+            <strong>학습 방식</strong>
+            Codex AI와 함께하는 런칭 자료 작성 + 팀별 최종 발표
+          </li>
+        </ul>
+        <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <a href="day10/day10-ai-classroom.html" class="ai-class-btn">
+            AI 강의실 입장
+          </a>
+          <a href="day10/day10-textbook.html" target="_blank" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #2563eb); border: 1px solid rgba(255, 255, 255, 0.2);">
+            📘 10일차 교재 (PDF)
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function setupModal(openButtonId, modalId, closeButtonId) {
+      const openButton = document.getElementById(openButtonId);
+      const modal = document.getElementById(modalId);
+      const closeButton = document.getElementById(closeButtonId);
+
+      if (!openButton || !modal || !closeButton) return;
+
+      function openModal() {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      openButton.addEventListener('click', openModal);
+
+      openButton.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openModal();
+        }
+      });
+
+      closeButton.addEventListener('click', closeModal);
+
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+          closeModal();
+        }
+      });
+    }
+
+    setupModal('openDay1Modal', 'day1Modal', 'closeDay1Modal');
+    setupModal('openDay2Modal', 'day2Modal', 'closeDay2Modal');
+    setupModal('openDay3Modal', 'day3Modal', 'closeDay3Modal');
+    setupModal('openDay4Modal', 'day4Modal', 'closeDay4Modal');
+    setupModal('openDay5Modal', 'day5Modal', 'closeDay5Modal');
+    setupModal('openDay6Modal', 'day6Modal', 'closeDay6Modal');
+    setupModal('openDay7Modal', 'day7Modal', 'closeDay7Modal');
+    setupModal('openDay8Modal', 'day8Modal', 'closeDay8Modal');
+    setupModal('openDay9Modal', 'day9Modal', 'closeDay9Modal');
+    setupModal('openDay10Modal', 'day10Modal', 'closeDay10Modal');
+
+    // Helper to get cookie
+    function getCookie(name) {
+      var nameEQ = name + "=";
+      var ca = document.cookie.split(';');
+      for(var i=0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+      }
+      return null;
+    }
+
+    // Helper to delete cookie
+    function eraseCookie(name) {
+      document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+
+    // Check cookie first
+    let loggedInUser = getCookie('currentUser');
+
+    // Fallback to localStorage session backup (for local file:// compatibility)
+    if (!loggedInUser) {
+      const sessionStr = localStorage.getItem('currentUserSession');
+      if (sessionStr) {
+        try {
+          const session = JSON.parse(sessionStr);
+          if (Date.now() < session.expiresAt) {
+            loggedInUser = session.value;
+          } else {
+            localStorage.removeItem('currentUserSession');
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    if (loggedInUser) {
+      try {
+        const user = JSON.parse(loggedInUser);
+        const lastNavLink = document.querySelector('.nav-links li:last-child');
+        if (lastNavLink) {
+          lastNavLink.innerHTML = `
+            <div class="user-badge-main" style="display:flex; align-items:center; gap:8px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 50px; padding: 6px 14px; font-size: 0.9rem; font-weight: 700; color: var(--secondary-color); cursor: pointer;" onclick="logoutUser()" title="클릭하여 로그아웃">
+              <span>${user.avatar}</span>
+              <span>${user.name}</span>
+            </div>
+          `;
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+
+    window.logoutUser = function() {
+      if (confirm('로그아웃 하시겠습니까?')) {
+        eraseCookie('currentUser');
+        localStorage.removeItem('currentUserSession');
+        localStorage.removeItem('currentUser'); // Clean up old storage
+        window.location.reload();
+      }
+    };
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>

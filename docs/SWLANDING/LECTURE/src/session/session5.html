@@ -1,0 +1,311 @@
+<!-- Slide 52: [간지] SESSION 05 -->
+<section class="slide-card divider-slide session-5" id="slide-59">
+  <div class="slide-header" style="display: none;">
+    <div class="slide-category">5일차 | 5차시. 서비스 설계 (UI / UX 리뷰)</div>
+    <div class="slide-title">[세션 오프닝] 5일차. 서비스 설계 (UI / UX 리뷰)</div>
+  </div>
+
+  <div class="divider-content">
+    <div class="divider-day">DAY 5</div>
+    <div class="divider-tag">SESSION 05</div>
+    <h1 class="divider-title">UI / UX 리뷰 및 최적화</h1>
+    <p class="divider-subtitle">초보 유저 사용성 리뷰, UI 디자인 일관성 검토, 동선 간소화 및 페르소나 품질 검증</p>
+    <div class="divider-topics">
+      <div class="topic-badge"><span>01</span> 사용성 &amp; UI 일관성 (Task 01/02)</div>
+      <div class="topic-badge"><span>02</span> User Journey 최적화 (Task 03)</div>
+      <div class="topic-badge"><span>03</span> 가상 페르소나 &amp; 품질 평가 (Mission 01/02)</div>
+    </div>
+  </div>
+
+  <div class="slide-body" style="display: none;">
+    <p>5차시. 서비스 설계 (UI / UX 리뷰) 세션 시작</p>
+  </div>
+  <div class="presenter-notes" style="display:none;">5일차 세션에서는 사용자가 쉽고 편하게 제품을 사용할 수 있도록 9단계 동선을 4단계로 최적화하고, 가상의 초보 유저(50대 자영업자) 페르소나를 임베딩해 UI/UX 품질을 평가하는 법을 배웁니다.</div>
+</section>
+
+<!-- Slide 53: 5일차 오프닝 & 13차시 안내 -->
+<section class="slide-card session-5" id="slide-60">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">13차시. 초보 사용자 UX 리뷰 및 UI 일관성 검토</div>
+      <div class="slide-title">5일차 오프닝 &amp; 13차시 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">5일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">주제:</span> 사용자 관점의 사용성 리뷰 (UX Review)</li>
+      <li><span class="highlight">핵심 가치:</span> 기획/개발팀의 주관적 아집에서 벗어나 타자(사용자)의 시선에서 인지 부하 요소를 객관적으로 탐색</li>
+      <li><span class="highlight">시간 계획 (총 180분):</span>
+        <ul>
+          <li>도입 (30분) - 기능은 백프로 성공했으나 사용자가 5초 만에 이탈하는 이탈률 원인 분석</li>
+          <li>실습 설명 (30분) - day5_signup_flow.md 파일의 UI 레이아웃 사양 대조 방법</li>
+          <li>실습 진행 (90분) - UX 사용성 리뷰 보고서 및 UI 일관성 검토서 작성</li>
+          <li>공유 및 피드백 (30분) - 저장하기 버튼 위치 불일치 및 가독성 취약점 적발</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">13차시에서는 시스템 상태 표기와 정보 구조의 계층을 오디팅하여 사용성 취약점을 선제 도출합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">화면 레이아웃에 돋보기가 얹어져 가독성 포인트를 추적하는 와이어프레임 목업 일러스트.</div>
+  </div>
+</section>
+
+<!-- Slide 54: 도입 질문: 기능은 완벽하나 사용자가 이탈하는 원인 -->
+<section class="slide-card session-5" id="slide-61">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">13차시. 초보 사용자 UX 리뷰 및 UI 일관성 검토</div>
+      <div class="slide-title">도입 질문: 기능은 완벽하나 사용자가 이탈하는 원인</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">5일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">기획자 중심의 오차:</span> "여기를 클릭하면 결제 예상 요금이 뜨는데 당연히 다들 누르겠지?"
+            <ul>
+              <li><span class="highlight">사용자 체감 인지 부하:</span> 요금 정보가 팝업 뒤에 가려져 있어 스크롤을 내리거나 팝업을 열기 전에는 결제 금액이 얼마인지 몰라 불안해서 예약을 포기함.</li>
+              <li><span class="highlight">UI 일관성 결여:</span> 로그인 페이지 메인 버튼은 하단 파란색 전체 너비인데, 회원가입 모달 내 완료 버튼은 우측 상단 초록색 소형 버튼이라 찾지 못함.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="image-container"
+        style="display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 12px; padding: 10px;">
+        <img alt="사용성 이탈 요인" src="images/slide54_illustration.png"
+          style="max-width: 100%; max-height: 320px; border-radius: 8px; object-fit: contain;" />
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">사용법을 매번 새로 배워야 한다면 사용자는 피로를 느끼고 떠납니다. AI를 통해 사용성 휴리스틱을 기준으로 명세서를 객관적으로 난도질해 보겠습니다.</div>
+    <div class="visual-guide-notes" style="display:none;">사용자가 비밀번호 에러로 3번 튕겨서 모바일 화면을 끄는 좌절 일러스트 배치.</div>
+  </div>
+</section>
+
+<!-- Slide 55: 실습 진행 Task 01: 초보 사용자 UX 리뷰 (User Experience Review) -->
+<section class="slide-card session-5" id="slide-62">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">13차시. 초보 사용자 UX 리뷰 및 UI 일관성 검토</div>
+      <div class="slide-title">실습 진행 Task 01: 초보 사용자 UX 리뷰</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">5일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: day5_signup_flow.md 생성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">로그인/가입 화면 사양(오류 시 입력데이터 다 날아감), 전문가 조밀한 시간 슬롯(10px), 9단계 예약 시나리오 기입.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 사용성 검토 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>UX 리뷰 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 예약 신청 상세 폼의 화면 명세를 기반으로, 서비스를 처음 접하는 초보 사용자의 입장에서 정보 구조가 명확한지 검토하고 사용성 저해 요소를 지목하여 검토영역, 저해요소, 유저영향, 개선방안 칼럼 표 형태의 UX Review Report를 작성해줘.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">AI가 스크롤 최하단에 처박힌 별점 정보, 시간대 슬롯 명도 대비 모호성, 요금 표시 가려짐의 UX 약점을 짚어내고 개선 방안을 제공합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">UX Review Report 마크다운 표가 도출되는 실시간 출력 화면 예시.</div>
+  </div>
+</section>
+
+<!-- Slide 56: 실습 진행 Task 02: 화면의 일관성 검토 (UI Consistency Review) -->
+<section class="slide-card session-5" id="slide-63">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">13차시. 초보 사용자 UX 리뷰 및 UI 일관성 검토</div>
+      <div class="slide-title">실습 진행 Task 02: 화면의 일관성 검토</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">5일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">실습 지시: AI 창에 UI 일관성 검증 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>UI 일관성 검증 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 day5_signup_flow.md의 각 화면 설계 내역들을 서로 대조하여, 버튼의 배치 규칙, 사용 용어, 피드백 메시지의 일관성이 결여된 요소를 분석해 화면 비교 보고서를 작성해줘. (아이디 vs 고객 ID 명칭 혼선 및 메인 버튼 전체너비 대조 포함)</pre>
+        </div>
+      </li>
+      <li style="margin-top: 5px;"><span class="highlight">기대 결과:</span> 가입화면(아이디)과 예약화면(고객 ID) 용어 불일치 및 가입완료 버튼(우상단 소형 초록)의 디자인 규칙 위배 검출.</li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">다수의 페이지를 작업자들이 쪼개서 만들 때 생기는 용어 오차와 단추 구성 위배를 AI가 클러스터링해 잡아냅니다.</div>
+    <div class="visual-guide-notes" style="display:none;">일관성이 깨진 화면 레이아웃 대조 및 표준 UI 가이드라인 제안서 표 노출.</div>
+  </div>
+</section>
+
+<!-- Slide 57: 실습 진행 Task 03: 사용자 동선 개선 (User Journey Review) -->
+<section class="slide-card session-5" id="slide-64">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">14차시. User Journey 최적화 및 캘린더 통합</div>
+      <div class="slide-title">실습 진행 Task 03: 사용자 동선 개선</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">5일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">실습 지시: AI 창에 동선 단축 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>동선 최적화 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 day5_signup_flow.md의 예약 상세 시나리오 동선을 분석하여, 사용자가 상담 예약을 완료하기까지의 클릭 단계와 화면 이동을 최소화할 수 있는 AS-IS 동선(9단계)과 TO-BE 개선 동선(4단계 내외)을 포함하는 사용자 동선 개선 보고서(User Journey Report)를 작성해줘.</pre>
+        </div>
+      </li>
+      <li style="margin-top: 5px;"><span class="highlight">개선 요점:</span> 상세프로필에 캘린더와 시간 슬롯을 하나의 화면으로 아코디언 통합 배치, 예약 시 팝업 약관 간편 동의 처리.</li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">사용자가 결제 완료에 도달하기까지 클릭 수와 불필요한 단독 화면 이동을 합치고 제거해 이탈율을 극적으로 단축시킵니다.</div>
+    <div class="visual-guide-notes" style="display:none;">9단계(지저분함)와 4단계(간결함)의 예약 흐름선 시각적 비교 다이어그램.</div>
+  </div>
+</section>
+
+<!-- Slide 58: Mission 01: 처음 사용하는 사용자 되어보기 (페르소나 리서치) -->
+<section class="slide-card session-5" id="slide-65">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">15차시. 페르소나 리서치 및 종합 편의성 평점 평가</div>
+      <div class="slide-title">Mission 01: 처음 사용하는 사용자 되어보기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">5일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">임베디드 가상 유저 페르소나:</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 3px 0 5px 0;">"디지털 스마트폰 조작이 다소 서툰 50대 자영업자"의 시나리오 첫인상 감정적 로그를 생성합니다.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 페르소나 투사 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>가상 페르소나 피드백 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">당신은 디지털 스마트폰 앱 사용이 다소 서툰 50대 자영업자입니다. 제공된 day5_signup_flow.md 명세서에 작성된 회원가입 및 첫 화면 UI 명세를 보면서, 당신의 입장에서 가입 시 무엇이 가장 헷갈리고 어려운지 감정적인 반응과 개선 요구사항을 적어주세요. (아이디 중복확인 혼선, 글자 크기 시인성 저하, 비밀번호 유효성 에러 시 작성내용 포맷 리셋 분노 포함)</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">AI가 가상 유저 역할을 투사해, "뒤로 가기 누르니 작성했던 긴 이름/연락처가 다 초기화되어 가입을 포기하고 싶다"는 뼈아픈 감정적 장애 로그를 색출합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">가상 자영업자 프로필 카드 형태 레이아웃 및 3대 사용 장애 곤경 로그 노출.</div>
+  </div>
+</section>
+
+<!-- Slide 59: Mission 02: AI와 함께 서비스 품질 평가하기 (Usability Scoring) -->
+<section class="slide-card session-5" id="slide-66">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">15차시. 페르소나 리서치 및 종합 편의성 평점 평가</div>
+      <div class="slide-title">Mission 02: AI와 함께 서비스 품질 평가하기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">5일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">국제 사용성 품질 지표 기반 평가:</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 3px 0 5px 0;">가독성, 회복성, 효율성 등 4대 축을 기준으로 UI/UX 품질을 등급/점수화합니다.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 품질 채점 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>사용성 수치 평가 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 day5_signup_flow.md 스펙을 기반으로, 1) 정보 가독성, 2) 조작 접근성, 3) 에러 회복성, 4) 동선 효율성 등의 항목에 대해 각각 5점 만점의 점수를 매기고, 종합 평가 점수와 함께 장점 및 뼈아픈 개선점을 지목하는 서비스 품질 평가서(Usability Evaluation)를 빌드해줘.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">AI가 사용성 지표를 점수(Usability Score - 종합 2.75 / 5.0)로 매겨 피드백 및 개선 로드맵 액션 플랜을 도출해 줍니다.</div>
+    <div class="visual-guide-notes" style="display:none;">종합 평점 인디케이터 게이지 및 영역별 품질 평가 스택 막대 그래프 그래픽.</div>
+  </div>
+</section>
+
+<!-- Slide 60: 정리: 5일차 핵심 요약 및 전체 마일스톤 회고 -->
+<section class="slide-card session-5" id="slide-67">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">15차시. 페르소나 리서치 및 종합 편의성 평점 평가</div>
+      <div class="slide-title">정리: 5일차 핵심 요약 및 전체 회고</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">5일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">2일간의 전체 마일스톤 회고:</span>
+        <ul>
+          <li><span class="highlight">요구사항 파이프라인 (Day 1):</span> 기획 회의록에서 6대 린트 통과 통합 요구 명세화 및 외부 전송 완수.</li>
+          <li><span class="highlight">통제 및 추적 (Day 2):</span> 삼각 모순 감사, 변경 영향도 매핑, 의사결정 로그 캡슐화 완료.</li>
+          <li><span class="highlight">기술설계 정규화 (Day 3):</span> 엔티티/관계성 Mermaid ERD 도출, 표준 용어 사전, Soft Delete 예외 보완.</li>
+          <li><span class="highlight">인터페이스 약속 (Day 4):</span> RESTful API 계약 Req/Res JSON 수립, Happy/Sad Path 경계값 테스트 케이스 목록 설계.</li>
+          <li><span class="highlight">사용성 품질 검증 (Day 5):</span> 9단계 동선 ➔ 4단계 축소, 페르소나 곤경 로그, 4대 사용성 평점 Usability Score 평가 카드 완성!</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">5일간 진행된 모든 실습을 마칩니다. 우리는 단순히 동작하는 코드가 아니라, AI 검토 동반자(Codex)와 요구사항 생애주기 전반의 품질을 제어하여 제품의 성공을 방어하는 완벽한 설계 엔지니어로 성장했습니다. 대단히 수고 많으셨습니다. 감사합니다!</div>
+    <div class="visual-guide-notes" style="display:none;">1일차부터 5일차까지 완성해온 모든 학습 산출물들이 하나의 통합 요구사항 통제 프레임워크로 집약되는 3D 큐브 그래픽.</div>
+  </div>
+</section>
+<!-- Slide: 5일차 강의 평가 (Daily Evaluation) -->
+<section class="slide-card session-5" id="slide-68">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">일차별 강의 평가 | Daily Feedback</div>
+      <div class="slide-title">5일차 교육 만족도 및 강의 평가 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">5일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">설문 목적:</span> 5일차 교육 내용 만족도, 난이도 체감 및 개선 의견 수렴</li>
+          <li><span class="highlight">참여 방법:</span> 우측 QR 코드를 스마트폰 카메라로 스캔하거나 아래 링크로 접속해 주세요.</li>
+          <li><span class="highlight">설문 링크:</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSdUApr0EnfNSqnJeGwQd0Emurbbfjf7ZPF95YkqWKbfPMIj8Q/viewform" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; word-break: break-all;">https://docs.google.com/forms/d/e/1FAIpQLSdUApr0EnfNSqnJeGwQd0Emurbbfjf7ZPF95YkqWKbfPMIj8Q/viewform</a></li>
+          <li><span class="highlight">유의 사항:</span> 작성해 주신 소중한 피드백은 다음 차시 커리큘럼 보완 및 교육 품질 향상에 즉시 반영됩니다.</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); border-radius: 16px; padding: 24px; text-align: center;">
+        <div style="background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: inline-block; margin-bottom: 16px;">
+          <img src="images/qr_eval_day5.png" alt="5일차 강의 평가 QR 코드" style="width: 220px; height: 220px; display: block; border-radius: 6px;" />
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px;">📱 카메라로 QR 코드를 스캔하세요</div>
+        <div style="font-size: 0.95rem; color: var(--text-secondary);">5일차 강의 평가 (Google Forms)</div>
+      </div>
+    </div>
+
+    <div class="presenter-notes" style="display:none;">5일차 수업을 마치며 교육 만족도 및 강의 평가를 진행합니다. 수강생분들께서는 QR 코드를 스캔하여 오늘 수업에 대한 피드백을 작성해 주시기 바랍니다.</div>
+  </div>
+</section>

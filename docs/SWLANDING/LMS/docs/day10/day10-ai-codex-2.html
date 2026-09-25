@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 10. Task 02 - 사용자 관점에서 서비스 점검하기 | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color:#3b82f6; --secondary-color:#06b6d4; --bg-dark:#09090b;
+      --bg-card:#1a1d24; --text-main:#ffffff; --text-muted:#e4e4e7;
+      --text-desc:#71717a; --border-color:rgba(255,255,255,0.06);
+      --accent-color:#06b6d4; --accent-purple:#8b5cf6; --card-radius:10px;
+      --shadow-sm:0 4px 20px rgba(0,0,0,.5),0 0 1px rgba(255,255,255,.1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Pretendard',sans-serif; color:var(--text-main); line-height:1.5;
+      background:var(--bg-dark);
+      background-image:radial-gradient(circle at 10% 20%,rgba(59,130,246,.04) 0%,transparent 40%),
+                       radial-gradient(circle at 90% 80%,rgba(6,182,212,.04) 0%,transparent 40%),
+                       linear-gradient(to bottom,#09090b 0%,#111827 100%);
+      background-attachment:fixed;
+    }
+    h1,h2,h3,h4,p,li,span,strong,td,th { word-break:keep-all; }
+    .container { max-width:860px; margin:0 auto; padding:0 20px; }
+    .navbar {
+      position:fixed; top:0; width:100%; z-index:1000;
+      background:rgba(9,9,11,.85); backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .nav-container {
+      min-height:48px; display:flex; align-items:center;
+      justify-content:space-between; flex-wrap:wrap; padding:6px 20px;
+    }
+    .logo { font-size:.9rem; font-weight:800; color:#fff; text-decoration:none; display:flex; align-items:center; gap:5px; }
+    .logo::before { content:""; width:4px; height:12px; background:linear-gradient(135deg,var(--primary-color),var(--accent-color)); border-radius:999px; display:inline-block; }
+    .logo-text p { font-size:.58rem; color:var(--text-desc); margin-top:1px; }
+    .nav-links { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .nav-links a {
+      text-decoration:none; color:var(--text-muted); font-weight:600; font-size:.72rem;
+      background:rgba(255,255,255,.05); padding:4px 8px; border-radius:5px;
+      border:1px solid rgba(255,255,255,.08); transition:all .2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      background:rgba(255,255,255,.1); color:var(--secondary-color); border-color:rgba(6,182,212,.3);
+    }
+    .hero {
+      margin-top:120px; padding:16px 0 10px;
+      background:radial-gradient(circle at 50% 50%,rgba(59,130,246,.04),transparent 60%),#09090b;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .hero-content { max-width:750px; margin:0 auto; text-align:center; }
+    .hero-badge-wrap { display:flex; justify-content:center; gap:5px; flex-wrap:wrap; margin-bottom:4px; }
+    .hero-badge {
+      display:inline-flex; align-items:center; padding:1px 5px; border-radius:999px;
+      background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.15);
+      font-size:.65rem; color:#93c5fd; font-weight:700;
+    }
+    .hero h1 {
+      font-size:1.25rem; font-weight:800; margin-bottom:4px;
+      background:linear-gradient(135deg,#fff 40%,#93c5fd 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:-.02em;
+    }
+    .hero p { font-size:.78rem; color:var(--text-muted); max-width:600px; margin:0 auto; line-height:1.35; }
+    .layout-wrapper { padding:15px 0 35px; }
+    .detail-card {
+      background:rgba(26,29,36,.85); border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--card-radius); padding:14px 16px; box-shadow:var(--shadow-sm);
+    }
+    .detail-card-head { margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,.06); padding-bottom:6px; }
+    .detail-card-head h2 { font-size:.98rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:5px; }
+    .detail-card-head h2 .badge-inline { font-size:.6rem; padding:1px 4px; border-radius:2px; background:var(--primary-color); color:#fff; }
+    .card-section { margin-bottom:12px; }
+    .card-section h3 {
+      font-size:.82rem; font-weight:700; color:var(--secondary-color); margin-bottom:4px;
+      display:flex; align-items:center; gap:4px;
+    }
+    .card-section h3::before { content:""; width:2px; height:8px; background:var(--secondary-color); border-radius:1px; display:inline-block; }
+    .card-section p { font-size:.76rem; color:var(--text-muted); margin-bottom:4px; }
+    ul { list-style-position:inside; padding-left:2px; margin-bottom:4px; }
+    li { font-size:.74rem; color:var(--text-muted); margin-bottom:2px; line-height:1.45; }
+    .prompt-box {
+      background:rgba(9,9,11,.6); border:1px solid rgba(255,255,255,.08);
+      border-radius:8px; padding:16px; position:relative; margin-bottom:8px;
+    }
+    .prompt-box pre {
+      padding-right: 70px; margin:0; white-space:pre-wrap; word-wrap:break-word; font-family:'Fira Code',monospace; font-size:.82rem; color:var(--text-muted); line-height:1.5; }
+    .copy-btn {
+      z-index: 10;
+      position:absolute; top:12px; right:12px;
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+      color:var(--text-muted); padding:4px 10px; border-radius:6px;
+      font-size:.74rem; font-weight:600; cursor:pointer; transition:all .2s;
+    }
+    .copy-btn:hover { background:rgba(255,255,255,.1); color:var(--secondary-color); border-color:rgba(6,182,212,.3); }
+    .action-btn-container { margin:4px 0 8px; display:flex; gap:8px; flex-wrap:wrap; }
+    .btn-download {
+      display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border-radius:4px;
+      background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));
+      color:#fff; font-size:.7rem; font-weight:700; border:none; cursor:pointer;
+      text-decoration:none; transition:all .2s;
+    }
+    .btn-download:hover { transform:translateY(-1px); }
+    @media(max-width:768px) {
+      .hero { margin-top:160px; }
+      .hero h1 { font-size:1.1rem; }
+      .detail-card { padding:10px 12px; }
+      .nav-container { flex-direction:column; gap:8px; padding:10px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 10 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day10-ai-codex-1.html" >Task 1 (런칭 준비)</a>
+        <a href="day10-ai-codex-2.html" class='active'>Task 2 (사용자 점검)</a>
+        <a href="day10-ai-codex-3.html" >Task 3 (성과 정리)</a>
+        <a href="day10-ai-codex-mission1.html" >Mission 1 (패키지)</a>
+        <a href="day10-ai-codex-mission2.html" >Mission 2 (최종 발표)</a>
+        <a href="day10-ai-codex-summation.html" style="background:rgba(6,182,212,.15);color:var(--secondary-color);border-color:rgba(6,182,212,.3);">📊 요약 보기</a>
+        <a href="day10-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 10</span>
+        <span class="hero-badge">Task 02</span>
+        <span class="hero-badge">사용자 점검</span>
+      </div>
+      <h1>Task 02. 사용자 관점에서 서비스 점검하기</h1>
+      <p>서비스를 처음 접하는 사용자가 겪을 어려움을 예측하고 FAQ와 고객 응대 시나리오를 준비합니다.</p>
+    </div>
+  </section>
+
+  <div class="container layout-wrapper">
+    <main>
+      <article class="detail-card">
+        <div class="detail-card-head">
+          <h2><span class="badge-inline">Task 02</span> 사용자 관점에서 서비스 점검하기 실습 가이드</h2>
+        </div>
+
+        <div class="card-section" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:rgba(9,9,11,.4);padding:10px;border-radius:6px;border:1px dashed rgba(255,255,255,.1);">
+          <div>
+            <h4 style="color:var(--accent-color);font-size:.74rem;margin-bottom:2px;">📥 실습 입력 (Input)</h4>
+            <ul style="list-style-type:none;margin-bottom:0;padding-left:0;">
+              <li style="font-size:.68rem;color:var(--text-muted);">• <code>day10_service_overview.md</code></li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="color:var(--accent-purple);font-size:.74rem;margin-bottom:2px;">💾 실습 출력 (Output)</h4>
+            <ul style="list-style-type:none;margin-bottom:0;padding-left:0;">
+              <li style="font-size:.68rem;color:var(--text-muted);">• <code>day10_faq_guide.md</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>1. 스토리 및 실습 배경</h3>
+          <p>서비스가 오픈된 첫날, 예상치 못한 문의가 쏟아집니다. '비밀번호를 잊어버렸는데 어떻게 찾아요?', '결제했는데 영수증이 안 왔어요', '앱이 안 켜져요' 같은 질문들입니다. 운영팀이 없는 스타트업에서는 개발자나 기획자가 직접 응대해야 합니다. 더 큰 문제는 같은 질문이 반복될수록 팀의 생산성이 급격히 떨어진다는 것입니다. 사전에 FAQ와 고객 응대 가이드를 준비해두면 이런 상황을 크게 줄일 수 있습니다.</p>
+        </div>
+
+        <div class="card-section">
+          <h3>2. 학습 목표</h3>
+          <ul>
+            <li>서비스를 처음 사용하는 사람이 겪을 수 있는 어려움을 사용자 관점에서 예측하고 목록화할 수 있다.</li>
+            <li>AI를 활용하여 회원가입·결제·오류 등 5개 카테고리로 구분된 FAQ 20개를 빠르게 작성할 수 있다.</li>
+            <li>사용자 피드백 예상 목록을 기반으로 서비스 개선 포인트를 도출하는 방법을 익힐 수 있다.</li>
+          </ul>
+        </div>
+
+        <div class="card-section">
+          <h3>3. Codex AI 프롬프트 카드</h3>
+          <p>아래 프롬프트를 복사하여 Codex Client에 붙여넣고 결과를 받으세요.</p>
+            <div class="prompt-box" style="margin-bottom:12px;">
+              <button class="copy-btn" onclick="copyPrompt(this, 'prompt2_1')">📋 복사</button>
+              <pre id="prompt2_1">이 서비스를 처음 사용하는 사용자가 가장 많이 할 질문 20가지를 FAQ 형식으로 만들어줘. 회원가입, 서비스 이용, 결제, 오류 해결, 기타 5개 카테고리로 구분해줘.</pre>
+            </div>
+            <div class="prompt-box" style="margin-bottom:12px;">
+              <button class="copy-btn" onclick="copyPrompt(this, 'prompt2_2')">📋 복사</button>
+              <pre id="prompt2_2">서비스를 처음 사용하는 사용자가 막히기 쉬운 구간 3곳을 분석하고, 각 구간에서 발생할 수 있는 문제와 해결 방안을 제안해줘.</pre>
+            </div>
+            <div class="prompt-box" style="margin-bottom:12px;">
+              <button class="copy-btn" onclick="copyPrompt(this, 'prompt2_3')">📋 복사</button>
+              <pre id="prompt2_3">서비스 사용 중 불만을 가질 가능성이 높은 시나리오 5가지를 작성하고, 각 시나리오에 대한 고객 응대 스크립트를 작성해줘.</pre>
+            </div>
+        </div>
+      </article>
+
+      <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;">
+        <a href="day10-ai-codex-1.html" style="color:var(--text-muted);text-decoration:none;font-size:.8rem;font-weight:700;background:rgba(255,255,255,.05);padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.06);">&larr; 이전 단계</a>
+        <a href="day10-ai-codex-3.html" style="color:#fff;text-decoration:none;font-size:.8rem;font-weight:700;background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));padding:8px 16px;border-radius:8px;box-shadow:0 4px 10px rgba(59,130,246,.25);">다음 단계 &rarr;</a>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function copyPrompt(btn, id) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✅ 복사 완료!';
+        btn.style.color = '#34d399';
+        btn.style.borderColor = 'rgba(52,211,153,.4)';
+        setTimeout(() => { btn.textContent = orig; btn.style.color=''; btn.style.borderColor=''; }, 2000);
+      });
+    }
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

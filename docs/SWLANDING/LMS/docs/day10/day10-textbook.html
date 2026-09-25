@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Day 10 교재 | Service Launch & Final Presentation</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<style>
+:root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #0891b2;
+      --accent: #7c3aed;
+      --text-dark: #0f172a;
+      --text-muted: #475569;
+      --bg-page: #f8fafc;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+      --success: #047857;
+      --warning: #b45309;
+      --danger: #b91c1c;
+      --paper-tint: #fffdf8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background: #cbd5e1;
+      color: var(--text-dark);
+      line-height: 1.55;
+      word-break: keep-all;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Screen Navigation Bar */
+    .no-print-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .no-print-bar .title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #ffffff;
+    }
+
+    .no-print-bar .badge {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .no-print-bar .action-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-print {
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    .btn-print:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4); }
+    .btn-download {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-download:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); }
+
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-back:hover { background: rgba(255, 255, 255, 0.2); }
+
+    /* A4 Book Page Container & True A4 Vertical Sheets */
+    .book-container {
+      width: 210mm;
+      max-width: 100%;
+      margin: 36px auto 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 36px;
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    .cover-page,
+    .book-page {
+      width: 210mm;
+      min-height: 297mm;
+      box-sizing: border-box;
+      position: relative;
+      background: #ffffff;
+      border-radius: 3px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 3px 10px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18mm 18mm 16mm 18mm;
+      page-break-after: always;
+      break-after: page;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Cover Page */
+    .cover-page {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
+      color: #ffffff;
+      padding: 24mm 20mm 20mm 20mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Responsive scaling for mobile devices */
+    @media screen and (max-width: 820px) {
+      .book-container {
+        width: 100%;
+      }
+      .cover-page,
+      .book-page {
+        width: 95vw;
+        height: auto;
+        min-height: auto;
+        max-height: none;
+        padding: 22px 18px;
+      }
+    }
+
+    /* Book Header / Footer */
+    .book-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .book-footer-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+      margin-top: auto;
+      flex-shrink: 0;
+    }
+
+    .cover-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cover-tag {
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #60a5fa;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .cover-main {
+      margin: 80px 0;
+    }
+
+    .cover-subtitle {
+      font-size: 1.25rem;
+      color: #94a3b8;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .cover-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1.25;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 24px;
+    }
+
+    .cover-desc {
+      font-size: 1.05rem;
+      color: #cbd5e1;
+      max-width: 650px;
+      line-height: 1.7;
+    }
+
+    .cover-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    /* Typography & Components */
+    h1.chapter-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chapter-number {
+      color: var(--primary);
+      font-size: 1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    h2.section-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 32px 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f1f5f9;
+    }
+
+    h3.sub-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #334155;
+      margin: 20px 0 10px 0;
+    }
+
+    p { margin-bottom: 14px; font-size: 0.98rem; color: #334155; }
+
+    .lead {
+      font-size: 1.08rem;
+      line-height: 1.8;
+      color: #1e293b;
+      max-width: 70ch;
+    }
+
+    .learning-map {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 22px 0;
+    }
+
+    .learning-item {
+      border-top: 3px solid var(--primary);
+      background: #ffffff;
+      padding: 16px;
+      box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+    }
+
+    .learning-item strong { display: block; margin-bottom: 5px; color: #0f172a; }
+    .learning-item p { margin: 0; font-size: 0.9rem; }
+
+    .study-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 24px;
+    }
+
+    .study-chip {
+      background: #eaf2ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+      padding: 6px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .check-point {
+      margin: 22px 0;
+      padding: 20px 22px;
+      border: 1px solid #f3d18b;
+      background: #fffbeb;
+    }
+
+    .check-point h3 { color: #92400e; font-size: 1rem; margin-bottom: 10px; }
+    .check-point ol, .check-point ul, .practice-box ol { padding-left: 22px; }
+    .check-point li, .practice-box li { margin: 7px 0; color: #334155; }
+
+    .practice-box {
+      margin: 24px 0;
+      padding: 22px;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+    }
+
+    .practice-label {
+      display: inline-block;
+      margin-bottom: 10px;
+      color: #ffffff;
+      background: #334155;
+      padding: 4px 9px;
+      font-weight: 800;
+      font-size: 0.78rem;
+      letter-spacing: .04em;
+    }
+
+    .answer-box {
+      margin: 18px 0;
+      border: 1px solid #bbf7d0;
+      background: #f0fdf4;
+      padding: 18px 20px;
+    }
+
+    .answer-box summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--success);
+    }
+
+    .answer-box p { margin: 12px 0 0; }
+
+    .wrong-right {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .example-panel { padding: 16px; border: 1px solid var(--border-color); background: #fff; }
+    .example-panel.bad { border-top: 4px solid var(--danger); }
+    .example-panel.good { border-top: 4px solid var(--success); }
+    .example-panel h4 { margin-bottom: 8px; }
+    .example-panel p { margin: 0; font-size: .9rem; }
+
+    .rubric { counter-reset: rubric; list-style: none; }
+    .rubric li { position: relative; padding: 10px 10px 10px 42px; border-bottom: 1px solid #e2e8f0; }
+    .rubric li::before { counter-increment: rubric; content: counter(rubric); position: absolute; left: 6px; top: 9px; width: 24px; height: 24px; border-radius: 50%; background: #dbeafe; color: #1d4ed8; display: grid; place-items: center; font-weight: 800; }
+
+    code { font-family: 'Menlo', 'Monaco', 'Courier New', monospace; background: #e2e8f0; padding: 1px 5px; border-radius: 3px; font-size: .88em; }
+    .code-box code { background: transparent; padding: 0; color: inherit; }
+
+    @media (max-width: 720px) {
+      .no-print-bar { position: static; align-items: flex-start; gap: 12px; padding: 12px 14px; }
+      .no-print-bar .title-group strong { display: none; }
+      .action-btns { flex-wrap: wrap; justify-content: flex-end; }
+      .btn-action { min-height: 44px; padding: 9px 12px; }
+      .book-container { margin: 0; border-radius: 0; }
+      .book-page, .cover-page { padding: 42px 24px; }
+      .cover-title { font-size: 2.15rem; }
+      .learning-map, .wrong-right { grid-template-columns: 1fr; }
+      .book-table { display: block; overflow-x: auto; }
+      .toc-page { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* Callout Box */
+    .callout {
+      background: #f8fafc;
+      border-left: 4px solid var(--primary);
+      padding: 18px 22px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+    .callout.cyan { border-left-color: var(--secondary); background: #ecfeff; }
+    .callout.purple { border-left-color: var(--accent); background: #f5f3ff; }
+
+    .callout-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    /* Tables */
+    .book-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.92rem;
+    }
+
+    .book-table th, .book-table td {
+      padding: 12px 16px;
+      border: 1px solid var(--border-color);
+      text-align: left;
+    }
+
+    .book-table th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    /* Code Blocks */
+    .code-box {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      font-size: 0.88rem;
+      overflow-x: auto;
+      margin: 16px 0;
+      line-height: 1.5;
+    }
+
+    .code-box-header {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    /* Step List */
+    .step-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .step-card {
+      display: flex;
+      gap: 16px;
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .step-body h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+
+    .step-body p {
+      font-size: 0.92rem;
+      color: #64748b;
+      margin: 0;
+    }
+
+    /* TOC (Table of Contents) */
+    .toc-list {
+      list-style: none;
+      margin: 24px 0;
+    }
+
+    .toc-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--border-color);
+      font-size: 1rem;
+    }
+
+    .toc-title {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .toc-page {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Standard A4 Screen & Print Styling */
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background: #cbd5e1 !important;
+      color: var(--text-dark);
+      line-height: 1.55;
+      word-break: keep-all;
+      margin: 0;
+      padding: 0;
+    }
+
+    .no-print-bar .action-btns {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-download {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-download:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); }
+
+    /* A4 Book Page Container & True A4 Vertical Sheets */
+    .book-container {
+      width: 210mm !important;
+      max-width: 100% !important;
+      margin: 36px auto 60px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 36px !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+    }
+
+    .cover-page,
+    .book-page {
+      width: 210mm !important;
+      min-height: 297mm !important;
+      box-sizing: border-box !important;
+      position: relative !important;
+      background: #ffffff !important;
+      border-radius: 3px !important;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25), 0 3px 10px rgba(0, 0, 0, 0.12) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      padding: 18mm 18mm 16mm 18mm !important;
+      page-break-after: always !important;
+      break-after: page !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    .cover-page {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%) !important;
+      color: #ffffff !important;
+      padding: 24mm 20mm 20mm 20mm !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+    }
+
+    @media screen and (max-width: 820px) {
+      .book-container {
+        width: 100% !important;
+      }
+      .cover-page,
+      .book-page {
+        width: 95vw !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        padding: 22px 18px !important;
+      }
+    }
+
+    .book-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .book-footer-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+      margin-top: auto;
+      flex-shrink: 0;
+    }
+
+    /* A4 Size & Print Styles */
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    @media print {
+      html, body {
+        width: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11.5px !important;
+        line-height: 1.42 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .no-print-bar {
+        display: none !important;
+      }
+
+      .book-container {
+        width: 210mm !important;
+        max-width: 210mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        gap: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+
+      .page-break {
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+
+      .cover-page,
+      .book-page {
+        width: 210mm !important;
+        height: 297mm !important;
+        min-height: 297mm !important;
+        max-height: 297mm !important;
+        margin: 0 !important;
+        padding: 16mm 16mm 14mm 16mm !important;
+        box-sizing: border-box !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        background: #ffffff !important;
+      }
+
+      .cover-page {
+        background: #0f172a !important;
+        color: #ffffff !important;
+        padding: 26mm 16mm 18mm 16mm !important;
+      }
+
+      .cover-title {
+        font-size: 2.1rem !important;
+        line-height: 1.25 !important;
+      }
+
+      .chapter-title {
+        font-size: 1.35rem !important;
+        margin-bottom: 6px !important;
+      }
+
+      .section-title {
+        font-size: 1.05rem !important;
+        margin-top: 10px !important;
+        margin-bottom: 6px !important;
+      }
+
+      .book-header-line {
+        margin-bottom: 10px !important;
+        padding-bottom: 5px !important;
+      }
+
+      .book-footer-line {
+        margin-top: auto !important;
+        padding-top: 6px !important;
+        border-top: 1px solid #cbd5e1 !important;
+      }
+
+      .book-table, .step-flow, .wrong-right, .code-box, .callout, .practice-box, .check-point, .answer-box {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin-top: 6px !important;
+        margin-bottom: 6px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .book-table th, .book-table td {
+        padding: 4px 7px !important;
+        font-size: 0.8rem !important;
+      }
+
+      .code-box {
+        padding: 6px 8px !important;
+        font-size: 0.75rem !important;
+        line-height: 1.3 !important;
+      }
+
+      .answer-box {
+        padding: 6px 10px !important;
+        margin: 6px 0 !important;
+      }
+
+      .answer-box summary {
+        display: block !important;
+        font-weight: 800 !important;
+        margin-bottom: 4px !important;
+        color: #166534 !important;
+      }
+    }
+
+
+    /* Self-study supplement: A4-safe layout */
+    .self-study-page { justify-content: flex-start !important; }
+    .self-study-page .book-footer-line { margin-top: auto; }
+    .concept-table { table-layout: fixed; font-size: .82rem; }
+    .concept-table th:nth-child(1) { width: 18%; }
+    .concept-table th:nth-child(2) { width: 31%; }
+    .concept-table th:nth-child(3) { width: 24%; }
+    .concept-table th:nth-child(4) { width: 27%; }
+    .concept-table td { vertical-align: top; line-height: 1.4; }
+    .guided-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+    .guided-panel { border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; background: #f8fafc; }
+    .guided-panel h3 { margin: 0 0 7px; font-size: .95rem; color: #1e3a8a; }
+    .guided-panel ol, .guided-panel ul { margin: 0; padding-left: 19px; }
+    .guided-panel li { margin-bottom: 5px; font-size: .84rem; }
+    .diagnostic-table { table-layout: fixed; font-size: .8rem; }
+    .diagnostic-table th, .diagnostic-table td { padding: 7px 8px; }
+    @media screen and (max-width: 720px) { .guided-grid { grid-template-columns: 1fr; } }
+    @media print {
+      .self-study-page { overflow: hidden !important; }
+      .concept-table, .diagnostic-table { display: table !important; overflow: visible !important; }
+      .concept-table th, .concept-table td { padding: 5px 6px !important; font-size: 8.4pt !important; }
+      .guided-grid { gap: 8px !important; margin: 7px 0 !important; }
+      .guided-panel { padding: 7px 9px !important; break-inside: avoid !important; }
+      .guided-panel li { font-size: 8.4pt !important; margin-bottom: 3px !important; }
+      .diagnostic-table th, .diagnostic-table td { padding: 4px 6px !important; font-size: 8pt !important; }
+    }
+
+  </style></head><body>
+<div class="no-print-bar"><div class="title-group"><span class="badge">ACE AI Startup Bootcamp</span><strong>Day 10: 서비스 출시와 최종 발표</strong></div><div class="action-btns"><a href="day10-ai-classroom.html" class="btn-action btn-back">← LMS 강의실</a><button id="btn-download-pdf" onclick="downloadPDF()" class="btn-action btn-download">📥 A4 PDF 다운로드</button>
+      <button onclick="downloadPDF()" class="btn-action btn-download">PDF 저장 / 인쇄</button></div></div>
+<main class="book-container">
+  <section class="cover-page page-break"><div class="cover-top"><span class="cover-tag">DAY 10 TEXTBOOK</span><span>ACE Startup SW/AI Pilot</span></div><div class="cover-main"><div class="cover-subtitle">ACE AI Startup Bootcamp 교재 시리즈 10</div><h1 class="cover-title">서비스 출시와 최종 발표</h1><p class="cover-desc">만든 서비스를 안전하게 출시하고 설득력 있게 설명하려면? 핵심 이론부터 사례 분석, 단계별 실습, 품질 검수, 종합 문제까지 혼자 학습할 수 있도록 구성한 전공 실습 교재입니다.</p></div><div class="cover-footer"><div>학습 시간: 약 6시간</div><div>대상: 대학교 3학년 수준의 SW·AI 학습자</div></div></section>
+
+  <section class="book-page page-break"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>학습 안내</span></div><div class="chapter-number">HOW TO STUDY</div><h1 class="chapter-title">오늘의 질문과 학습목표</h1><p class="lead"><strong>만든 서비스를 안전하게 출시하고 설득력 있게 설명하려면?</strong> 이 질문에 자신의 말로 답할 수 있고, 설계 결과물을 직접 만들고 검수하는 것이 오늘의 완료 기준입니다.</p><div class="study-meta"><span class="study-chip">개념 60분</span><span class="study-chip">실습 90분</span><span class="study-chip">복습 30분</span></div><div class="learning-map"><div class="learning-item"><strong>01</strong><p>릴리스와 배포의 차이를 설명한다.</p></div><div class="learning-item"><strong>02</strong><p>무중단 배포와 롤백 전략을 설계한다.</p></div><div class="learning-item"><strong>03</strong><p>환경 변수와 비밀정보를 안전하게 관리한다.</p></div><div class="learning-item"><strong>04</strong><p>모니터링 지표와 운영 대응 절차를 정의한다.</p></div><div class="learning-item"><strong>05</strong><p>출시 체크리스트와 Go/No-Go 기준을 만든다.</p></div><div class="learning-item"><strong>06</strong><p>문제·해결·증거 중심으로 최종 발표를 구성한다.</p></div></div><div class="check-point"><h3>혼자 공부하는 순서</h3><ol><li>용어를 암기하기 전에 사례에서 문제가 생기는 이유를 설명합니다.</li><li>좋은 예와 나쁜 예의 차이를 관찰 가능한 기준으로 적습니다.</li><li>예시를 보지 않고 종합 실습을 먼저 해결합니다.</li><li>모범답안과 비교한 뒤 빠진 조건을 다른 색으로 보완합니다.</li></ol></div><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>2</span></div></section>
+
+  <section class="book-page page-break"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>목차</span></div><div class="chapter-number">CONTENTS</div><h1 class="chapter-title">교재 목차</h1><ul class="toc-list"><li class="toc-item"><span class="toc-title">학습 안내와 학습목표</span><span class="toc-page">Page 02</span></li><li class="toc-item"><span class="toc-title">제1장. 핵심 이론과 설계 원칙</span><span class="toc-page">Page 04</span></li><li class="toc-item"><span class="toc-title">제2장. 단계별 설계 실습</span><span class="toc-page">Page 05</span></li><li class="toc-item"><span class="toc-title">제3장. 사례 분석과 품질 검수</span><span class="toc-page">Page 06</span></li><li class="toc-item"><span class="toc-title">제4장. 종합 실습과 모범답안</span><span class="toc-page">Page 07</span></li><li class="toc-item"><span class="toc-title">핵심 용어와 최종 점검</span><span class="toc-page">Page 08</span></li><li class="toc-item"><span class="toc-title">자기주도 심화학습과 안내형 실습</span><span class="toc-page">Pages 09–11</span></li></ul><div class="callout cyan"><div class="callout-title">완료 기준</div><p style="margin:0;">종합 실습 결과물, 자가진단 80점 이상, 핵심 질문 4개에 대한 자신의 답을 남기면 Day 10 학습을 완료한 것입니다.</p></div><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>3</span></div></section>
+
+  <section class="book-page page-break"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>제1장 핵심 이론</span></div><div class="chapter-number">CHAPTER 01</div><h1 class="chapter-title">서비스 출시와 최종 발표 핵심 이론</h1><p class="lead">전문 용어는 복잡해 보이지만, 각 용어는 설계에서 반복되는 한 가지 문제를 해결하기 위해 존재합니다. 아래 표에서 “무엇을 뜻하는가”보다 “언제 필요한가”를 중심으로 학습하세요.</p><table class="book-table"><thead><tr><th style="width:28%">핵심 개념</th><th>설명</th></tr></thead><tbody><tr><td><strong>Deployment</strong></td><td>새 코드를 실행 환경에 설치하는 기술적 행위입니다.</td></tr><tr><td><strong>Release</strong></td><td>새 기능을 사용자에게 공개하는 제품 결정입니다.</td></tr><tr><td><strong>Blue-Green</strong></td><td>구·신 환경을 함께 두고 트래픽을 전환하는 배포 방식입니다.</td></tr><tr><td><strong>Canary</strong></td><td>일부 사용자에게 먼저 공개해 위험을 제한하는 방식입니다.</td></tr><tr><td><strong>Rollback</strong></td><td>문제가 생기면 이전 안정 버전으로 되돌리는 절차입니다.</td></tr><tr><td><strong>Observability</strong></td><td>로그·메트릭·추적으로 내부 상태를 이해하는 능력입니다.</td></tr></tbody></table><h2 class="section-title">좋은 설계와 나쁜 설계의 차이</h2><div class="wrong-right"><div class="example-panel bad"><h4>피해야 할 접근</h4><p>테스트가 통과했으니 전 사용자에게 즉시 배포하고 문제 발생 시 개발자가 수동으로 대응한다.</p></div><div class="example-panel good"><h4>권장 접근</h4><p>백업, 마이그레이션, 상태 확인, 단계적 트래픽, 자동 경보, 롤백 조건과 책임자를 배포 전에 정한다.</p></div></div><div class="callout purple"><div class="callout-title">설계 공식</div><p style="margin:0"><strong>[출시 범위] → [사전 검증] → [배포 전략] → [상태 확인] → [점진 공개] → [관측·대응·롤백]</strong></p></div><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>4</span></div></section>
+
+  <section class="book-page page-break"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>제2장 단계별 실습</span></div><div class="chapter-number">CHAPTER 02</div><h1 class="chapter-title">단계별 설계 절차</h1><div class="step-flow"><div class="step-card"><div class="step-num">1</div><div class="step-body"><h4>문제 정의</h4><p>이번 릴리스의 사용자 가치와 제외 범위를 고정한다.</p></div></div><div class="step-card"><div class="step-num">2</div><div class="step-body"><h4>구조 추출</h4><p>테스트, 보안, 데이터 마이그레이션, 백업을 확인한다.</p></div></div><div class="step-card"><div class="step-num">3</div><div class="step-body"><h4>핵심 설계</h4><p>Blue-Green 또는 Canary와 롤백 기준을 선택한다.</p></div></div><div class="step-card"><div class="step-num">4</div><div class="step-body"><h4>실패 조건</h4><p>에러율, 지연시간, 트래픽, 자원 포화 지표와 경보를 설정한다.</p></div></div><div class="step-card"><div class="step-num">5</div><div class="step-body"><h4>정책 연결</h4><p>Go/No-Go 회의에서 책임자와 비상 연락 체계를 확인한다.</p></div></div><div class="step-card"><div class="step-num">6</div><div class="step-body"><h4>검증과 추적</h4><p>문제, 사용자, 해결, 데모, 기술 결정, 검증 결과 순으로 발표한다.</p></div></div></div><h2 class="section-title">작동하는 예시</h2><div class="code-box"><div class="code-box-header">출시 Go/No-Go 기준 예시</div>GO 조건
+- 핵심 E2E 테스트 100% 통과
+- 치명적/높음 보안 결함 0건
+- DB 백업과 롤백 리허설 완료
+- Canary 10%에서 오류율 &lt; 1%, p95 &lt; 500ms
+
+NO-GO 조건
+- 결제·로그인 핵심 흐름 실패
+- 데이터 마이그레이션 복구 절차 미검증
+- 담당자·모니터링·롤백 권한 부재</div><div class="check-point"><h3>예시를 읽을 때 확인할 것</h3><ul><li>입력과 시작 조건이 명확한가?</li><li>정상 결과뿐 아니라 실패 결과도 관찰 가능한가?</li><li>중복·권한·동시성·외부 장애가 필요한 수준으로 다뤄졌는가?</li><li>요구사항과 구현 결과를 서로 추적할 수 있는가?</li></ul></div><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>5</span></div></section>
+
+  <section class="book-page page-break"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>제3장 사례와 검수</span></div><div class="chapter-number">CHAPTER 03</div><h1 class="chapter-title">사례 분석과 품질 검수</h1><h2 class="section-title">스스로 설명해 보기</h2><div class="practice-box"><span class="practice-label">개념 확인</span><ol><li>배포와 릴리스를 분리하면 어떤 이점이 있는가?</li><li>DB 마이그레이션이 롤백을 어렵게 만드는 이유는?</li><li>평균 지연시간보다 p95가 유용한 이유는?</li><li>좋은 최종 발표에서 기능 목록보다 증거가 중요한 이유는?</li></ol><p>각 질문에 2~3문장으로 답하고, 답을 뒷받침하는 사례를 하나씩 적으세요.</p></div><h2 class="section-title">품질 자가진단 · 100점</h2><table class="book-table"><thead><tr><th>영역</th><th>판단 기준</th><th>점수</th></tr></thead><tbody><tr><td>정확성</td><td>개념과 기술 선택이 요구사항 및 사실에 맞는다.</td><td>25</td></tr><tr><td>완전성</td><td>정상 흐름, 경계 조건, 실패와 복구를 함께 다룬다.</td><td>25</td></tr><tr><td>일관성</td><td>용어, ID, 상태, 인터페이스가 산출물 사이에서 일치한다.</td><td>20</td></tr><tr><td>검증 가능성</td><td>관찰 가능한 결과와 완료 기준을 제시한다.</td><td>20</td></tr><tr><td>설명력</td><td>선택한 방법과 대안의 차이를 자신의 말로 설명한다.</td><td>10</td></tr></tbody></table><div class="callout"><div class="callout-title">80점 미만이라면</div><p style="margin:0;">틀린 결과만 고치지 말고, 빠진 질문이 무엇이었는지 기록하세요. 좋은 엔지니어는 정답을 외우기보다 다음 설계에서 같은 누락을 막는 점검 기준을 만듭니다.</p></div><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>6</span></div></section>
+
+  <section class="book-page page-break"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>제4장 종합 실습</span></div><div class="chapter-number">CHAPTER 04</div><h1 class="chapter-title">종합 실습과 모범답안</h1><div class="practice-box"><span class="practice-label">제출 과제</span><p><strong>예약 서비스를 출시한다고 가정하고 30분 단위 배포 런북과 5분 최종 발표 구조를 작성하세요.</strong></p><ol><li>핵심 가정과 미결정 사항을 먼저 적습니다.</li><li>주요 설계 결과물을 표, 코드 또는 다이어그램으로 작성합니다.</li><li>정상 흐름과 최소 3개의 실패·경계 조건을 포함합니다.</li><li>자가진단표로 채점하고 개선 전후를 비교합니다.</li></ol></div><details class="answer-box" open><summary>모범답안의 핵심 방향 보기</summary><p>런북에는 담당자, 시작 전 백업, 배포 명령, 헬스 체크, 10%·50%·100% 트래픽 전환, 각 단계의 오류율 기준, 롤백 명령과 사용자 공지를 포함합니다. 발표는 문제 40초, 사용자·해결 50초, 데모 100초, 기술 결정 50초, 검증·지표 40초, 다음 단계 20초로 구성할 수 있습니다.</p></details><div class="check-point"><h3>답안 사용법</h3><p>모범답안은 유일한 정답이 아닙니다. 자신의 설계가 다른 경우에는 요구사항, 비용, 복잡도, 위험 중 어떤 근거로 다른 선택을 했는지 설명할 수 있어야 합니다.</p></div><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>7</span></div></section>
+
+  <section class="book-page page-break"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>학습 마무리</span></div><div class="chapter-number">REVIEW</div><h1 class="chapter-title">핵심 용어와 최종 점검</h1><table class="book-table"><thead><tr><th style="width:28%">용어</th><th>쉽게 말하면</th></tr></thead><tbody><tr><td><strong>Blue-Green</strong></td><td>두 환경 사이 트래픽을 전환하는 배포</td></tr><tr><td><strong>Canary</strong></td><td>일부 트래픽으로 먼저 검증하는 배포</td></tr><tr><td><strong>Rollback</strong></td><td>이전 안정 상태로 되돌리는 절차</td></tr><tr><td><strong>Runbook</strong></td><td>운영 작업과 장애 대응의 실행 절차서</td></tr><tr><td><strong>SLO</strong></td><td>서비스가 지켜야 할 신뢰성 목표</td></tr><tr><td><strong>p95</strong></td><td>요청의 95%가 이 값 이하로 완료되는 지연시간</td></tr></tbody></table><h2 class="section-title">제출 전 8문항</h2><ol class="rubric"><li>오늘의 핵심 질문에 자신의 말로 답할 수 있는가?</li><li>설계의 입력, 조건, 결과가 명확한가?</li><li>정상 흐름뿐 아니라 실패와 복구를 포함했는가?</li><li>동시성, 중복 요청, 권한 문제를 검토했는가?</li><li>외부 시스템 장애와 타임아웃을 고려했는가?</li><li>선택한 방법의 단점과 대안을 설명할 수 있는가?</li><li>산출물 사이의 용어와 상태가 일치하는가?</li><li>테스트하거나 관찰할 수 있는 완료 기준이 있는가?</li></ol><div class="callout cyan"><div class="callout-title">Day 10 한 문장 정리</div><p style="margin:0"><strong>만든 서비스를 안전하게 출시하고 설득력 있게 설명하려면?</strong> 오늘 만든 결과물을 근거로 이 질문에 답해 보세요.</p></div><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>8</span></div></section>
+  <section class="book-page page-break self-study-page"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>자기주도 심화학습</span></div><div class="chapter-number">SELF-STUDY 01</div><h1 class="chapter-title">맥락으로 이해하는 핵심 용어</h1><p class="lead">용어를 정의만 외우지 말고 판단 도구로 익히세요. 각 행을 정의→필요한 이유→예시 또는 주의점 순서로 읽습니다.</p><table class="book-table concept-table"><thead><tr><th>용어</th><th>쉬운 정의</th><th>왜 중요한가</th><th>예시 또는 주의점</th></tr></thead><tbody><tr><td><strong>배포</strong></td><td>검증된 소프트웨어를 사용 가능한 환경에 설치·공개하는 과정</td><td>개발 결과를 실제 사용자에게 전달</td><td>빌드·설정·DB 변경을 재현 가능하게 만든다.</td></tr><tr><td><strong>CI/CD</strong></td><td>변경을 자동 검사하고 배포하는 연속 통합·전달 절차</td><td>수동 실수와 출시 시간을 줄임</td><td>테스트 실패 시 배포가 멈춰야 한다.</td></tr><tr><td><strong>환경 변수</strong></td><td>환경마다 다른 설정을 코드 밖에서 주입하는 값</td><td>개발·시험·운영 설정과 비밀을 분리</td><td>비밀 값을 저장소에 커밋하지 않는다.</td></tr><tr><td><strong>헬스 체크</strong></td><td>서비스가 요청을 처리할 준비가 됐는지 확인하는 엔드포인트</td><td>배포·로드밸런서의 자동 판단 근거</td><td>프로세스 생존과 실제 준비 상태를 구분한다.</td></tr><tr><td><strong>롤백</strong></td><td>문제가 있는 배포를 이전 안정 버전으로 되돌리는 절차</td><td>장애 시간을 빠르게 줄임</td><td>DB 변경의 하위 호환성도 함께 준비한다.</td></tr><tr><td><strong>데모 스토리</strong></td><td>문제·사용자·해결 흐름·결과를 연결한 발표 구조</td><td>기능 목록이 아닌 제품 가치를 전달</td><td>핵심 시나리오 하나를 실제 화면으로 증명한다.</td></tr></tbody></table><div class="callout cyan"><div class="callout-title">실습 상황</div><p style="margin:0">최종 발표 30분 전 새 버전을 배포했는데 로그인 오류율이 증가하고, 데모용 외부 API도 불안정하다.</p></div><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>9</span></div></section>
+
+  <section class="book-page page-break self-study-page"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>안내형 실습</span></div><div class="chapter-number">SELF-STUDY 02</div><h1 class="chapter-title">안내형 실습과 문제 해결</h1><div class="guided-grid"><div class="guided-panel"><h3>실습 상황</h3><p style="margin:0;font-size:.86rem">최종 발표 30분 전 새 버전을 배포했는데 로그인 오류율이 증가하고, 데모용 외부 API도 불안정하다.</p></div><div class="guided-panel"><h3>순서대로 수행하기</h3><ol><li>출시 체크리스트에 테스트·설정·백업·모니터링·롤백 책임자를 적는다.</li><li>소규모 트래픽으로 배포하고 오류율·지연·핵심 전환을 관찰한다.</li><li>임계치를 넘으면 즉시 롤백하고 변경과 증거를 기록한다.</li><li>발표는 문제→사용자 흐름→측정 결과→다음 단계 순으로 연습한다.</li></ol></div></div><div class="callout purple"><div class="callout-title">남겨야 할 증거</div><p style="margin:0">산출물 1개, 핵심 가정 3개, 실패 사례 3개 이상을 저장하세요. 다른 학습자가 추가 질문 없이 판단 과정을 재현할 수 있어야 합니다.</p></div><h2 class="section-title">결과가 다를 때 진단하기</h2><table class="book-table diagnostic-table"><thead><tr><th>관찰한 증상</th><th>가능한 원인</th><th>다음 조치</th></tr></thead><tbody><tr><td>운영에서만 설정 오류</td><td>환경 차이와 검증 부족</td><td>시작 시 필수 설정 검증</td></tr><tr><td>배포 후 장애를 늦게 발견</td><td>핵심 메트릭·알림 없음</td><td>오류율·지연·전환 알림</td></tr><tr><td>데모 중 외부 API 실패</td><td>대체 경로 없음</td><td>검증된 데모 데이터와 녹화 백업</td></tr></tbody></table><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>10</span></div></section>
+
+  <section class="book-page page-break self-study-page"><div class="book-header-line"><span>ACE AI Startup Bootcamp | Day 10</span><span>인출 연습</span></div><div class="chapter-number">SELF-STUDY 03</div><h1 class="chapter-title">스스로 이해도 확인하기</h1><p class="lead">인출 연습 — 펼치기 전에 답하기</p><details class="answer-box" open><summary>릴리스와 배포의 차이는?</summary><p>배포는 코드를 환경에 올리는 일, 릴리스는 기능을 사용자에게 노출하는 결정입니다.</p></details><details class="answer-box" open><summary>롤백 계획을 배포 전에 만드는 이유는?</summary><p>장애 중에는 판단 시간이 부족하므로 검증된 복구 절차와 책임자가 미리 필요합니다.</p></details><details class="answer-box" open><summary>발표 완료 기준은?</summary><p>청중이 문제, 핵심 사용자 흐름, 검증 근거, 다음 행동을 명확히 이해해야 합니다.</p></details><div class="callout cyan"><div class="callout-title">2분 안에 가르쳐 보기</div><p style="margin:0">페이지를 보지 않고 오늘의 핵심 판단, 대표 실패 원인, 검증 방법을 연결해 설명하세요. 세 가지가 이어지지 않으면 놓친 용어나 진단 사례로 돌아갑니다.</p></div><div class="book-footer-line"><span>ACE AI Startup Bootcamp</span><span>11</span></div></section>
+
+</main>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    async function downloadPDF() {
+      const btn = document.getElementById('btn-download-pdf');
+      const originalText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.innerHTML = '⏳ PDF 생성 중...';
+        btn.disabled = true;
+      }
+
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait'
+        });
+
+        const pages = document.querySelectorAll('.cover-page, .book-page');
+        const A4_WIDTH_MM = 210;
+        const A4_HEIGHT_MM = 297;
+
+        // Temporarily hide the nav bar for rendering
+        const navBar = document.querySelector('.no-print-bar');
+        if (navBar) navBar.style.display = 'none';
+
+        for (let i = 0; i < pages.length; i++) {
+          const page = pages[i];
+          const isCover = page.classList.contains('cover-page');
+
+          const canvas = await html2canvas(page, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            backgroundColor: isCover ? '#0f172a' : '#ffffff',
+            onclone: function(clonedDoc) {
+              const cloneNav = clonedDoc.querySelector('.no-print-bar');
+              if (cloneNav) cloneNav.style.display = 'none';
+              const allPages = clonedDoc.querySelectorAll('.cover-page, .book-page');
+              allPages.forEach(function(p) {
+                p.style.overflow = 'visible';
+                p.style.boxShadow = 'none';
+              });
+              // Fix: html2canvas cannot render -webkit-background-clip:text
+              // Replace gradient text with solid white on cover title
+              const coverTitles = clonedDoc.querySelectorAll('.cover-title');
+              coverTitles.forEach(function(el) {
+                el.style.webkitBackgroundClip = 'unset';
+                el.style.backgroundClip = 'unset';
+                el.style.webkitTextFillColor = '#ffffff';
+                el.style.color = '#ffffff';
+                el.style.background = 'none';
+              });
+            }
+          });
+
+          if (i > 0) doc.addPage();
+
+          const imgData = canvas.toDataURL('image/jpeg', 0.98);
+          const canvasRatio = canvas.height / canvas.width;
+          const imgHeightMM = A4_WIDTH_MM * canvasRatio;
+
+          doc.addImage(imgData, 'JPEG', 0, 0, A4_WIDTH_MM, Math.min(imgHeightMM, A4_HEIGHT_MM));
+        }
+
+        if (navBar) navBar.style.display = '';
+        doc.save('Day10_교재_A4.pdf');
+
+      } catch (err) {
+        console.error('PDF 생성 오류:', err);
+        const navBar = document.querySelector('.no-print-bar');
+        if (navBar) navBar.style.display = '';
+        alert('PDF 생성에 실패했습니다. 브라우저 인쇄(Ctrl+P) 기능으로 PDF를 저장해 주세요.');
+      } finally {
+        if (btn) {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
+    }
+  </script>
+</body></html>

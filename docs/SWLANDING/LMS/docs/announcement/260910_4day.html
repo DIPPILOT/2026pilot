@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 4 Announcements — Today & Tomorrow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0f172a; font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; }
+  body { display: flex; align-items: center; justify-content: center; }
+  .slide { width: 1280px; height: 720px; background: #fff; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+  .head { background: #0b3d2e; color: #fff; padding: 26px 56px; display: flex; align-items: center; justify-content: space-between; }
+  .tag { display: inline-block; background: #22c55e; color: #052e16; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; padding: 5px 11px; border-radius: 4px; text-transform: uppercase; }
+  .head h1 { font-size: 30px; font-weight: 800; margin-top: 8px; }
+  .head .org { text-align: right; font-size: 13px; color: #86efac; line-height: 1.6; }
+  .head .org b { color: #fff; font-size: 14px; }
+  .cols { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .col { padding: 30px 48px 24px; display: flex; flex-direction: column; }
+  .col + .col { border-left: 2px solid #e2e8f0; }
+  .col h2 { font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #64748b; }
+  .col .day { font-size: 24px; font-weight: 800; color: #0b3d2e; margin: 4px 0 18px; }
+  .col .day span { font-weight: 500; color: #475569; font-size: 17px; margin-left: 10px; }
+  .timeline { position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 105px; top: 12px; bottom: 12px; width: 2px; background: #e2e8f0; }
+  .item { display: grid; grid-template-columns: 90px 30px 1fr; align-items: start; margin-bottom: 16px; }
+  .time { font-size: 15px; font-weight: 700; color: #0b3d2e; text-align: right; padding-top: 3px; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; background: #22c55e; border: 3px solid #fff; box-shadow: 0 0 0 2px #22c55e; margin: 5px auto 0; }
+  .item.major .dot { background: #0b3d2e; box-shadow: 0 0 0 2px #0b3d2e; }
+  .body { padding-left: 12px; }
+  .title { font-size: 20px; font-weight: 700; color: #0f172a; line-height: 1.3; }
+  .item.major .title { color: #0b3d2e; }
+  .pill { display: inline-block; margin-left: 8px; background: #dcfce7; color: #166534; font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 999px; vertical-align: middle; }
+  .sub { margin-top: 6px; list-style: none; }
+  .sub li { font-size: 15px; color: #334155; padding: 5px 0 5px 12px; border-left: 3px solid #bbf7d0; margin-bottom: 4px; line-height: 1.4; }
+  .sub li b { color: #0b3d2e; }
+  .alert { margin-top: auto; background: #0f172a; color: #fff; border-radius: 8px; padding: 14px 16px; font-size: 14.5px; line-height: 1.5; display: flex; gap: 10px; align-items: flex-start; }
+  .alert .ic { font-size: 20px; line-height: 1.2; }
+  .alert b { color: #86efac; }
+  .alert.red { background: #7f1d1d; }
+  .alert.red b { color: #fecaca; }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="head">
+    <div>
+      <span class="tag">Day 4 · Announcements</span>
+      <h1>Today’s Plan & Tomorrow’s Final Day</h1>
+    </div>
+    <div class="org"><b>ACE Startup Academy 2026 · AI Track</b><br>KOICA · Abuja, Nigeria</div>
+  </div>
+
+  <div class="cols">
+    <!-- TODAY -->
+    <div class="col">
+      <h2>Today</h2>
+      <div class="day">Thursday <span>10 September</span></div>
+      <div class="timeline">
+        <div class="item">
+          <div class="time">Morning</div><div class="dot"></div>
+          <div class="body"><div class="title">LMS Module 4</div></div>
+        </div>
+        <div class="item">
+          <div class="time">Afternoon</div><div class="dot"></div>
+          <div class="body">
+            <div class="title">Presentation Prep with Your ToT</div>
+            <ul class="sub"><li>Work with your ToT to build and rehearse tomorrow’s team presentation</li></ul>
+          </div>
+        </div>
+        <div class="item major">
+          <div class="time">Before class ends</div><div class="dot"></div>
+          <div class="body">
+            <div class="title">Submit ALL Deliverables to Your ToT</div>
+            <ul class="sub">
+              <li>Everything you have produced <b>up to today</b></li>
+              <li><b>Including tomorrow’s presentation slides</b></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="alert red">
+        <span class="ic">⏰</span>
+        <span><b>Deadline: end of class today.</b> Hand everything to your ToT before you leave — please don’t leave it for tomorrow morning.</span>
+      </div>
+    </div>
+
+    <!-- TOMORROW -->
+    <div class="col">
+      <h2>Tomorrow</h2>
+      <div class="day">Friday <span>11 September</span></div>
+      <div class="timeline">
+        <div class="item">
+          <div class="time">Morning</div><div class="dot"></div>
+          <div class="body">
+            <div class="title">Team Presentations <span class="pill">5 min per team</span></div>
+            <ul class="sub"><li>Keep it tight — 5 minutes is strict, so rehearse with a timer today</li></ul>
+          </div>
+        </div>
+        <div class="item">
+          <div class="time">Midday</div><div class="dot"></div>
+          <div class="body"><div class="title">Lunch &amp; Prayer</div></div>
+        </div>
+        <div class="item major">
+          <div class="time">2:00 PM</div><div class="dot"></div>
+          <div class="body">
+            <div class="title">Closing Ceremony</div>
+            <ul class="sub">
+              <li><b>Certificates</b> presented to all participants</li>
+              <li><b>Administrative wrap-up</b> — AI tool credit payment (USD 40 per team)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="alert">
+        <span class="ic">🧾</span>
+        <span>Claiming the AI tool credit? Bring your <b>printed paper receipt</b> — phone screenshots will not be accepted.</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

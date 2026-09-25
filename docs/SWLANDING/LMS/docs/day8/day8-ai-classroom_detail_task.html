@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 8 User Management & UX Audit Tasks | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background: Deep Black */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Surface/Card: Dark Gray */
+      --text-main: #ffffff; /* Primary: White */
+      --text-muted: #e4e4e7; /* Secondary: Light Gray */
+      --text-desc: #71717a; /* Description: Gray */
+      --border-color: rgba(255, 255, 255, 0.08); /* Thin border with low opacity */
+      --accent-color: #06b6d4; /* Neon Cyan */
+      --accent-purple: #8b5cf6; /* Purple highlight */
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.65;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong { word-break: keep-all; }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    section { padding: 60px 0; }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 16px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    .hero {
+      margin-top: 70px;
+      padding: 100px 0 70px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .hero-center {
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      font-size: 0.8rem;
+      color: #93c5fd;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 750px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .task-board {
+      background: #09090b;
+      position: relative;
+    }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .task-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .task-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-thumb {
+      height: 160px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .card-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex-grow: 1;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-badge {
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .card-badge.mission {
+      background: rgba(139, 92, 246, 0.1);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .card-step {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-desc);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .card-outcomes {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .outcomes-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .outcome-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .outcome-item {
+      font-size: 0.8rem;
+      color: var(--text-desc);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .outcome-item::before {
+      content: "✓";
+      color: var(--secondary-color);
+      font-weight: bold;
+    }
+
+    .enter-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 12px;
+      text-decoration: none;
+    }
+
+    .enter-btn:hover {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    @media (max-width: 1200px) {
+      .task-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.2rem; }
+      .task-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        ACE AI Startup Bootcamp
+      </a>
+      <ul class="nav-links">
+        <li><a href="day8-ai-classroom.html">← 메인 강의실로 복귀</a></li>
+        <li><a href="../homework_week1.html" style="color: #c084fc !important; font-weight: 700 !important; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 14px; border-radius: 8px;">📝 과제페이지</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-center">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">DAY 8</span>
+        <span class="hero-badge">Membership & Onboarding Experience</span>
+        <span class="hero-badge">Codex AI Lab</span>
+      </div>
+      <h1>회원 서비스 설계 & 사용성 검증</h1>
+      <p>
+        단순히 회원가입/로그인 기능을 코딩하는 것을 넘어, 사용자가 가장 매끄럽게 가입할 수 있는 최적의 온보딩 동선을 설계하고, 보안/정합성 가드를 탄탄히 조립하며, AI를 통해 사용자 중심 품질을 점검합니다.
+      </p>
+      <a href="day8-ai-classroom.html" class="back-btn">← Day 8 메인 강의실 가기</a>
+    </div>
+  </section>
+
+  <!-- Task Board Section -->
+  <section class="task-board">
+    <div class="container">
+      <div class="task-grid">
+
+        <!-- Task 1 -->
+        <article class="task-card">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(0deg);">TASK 1</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge">Planning</span>
+              <span class="card-step">Task 01</span>
+            </div>
+            <h3 class="card-title">회원 기능 설계하기</h3>
+            <p class="card-desc">우리 서비스 비즈니스에 맞는 필수 회원 기능(가입, 로그인)과 확장 기능(소셜로그인, 마이페이지)을 도출하고 우선순위 명세 테이블을 작성합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day8_service_intro.md</code> 기반 설계서</li>
+                <li class="outcome-item">구현 우선순위 체크리스트 표</li>
+              </ul>
+            </div>
+            <a href="day8-ai-codex-1.html" class="enter-btn">Task 1 실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Task 2 -->
+        <article class="task-card">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(90deg);">TASK 2</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge">UX Flow</span>
+              <span class="card-step">Task 02</span>
+            </div>
+            <h3 class="card-title">사용자 관점에서 회원 기능 검토</h3>
+            <p class="card-desc">입력 항목이 너무 많거나 오류 시 비밀번호가 리셋되어 가입 단계에서 이탈하는 장벽을 찾아내고, 시점별로 입력을 분할하는 개선안을 수립합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day8_signup_spec.md</code> 분석서</li>
+                <li class="outcome-item">가입 장벽 제거 사용자 흐름 보고서</li>
+              </ul>
+            </div>
+            <a href="day8-ai-codex-2.html" class="enter-btn">Task 2 실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Task 3 -->
+        <article class="task-card">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(180deg);">TASK 3</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge">Integrity</span>
+              <span class="card-step">Task 03</span>
+            </div>
+            <h3 class="card-title">회원 기능 점검하기</h3>
+            <p class="card-desc">중복 이메일 가입으로 인한 무결성 파괴, 메일 주소 형식 위배, 비밀번호 변경 시의 보안 세션 예외 등을 차단하는 정합성 가드 코드를 보강합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day8_user_service.js</code> 취약 감사</li>
+                <li class="outcome-item">중복 가드/정규식 보강 JS 소스</li>
+              </ul>
+            </div>
+            <a href="day8-ai-codex-3.html" class="enter-btn">Task 3 실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Skill Task 1 -->
+        <article class="task-card" style="border-color: rgba(6, 182, 212, 0.3);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(45deg);">SKILL 1</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">Skill Task</span>
+              <span class="card-step">Skill Task 1</span>
+            </div>
+            <h3 class="card-title">Role·Permission Matrix 설계</h3>
+            <p class="card-desc">ADD-D08-T01: Viewer·Creator·Advertiser·Admin별 화면·API·데이터 권한을 Matrix로 정의하고 과도한 권한 및 소유권 누락을 색출합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>10_SECURITY.md</code></li>
+                <li class="outcome-item">Authorization Matrix 명세</li>
+              </ul>
+            </div>
+            <a href="day8-ai-codex-1.html" class="enter-btn">실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Skill Task 2 -->
+        <article class="task-card" style="border-color: rgba(6, 182, 212, 0.3);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(135deg);">SKILL 2</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">Skill Task</span>
+              <span class="card-step">Skill Task 2</span>
+            </div>
+            <h3 class="card-title">Authentication Flow 구현</h3>
+            <p class="card-desc">ADD-D08-T02: Signup, Login, Password 처리, Token/JWT 발급·만료·갱신과 Front-End 세션 흐름을 구현합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>auth-service-code.js</code></li>
+                <li class="outcome-item">JWT / Session Auth Flow 소스</li>
+              </ul>
+            </div>
+            <a href="day8-ai-codex-2.html" class="enter-btn">실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Skill Task 3 -->
+        <article class="task-card" style="border-color: rgba(6, 182, 212, 0.3);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(225deg);">SKILL 3</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">Skill Task</span>
+              <span class="card-step">Skill Task 3</span>
+            </div>
+            <h3 class="card-title">Authorization Negative Test &amp; Security Audit</h3>
+            <p class="card-desc">ADD-D08-T03: 타인의 데이터 수정, Admin API 접근, Role 위조 등 권한 우회를 시도하고 보안 감사를 수행합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>security-audit-report.md</code></li>
+                <li class="outcome-item">Role Validation Fix 패치</li>
+              </ul>
+            </div>
+            <a href="day8-ai-codex-3.html" class="enter-btn">실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Mission 1 -->
+        <article class="task-card" style="border-color: rgba(139, 92, 246, 0.15);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(270deg);">MISSION 1</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge mission">QA Review</span>
+              <span class="card-step">Mission 01</span>
+            </div>
+            <h3 class="card-title">처음 가입하는 사용자 되어보기</h3>
+            <p class="card-desc">디지털 소외 계층 가상 유저 페르소나를 활용해 가입 화면에서 규칙 인지가 어긋나 마찰을 겪는 지점을 수집하고, 실시간 반응 유효성 처리를 적용합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day8_first_user_review.md</code></li>
+                <li class="outcome-item">이메일 blur 비동기 체크 요구서</li>
+              </ul>
+            </div>
+            <a href="day8-ai-codex-mission1.html" class="enter-btn">Mission 1 실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Mission 2 -->
+        <article class="task-card" style="border-color: rgba(139, 92, 246, 0.15);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(320deg);">MISSION 2</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge mission">Usability Metric</span>
+              <span class="card-step">Mission 02</span>
+            </div>
+            <h3 class="card-title">회원 서비스 품질 평가하기</h3>
+            <p class="card-desc">작성한 최종 회원 로직을 조작 편의성, 에러 예방성, 보안 안전도 등 다차원 평점으로 정량 분석받고, 로그인 상세 실패 메시지 취약점을 패치합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day8_usability_evaluation.md</code></li>
+                <li class="outcome-item">실패 메시지 보안 개선 코드 단일화</li>
+              </ul>
+            </div>
+            <a href="day8-ai-codex-mission2.html" class="enter-btn">Mission 2 실습실 입장 →</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

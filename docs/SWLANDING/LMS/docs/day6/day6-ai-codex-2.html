@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 6. Task 01 - 데이터 구조 이해 차이 해결 (Data Structure Alignment) | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Card Surface */
+      --text-main: #ffffff; /* Primary Text */
+      --text-muted: #e4e4e7; /* Secondary Text */
+      --text-desc: #71717a; /* Description Text */
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 10px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong, td, th { word-break: keep-all; }
+
+    .container {
+      max-width: 860px; 
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 6px 20px;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .logo-text p {
+      font-size: 0.58rem;
+      color: var(--text-desc);
+      margin-top: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 120px;
+      padding: 16px 0 10px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.04), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-content {
+      max-width: 750px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 5px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      font-size: 0.65rem;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      font-size: 1.25rem;
+      line-height: 1.25;
+      margin-bottom: 4px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.35;
+    }
+
+    /* Detail Section Layout */
+    .layout-wrapper {
+      padding: 15px 0 35px;
+    }
+
+    .detail-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .detail-card-head {
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 6px;
+    }
+
+    .detail-card-head h2 {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .detail-card-head h2 .badge-inline {
+      font-size: 0.6rem;
+      padding: 1px 4px;
+      border-radius: 2px;
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    .card-section {
+      margin-bottom: 12px;
+    }
+
+    .card-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-section h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-section h3::before {
+      content: "";
+      width: 2px;
+      height: 8px;
+      background: var(--secondary-color);
+      border-radius: 1px;
+      display: inline-block;
+    }
+
+    .card-section p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    /* Lists */
+    ul {
+      list-style-position: inside;
+      padding-left: 2px;
+      margin-bottom: 4px;
+    }
+
+    li {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    /* Code Block Styles */
+    pre {
+      background: #0d0f14;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 10px;
+      overflow-x: auto;
+      max-height: 180px; 
+      overflow-y: auto;  
+      margin: 6px 0 10px;
+      position: relative;
+    }
+
+    pre::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+      font-size: 0.7rem;
+      color: #e4e4e7;
+    }
+
+    .code-badge {
+      display: inline-block !important;
+      position: relative !important;
+      top: auto !important;
+      right: auto !important;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--secondary-color, #06b6d4);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0 10px;
+      background: rgba(9, 9, 11, 0.3);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    th, td {
+      padding: 6px 8px;
+      font-size: 0.72rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(59, 130, 246, 0.08);
+      color: #93c5fd;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Box styles */
+    .info-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.06);
+      border-left: 3px solid var(--accent-color);
+      color: #a5f3fc;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(139, 92, 246, 0.06);
+      border-left: 3px solid var(--accent-purple);
+      color: #e9d5ff;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box h4 {
+      color: #d8b4fe;
+      margin-bottom: 3px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Inline Sidebar Box */
+    .inline-sidebar-box {
+      margin-top: 14px;
+      background: rgba(139, 92, 246, 0.04);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .inline-sidebar-box h4 {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #d8b4fe;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Button utilities */
+    .action-btn-container {
+      margin: 4px 0 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+      transition: all 0.2s;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        margin-top: 160px;
+      }
+      .hero h1 { font-size: 1.1rem; }
+      .detail-card { padding: 10px 12px; }
+      .nav-container {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 20px;
+      }
+    }
+
+    /* Prompt Copy Box Styles */
+    .prompt-box {
+      background: rgba(9, 9, 11, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 16px;
+      position: relative;
+      margin-top: 12px;
+      margin-bottom: 16px;
+    }
+
+    .prompt-box pre {
+      padding-right: 70px;
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .copy-btn {
+      z-index: 10;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 6 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day6-ai-codex-1.html" >Task 1 (초안 빌드)</a>
+        <a href="day6-ai-codex-2.html" class="active">Task 2 (오류 디버깅)</a>
+        <a href="day6-ai-codex-3.html" >Task 3 (코드 개선)</a>
+        <a href="day6-ai-codex-mission1.html" >Mission 1 (오류 해결)</a>
+        <a href="day6-ai-codex-mission2.html" >Mission 2 (코드 리뷰)</a>
+        <a href="day6-ai-codex-summation.html" class="summation-btn" style="background: rgba(6, 182, 212, 0.15); color: var(--secondary-color); border-color: rgba(6, 182, 212, 0.3);">📊 요약 보기</a>
+        <a href="day6-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 6</span>
+        <span class="hero-badge">Task 02</span>
+        <span class="hero-badge">AI 디버깅</span>
+      </div>
+      <h1>Task 02. 오류 해결 도우미 (AI Debug Assistant)</h1>
+      <p>개발 과정에서 직면하는 다양한 런타임 오류 메시지를 Codex AI로 신속히 판독하고 방어 코드를 적용합니다.</p>
+    </div>
+  </section>
+
+  <!-- Layout Wrapper for Details -->
+  <div class="container layout-wrapper">
+        <main class="left-col">
+      <article class="detail-card">
+        <div class="detail-card-head">
+          <h2><span class="badge-inline">Task 02</span> Task 02 오류 해결 도우미 실습 가이드</h2>
+        </div>
+
+        <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+          <div>
+            <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 실습 입력 (Input)</h4>
+            <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>day6_meeting_notes.md</code> (회의록)</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">💾 실습 출력 (Output)</h4>
+            <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>day6_debug_solution.js</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>1. 스토리 및 실습 배경</h3>
+
+          <p>
+            화면을 띄우고 신나게 API 데이터를 가져오도록 JavaScript 코드를 작성했습니다. 그런데 브라우저 새로고침을 누르자 화면이 하얗게 멈추고 콘솔(Console)창에 <code>TypeError: Cannot read properties of undefined (reading 'map')</code>라는 에러 메시지가 붉은색으로 가득 찼습니다. 주니어 개발자는 원인을 몰라 코드만 수십 번 쳐다보고, 구글 검색창에 메시지를 쳐봐도 내 상황과 맞지 않는 영어 답변만 쏟아져 결국 좌절감에 빠졌습니다.
+          </p>
+          <p>
+            개발의 절반 이상은 오류를 찾아내고 고치는 '디버깅' 과정입니다. 초급자는 에러의 단서인 에러 로그를 읽고 해석하는 능력이 부족해 많은 시간을 낭비합니다. 이번 실습에서는 Codex에게 발생한 오류 현상과 에러 로그, 그리고 실행 코드를 전달하여 문제의 근본적인 발생 지점을 정확히 짚어내고 즉시 고쳐 쓸 수 있는 조치 요령을 처방받는 실습을 진행합니다.
+          </p>
+        
+        </div>
+
+        <div class="card-section">
+          <h3>2. 학습 목표</h3>
+          <ul class="bullet-list">
+
+            <li>브라우저 콘솔 및 서버 로그의 에러 메시지를 읽고 문제의 유형을 판별할 수 있다.</li>
+            <li>에러가 발생한 원인과 발생 경로(Stack Trace)를 분석하는 논리적 디버깅 습관을 기른다.</li>
+            <li>AI가 제안한 오류 분석 보고서를 바탕으로 안전한 방어적 코드(Defensive Coding)를 직접 적용할 수 있다.</li>
+        
+          </ul>
+        </div>
+
+        <div class="guide-box" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+          <h4 style="color: var(--primary-color); font-size: 0.82rem; margin-bottom: 6px;">🛠️ 실제 따라 하기 실습 가이드</h4>
+          <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+            <li><strong>실습용 파일 생성</strong>: 아래 다운로드 버튼을 눌러 <code>day6_meeting_notes.md</code> 파일을 <code>automation/</code> 폴더 내에 저장합니다.</li>
+            <li><strong>Codex 디버깅 의뢰</strong>: Codex Client 프롬프트 입력창에 아래 **Codex 요청 프롬프트**를 전송하여 진단을 의뢰합니다.</li>
+            <li><strong>오류 패치 적용</strong>: Codex의 원인 진단과 조건식 가드 및 가독성 높은 코드를 로컬 소스에 적용하고 새로고침하여 에러가 사라졌는지 검증합니다.</li>
+          </ol>
+        </div>
+
+        <div class="card-section">
+          <h3>실습 자료 다운로드</h3>
+          <div class="action-btn-container">
+            <button onclick="downloadTask02DebugSource()" class="btn-download">📥 day6_meeting_notes.md 다운로드</button>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>Codex 요청 프롬프트</h3>
+          <div class="prompt-box">
+            <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+            <pre id="promptText"><span class="code-badge" style="margin-bottom: 8px; display: inline-block;">Task 02 Prompt</span>
+작성한 코드에서 'TypeError: Cannot read properties of undefined (reading 'map')' 에러가 발생했습니다. 제공된 소스코드 day6_debug_source.js와 콘솔 에러 로그를 대조해 에러가 발생한 원인(Why)을 초보자 눈높이에서 설명해 주고, 해당 에러를 완벽히 통제할 수 있는 방어 코드가 가미된 수정 소스를 제시해 주세요.</pre>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>4. 결과물 예시</h3>
+          <p>Codex는 회의 기록을 분석해 아래와 같이 정규화된 데이터 엔티티 매핑 및 Mermaid ERD 스크립트를 출력합니다.</p>
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th>파일명</th><th>오류 현상</th><th>주요 원인</th><th>처방 조치</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>day6_debug_source.js</strong></td><td>TypeError: Cannot read properties of undefined (reading 'map')</td><td>데이터 fetch 지연으로 인한 빈 값(undefined) 참조</td><td>옵셔널 체이닝 및 예외 분기 처리</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card-section">
+          <h3>5. AI 활용 포인트</h3>
+          <ul class="bullet-list">
+            <li><strong>에러 문맥 분석</strong>: 단순 오타(Syntax) 에러뿐 아니라, 호출 순서나 비동기 실행 타이밍(Asynchronous Flow)으로 발생하는 비정형 런타임 예외 현상의 맥락을 유추해 냅니다.</li><li><strong>디버깅 과정 가이드</strong>: 단순 해결 코드만 주는 것이 아닌, '왜 이 줄에서 에러가 터졌는가?'에 대한 개념 교육적 해설을 제공합니다.</li>
+          </ul>
+        </div>
+      </article>
+    </main>
+  </div>
+
+      <script>
+    function copyPrompt() {
+      const preEl = document.getElementById('promptText');
+      const textLines = preEl.innerText.split('\n');
+      const promptText = textLines.slice(1).join('\n').trim();
+
+      navigator.clipboard.writeText(promptText).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        copyBtn.textContent = 'Copied!';
+        copyBtn.style.background = 'var(--secondary-color)';
+        copyBtn.style.color = '#000000';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy';
+          copyBtn.style.background = 'rgba(255, 255, 255, 0.05)';
+          copyBtn.style.color = 'var(--text-muted)';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+
+    function downloadTask02DebugSource() {
+      const text = `// 가상의 비동기 예약 목록 데이터 수신 함수
+let reservationList;
+
+// 서버 API를 호출하는 척 시뮬레이션
+setTimeout(() => {
+  reservationList = [
+    { id: 1, name: 'Alice', status: 'wait' },
+    { id: 2, name: 'Bob', status: 'approved' }
+  ];
+}, 1000);
+
+// 화면에 예약 상태 목록을 그리는 함수
+function renderBookings() {
+  // 에러 발생점: reservationList가 setTimeout에 의해 1초 뒤 정의되므로, 
+  // 즉각 호출 시 undefined 상태에서 .map()을 읽으려고 크래시가 유발됨.
+  const cardsHtml = reservationList.map(item => {
+    return \`<div class="card">\${item.name} (\${item.status})</div>\`;
+  }).join('');
+  document.getElementById('booking-container').innerHTML = cardsHtml;
+}
+
+renderBookings();`;
+      triggerBlobDownload(text, 'day6_debug_source.js');
+    }
+
+    function triggerBlobDownload(content, filename) {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

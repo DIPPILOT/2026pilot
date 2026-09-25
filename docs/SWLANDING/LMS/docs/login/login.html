@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACE Startup AI SW 파일럿 | 로그인</title>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      /* Electric Blue */
+      --secondary-color: #06b6d4;
+      /* Neon Cyan */
+      --bg-dark: #09090b;
+      /* Deep Black */
+      --bg-charcoal: #111827;
+      /* Secondary Background */
+      --bg-card: rgba(26, 29, 36, 0.7);
+      /* Surface/Card with glass transparency */
+      --text-main: #ffffff;
+      /* Primary: White */
+      --text-muted: #e4e4e7;
+      /* Secondary: Light Gray */
+      --text-desc: #71717a;
+      /* Description: Gray */
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .brand-section {
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 600px;
+    }
+
+    .brand-logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .brand-logo::before {
+      content: "";
+      width: 8px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .brand-section h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-section p {
+      font-size: 0.95rem;
+      color: var(--text-desc);
+    }
+
+    /* Search Bar */
+    .search-container {
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 30px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 20px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 30px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .profile-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 30px 24px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .profile-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+
+    /* Scanning animation overlay */
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(to bottom, transparent, var(--secondary-color), transparent);
+      box-shadow: 0 0 8px var(--secondary-color);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .profile-card:hover .scan-line {
+      animation: scan 2.2s linear infinite;
+      opacity: 1;
+    }
+
+    @keyframes scan {
+      0% {
+        top: 0%;
+      }
+
+      50% {
+        top: 100%;
+      }
+
+      100% {
+        top: 0%;
+      }
+    }
+
+    .avatar-wrapper {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+      transition: all 0.3s;
+    }
+
+    .profile-card:hover .avatar-wrapper {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+      transform: scale(1.05);
+    }
+
+    .track-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 30px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      margin-bottom: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    .track-badge.mobility {
+      color: var(--accent-purple);
+      background: rgba(139, 92, 246, 0.1);
+      border-color: rgba(139, 92, 246, 0.2);
+    }
+
+    .track-badge.robotics {
+      color: #ff9f43;
+      background: rgba(255, 159, 67, 0.1);
+      border-color: rgba(255, 159, 67, 0.2);
+    }
+
+    .founder-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .startup-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-desc);
+      margin-bottom: 16px;
+    }
+
+    .email-label {
+      font-size: 0.75rem;
+      color: var(--text-desc);
+      word-break: break-all;
+    }
+
+    /* Auth Verification Overlay */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .auth-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .biometric-sensor {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.05);
+      border: 2px dashed var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 30px;
+      position: relative;
+      animation: rotate 10s linear infinite;
+    }
+
+    @keyframes rotate {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .sensor-icon {
+      font-size: 3.5rem;
+      animation: pulsate 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulsate {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.6;
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+      }
+
+      100% {
+        transform: scale(1.05);
+        opacity: 1;
+        text-shadow: var(--glow-blue);
+      }
+    }
+
+    .auth-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-status {
+      font-size: 0.95rem;
+      color: var(--secondary-color);
+      font-weight: 700;
+      height: 24px;
+    }
+
+    .cancel-btn {
+      margin-top: 40px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 18px;
+      color: var(--text-desc);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cancel-btn:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Brand Header -->
+  <div class="brand-section">
+    <a href="../index.html" class="brand-logo">대구 SW 랜딩</a>
+    <h1>Verify Your Identity</h1>
+    <p>보유하신 참가자 프로필 카드를 클릭하여 안전하게 워크스페이스에 로그인해 주세요.</p>
+  </div>
+
+  <!-- Search Panel -->
+  <div class="search-container">
+    <input type="text" class="search-input" id="searchBar" placeholder="이름 또는 스타트업명으로 검색하세요..." />
+  </div>
+
+  <!-- Cards Grid Container -->
+  <div class="cards-grid" id="cardsGrid">
+    <!-- Generated dynamically -->
+  </div>
+
+  <!-- Dynamic Authentication Screen -->
+  <div class="auth-overlay" id="authOverlay">
+    <div class="biometric-sensor">
+      <div class="sensor-icon">🧬</div>
+    </div>
+    <h3 class="auth-title" id="authTitle">Establishing Connection...</h3>
+    <div class="auth-status" id="authStatus">Initial check...</div>
+    <button class="cancel-btn" onclick="cancelAuth()">인증 취소</button>
+  </div>
+
+  <script>
+    // Startup founder cards database
+    const founders = [
+      {
+        id: 1,
+        name: "김민준",
+        startup: "TechSync AI",
+        track: "web",
+        trackName: "AI & Web Software",
+        avatar: "👨🏻‍💻",
+        email: "minjun.kim@techsync.ai"
+      },
+      {
+        id: 2,
+        name: "이서연",
+        startup: "DataMind Systems",
+        track: "mobility",
+        trackName: "Mobility & AI IoT",
+        avatar: "👩🏻‍💼",
+        email: "seoyeon.lee@datamind.io"
+      },
+      {
+        id: 3,
+        name: "박도현",
+        startup: "PayNext Solutions",
+        track: "web",
+        trackName: "AI & Web Software",
+        avatar: "👨🏻‍🔬",
+        email: "dohyun.park@paynext.kr"
+      },
+      {
+        id: 4,
+        name: "최지우",
+        startup: "SmartEdu AI",
+        track: "robotics",
+        trackName: "Robotics & ROS",
+        avatar: "👩🏻‍🏫",
+        email: "jiu.choi@smartedu.ai"
+      },
+      {
+        id: 5,
+        name: "정현우",
+        startup: "LogiRoute AI",
+        track: "mobility",
+        trackName: "Mobility & AI IoT",
+        avatar: "👨🏻‍💻",
+        email: "hyunwoo.jung@logiroute.com"
+      },
+      {
+        id: 6,
+        name: "강예은",
+        startup: "NextBot AI",
+        track: "robotics",
+        trackName: "Robotics & ROS",
+        avatar: "👩🏻‍🔧",
+        email: "yeeun.kang@nextbot.kr"
+      },
+      {
+        id: 7,
+        name: "윤성민",
+        startup: "Genius AI",
+        track: "web",
+        trackName: "AI & Web Software",
+        avatar: "👨🏻‍💼",
+        email: "sungmin.yoon@geniusai.kr"
+      },
+      {
+        id: 8,
+        name: "조은서",
+        startup: "CloudPulse",
+        track: "mobility",
+        trackName: "Mobility & AI IoT",
+        avatar: "👩🏻‍💻",
+        email: "eunseo.cho@cloudpulse.io"
+      },
+      {
+        id: 9,
+        name: "한지호",
+        startup: "EcoGrid Energy",
+        track: "robotics",
+        trackName: "Robotics & ROS",
+        avatar: "👨🏻‍💻",
+        email: "jiho.han@ecogrid.kr"
+      },
+      {
+        id: 10,
+        name: "오유진",
+        startup: "VisionTech AI",
+        track: "web",
+        trackName: "AI & Web Software",
+        avatar: "👩🏻‍💻",
+        email: "yujin.oh@visiontech.kr"
+      },
+      {
+        id: 11,
+        name: "송태양",
+        startup: "MedVitals Health",
+        track: "mobility",
+        trackName: "Mobility & AI IoT",
+        avatar: "👨🏻‍⚕️",
+        email: "taeyang.song@medvitals.ai"
+      },
+      {
+        id: 12,
+        name: "배서현",
+        startup: "SafeNet AI",
+        track: "robotics",
+        trackName: "Robotics & ROS",
+        avatar: "👩🏻‍💼",
+        email: "seohyun.bae@safenet.kr"
+      },
+      {
+        id: 13,
+        name: "임재원",
+        startup: "MediaWave AI",
+        track: "web",
+        trackName: "AI & Web Software",
+        avatar: "👨🏻‍💻",
+        email: "jaewon.lim@mediawave.io"
+      },
+      {
+        id: 14,
+        name: "류다인",
+        startup: "AutoFleet AI",
+        track: "mobility",
+        trackName: "Mobility & AI IoT",
+        avatar: "👩🏻‍🎓",
+        email: "dain.ryu@autofleet.kr"
+      },
+      {
+        id: 15,
+        name: "권혁진",
+        startup: "RoboSort Systems",
+        track: "robotics",
+        trackName: "Robotics & ROS",
+        avatar: "👨🏻‍💻",
+        email: "hyukjin.kwon@robosort.com"
+      },
+      {
+        id: 16,
+        name: "서수빈",
+        startup: "SmartWave AI",
+        track: "web",
+        trackName: "AI & Web Software",
+        avatar: "👩🏻‍💻",
+        email: "subin.seo@smartwave.ai"
+      }
+    ];
+
+    const cardsGrid = document.getElementById('cardsGrid');
+    const searchBar = document.getElementById('searchBar');
+    const authOverlay = document.getElementById('authOverlay');
+    const authTitle = document.getElementById('authTitle');
+    const authStatus = document.getElementById('authStatus');
+
+    let cancelTimer1, cancelTimer2, cancelTimer3;
+
+    // Render profile cards
+    function renderCards(filterQuery = '') {
+      cardsGrid.innerHTML = '';
+      
+      const query = filterQuery.toLowerCase();
+      const filtered = founders.filter(f => 
+        f.name.toLowerCase().includes(query) || 
+        f.startup.toLowerCase().includes(query) ||
+        f.trackName.toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        cardsGrid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 60px 0; color: var(--text-desc);">
+            <h4>일치하는 참가자 프로필이 없습니다.</h4>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(f => {
+        const card = document.createElement('div');
+        card.className = 'profile-card';
+        card.onclick = () => startAuth(f);
+
+        // Customize class for badges
+        let badgeClass = '';
+        if (f.track === 'mobility') badgeClass = 'mobility';
+        if (f.track === 'robotics') badgeClass = 'robotics';
+
+        card.innerHTML = `
+          <div class="scan-line"></div>
+          <span class="track-badge ${badgeClass}">${f.trackName}</span>
+          <div class="avatar-wrapper">
+            <span>${f.avatar}</span>
+          </div>
+          <h4 class="founder-name">${f.name}</h4>
+          <span class="startup-name">${f.startup}</span>
+          <span class="email-label">${f.email}</span>
+        `;
+        cardsGrid.appendChild(card);
+      });
+    }
+
+    // Dynamic verification simulation flow
+    function startAuth(founder) {
+      authOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      authTitle.textContent = `Establishing Secure Connection...`;
+      authStatus.textContent = `Node: secure.bootcamp.kr`;
+
+      // Step 1: scan credentials
+      cancelTimer1 = setTimeout(() => {
+        authTitle.textContent = `Analyzing Credentials...`;
+        authStatus.textContent = `User: ${founder.name} | ${founder.startup}`;
+      }, 700);
+
+      // Step 2: access granted
+      cancelTimer2 = setTimeout(() => {
+        authTitle.textContent = `Access Granted!`;
+        authStatus.textContent = `Welcome back, ${founder.name}. Redirecting...`;
+        
+        const userData = JSON.stringify({
+          name: founder.name,
+          email: founder.email,
+          avatar: founder.avatar,
+          startup: founder.startup,
+          track: founder.track
+        });
+        
+        // Set cookie (10 hours)
+        const expiryHours = 10;
+        const d = new Date();
+        d.setTime(d.getTime() + (expiryHours * 60 * 60 * 1000));
+        document.cookie = "currentUser=" + encodeURIComponent(userData) + "; expires=" + d.toUTCString() + "; path=/";
+
+        // Set localStorage session backup (for local file:// compatibility)
+        localStorage.setItem('currentUserSession', JSON.stringify({
+          value: userData,
+          expiresAt: Date.now() + (expiryHours * 60 * 60 * 1000)
+        }));
+      }, 1500);
+
+      // Step 3: redirect
+      cancelTimer3 = setTimeout(() => {
+        window.location.href = '../index.html';
+      }, 2300);
+    }
+
+    // Cancel dynamic login flow
+    function cancelAuth() {
+      clearTimeout(cancelTimer1);
+      clearTimeout(cancelTimer2);
+      clearTimeout(cancelTimer3);
+      authOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Input search binding
+    searchBar.addEventListener('input', (e) => {
+      renderCards(e.target.value);
+    });
+
+    // Initial load
+    renderCards();
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+
+</html>

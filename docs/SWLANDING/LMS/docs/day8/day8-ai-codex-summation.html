@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 8. 회원 서비스 만들기 교육 요약서 | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Card Surface */
+      --text-main: #ffffff;
+      --text-muted: #e4e4e7;
+      --text-desc: #71717a;
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 10px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong, td, th { word-break: keep-all; }
+
+    .container {
+      max-width: 860px; 
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 6px 20px;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .logo-text p {
+      font-size: 0.58rem;
+      color: var(--text-desc);
+      margin-top: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 120px; 
+      padding: 20px 0 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .hero h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    /* Content Layout */
+    .layout-wrapper {
+      padding: 20px 0 40px;
+    }
+
+    .summation-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .summation-section {
+      margin-bottom: 24px;
+    }
+
+    .summation-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .summation-section h2 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--secondary-color);
+      margin-bottom: 10px;
+      border-left: 3px solid var(--primary-color);
+      padding-left: 8px;
+    }
+
+    .summation-section h3 {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
+    .summation-section p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    ul, ol {
+      list-style-position: inside;
+      margin-left: 4px;
+      margin-bottom: 10px;
+    }
+
+    li {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      line-height: 1.45;
+    }
+
+    /* Comparison Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 16px;
+      background: rgba(9, 9, 11, 0.3);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    th, td {
+      padding: 8px 10px;
+      font-size: 0.74rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(59, 130, 246, 0.08);
+      color: #93c5fd;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Code style */
+    code {
+      font-family: 'Fira Code', monospace;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--secondary-color);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.72rem;
+    }
+
+    /* Diagram visualizer */
+    .diagram-panel {
+      background: #0d0f14;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      font-family: monospace;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      color: #a5f3fc;
+      overflow-x: auto;
+    }
+
+    .back-btn-bottom {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      margin-top: 14px;
+    }
+
+    .back-btn-bottom:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 8 Codex AI Summary</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day8-ai-codex-1.html">Task 1 (기능 설계)</a>
+        <a href="day8-ai-codex-2.html">Task 2 (시나리오 검증)</a>
+        <a href="day8-ai-codex-3.html">Task 3 (오류 검증)</a>
+        <a href="day8-ai-codex-mission1.html">Mission 1 (사용자 리뷰)</a>
+        <a href="day8-ai-codex-mission2.html">Mission 2 (품질 평가)</a>
+        <a href="day8-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 8</span>
+        <span class="hero-badge">Summary</span>
+        <span class="hero-badge">회원 설계 종합 요약</span>
+      </div>
+      <h1>Day 08. 회원 서비스 만들기 교육 요약서</h1>
+      <p>사용자 온보딩 경험을 극대화하고 이탈 장벽을 걷어내는 가입/로그인 흐름과 계정 정합성 보안 가드를 총정리합니다.</p>
+    </div>
+  </section>
+
+  <!-- Content Layout -->
+  <div class="container layout-wrapper">
+    <main class="left-col">
+      <article class="summation-card">
+
+        <div class="summation-section">
+          <h2>📌 Part 1. 도입 배경 및 교육의 필요성</h2>
+          <p>
+            온라인 서비스의 활성화는 회원가입과 로그인의 장벽을 무너뜨리는 데서 출발합니다. 기술적인 데이터베이스 맵 설계 이전에 '사용자'의 관점에서 동선 편의성을 극대화해야 가입 이탈율을 줄일 수 있습니다. 본 세션에서는 Codex Workspace를 통해 요구 우선순위를 획득하고, 복잡한 인풋 폼을 시간차로 분산하며, 중복 가입 취약점을 자바스크립트 가드 변수로 방어하는 실무 핵심 역량을 연마합니다.
+          </p>
+          
+          <h3>1. 회원 서비스 설계 시 극복해야 할 3대 마찰</h3>
+          <ul>
+            <li><strong>초기 입력 인지 과부하:</strong> 가입 화면부터 상세 프로필과 선호 항목을 모조리 요구해 중도 가입 이탈을 조장함.</li>
+            <li><strong>불친절한 폼 검증과 피드백:</strong> 비밀번호 대문자 규칙 등 세부 사항을 사전에 표시하지 않아 유저가 기입에 여러 번 실패함.</li>
+            <li><strong>계정 무결성 취약점:</strong> 이메일 중복 검사가 빠져 중복 메일 계정이 복수로 적재되거나 실패 사유의 세부 노출로 유저 힌트를 줘 크래킹에 취약함.</li>
+          </ul>
+
+          <h3>2. 일반 AI 활용과의 격차 비교</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>성능 영역</th>
+                <th>일반 AI (대화형 브라우저)</th>
+                <th>Codex Workspace (작업 디렉터리 연동)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>회원 기능 기획</strong></td>
+                <td>보편적인 비밀번호 찾기 모듈 가이드만 제안</td>
+                <td>서비스 개요(`day8_service_intro.md`)를 분석해 예약 비즈니스 맞춤형 우선순위 리스트 제공</td>
+              </tr>
+              <tr>
+                <td><strong>사용자 동선 오디팅</strong></td>
+                <td>"입력폼 길이를 간결히 하세요" 수준 조언</td>
+                <td>`day8_signup_spec.md` 명세를 1단계 즉시 가입과 2단계 상세 입력(예약 시점)으로 나누는 구체적 시나리오 도출</td>
+              </tr>
+              <tr>
+                <td><strong>정합성 가드 보강</strong></td>
+                <td>단순 비밀번호 비교 함수 스니펫만 부분 작성</td>
+                <td>`day8_user_service.js`를 감사하여 중복 방지 `some` 검증식 및 안전한 이메일 정규식(Regex)을 주입한 최종 스크립트 도출</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="summation-section">
+          <h2>📌 Part 2. 실습 결과물 매핑 관계</h2>
+          <p>학습을 완수하면 로컬 작업 공간에 다음과 같은 5대 핵심 기획서 및 패치 소스코드가 구축됩니다.</p>
+          <ul>
+            <li><strong>Task 01:</strong> <code>day8_feature_checklist.md</code> - 비즈니스 요구에 기반한 회원 가입/로그인 우선순위 설계표</li>
+            <li><strong>Task 02:</strong> <code>day8_ux_improvement_report.md</code> - 입력 폼 간소화 및 온보딩 분할 개선 보고서</li>
+            <li><strong>Task 03:</strong> <code>day8_robust_user_service.js</code> - 중복 유입 및 이메일 포맷 필터 가드가 탑재된 견고한 자바스크립트 소스</li>
+            <li><strong>Mission 01:</strong> <code>day8_first_user_review.md</code> - 디지털 소외 페르소나 모의주행 반응 및 blur 자동 중복 체크 사양서</li>
+            <li><strong>Mission 02:</strong> <code>day8_usability_evaluation.md</code> - 다차원 편의 점수 매핑 및 에러 메시지 세부 노출 보안 패치(단일 에러 통합) 보고서</li>
+          </ul>
+        </div>
+
+        <div class="summation-section">
+          <h2>📌 Part 3. 사용자 온보딩 프로세스 구조도</h2>
+          <p>사용자 이탈을 막기 위해 가입 절차를 분할하고 가드를 씌우는 점진적 온보딩 여정(Progressive Onboarding Journey) 흐름입니다.</p>
+          <div class="diagram-panel">
+[가입 개시] ➔ [1단계: 이메일/비밀번호/닉네임만 입력]
+                   │
+                   ▼ (blur 포커스아웃 시점 비동기 중복 확인 자동 검사)
+[스토리지 무결성 검증] ➔ (규칙 불일치 시 실시간 인디케이터 표시)
+                   │
+                   ▼ (가입 즉시 대시보드 진입 - 가입 성공율 극대화)
+[첫 예약 신청 시점] ➔ [2단계: 추가 정보(상세 주소, 연락처) 획득]
+                   │
+                   ▼ (이중 클릭 방지 Submit Lock + 동일 사유 에러 안내 통합)
+[안전하게 계정 위탁 완료]
+          </div>
+        </div>
+
+        <div class="summation-section">
+          <h2>📌 Part 4. 실무 응용 팁 (Best Practices)</h2>
+          <p><strong>1) 에러 피드백 단일화를 통한 정보 은폐 (Information Hiding):</strong></p>
+          <p>
+            로그인 실패 시 "이메일이 존재하지 않습니다"와 "비밀번호가 다릅니다"를 다르게 표시해주면 해커가 사이트에 가입된 회원들의 이메일 리스트를 스캐닝하기 쉬워집니다. 항상 "이메일 또는 비밀번호가 잘못되었습니다"라는 모호하고 단일한 메시지로 처리하는 것이 계정 보안의 정석입니다.
+          </p>
+          <p><strong>2) 점진적 회원 가입 (Progressive Profiling):</strong></p>
+          <p>
+            첫 회원 가입 단계에서는 구매나 예약에 지장이 없는 필수 최소 데이터만 받아 가입을 승인한 뒤, 결제를 하거나 상세 기능을 쓸 때 정보를 추가 수집하도록 분할 설계하면 가입 완료율을 최소 30% 이상 끌어올릴 수 있습니다.
+          </p>
+        </div>
+
+        <div class="summation-section">
+          <h2>📌 Part 5. 강사 가이던스 (토의 주제)</h2>
+          <ol>
+            <li><strong>소셜 vs 자체 로그인:</strong> 소셜 로그인은 극도의 편의를 주나 사용자 계정 주권을 타사에 종속시킵니다. 스타트업 런칭 시의 가입 편의 가치와 자체 데이터 주권 확보의 기회 비용을 어떻게 대조해야 할까요?</li>
+            <li><strong>비밀번호 찾기 프로세스:</strong> 임시 패스워드 자동 발급 방식과 이메일 링크 재설정 방식 중, 보안성 및 사용자 조작 피로도 측면에서 스타트업 예약 앱에 더 최적인 방식은 무엇일지 기획해 봅시다.</li>
+          </ol>
+        </div>
+
+        <a href="day8-ai-classroom.html" class="back-btn-bottom">← Day 8 메인 강의실로 돌아가기</a>
+      </article>
+    </main>
+  </div>
+
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

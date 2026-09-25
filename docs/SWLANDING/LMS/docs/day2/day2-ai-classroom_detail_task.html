@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 2 Sequence & Data Flow Tasks | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background: Deep Black */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Surface/Card: Dark Gray */
+      --text-main: #ffffff; /* Primary: White */
+      --text-muted: #e4e4e7; /* Secondary: Light Gray */
+      --text-desc: #71717a; /* Description: Gray */
+      --border-color: rgba(255, 255, 255, 0.08); /* Thin border with low opacity */
+      --accent-color: #06b6d4; /* Neon Cyan */
+      --accent-purple: #8b5cf6; /* Purple highlight */
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.65;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong { word-break: keep-all; }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    section { padding: 60px 0; }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 16px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    .hero {
+      margin-top: 70px;
+      padding: 100px 0 70px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .hero-center {
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      font-size: 0.88rem;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      color: #ffffff;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .section-title::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      margin: 12px auto 0;
+      border-radius: 999px;
+    }
+
+    .section-desc {
+      max-width: 860px;
+      margin: 0 auto 48px;
+      text-align: center;
+      color: var(--text-desc);
+      font-size: 1.02rem;
+    }
+
+    /* Grid Layout */
+    .curriculum-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .course-card {
+      background: rgba(26, 29, 36, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 520px;
+    }
+
+    .course-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-md), 0 0 25px rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .course-thumb {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .course-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-grow: 1;
+    }
+
+    .day-label {
+      display: inline-block;
+      width: fit-content;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .course-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.35;
+      color: #ffffff;
+      transition: color 0.2s ease;
+    }
+
+    .course-card:hover .course-title {
+      color: var(--secondary-color);
+    }
+
+    .course-subtitle {
+      font-size: 0.88rem;
+      color: var(--secondary-color);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .course-desc {
+      color: #a1a1aa;
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+    }
+
+    .meta-item {
+      color: #e4e4e7;
+      line-height: 1.5;
+    }
+
+    .meta-item strong {
+      color: var(--primary-color);
+      margin-right: 6px;
+    }
+
+    .time-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.82rem;
+      border-left: 2px solid rgba(255, 255, 255, 0.08);
+      padding-left: 12px;
+      margin: 4px 0;
+    }
+
+    .time-row {
+      color: #d4d4d8;
+    }
+
+    .time-row strong {
+      color: #ffffff;
+      margin-right: 4px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      color: #a1a1aa;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .ai-class-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+      transition: all 0.25s ease;
+      margin-top: auto;
+    }
+
+    .ai-class-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4), 0 0 10px rgba(6, 182, 212, 0.3);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+
+    .footer-cta {
+      background: #09090b;
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 40px;
+    }
+
+    .footer-cta h3 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+
+    .footer-cta p {
+      max-width: 760px;
+      margin: 0 auto;
+      opacity: 0.8;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 1024px) {
+      .curriculum-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .curriculum-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero h1 { font-size: 2.2rem; }
+      section { padding: 50px 0; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">대구 SW 랜딩</a>
+      <ul class="nav-links">
+        <li><a href="day2-ai-classroom.html">← Day 2 강의실</a></li>
+        <li><a href="../homework_week1.html" style="color: #c084fc !important; font-weight: 700 !important; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 14px; border-radius: 8px;">📝 과제페이지</a></li>
+        <li><a href="../index.html">← 전체 로드맵</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container hero-center">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 2 Flow & Consistency</span>
+        <span class="hero-badge">Codex AI Auditor</span>
+      </div>
+      <h1>Codex Client Workspace 기반 검토 & 설계 Tasks</h1>
+      <p>
+        스타트업들이 Figma 화면 기획 이후 개발 설계(시퀀스, 데이터 매핑, DFD)를 추진하고,<br />
+        문서 간 엇갈린 충돌이나 비정형 의사결정을 실시간으로 자동 조치하기 위한 AI 오디팅 실무 Task 보드입니다.
+      </p>
+    </div>
+  </section>
+
+  <section class="container">
+    <h2 class="section-title">Day 2 Startup MVP Tasks</h2>
+    <p class="section-desc">
+      문서 상호 모순을 잡는 정합성 검출부터 변경 영향 범위 추적, 채팅에서 의사결정 히스토리를 파싱해 내는 PM 업무 자동화를 경험해보세요.
+    </p>
+
+    <div class="curriculum-grid">
+      <!-- Task 1 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(0deg); background-size: cover; background-position: center;">TASK 1</div>
+        <div class="course-content">
+          <span class="day-label">Task 1</span>
+          <h3 class="course-title">Task 1. 설계 불일치 검출 실습</h3>
+          <p class="course-subtitle">Task 01: 3대 기획 문서 간 정합성 모순 검출</p>
+          <p class="course-desc">
+            회의록, 요구사항 정의서, 화면 정의서를 대조하여 일관성(Consistency) 없는 정책 충돌이나 누락된 항목을 AI로 자동 분석합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>문서 간 불일치 요약 리포트 표 완성</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Design Consistency Auditor</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📂 요구사항 및 화면 정의서 등 3대 문서 준비</div>
+            <div class="time-row"><strong>2단계</strong> 🔍 Codex에 모순 검출 및 개발 영향 우선순위 도출 의뢰</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Consistency Check</span>
+            <span class="tag">Auditing</span>
+            <span class="tag">Reviewer AI</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>consistency-report.md</code> (기획 불일치 리포트)
+          </div>
+
+          <a href="day2-ai-codex-1.html" class="ai-class-btn">Task 1 실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Task 2 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(90deg); background-size: cover; background-position: center;">TASK 2</div>
+        <div class="course-content">
+          <span class="day-label">Task 2</span>
+          <h3 class="course-title">Task 2. 요구사항 변경 영향도 관리 실습</h3>
+          <p class="course-subtitle">Task 02: 요구사항 변경 영향 범위 추적</p>
+          <p class="course-desc">
+            고객 요건 변경(소셜 로그인, 인증 수단 등)에 대해 v1.0 화면 기획 및 API 명세서에서 영향받는 상세 범위를 파악하고 대처법을 작성합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>UI 및 API 변경 영향도 분석표 도출</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Change Control & Impact Trace</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 변경 전/후 요건서 및 화면/API 정의서 준비</div>
+            <div class="time-row"><strong>2단계</strong> 🔄 Codex를 통한 수정 영향 범위 매핑 및 보완책 수립</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Change Management</span>
+            <span class="tag">Impact Analysis</span>
+            <span class="tag">UI/API Sync</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>impact-analysis.md</code> (변경 영향도 분석서)
+          </div>
+
+          <a href="day2-ai-codex-2.html" class="ai-class-btn">Task 2 실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Task 3 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(180deg); background-size: cover; background-position: center;">TASK 3</div>
+        <div class="course-content">
+          <span class="day-label">Task 3</span>
+          <h3 class="course-title">Task 3. 미팅 의사결정 이력 추적 실습</h3>
+          <p class="course-subtitle">Task 03: 비정형 대화록 의사결정 아카이빙</p>
+          <p class="course-desc">
+            개발 단체 메신저 대화 등 비정형 구두 대화록에서 최종 조율/결정된 비즈니스 규칙(Reasoning)과 미결 안건을 분리해 로그화합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>의사결정 로그 및 Action Items 표 완성</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Decision Archiving & Task Tracking</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 메신저 단체 채팅 텍스트 파일(messenger-chat.md) 작성</div>
+            <div class="time-row"><strong>2단계</strong> 📋 Codex로 결정 배경(Reasoning) 및 책임자별 후속 과제 도출</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Decision Log</span>
+            <span class="tag">Action Items</span>
+            <span class="tag">Archiving</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>decision-log.md</code> (의사결정 및 미결 로그)
+          </div>
+
+          <a href="day2-ai-codex-3.html" class="ai-class-btn">실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Skill Task 1 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(45deg); background-size: cover; background-position: center;">SKILL 1</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Skill Task 1</span>
+          <h3 class="course-title">Skill Task 1. 핵심 사용자 Flow 설계</h3>
+          <p class="course-subtitle">ADD-D02-T01: User Flow 3종 책임 및 단계 명세</p>
+          <p class="course-desc">
+            Video Upload, Video Playback, Advertising 세 가지 핵심 사용자 흐름을 시작 조건부터 완료 조건까지 명세화합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>User Flow 3종 명세 완료</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client</div>
+            <div class="meta-item"><strong>실습 범위</strong>Skill Task (TECH)</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 Day 1 Domain Map 및 Feature List 검토</div>
+            <div class="time-row"><strong>2단계</strong> ⚙️ Actor, 시작/완료 조건 및 시스템 책임 분류</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Skill Task</span>
+            <span class="tag">User Flow</span>
+            <span class="tag">TECH-BA</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>04_USER_FLOW.md</code>
+          </div>
+
+          <a href="day2-ai-codex-1.html" class="ai-class-btn">실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Skill Task 2 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(135deg); background-size: cover; background-position: center;">SKILL 2</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Skill Task 2</span>
+          <h3 class="course-title">Skill Task 2. Domain 간 Sequence Diagram 작성</h3>
+          <p class="course-subtitle">ADD-D02-T02: Mermaid Sequence Diagram 시각화</p>
+          <p class="course-desc">
+            각 Flow를 Domain·Service·DB·외부 시스템 간 메시지 순서로 변환하고 Mermaid 다이어그램으로 작성합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>Sequence Diagram 3종 구축</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client</div>
+            <div class="meta-item"><strong>실습 범위</strong>Skill Task (HYBRID)</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 Flow별 메시지 동기/비동기 호출 정의</div>
+            <div class="time-row"><strong>2단계</strong> ⚙️ Mermaid 코드 생성 및 예외 처리 2종 추가</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Skill Task</span>
+            <span class="tag">Sequence Diagram</span>
+            <span class="tag">Mermaid</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>05_SEQUENCE.md</code>
+          </div>
+
+          <a href="day2-ai-codex-2.html" class="ai-class-btn">실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Skill Task 3 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(225deg); background-size: cover; background-position: center;">SKILL 3</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Skill Task 3</span>
+          <h3 class="course-title">Skill Task 3. 광고 과다 노출 방지 &amp; 예외 규칙</h3>
+          <p class="course-subtitle">ADD-D02-T03: Frequency Capping 규칙 및 데이터 정의</p>
+          <p class="course-desc">
+            동일 광고의 과다 노출을 방지하기 위해 윈도우 시간창, 식별자, 예외 처리 규칙을 정의합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>Frequency Cap 명세 및 예외 룰 정의</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client</div>
+            <div class="meta-item"><strong>실습 범위</strong>Skill Task (AI)</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 광고 노출 상태 및 식별 파라미터 수집</div>
+            <div class="time-row"><strong>2단계</strong> ⚙️ AI 질의를 통한 예외 규칙 검증 및 문서화</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Skill Task</span>
+            <span class="tag">Frequency Cap</span>
+            <span class="tag">Ad Exception</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>ad-frequency-rules.md</code>
+          </div>
+
+          <a href="day2-ai-codex-3.html" class="ai-class-btn">실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Mission 1 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(270deg); background-size: cover; background-position: center;">MISSION 1</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border: 1px solid rgba(139, 92, 246, 0.2);">Mission 1</span>
+          <h3 class="course-title">Mission 1. 회원가입 변경 영향도 분석 실습</h3>
+          <p class="course-subtitle">Task 06: 회원가입 휴대폰 인증 추가 영향 분석</p>
+          <p class="course-desc">
+            "회원가입 시 휴대폰 인증 추가" 요청에 대해 시스템 전체에 미치는 영향을 파악하고 수정이 필요한 화면, API, DB, 문서를 도출합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>영향도 분석 보고서(Markdown 표) 완성</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Change Control & Impact Trace</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📂 변경 요청 사항 및 분석 대상(UI, API, DB) 식별</div>
+            <div class="time-row"><strong>2단계</strong> 🔍 Codex에 영향 범위 매핑 및 구체적 조치안 보고서 요구</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Impact Analysis</span>
+            <span class="tag">Change Control</span>
+            <span class="tag">Mobile Auth</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>impact-analysis-report.md</code> (영향도 분석 보고서)
+          </div>
+
+          <a href="day2-ai-codex-mission1.html" class="ai-class-btn" style="background: linear-gradient(135deg, #8b5cf6, #d946ef);">과제실 입장</a>
+        </div>
+      </article>
+
+      <!-- Mission 2 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(320deg); background-size: cover; background-position: center;">MISSION 2</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border: 1px solid rgba(139, 92, 246, 0.2);">Mission 2</span>
+          <h3 class="course-title">Mission 2. 프로젝트 이슈 리포트 작성 실습</h3>
+          <p class="course-subtitle">Task 07: 프로젝트 자료 요약 및 이슈 리포트 자동 생성</p>
+          <p class="course-desc">
+            회의록, 변경 이력, Action Item, 이슈 목록 등 수많은 프로젝트 원본 자료를 통합 분석하여 한눈에 파악할 수 있는 이슈 리포트를 자동 작성합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>프로젝트 이슈 리포트(Markdown 표) 완성</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Project Tracking & Issue Management</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📂 회의록, 변경이력, Action Item 등 실습 데이터 준비</div>
+            <div class="time-row"><strong>2단계</strong> 📋 Codex에 우선순위, 담당자, 긴급도 분류 보고서 도출 의뢰</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Issue Report</span>
+            <span class="tag">Project Status</span>
+            <span class="tag">Risk Management</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>project-issue-report.md</code> (프로젝트 이슈 리포트)
+          </div>
+
+          <a href="day2-ai-codex-mission2.html" class="ai-class-btn" style="background: linear-gradient(135deg, #8b5cf6, #d946ef);">과제실 입장</a>
+        </div>
+      </article>
+
+      <!-- Mission 3 (Skill Mission 1) -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(140deg); background-size: cover; background-position: center;">MISSION 3</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border: 1px solid rgba(139, 92, 246, 0.2);">Mission 3</span>
+          <h3 class="course-title">[과제] Mission 3. 글로벌 결제 PG 시퀀스 &amp; 예외 설계</h3>
+          <p class="course-subtitle">Skill Mission 1: 글로벌 결제 승인/취소 및 웹훅 재시도 명세</p>
+          <p class="course-desc">
+            글로벌 멀티 PG 결제 시스템의 승인, 취소, 웹훅 재시도, 카드사 타임아웃 예외 시나리오를 다루는 시퀀스 다이어그램 및 설계서를 작성합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>결제 Sequence &amp; 타임아웃 명세 완료</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client</div>
+            <div class="meta-item"><strong>실습 범위</strong>Skill Task Mission (Level 1)</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 PG사 결제 API 규격 및 웹훅 수신 파라미터 정의</div>
+            <div class="time-row"><strong>2단계</strong> ⚙️ Idempotency Key 기반 이중결제 방지 시퀀스 시각화</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Skill Mission</span>
+            <span class="tag">Payment PG</span>
+            <span class="tag">Sequence</span>
+            <span class="tag">Idempotency</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>payment-sequence-specification.md</code>
+          </div>
+
+          <a href="day2-ai-codex-mission1.html" class="ai-class-btn" style="background: linear-gradient(135deg, #8b5cf6, #d946ef);">과제실 입장</a>
+        </div>
+      </article>
+
+      <!-- Mission 4 (Skill Mission 2) -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(180deg); background-size: cover; background-position: center;">MISSION 4</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border: 1px solid rgba(139, 92, 246, 0.2);">Mission 4</span>
+          <h3 class="course-title">[과제] Mission 4. 스마트 헬스케어 생체 데이터 동기화 흐름</h3>
+          <p class="course-subtitle">Skill Mission 2: BLE 동기화 및 실시간 푸시 알림 명세</p>
+          <p class="course-desc">
+            웨어러블 기기에서 수집되는 생체 실시간 데이터의 BLE 동기화, 이상 징후 알림 및 단절 시 로컬 캐싱 재전송 시퀀스를 설계합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>생체 동기화 시퀀스 &amp; 데이터 정합성 검증 완료</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client</div>
+            <div class="meta-item"><strong>실습 범위</strong>Skill Task Mission (Level 2)</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 BLE 단말기-앱-서버 데이터 동기화 다이어그램 수립</div>
+            <div class="time-row"><strong>2단계</strong> 🔌 이상 데이터 감지 및 네트워크 재연결 배치 처리</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Skill Mission</span>
+            <span class="tag">Healthcare IoT</span>
+            <span class="tag">BLE Sync</span>
+            <span class="tag">Realtime Push</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>healthcare-flow-specification.md</code>
+          </div>
+
+          <a href="day2-ai-codex-mission2.html" class="ai-class-btn" style="background: linear-gradient(135deg, #8b5cf6, #d946ef);">과제실 입장</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer class="footer-cta">
+    <div class="container">
+      <h3>ACE AI Startup Bootcamp</h3>
+      <p style="margin-top: 10px;">
+        © 2026 ACE Startup &amp; ACE Ministry. All Rights Reserved. 본 교육 과정은 실물 개발 키트 중심의 실전형 MVP 프로젝트 과정입니다.
+      </p>
+    </div>
+  </footer>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

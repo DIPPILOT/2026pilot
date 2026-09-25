@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 7. Task 01 - 데이터 구조 이해 차이 해결 (Data Structure Alignment) | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Card Surface */
+      --text-main: #ffffff; /* Primary Text */
+      --text-muted: #e4e4e7; /* Secondary Text */
+      --text-desc: #71717a; /* Description Text */
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 10px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong, td, th { word-break: keep-all; }
+
+    .container {
+      max-width: 860px; 
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 6px 20px;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .logo-text p {
+      font-size: 0.58rem;
+      color: var(--text-desc);
+      margin-top: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 120px;
+      padding: 16px 0 10px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.04), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-content {
+      max-width: 750px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 5px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      font-size: 0.65rem;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      font-size: 1.25rem;
+      line-height: 1.25;
+      margin-bottom: 4px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.35;
+    }
+
+    /* Detail Section Layout */
+    .layout-wrapper {
+      padding: 15px 0 35px;
+    }
+
+    .detail-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .detail-card-head {
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 6px;
+    }
+
+    .detail-card-head h2 {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .detail-card-head h2 .badge-inline {
+      font-size: 0.6rem;
+      padding: 1px 4px;
+      border-radius: 2px;
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    .card-section {
+      margin-bottom: 12px;
+    }
+
+    .card-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-section h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-section h3::before {
+      content: "";
+      width: 2px;
+      height: 8px;
+      background: var(--secondary-color);
+      border-radius: 1px;
+      display: inline-block;
+    }
+
+    .card-section p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    /* Lists */
+    ul {
+      list-style-position: inside;
+      padding-left: 2px;
+      margin-bottom: 4px;
+    }
+
+    li {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    /* Code Block Styles */
+    pre {
+      background: #0d0f14;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 10px;
+      overflow-x: auto;
+      max-height: 180px; 
+      overflow-y: auto;  
+      margin: 6px 0 10px;
+      position: relative;
+    }
+
+    pre::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+      font-size: 0.7rem;
+      color: #e4e4e7;
+    }
+
+    .code-badge {
+      display: inline-block !important;
+      position: relative !important;
+      top: auto !important;
+      right: auto !important;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--secondary-color, #06b6d4);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0 10px;
+      background: rgba(9, 9, 11, 0.3);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    th, td {
+      padding: 6px 8px;
+      font-size: 0.72rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(59, 130, 246, 0.08);
+      color: #93c5fd;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Box styles */
+    .info-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.06);
+      border-left: 3px solid var(--accent-color);
+      color: #a5f3fc;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(139, 92, 246, 0.06);
+      border-left: 3px solid var(--accent-purple);
+      color: #e9d5ff;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box h4 {
+      color: #d8b4fe;
+      margin-bottom: 3px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Inline Sidebar Box */
+    .inline-sidebar-box {
+      margin-top: 14px;
+      background: rgba(139, 92, 246, 0.04);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .inline-sidebar-box h4 {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #d8b4fe;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Button utilities */
+    .action-btn-container {
+      margin: 4px 0 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+      transition: all 0.2s;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        margin-top: 160px;
+      }
+      .hero h1 { font-size: 1.1rem; }
+      .detail-card { padding: 10px 12px; }
+      .nav-container {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 20px;
+      }
+    }
+
+    /* Prompt Copy Box Styles */
+    .prompt-box {
+      background: rgba(9, 9, 11, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 16px;
+      position: relative;
+      margin-top: 12px;
+      margin-bottom: 16px;
+    }
+
+    .prompt-box pre {
+      padding-right: 70px;
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .copy-btn {
+      z-index: 10;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 7 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day7-ai-codex-1.html" class="active">Task 1 (기능 연결)</a>
+        <a href="day7-ai-codex-2.html" >Task 2 (시나리오 검증)</a>
+        <a href="day7-ai-codex-3.html" >Task 3 (오류 검증)</a>
+        <a href="day7-ai-codex-mission1.html" >Mission 1 (품질 점검)</a>
+        <a href="day7-ai-codex-mission2.html" >Mission 2 (E2E 검증)</a>
+        <a href="day7-ai-codex-summation.html" class="summation-btn" style="background: rgba(6, 182, 212, 0.15); color: var(--secondary-color); border-color: rgba(6, 182, 212, 0.3);">📊 요약 보기</a>
+        <a href="day7-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 7</span>
+        <span class="hero-badge">Task 01</span>
+        <span class="hero-badge">기능 연결</span>
+      </div>
+      <h1>Task 01. 기능 연결하기 (Feature Integration)</h1>
+      <p>정적인 HTML 화면 구성 요소에 자바스크립트 이벤트를 매핑하고 데이터 스토리지 적재 및 연동을 실행합니다.</p>
+    </div>
+  </section>
+
+  <!-- Layout Wrapper for Details -->
+  <div class="container layout-wrapper">
+        <main class="left-col">
+      <article class="detail-card">
+        <div class="detail-card-head">
+          <h2><span class="badge-inline">Task 01</span> Task 01 기능 연결하기 실습 가이드</h2>
+        </div>
+
+        <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+          <div>
+            <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 실습 입력 (Input)</h4>
+            <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>day7_meeting_notes.md</code> (회의록)</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">💾 실습 출력 (Output)</h4>
+            <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>day7_connected_feature.html</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>1. 스토리 및 실습 배경</h3>
+
+          <p>
+            한 주니어 기획자가 로그인 화면과 예약 목록 화면 프로토타입을 완성했습니다. 하지만 회의 때 대표님이 로그인 버튼을 누르자 아무 반응도 일어나지 않고 정적 화면만 덩그러니 유지되었습니다. "화면은 예쁜데, 클릭하면 다음으로 넘어가지 않네요. 실제 예약 데이터가 저장되고 회원 정보가 세션에 기록되는 흐름은 언제 연결되나요?"라는 피드백을 듣고, 화면 구성과 데이터 제어 로직을 엮는 연동 작업이 시급하다는 것을 깨달았습니다.
+          </p>
+          <p>
+            이번 실습에서는 Codex AI를 활용하여 정적인 로그인 폼과 예약 등록 카드 컴포넌트에 이벤트 리스너(Click, Submit Event)를 달고, 데이터 저장소(Local Storage 등) 및 가상 API 함수 호출을 유기적으로 엮어 화면이 클릭 반응 및 데이터 적재 동작을 정상적으로 수행하도록 연결하는 방법을 학습합니다.
+          </p>
+        
+        </div>
+
+        <div class="card-section">
+          <h3>2. 학습 목표</h3>
+          <ul class="bullet-list">
+
+            <li>HTML 엘리먼트와 JavaScript 이벤트(Event Listener)를 적절히 연결할 수 있다.</li>
+            <li>사용자가 입력 폼에 기재한 데이터를 수집하여 가상 API 또는 스토리지에 적재할 수 있다.</li>
+            <li>AI의 제안을 참고하여 기능 연결 중 누락되거나 빠진 예외 이벤트 처리 단계를 자가 보완할 수 있다.</li>
+        
+          </ul>
+        </div>
+
+        <div class="guide-box" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+          <h4 style="color: var(--primary-color); font-size: 0.82rem; margin-bottom: 6px;">🛠️ 실제 따라 하기 실습 가이드</h4>
+          <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+            <li><strong>실습용 파일 생성</strong>: 아래 다운로드 버튼을 눌러 <code>day7_meeting_notes.md</code> 파일을 <code>automation/</code> 폴더 내에 저장합니다.</li>
+            <li><strong>Codex 기능 조립 위임</strong>: Codex Client 프롬프트 입력창에 아래 **Codex 요청 프롬프트**를 전달하여 로직 연동을 지시합니다.</li>
+            <li><strong>데이터 적재 확인</strong>: 가입 완료 시 브라우저 내 경고 메시지가 정상 출력되는지 보고, 개발자 도구의 Application -> LocalStorage 탭에 입력값이 올바르게 동기화되는지 검증합니다.</li>
+          </ol>
+        </div>
+
+        <div class="card-section">
+          <h3>실습 자료 다운로드</h3>
+          <div class="action-btn-container">
+            <button onclick="downloadTask01UnconnectedFeature()" class="btn-download">📥 day7_meeting_notes.md 다운로드</button>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>Codex 요청 프롬프트</h3>
+          <div class="prompt-box">
+            <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+            <pre id="promptText"><span class="code-badge" style="margin-bottom: 8px; display: inline-block;">Task 01 Prompt</span>
+제공된 day7_unconnected_feature.html의 회원가입 화면 코드에 JavaScript 기능을 연결하려고 합니다. 1) 가입 완료 버튼 클릭 시 입력값 유효성을 검사하고, 2) 브라우저 로컬 스토리지에 정보를 저장하며, 3) 성공 시 대시보드 화면으로 이동하는 연동 스크립트를 작성해 주세요. 누락된 취소 버튼 반응이나 중복 가입 체크 로직도 함께 제안해 주세요.</pre>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>4. 결과물 예시</h3>
+          <p>Codex는 회의 기록을 분석해 아래와 같이 정규화된 데이터 엔티티 매핑 및 Mermaid ERD 스크립트를 출력합니다.</p>
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th>파일명</th><th>역할</th><th>주요 컴포넌트</th><th>저장 형태</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>day7_connected_feature.html</strong></td><td>가입 폼 제출 핸들링 및 검증</td><td>signup-form, submit-btn</td><td>LocalStorage (JSON 포맷)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card-section">
+          <h3>5. AI 활용 포인트</h3>
+          <ul class="bullet-list">
+            <li><strong>동작 흐름 가이드</strong>: 화면 단추가 눌렸을 때 브라우저 백그라운드에서 일어나는 상태 변경 단계를 순차적 알고리즘으로 도출합니다.</li><li><strong>보조 분기 감지</strong>: 가입 성공 처리뿐 아니라, 사용자가 실수로 빈 칸을 남겨둔 채 제출 버튼을 연타하는 경우 등의 '유효성 체크' 구문을 선제 제안합니다.</li>
+          </ul>
+        </div>
+      </article>
+    </main>
+  </div>
+
+      <script>
+    function copyPrompt() {
+      const preEl = document.getElementById('promptText');
+      const textLines = preEl.innerText.split('\n');
+      const promptText = textLines.slice(1).join('\n').trim();
+
+      navigator.clipboard.writeText(promptText).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        copyBtn.textContent = 'Copied!';
+        copyBtn.style.background = 'var(--secondary-color)';
+        copyBtn.style.color = '#000000';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy';
+          copyBtn.style.background = 'rgba(255, 255, 255, 0.05)';
+          copyBtn.style.color = 'var(--text-muted)';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+
+    function downloadTask01UnconnectedFeature() {
+      const text = `<!-- 가입 양식 컴포넌트 -->
+<form id="signup-form">
+  <input type="email" id="user-email" placeholder="이메일 입력">
+  <input type="text" id="user-nickname" placeholder="닉네임 입력">
+  <button type="submit" id="submit-btn">가입 완료</button>
+  <button type="button" id="cancel-btn">취소</button>
+</form>`;
+      triggerBlobDownload(text, 'day7_unconnected_feature.html');
+    }
+
+    function triggerBlobDownload(content, filename) {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

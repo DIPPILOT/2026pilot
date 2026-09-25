@@ -1,0 +1,301 @@
+<!-- Slide 88: [간지] SESSION 09 -->
+<section class="slide-card divider-slide session-9" id="slide-99">
+  <div class="slide-header" style="display: none;">
+    <div class="slide-category">9일차 | 9차시. 결제 서비스 설계하기 (Payment Service)</div>
+    <div class="slide-title">[세션 오프닝] 9일차. 결제 서비스 설계하기 (Payment Service)</div>
+  </div>
+
+  <div class="divider-content">
+    <div class="divider-day">DAY 9</div>
+    <div class="divider-tag">SESSION 09</div>
+    <h1 class="divider-title">결제 서비스 설계하기</h1>
+    <p class="divider-subtitle">구매 여정 3단계 단축, 은행 점검 및 한도초과 안심 카피, 이중 승인 방제 UUID 락</p>
+    <div class="divider-topics">
+      <div class="topic-badge"><span>01</span> 결제 여정 간소화 (Task 01)</div>
+      <div class="topic-badge"><span>02</span> PG 오류 카피 한글 정렬 (Task 02)</div>
+      <div class="topic-badge"><span>03</span> 영수증 레이아웃 &amp; 이중 승인 차단 (Task 03 / Mission 01/02)</div>
+    </div>
+  </div>
+
+  <div class="slide-body" style="display: none;">
+    <p>9차시. 결제 서비스 설계하기 (Payment Service) 세션 시작</p>
+  </div>
+  <div class="presenter-notes" style="display:none;">9일차 세션에서는 사용자가 결제 중 불안감을 느끼고 이탈하지 않도록 9단계 동선을 3단계로 줄이고, PG 오류코드를 사용자 안심 카피로 바꾸며, 중복 이중결제를 차단하는 주문 UUID Idempotency 락 장치를 학습합니다.</div>
+</section>
+
+<!-- Slide 89: 9일차 오프닝 & 25차시 안내 -->
+<section class="slide-card session-9" id="slide-100">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">25차시. 결제 동선 설계 및 이탈률 최소화</div>
+      <div class="slide-title">9일차 오프닝 &amp; 25차시 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">9일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">주제:</span> 결제 흐름 설계하기 (Payment Flow Planning)</li>
+      <li><span class="highlight">핵심 가치:</span> 지출을 결심하는 임계 경로(Critical Path)의 마찰을 제거해 매출 이탈률 방어</li>
+      <li><span class="highlight">시간 계획 (총 180분):</span>
+        <ul>
+          <li>도입 (30분) - 본인인증 팝업 및 주소 찾기 튕김 등 9단계 결제의 문제점</li>
+          <li>실습 설명 (30분) - day9_current_checkout_flow.md 구조 분석</li>
+          <li>실습 진행 (90분) - Single Page 통합 요약 주문서 및 overlay 결제식 TO-BE 설계</li>
+          <li>공유 및 피드백 (30분) - 가입지 정보 기본 로드 구현 검수</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">25차시에서는 구매 전환율을 높이는 최단 거리 결제 동선 단선화 기획을 배웁니다.</div>
+  </div>
+</section>
+
+<!-- Slide 90: 도입 질문: 기획자는 단순 PG 연결만 보나, 유저는 결제 중 도망치는 이유 -->
+<section class="slide-card session-9" id="slide-101">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">25차시. 결제 동선 설계 및 이탈률 최소화</div>
+      <div class="slide-title">도입 질문: 기획자는 단순 PG 연결만 보나, 유저는 결제 중 도망치는 이유</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">9일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">다단계 결제의 이탈 유발:</span>
+            <ul>
+              <li>옵션 ➔ 주문서 ➔ 약관 ➔ 배송지 ➔ 휴대폰 본인 인증 ➔ PG 호출 ➔ 완료 (총 9단계).</li>
+              <li>모바일 화면에서 팝업이 뜰 때마다 사용자는 구매 욕구를 포기함.</li>
+            </ul>
+          </li>
+          <li><span class="highlight">TO-BE 3단계 축약:</span>
+            <ul>
+              <li>1단계: 배송지 자동 로드 (Single Page)</li>
+              <li>2단계: 결제수단 및 약관 통합 동의 (Checkout Overlay)</li>
+              <li>3단계: PG 간편 승인 및 완료 리디렉션</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="image-container"
+        style="display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 12px; padding: 10px;">
+        <img alt="결제 마찰 피크" src="images/slide90_illustration.png"
+          style="max-width: 100%; max-height: 320px; border-radius: 8px; object-fit: contain;" />
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">본인 인증의 중복 요구나 이탈 모바일 폼 유실을 방지하는 병합 화면 설계를 배웁니다.</div>
+  </div>
+</section>
+
+<!-- Slide 91: 실습 진행 Task 01: 결제 흐름 설계하기 (Payment Flow Planning) -->
+<section class="slide-card session-9" id="slide-102">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">25차시. 결제 동선 설계 및 이탈률 최소화</div>
+      <div class="slide-title">실습 진행 Task 01: 결제 흐름 설계하기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">9일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: day9_current_checkout_flow.md 작성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">가입 인증을 마쳤음에도 본인인증을 또 요구하고 주소검색 튕기는 9단계 시나리오.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 동선 최적화 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>결제 동선 단선화 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">현재의 다단계 결제 동선(day9_current_checkout_flow.md)을 읽고, 유저가 결제를 누르기 전에 피로감을 느껴 도망칠 법한 장벽 2가지를 찾아주세요. 그리고 이메일 가입 유저가 가장 빠르게 구매에 골인하도록 불필요한 단계를 병합해 3단계 이하로 축약한 개선 결제 유저 플로우(TO-BE Flow)를 도출해 주세요.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">AI가 제안한 간소화 요소를 적용해 팝업 단계를 병합한 주문/결제 요약 시트를 작성합니다.</div>
+  </div>
+</section>
+
+<!-- Slide 92: 실습 진행 Task 02: 결제 실패 시나리오 검토하기 (Payment Exception Review) -->
+<section class="slide-card session-9" id="slide-103">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">26차시. 결제 예외 처리 및 가격 영수증 신뢰도 보완</div>
+      <div class="slide-title">실습 진행 Task 02: 결제 실패 시나리오 검토하기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">9일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: day9_raw_payment_errors.json 작성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">PG사에서 내려주는 날것의 시스템 오류 로그 및 한도초과 에러코드 기입.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 한글 피드백 변환 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>오류 한글화 및 안심 가이드 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 PG사 원시 오류 로그 명세 day9_raw_payment_errors.json를 기반으로, 사용자에게 절대로 불안감을 주지 않는 친절한 '오류 상황별 한글 안내 문구집'과 중복 결제 시도를 차단하는 '이중 승인 예방 대응 가이드라인(Mitigation Playbook)'을 작성해 주세요.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">"ERR_CARD_LIMIT_EXCEEDED" 같은 무서운 영문 에러 대신 "한도가 초과되었습니다 (결제는 즉시 취소 처리되었습니다)"의 한글 수습 메시지를 조립합니다.</div>
+  </div>
+</section>
+
+<!-- Slide 93: 실습 진행 Task 03: 결제 경험 개선하기 (Payment Experience Review) -->
+<section class="slide-card session-9" id="slide-104">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">26차시. 결제 예외 처리 및 가격 영수증 신뢰도 보완</div>
+      <div class="slide-title">실습 진행 Task 03: 결제 경험 개선하기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">9일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: day9_payment_ui.html 준비</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">가입금액 50,000원 외에 보안 보증이나 세부 수수료가 빠져 피싱 느낌을 주는 화면.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 영수증 가격 세분화 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>영수증 UI 개선 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 day9_payment_ui.html 결제 UI 레이아웃의 사용성 및 신뢰도를 검토해 주세요. 사용자가 정보 불투명성으로 인해 불안을 느낄 만한 곳을 찾고, 1) 가격 세부 할인 영수증식 분리 표시, 2) 24시간 안심 결제 보안 문구 배치, 3) 간편 취소/환불 링크 처방이 보완된 최종 CSS/HTML 구조를 도출해 주세요.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">부가세 VAT 포함 최종가와 "7일 이내 원클릭 취소 보장" 문구를 삽입해 지불 신뢰 장치를 보완합니다.</div>
+  </div>
+</section>
+
+<!-- Slide 94: Mission 01: 결제 실패 상황 대응하기 (Handling Failures) -->
+<section class="slide-card session-9" id="slide-105">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">27차시. 결제 장애 복구 수립 및 고객 여정 오디팅</div>
+      <div class="slide-title">Mission 01: 결제 실패 상황 대응하기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">9일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">결제창 중도 강제종료 및 점검 대응:</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 3px 0 5px 0;">결제 도중 창을 닫았을 때 '출금되지 않았으니 안심하세요' 메시지 및 중복결제 차단용 UUID Idempotency Key 락 설계.</div>
+      </li>
+      <li><span class="highlight">대응서 작성 및 저장:</span>
+        <div style="font-size:13px; color: var(--text-secondary); margin-top:5px;">장애 상황별 피드백 문장을 매트릭스화한 `day9_failure_scenarios.md` 예방 가이드북 완성.</div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">동일 주문번호가 중복 전송되어 돈이 이중 출금되지 않도록 서버 주문 UUID 키 락 규칙을 수립합니다.</div>
+  </div>
+</section>
+
+<!-- Slide 95: Mission 02: 구매 완료까지 직접 점검하기 (Checkout Journey) -->
+<section class="slide-card session-9" id="slide-106">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">27차시. 결제 장애 복구 수립 및 고객 여정 오디팅</div>
+      <div class="slide-title">Mission 02: 구매 완료까지 직접 점검하기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">9일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">이탈률 극심 구간 (Friction Peak) 특정:</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 3px 0 5px 0;">주문 정보 기재 중 쿠폰 찾기를 눌러 나갈 때 기존 배송지가 휘발되는 설계상 결함 적발.</div>
+      </li>
+      <li><span class="highlight">개선조치 및 저장:</span>
+        <div style="font-size:13px; color: var(--text-secondary); margin-top:5px;">모달 실행 시 필드 인풋 데이터를 로컬 세션에 임시 동기화해 폼 초기화를 원천 방어한 `day9_checkout_journey.md` 보고서 보관.</div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">사용자가 결제를 진행하다 지우는 사유를 시점별로 분석하여 즉시 조치가 가능한 환불 정책 노출 등의 액션 플랜을 수립합니다.</div>
+  </div>
+</section>
+
+<!-- Slide 96: 정리: 9일차 핵심 요약 -->
+<section class="slide-card session-9" id="slide-107">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">27차시. 결제 장애 복구 수립 및 고객 여정 오디팅</div>
+      <div class="slide-title">정리: 9일차 핵심 요약</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">9일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">9일차 핵심 요약:</span>
+        <ul>
+          <li><span class="highlight">구매 동선 3단계 단선화:</span> 복잡한 9단계 결제 프로세스를 단일 요약 주문 Overlay로 병합.</li>
+          <li><span class="highlight">날것 에러 한글 순화:</span> 카드 거절 PG 오류를 조치 지침이 담긴 안심 수습 카피로 치환.</li>
+          <li><span class="highlight">자산 안전 가드 (Idempotency):</span> UUID 주문 키를 엮어 연타 클릭에 의한 이중 승인 매출 사고 원천 예방.</li>
+          <li><span class="highlight">다음 차시 예고:</span> 10일차. 서비스 런칭하기 (Service Launch)</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">9일차 결제 관리 세션을 성공적으로 마쳤습니다. 마지막 10일차에는 완성된 서비스를 세상에 알리는 홍보 공지 패키징 및 FAQ 구축, Keep/Problem/Try 프로젝트 최종 발표를 진행하겠습니다.</div>
+  </div>
+</section>
+<!-- Slide: 9일차 강의 평가 (Daily Evaluation) -->
+<section class="slide-card session-9" id="slide-108">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">일차별 강의 평가 | Daily Feedback</div>
+      <div class="slide-title">9일차 교육 만족도 및 강의 평가 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">9일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">설문 목적:</span> 9일차 교육 내용 만족도, 난이도 체감 및 개선 의견 수렴</li>
+          <li><span class="highlight">참여 방법:</span> 우측 QR 코드를 스마트폰 카메라로 스캔하거나 아래 링크로 접속해 주세요.</li>
+          <li><span class="highlight">설문 링크:</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLScwq8xHgLtcwb6wHIaXE_eQ4WtHv1tXdslK96DJI8rNOrDUwQ/viewform" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; word-break: break-all;">https://docs.google.com/forms/d/e/1FAIpQLScwq8xHgLtcwb6wHIaXE_eQ4WtHv1tXdslK96DJI8rNOrDUwQ/viewform</a></li>
+          <li><span class="highlight">유의 사항:</span> 작성해 주신 소중한 피드백은 다음 차시 커리큘럼 보완 및 교육 품질 향상에 즉시 반영됩니다.</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); border-radius: 16px; padding: 24px; text-align: center;">
+        <div style="background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: inline-block; margin-bottom: 16px;">
+          <img src="images/qr_eval_day9.png" alt="9일차 강의 평가 QR 코드" style="width: 220px; height: 220px; display: block; border-radius: 6px;" />
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px;">📱 카메라로 QR 코드를 스캔하세요</div>
+        <div style="font-size: 0.95rem; color: var(--text-secondary);">9일차 강의 평가 (Google Forms)</div>
+      </div>
+    </div>
+
+    <div class="presenter-notes" style="display:none;">9일차 수업을 마치며 교육 만족도 및 강의 평가를 진행합니다. 수강생분들께서는 QR 코드를 스캔하여 오늘 수업에 대한 피드백을 작성해 주시기 바랍니다.</div>
+  </div>
+</section>

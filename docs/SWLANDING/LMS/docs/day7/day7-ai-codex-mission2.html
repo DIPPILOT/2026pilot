@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 7. Task 01 - 데이터 구조 이해 차이 해결 (Data Structure Alignment) | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Card Surface */
+      --text-main: #ffffff; /* Primary Text */
+      --text-muted: #e4e4e7; /* Secondary Text */
+      --text-desc: #71717a; /* Description Text */
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 10px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong, td, th { word-break: keep-all; }
+
+    .container {
+      max-width: 860px; 
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 6px 20px;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .logo-text p {
+      font-size: 0.58rem;
+      color: var(--text-desc);
+      margin-top: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 120px;
+      padding: 16px 0 10px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.04), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-content {
+      max-width: 750px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 5px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      font-size: 0.65rem;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      font-size: 1.25rem;
+      line-height: 1.25;
+      margin-bottom: 4px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.35;
+    }
+
+    /* Detail Section Layout */
+    .layout-wrapper {
+      padding: 15px 0 35px;
+    }
+
+    .detail-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .detail-card-head {
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 6px;
+    }
+
+    .detail-card-head h2 {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .detail-card-head h2 .badge-inline {
+      font-size: 0.6rem;
+      padding: 1px 4px;
+      border-radius: 2px;
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    .card-section {
+      margin-bottom: 12px;
+    }
+
+    .card-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-section h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-section h3::before {
+      content: "";
+      width: 2px;
+      height: 8px;
+      background: var(--secondary-color);
+      border-radius: 1px;
+      display: inline-block;
+    }
+
+    .card-section p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    /* Lists */
+    ul {
+      list-style-position: inside;
+      padding-left: 2px;
+      margin-bottom: 4px;
+    }
+
+    li {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    /* Code Block Styles */
+    pre {
+      background: #0d0f14;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 10px;
+      overflow-x: auto;
+      max-height: 180px; 
+      overflow-y: auto;  
+      margin: 6px 0 10px;
+      position: relative;
+    }
+
+    pre::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+      font-size: 0.7rem;
+      color: #e4e4e7;
+    }
+
+    .code-badge {
+      display: inline-block !important;
+      position: relative !important;
+      top: auto !important;
+      right: auto !important;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--secondary-color, #06b6d4);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0 10px;
+      background: rgba(9, 9, 11, 0.3);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    th, td {
+      padding: 6px 8px;
+      font-size: 0.72rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(59, 130, 246, 0.08);
+      color: #93c5fd;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Box styles */
+    .info-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.06);
+      border-left: 3px solid var(--accent-color);
+      color: #a5f3fc;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(139, 92, 246, 0.06);
+      border-left: 3px solid var(--accent-purple);
+      color: #e9d5ff;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box h4 {
+      color: #d8b4fe;
+      margin-bottom: 3px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Inline Sidebar Box */
+    .inline-sidebar-box {
+      margin-top: 14px;
+      background: rgba(139, 92, 246, 0.04);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .inline-sidebar-box h4 {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #d8b4fe;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Button utilities */
+    .action-btn-container {
+      margin: 4px 0 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+      transition: all 0.2s;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        margin-top: 160px;
+      }
+      .hero h1 { font-size: 1.1rem; }
+      .detail-card { padding: 10px 12px; }
+      .nav-container {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 20px;
+      }
+    }
+
+    /* Prompt Copy Box Styles */
+    .prompt-box {
+      background: rgba(9, 9, 11, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 16px;
+      position: relative;
+      margin-top: 12px;
+      margin-bottom: 16px;
+    }
+
+    .prompt-box pre {
+      padding-right: 70px;
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .copy-btn {
+      z-index: 10;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 7 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day7-ai-codex-1.html" >Task 1 (기능 연결)</a>
+        <a href="day7-ai-codex-2.html" >Task 2 (시나리오 검증)</a>
+        <a href="day7-ai-codex-3.html" >Task 3 (오류 검증)</a>
+        <a href="day7-ai-codex-mission1.html" >Mission 1 (품질 점검)</a>
+        <a href="day7-ai-codex-mission2.html" class="active">Mission 2 (E2E 검증)</a>
+        <a href="day7-ai-codex-summation.html" class="summation-btn" style="background: rgba(6, 182, 212, 0.15); color: var(--secondary-color); border-color: rgba(6, 182, 212, 0.3);">📊 요약 보기</a>
+        <a href="day7-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 7</span>
+        <span class="hero-badge">Mission 02</span>
+        <span class="hero-badge">E2E 검증</span>
+      </div>
+      <h1>Mission 02. 처음부터 끝까지 사용해보기 (End-to-End Walkthrough)</h1>
+      <p>모바일 앱 예약에 서툰 50대 초보 자영업자 페르소나를 AI에 투영해 연쇄 동작 흐름을 E2E 검증합니다.</p>
+    </div>
+  </section>
+
+  <!-- Layout Wrapper for Details -->
+  <div class="container layout-wrapper">
+        <main class="left-col">
+      <article class="detail-card">
+        <div class="detail-card-head">
+          <h2><span class="badge-inline">Mission 02</span> Mission 02 처음부터 끝까지 사용해보기 실습 가이드</h2>
+        </div>
+
+        <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+          <div>
+            <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 실습 입력 (Input)</h4>
+            <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>day7_meeting_notes.md</code> (회의록)</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">💾 실습 출력 (Output)</h4>
+            <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>day7_e2e_validation.md</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>1. 스토리 및 실습 배경</h3>
+
+          <p>
+            실제 고객이 앱스토어에서 앱을 받아 최초로 서비스를 열고 최종 예약을 마무리 짓기까지의 단절 없는 시나리오(End-to-End)를 Codex의 페르소나와 챗 형식으로 시뮬레이션하면서, 끊김 없이 흐르는 무결점 서비스를 최종 입증합니다.
+          </p>
+        
+        </div>
+
+        <div class="card-section">
+          <h3>2. 학습 목표</h3>
+          <ul class="bullet-list">
+
+            <li>가입에서 목록 검색, 결제 회귀까지 단절 없는 사용자 시나리오(E2E)를 구성한다.</li>
+            <li>디지털 기기 사용이 다소 어색한 고연령 페르소나의 인지 장벽 의견을 경청한다.</li>
+            <li>NG(오류) 지점을 개선하고 완주 가능한 시나리오 검증서(`day7_e2e_validation.md`)를 빌드한다.</li>
+        
+          </ul>
+        </div>
+
+        <div class="guide-box" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+          <h4 style="color: var(--primary-color); font-size: 0.82rem; margin-bottom: 6px;">🛠️ 실제 따라 하기 실습 가이드</h4>
+          <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+            <li><strong>실습용 파일 생성</strong>: 아래 다운로드 버튼을 눌러 <code>day7_meeting_notes.md</code> 파일을 <code>automation/</code> 폴더 내에 저장합니다.</li>
+            <li><strong>페르소나 역할 롤플레잉</strong>: Codex Client에게 '스마트폰 사용이 낯선 50대 자영업자 페르소나'를 지시하고 여정 시나리오 검증 테스트 대화를 나눕니다.</li>
+            <li><strong>검증 결과서 작성</strong>: 동선 중 불편을 느낀 가입 정보 복원 에러 가드를 수정하고 최적화 상태 매트릭스를 기재한 종합 검증 결과서(`day7_e2e_validation.md`)를 빌드합니다.</li>
+          </ol>
+        </div>
+
+        <div class="card-section">
+          <h3>실습 자료 다운로드</h3>
+          <div class="action-btn-container">
+            <button onclick="downloadMission02UserFlow()" class="btn-download">📥 day7_meeting_notes.md 다운로드</button>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>Codex 요청 프롬프트</h3>
+          <div class="prompt-box">
+            <button class="copy-btn" onclick="copyPrompt()">Copy</button>
+            <pre id="promptText"><span class="code-badge" style="margin-bottom: 8px; display: inline-block;">Mission 02 Prompt</span>
+당신은 모바일 앱 예약 결제가 낯선 50대 초보 자영업자입니다. 가입부터 결제 완료에 이르는 E2E 시나리오를 사용한다고 가정할 때, 제 로직에서 불편을 유발하거나 중간에 이탈할 위험 구간이 있는지 생생한 유저 시나리오 검증서(E2E Validation)를 뽑아주세요.</pre>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>4. 결과물 예시</h3>
+          <p>Codex는 회의 기록을 분석해 아래와 같이 정규화된 데이터 엔티티 매핑 및 Mermaid ERD 스크립트를 출력합니다.</p>
+          <table class="result-table">
+            <thead>
+              <tr>
+                <th>파일명</th><th>점검 페르소나</th><th>핵심 결과</th><th>개선 대책</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>day7_e2e_validation.md</strong></td><td>50대 모바일 초보 자영업자</td><td>가입 이메일 오타 체크 OK, 뒤로가기 복원 NG ➔ OK 개선 완료</td><td>sessionStorage 활용 필터링 상태 복원 보존</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card-section">
+          <h3>5. AI 활용 포인트</h3>
+          <ul class="bullet-list">
+            <li><strong>E2E 모의 주행</strong>: 기획 설계자가 미처 예상하지 못한 연속 시나리오 전 구간의 단절 지점을 찾아냅니다.</li><li><strong>인지 마찰 지점 포착</strong>: 가상 유저의 곤경 로그를 수집하여 사용성이 우수한 친화적 인터페이스 개선 제안을 줍니다.</li>
+          </ul>
+        </div>
+      </article>
+    </main>
+  </div>
+
+      <script>
+    function copyPrompt() {
+      const preEl = document.getElementById('promptText');
+      const textLines = preEl.innerText.split('\n');
+      const promptText = textLines.slice(1).join('\n').trim();
+
+      navigator.clipboard.writeText(promptText).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        copyBtn.textContent = 'Copied!';
+        copyBtn.style.background = 'var(--secondary-color)';
+        copyBtn.style.color = '#000000';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy';
+          copyBtn.style.background = 'rgba(255, 255, 255, 0.05)';
+          copyBtn.style.color = 'var(--text-muted)';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+
+    function downloadMission02UserFlow() {
+      const text = `# 사용자 서비스 이용 여정 시나리오 (E2E Flow)
+1. 사용자는 이메일과 닉네임으로 가입을 진행한다. (SignUp)
+2. 가입 완료 즉시 메인 대시보드로 진입하여 전문가 검색 필터를 활성화한다. (Search: 카테고리=IT, 평점=4.5)
+3. 필터링된 목록에서 특정 전문가 카드를 클릭해 상세 예약 페이지로 이동한다. (Detail Booking)
+4. 뒤로가기 버튼을 눌러 전문가 검색 목록으로 회귀할 때 설정 상태가 유지되어야 한다. (Filter Restoration)`;
+      triggerBlobDownload(text, 'day7_user_flow.md');
+    }
+
+    function triggerBlobDownload(content, filename) {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

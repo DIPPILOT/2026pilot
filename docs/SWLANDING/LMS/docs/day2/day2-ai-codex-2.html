@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 2. Task 02 - 변경사항 관리 (Change Management) | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Card Surface */
+      --text-main: #ffffff; /* Primary Text */
+      --text-muted: #e4e4e7; /* Secondary Text */
+      --text-desc: #71717a; /* Description Text */
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 10px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong, td, th { word-break: keep-all; }
+
+    .container {
+      max-width: 860px; 
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 6px 20px;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .logo-text p {
+      font-size: 0.58rem;
+      color: var(--text-desc);
+      margin-top: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 120px;
+      padding: 16px 0 10px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.04), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-content {
+      max-width: 750px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 5px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      font-size: 0.65rem;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      font-size: 1.25rem;
+      line-height: 1.25;
+      margin-bottom: 4px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.35;
+    }
+
+    /* Detail Section Layout */
+    .layout-wrapper {
+      padding: 15px 0 35px;
+    }
+
+    .detail-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .detail-card-head {
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 6px;
+    }
+
+    .detail-card-head h2 {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .detail-card-head h2 .badge-inline {
+      font-size: 0.6rem;
+      padding: 1px 4px;
+      border-radius: 2px;
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    .card-section {
+      margin-bottom: 12px;
+    }
+
+    .card-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-section h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-section h3::before {
+      content: "";
+      width: 2px;
+      height: 8px;
+      background: var(--secondary-color);
+      border-radius: 1px;
+      display: inline-block;
+    }
+
+    .card-section p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    /* Lists */
+    ul {
+      list-style-position: inside;
+      padding-left: 2px;
+      margin-bottom: 4px;
+    }
+
+    li {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    /* Code Block Styles */
+    pre {
+      background: #0d0f14;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 10px;
+      overflow-x: auto;
+      max-height: 180px; 
+      overflow-y: auto;  
+      margin: 6px 0 10px;
+      position: relative;
+    }
+
+    pre::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+      font-size: 0.7rem;
+      color: #e4e4e7;
+    }
+
+    .code-badge {
+      display: inline-block !important;
+      position: relative !important;
+      top: auto !important;
+      right: auto !important;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--secondary-color, #06b6d4);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0 10px;
+      background: rgba(9, 9, 11, 0.3);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    th, td {
+      padding: 6px 8px;
+      font-size: 0.72rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(59, 130, 246, 0.08);
+      color: #93c5fd;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Box styles */
+    .info-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.06);
+      border-left: 3px solid var(--accent-color);
+      color: #a5f3fc;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(139, 92, 246, 0.06);
+      border-left: 3px solid var(--accent-purple);
+      color: #e9d5ff;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box h4 {
+      color: #d8b4fe;
+      margin-bottom: 3px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Inline Sidebar Box */
+    .inline-sidebar-box {
+      margin-top: 14px;
+      background: rgba(139, 92, 246, 0.04);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .inline-sidebar-box h4 {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #d8b4fe;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Button utilities */
+    .action-btn-container {
+      margin: 4px 0 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+      transition: all 0.2s;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        margin-top: 160px;
+      }
+      .hero h1 { font-size: 1.1rem; }
+      .detail-card { padding: 10px 12px; }
+      .nav-container {
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 2 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day2-ai-codex-1.html">Task 1 (불일치)</a>
+        <a href="day2-ai-codex-2.html" class="active">Task 2 (변경관리)</a>
+        <a href="day2-ai-codex-3.html">Task 3 (의사결정)</a>
+        <a href="day2-ai-codex-mission1.html">Mission 1 (영향도)</a>
+        <a href="day2-ai-codex-mission2.html">Mission 2 (이슈리포트)</a>
+        <a href="day2-ai-codex-summation.html" class="summation-btn" style="background: rgba(6, 182, 212, 0.15); color: var(--secondary-color); border-color: rgba(6, 182, 212, 0.3);">📊 요약 보기</a>
+        <a href="day2-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 2</span>
+        <span class="hero-badge">Task 02</span>
+        <span class="hero-badge">변경사항 관리</span>
+      </div>
+      <h1>Task 02. 변경사항 관리 (Change Management)</h1>
+      <p>
+        비즈니스 정책 변화에 맞춰 요구사항(v1.0 ➔ v2.0)이 달라졌을 때, 하위 산출물(화면 정의서, API 명세서)의 영향 범위를 매핑하는 통제 기술을 학습합니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- Layout Wrapper for Details -->
+  <div class="container layout-wrapper">
+    <main class="left-col">
+      <article class="detail-card">
+        <div class="detail-card-head">
+          <h2><span class="badge-inline">Task 02</span> 변경 영향도 분석(Impact Analysis) 실습 가이드</h2>
+        </div>
+
+        <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+          <div>
+            <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 실습 입력 (Input)</h4>
+            <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>requirements-before.md</code> (v1.0 요구사항)</li>
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>requirements-after.md</code> (v2.0 요구사항)</li>
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>screen-specification-v2.md</code> (v1.0 화면설계서)</li>
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>api-specification.md</code> (v1.0 API 규격서)</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 실습 출력 (Output)</h4>
+            <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+              <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 변경 분석 및 조치 리포트 표</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="guide-box">
+          <h4>🛠️ 실제 따라 하기 실습 가이드</h4>
+          <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+            <li><strong>실습용 파일 생성</strong>: 아래 다운로드 버튼들을 눌러 4개 파일을 <code>automation/</code> 폴더 내에 저장합니다.</li>
+            <li><strong>영향 범위 매핑 의뢰</strong>: Codex Client 입력창에 아래 <strong>Codex 요청 프롬프트</strong>를 전송하여 빌드합니다.</li>
+            <li><strong>수정 액션 아이템 확인</strong>: AI가 분석해 준 조치 사항을 읽고 프론트엔드 로그인 버튼 추가, 백엔드 회원가입 API 추가 필드 누락이 해결되는 시나리오를 검토합니다.</li>
+          </ol>
+        </div>
+
+        <div class="card-section">
+          <h3>실습 자료 다운로드</h3>
+          <div class="action-btn-container">
+            <button onclick="downloadTask03ReqBefore()" class="btn-download">📥 req-before.md 다운로드</button>
+            <button onclick="downloadTask03ReqAfter()" class="btn-download">📥 req-after.md 다운로드</button>
+            <button onclick="downloadTask03ScreenSpec()" class="btn-download">📥 screen-spec-v2.md 다운로드</button>
+            <button onclick="downloadTask03ApiSpec()" class="btn-download">📥 api-spec.md 다운로드</button>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>Codex 요청 프롬프트</h3>
+          <pre><span class="code-badge">Task 02 Prompt</span><code>프로젝트 폴더 내에 있는 'requirements-before.md'와 'requirements-after.md' 파일을 대조하여 어떤 정책이 변경되었는지 먼저 분석해줘.
+
+그 후, 변경된 정책 내용이 v1.0 수준에 머물러 있는 'screen-specification-v2.md' 및 'api-specification.md' 문서의 어느 부분에 반영되어야 하는지 분석해줘.
+
+결과는 아래 형식에 맞춰 Markdown 표 형태로 출력해줘:
+1. '변경 항목', '변경 전', '변경 후', '영향 범위 (화면/API)', '조치 사항 (필요한 구체적인 수정 가이드)'
+2. 추가로, v2.0 요구사항을 기준으로 수정이 필요한 부분의 중요도를 '높음/중간/낮음' 순으로 구분하여 칼럼에 표시해줘.</code></pre>
+        </div>
+
+        <div class="card-section">
+          <h3>예상 결과 리포트</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>변경 항목</th>
+                <th>변경 전</th>
+                <th>변경 후</th>
+                <th>영향 범위 (화면/API)</th>
+                <th>중요도</th>
+                <th>조치 사항 (구체적인 수정 가이드)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>소셜 로그인</strong></td>
+                <td>이메일 로그인만 제공</td>
+                <td>Google 소셜 로그인 기능 추가</td>
+                <td>• 로그인 화면(`SCR-01`) <br>• 로그인 API</td>
+                <td><strong style="color: #ef4444;">높음</strong></td>
+                <td>• 로그인 화면 UI에 'Google 로그인' 버튼 컴포넌트 배치 <br>• API Payload에 Google OAuth 토큰 수신 파라미터(`"oauth_token": "string"`) 추가 설계 필요</td>
+              </tr>
+              <tr>
+                <td><strong>회원가입 인증</strong></td>
+                <td>이메일 링크 인증</td>
+                <td>휴대폰 번호 입력을 통한 SMS 인증번호 확인</td>
+                <td>• 회원가입 화면(`SCR-02`) <br>• 회원가입 API</td>
+                <td><strong style="color: #ef4444;">높음</strong></td>
+                <td>• 이메일 발송 컴포넌트를 휴대폰 번호 입력 필드 및 '인증번호 발송/확인' 필드로 UI 교체 <br>• 가입 API Payload에 휴대폰 번호(`"phone": "string"`) 및 인증코드(`"verification_code": "string"`) 필드 필수 반영</td>
+              </tr>
+              <tr>
+                <td><strong>관리자 권한</strong></td>
+                <td>단일 User 권한 자동 부여</td>
+                <td>일반 User / 시스템 Admin 권한 다원화</td>
+                <td>• 마이페이지 화면(`SCR-03`) <br>• 전체 보안 인가 API</td>
+                <td><strong style="color: #eab308;">중간</strong></td>
+                <td>• 관리자 계정으로 로그인 시 노출될 관리자 전용 대시보드 화면 설계서 추가 <br>• API 인증 헤더 또는 회원 정보 응답에 권한 역할(`"role": "string"`) 정보 수신부 설계</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="inline-sidebar-box">
+          <h4>💡 AI 활용 및 학습 포인트</h4>
+          <p style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.4;">
+            요구사항 문서가 고쳐졌을 때, 하위 개발 규격서(API)와 디자인 설계서(Screen spec)의 싱크 상태를 동적으로 추적(Impact Mapping)하여 소스 코드 및 기획 누락 사고를 차단합니다.
+          </p>
+        </div>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    function downloadTask03ReqBefore() {
+      const text = `# 기능 요구사항 정의서 v1.0 (변경 전)
+
+| 요구사항 ID | 사용자 | 기능명 | 요구사항 설명 |
+|---|---|---|---|
+| FR-AUTH-01 | Customer | 로그인 | 사용자는 이메일 주소와 비밀번호를 사용하여 로그인할 수 있다. |
+| FR-AUTH-02 | Customer | 회원가입 | 사용자는 이메일 주소를 입력하고 이메일 인증 링크를 눌러 가입을 완료한다. |
+| FR-AUTH-03 | System | 권한부여 | 가입 완료 시 시스템은 모든 사용자에게 일반 사용자(User) 권한을 자동으로 부여한다. |`;
+      triggerBlobDownload(text, 'requirements-before.md');
+    }
+
+    function downloadTask03ReqAfter() {
+      const text = `# 기능 요구사항 정의서 v2.0 (변경 후)
+
+| 요구사항 ID | 사용자 | 기능명 | 요구사항 설명 |
+|---|---|---|---|
+| FR-AUTH-01 | Customer | 로그인 | 사용자는 이메일 로그인 외에 Google 소셜 계정을 연동하여 로그인할 수 있다. |
+| FR-AUTH-02 | Customer | 회원가입 | 사용자는 회원 가입 신청 후 휴대폰 번호 입력을 통한 SMS 인증번호 확인 절차를 거쳐 가입을 완료한다. |
+| FR-AUTH-03 | System | 권한구분 | 시스템 권한 정책은 일반 사용자(User) 권한과 시스템 관리자(Admin) 권한으로 다원화하여 부여한다. |`;
+      triggerBlobDownload(text, 'requirements-after.md');
+    }
+
+    function downloadTask03ScreenSpec() {
+      const text = `# 화면 설계서 (v1.0 기준 잔존 문서)
+
+1. **로그인 화면 (SCR-01)**:
+   - 이메일 입력 필드, 비밀번호 입력 필드, 그리고 '로그인' 버튼만 노출된다.
+
+2. **회원가입 화면 (SCR-02)**:
+   - 이메일 입력 필드, '인증메일 발송' 버튼이 제공된다. 클릭 시 이메일 링크 인증 가이드 팝업창이 출력된다.
+
+3. **마이페이지 화면 (SCR-03)**:
+   - 일반 회원용 프로필 정보 및 예약 현황 화면만 표시된다. 관리자용 모니터링 메뉴나 페이지 전환 흐름은 설계되어 있지 않다.`;
+      triggerBlobDownload(text, 'screen-specification-v2.md');
+    }
+
+    function downloadTask03ApiSpec() {
+      const text = `# 백엔드 회원인증 API 규격서 (v1.0 기준 잔존 문서)
+
+* **로그인 API**:
+  - \`POST /api/v1/auth/login\`
+  - 요청 Payload: \`{ "email": "string", "password": "string" }\`
+
+* **회원가입 API**:
+  - \`POST /api/v1/auth/signup\`
+  - 요청 Payload: \`{ "email": "string", "password": "string" }\``;
+      triggerBlobDownload(text, 'api-specification.md');
+    }
+
+    function triggerBlobDownload(content, filename) {
+      const blob = new Blob([content], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

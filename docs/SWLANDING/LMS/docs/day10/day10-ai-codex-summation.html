@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 10. 서비스 런칭하기 교육 요약서 | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color:#3b82f6; --secondary-color:#06b6d4; --bg-dark:#09090b;
+      --bg-card:#1a1d24; --text-main:#ffffff; --text-muted:#e4e4e7;
+      --text-desc:#71717a; --accent-color:#06b6d4; --accent-purple:#8b5cf6;
+      --card-radius:10px; --shadow-sm:0 4px 20px rgba(0,0,0,.5),0 0 1px rgba(255,255,255,.1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Pretendard',sans-serif; color:var(--text-main); line-height:1.5;
+      background:var(--bg-dark);
+      background-image:radial-gradient(circle at 10% 20%,rgba(59,130,246,.04) 0%,transparent 40%),
+                       radial-gradient(circle at 90% 80%,rgba(6,182,212,.04) 0%,transparent 40%),
+                       linear-gradient(to bottom,#09090b 0%,#111827 100%);
+      background-attachment:fixed;
+    }
+    h1,h2,h3,h4,p,li,span,strong,td,th { word-break:keep-all; }
+    .container { max-width:860px; margin:0 auto; padding:0 20px; }
+    .navbar {
+      position:fixed; top:0; width:100%; z-index:1000;
+      background:rgba(9,9,11,.85); backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .nav-container { min-height:48px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; padding:6px 20px; }
+    .logo { font-size:.9rem; font-weight:800; color:#fff; text-decoration:none; display:flex; align-items:center; gap:5px; }
+    .logo::before { content:""; width:4px; height:12px; background:linear-gradient(135deg,var(--primary-color),var(--accent-color)); border-radius:999px; display:inline-block; }
+    .logo-text p { font-size:.58rem; color:var(--text-desc); margin-top:1px; }
+    .nav-links { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .nav-links a {
+      text-decoration:none; color:var(--text-muted); font-weight:600; font-size:.72rem;
+      background:rgba(255,255,255,.05); padding:4px 8px; border-radius:5px;
+      border:1px solid rgba(255,255,255,.08); transition:all .2s;
+    }
+    .nav-links a:hover { background:rgba(255,255,255,.1); color:var(--secondary-color); border-color:rgba(6,182,212,.3); }
+    .hero { margin-top:120px; padding:20px 0 10px; text-align:center; border-bottom:1px solid rgba(255,255,255,.05); }
+    .hero-badge-wrap { display:flex; justify-content:center; gap:6px; margin-bottom:8px; }
+    .hero-badge { display:inline-block; padding:3px 8px; border-radius:999px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); font-size:.65rem; color:var(--text-muted); font-weight:600; }
+    .hero h1 { font-size:1.3rem; font-weight:800; background:linear-gradient(135deg,#fff 40%,#93c5fd 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:4px; letter-spacing:-.02em; }
+    .hero p { font-size:.8rem; color:var(--text-muted); max-width:600px; margin:0 auto; line-height:1.4; }
+    .layout-wrapper { padding:20px 0 40px; }
+    .summation-card { background:rgba(26,29,36,.85); border:1px solid rgba(255,255,255,.06); border-radius:var(--card-radius); padding:20px; box-shadow:var(--shadow-sm); }
+    .summation-section { margin-bottom:24px; }
+    .summation-section:last-child { margin-bottom:0; }
+    .summation-section h2 { font-size:1rem; font-weight:800; color:var(--secondary-color); margin-bottom:10px; border-left:3px solid var(--primary-color); padding-left:8px; }
+    .summation-section h3 { font-size:.86rem; font-weight:700; color:#fff; margin-top:14px; margin-bottom:6px; }
+    .summation-section p { font-size:.78rem; color:var(--text-muted); margin-bottom:8px; line-height:1.5; }
+    ul,ol { list-style-position:inside; margin-left:4px; margin-bottom:10px; }
+    li { font-size:.76rem; color:var(--text-muted); margin-bottom:4px; line-height:1.45; }
+    table { width:100%; border-collapse:collapse; margin:10px 0 16px; background:rgba(9,9,11,.3); border-radius:6px; overflow:hidden; border:1px solid rgba(255,255,255,.06); }
+    th,td { padding:8px 10px; font-size:.74rem; text-align:left; }
+    th { background:rgba(59,130,246,.08); color:#93c5fd; font-weight:700; border-bottom:1px solid rgba(255,255,255,.08); }
+    td { border-bottom:1px solid rgba(255,255,255,.04); color:var(--text-muted); }
+    tr:last-child td { border-bottom:none; }
+    code { font-family:'Fira Code',monospace; background:rgba(255,255,255,.06); color:var(--secondary-color); padding:1px 4px; border-radius:3px; font-size:.72rem; }
+    .milestone-flow {
+      background:#0d0f14; border:1px solid rgba(255,255,255,.05); border-radius:8px;
+      padding:16px; margin:12px 0; font-family:monospace; font-size:.72rem;
+      line-height:1.6; color:#a5f3fc; overflow-x:auto;
+    }
+    .back-btn-bottom {
+      display:inline-flex; align-items:center; justify-content:center; width:100%;
+      padding:10px; border-radius:8px; background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08); color:#fff; font-size:.8rem;
+      font-weight:700; cursor:pointer; text-decoration:none; transition:all .2s; margin-top:14px;
+    }
+    .back-btn-bottom:hover { background:rgba(255,255,255,.1); color:var(--secondary-color); border-color:rgba(6,182,212,.3); }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 10 Codex AI Summary</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day10-ai-codex-1.html">Task 1 (런칭 준비)</a>
+        <a href="day10-ai-codex-2.html">Task 2 (사용자 점검)</a>
+        <a href="day10-ai-codex-3.html">Task 3 (성과 정리)</a>
+        <a href="day10-ai-codex-mission1.html">Mission 1 (패키지)</a>
+        <a href="day10-ai-codex-mission2.html">Mission 2 (최종 발표)</a>
+        <a href="day10-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 10</span>
+        <span class="hero-badge">Summary</span>
+        <span class="hero-badge">서비스 런칭 종합 요약</span>
+      </div>
+      <h1>Day 10. 서비스 런칭하기 교육 요약서</h1>
+      <p>10일간의 교육 여정 마지막 날 - 완성된 서비스를 세상에 공개하고, 사용자를 지원하고, 프로젝트를 돌아보는 전 과정을 총정리합니다.</p>
+    </div>
+  </section>
+
+  <div class="container layout-wrapper">
+    <main>
+      <article class="summation-card">
+
+        <div class="summation-section">
+          <h2>📌 Part 1. 도입 배경 - Day 10이 서비스 런칭인 이유</h2>
+          <p>지금까지 10일간의 교육 흐름을 돌아보면 가장 자연스러운 마지막은 <strong>서비스를 세상에 공개하는 것</strong>입니다. 아무리 훌륭한 서비스도 사용자에게 잘 소개하지 못하면 아무도 사용하지 않습니다.</p>
+          <table>
+            <thead><tr><th>날짜</th><th>주제</th><th>핵심 활동</th></tr></thead>
+            <tbody>
+              <tr><td>Day 1~2</td><td>기획</td><td>아이디어 → 비즈니스 모델 구체화</td></tr>
+              <tr><td>Day 3~4</td><td>요구사항/설계</td><td>ERD, API 명세, 와이어프레임</td></tr>
+              <tr><td>Day 5~6</td><td>UI/화면 개발</td><td>퍼블리싱 + Codex 화면 디버깅</td></tr>
+              <tr><td>Day 7</td><td>기능 완성</td><td>API 연동, 이벤트 핸들링</td></tr>
+              <tr><td>Day 8</td><td>회원 서비스</td><td>가입/로그인/온보딩 UX</td></tr>
+              <tr><td>Day 9</td><td>결제 서비스</td><td>결제 흐름, 에러 안심화, 신뢰 UI</td></tr>
+              <tr><td><strong>Day 10</strong></td><td><strong>서비스 런칭 ✅</strong></td><td>소개서, FAQ, 회고, 발표</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="summation-section">
+          <h2>📌 Part 2. 일반 AI vs Codex Workspace 비교</h2>
+          <table>
+            <thead><tr><th>업무 영역</th><th>일반 AI (대화형)</th><th>Codex Workspace (작업 디렉터리 연동)</th></tr></thead>
+            <tbody>
+              <tr><td>서비스 소개서</td><td>일반적인 SaaS 소개서 템플릿 제공</td><td><code>day10_service_overview.md</code>를 읽어 실제 서비스명·기능·대상이 반영된 맞춤형 소개서 생성</td></tr>
+              <tr><td>FAQ 작성</td><td>범용적인 앱 서비스 FAQ 20개 예시</td><td>실제 개발된 기능 목록을 분석하여 해당 서비스에 특화된 질문 생성</td></tr>
+              <tr><td>결과보고서</td><td>일반적인 프로젝트 보고서 양식</td><td><code>day10_project_summary.md</code>를 읽어 실제 개발 과정과 성과가 반영된 구체적 보고서</td></tr>
+              <tr><td>Version 2.0 로드맵</td><td>일반적인 기능 개선 아이디어 나열</td><td>완성/미완성 기능 목록 분석 후 MoSCoW 우선순위와 팀 규모가 적용된 스프린트 계획</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="summation-section">
+          <h2>📌 Part 3. 실습 결과물 매핑</h2>
+          <ul>
+            <li><strong>Task 01:</strong> <code>day10_launch_materials.md</code> — 소개서 + 채널별 오픈 공지 + 이용약관 초안</li>
+            <li><strong>Task 02:</strong> <code>day10_faq_guide.md</code> — FAQ 20개 (5카테고리) + 고객 응대 시나리오 5개</li>
+            <li><strong>Task 03:</strong> <code>day10_retrospective.md</code> — 결과보고서 + Keep/Problem/Try 회고 + MoSCoW 로드맵</li>
+            <li><strong>Mission 01:</strong> <code>day10_launch_package.md</code> — 전체 자료 통합 완성형 런칭 패키지</li>
+            <li><strong>Mission 02:</strong> <code>day10_presentation.md</code> + <code>day10_v2_roadmap.md</code> — 최종 발표 자료 + 3개월 스프린트 계획</li>
+          </ul>
+        </div>
+
+        <div class="summation-section">
+          <h2>📌 Part 4. 서비스 런칭 여정 흐름도</h2>
+          <div class="milestone-flow">
+[서비스 완성] ➔ (핵심 가치 한 줄 정의)
+                │
+                ▼ (Task 01: 소개서 + 채널별 공지 + 이용약관)
+[런칭 자료 준비] ➔ (사용자가 5초 안에 이해할 수 있도록)
+                │
+                ▼ (Task 02: FAQ 20개 + 응대 시나리오)
+[사용자 지원 준비] ➔ (첫날 쏟아질 문의를 사전에 차단)
+                │
+                ▼ (Task 03: 결과보고서 + 회고 + 로드맵)
+[프로젝트 정리] ➔ (투자자·이해관계자에게 성과 전달)
+                │
+                ▼ (Mission 01: 전체 통합)
+[런칭 패키지 완성] ➔ (오늘 당장 배포 가능한 수준)
+                │
+                ▼ (Mission 02: 10분 발표 + Q&A)
+[최종 발표] ➔ "다음 프로젝트는 Version 2.0으로 시작합니다"
+          </div>
+        </div>
+
+        <div class="summation-section">
+          <h2>📌 Part 5. 강사 가이던스 (토의 주제)</h2>
+          <ol>
+            <li><strong>AI와 함께하는 커뮤니케이션의 미래:</strong> "10일 동안 Codex와 협업하면서 가장 놀라웠던 순간은 언제였나요? 앞으로 어떤 업무에서 AI를 가장 많이 활용할 것 같나요?"</li>
+            <li><strong>기획자 vs 개발자 관점 차이:</strong> "서비스 런칭을 준비하면서 개발자 관점과 기획자 관점에서 가장 크게 다른 점은 무엇이라고 느꼈나요?"</li>
+            <li><strong>Version 2.0을 만든다면:</strong> "만약 이 프로젝트를 3개월 더 진행한다면 반드시 추가하고 싶은 기능 하나는 무엇인가요?"</li>
+            <li><strong>AI 협업의 한계와 극복:</strong> "Codex가 잘못된 방향으로 안내했던 경험이 있나요? 어떻게 수정했나요?"</li>
+          </ol>
+        </div>
+
+        <div class="summation-section">
+          <h2>📌 Part 6. Day 10 핵심 메시지</h2>
+          <p style="font-size:.9rem;color:#ffffff;font-weight:700;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:14px;">
+            💡 "AI는 도구가 아니라 함께 기획하는 파트너입니다."
+          </p>
+          <p style="margin-top:12px;">Day 10은 단순한 프로젝트 종료가 아니라, <strong>서비스 런칭 → 사용자 지원 준비 → 성과 공유 → 회고 및 차기 기획</strong>까지 이어지는 실제 서비스 기획자의 업무를 AI(Codex)와 함께 수행하는 교육으로 완성됩니다. 마지막 Version 2.0 로드맵 작성은 교육의 마무리가 아니라 다음 프로젝트의 시작입니다.</p>
+        </div>
+
+        <a href="day10-ai-classroom.html" class="back-btn-bottom">← Day 10 메인 강의실로 돌아가기</a>
+      </article>
+    </main>
+  </div>
+
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 2. Codex Client 기반 불일치 검출, 변경 관리 및 의사결정 추적 교육 요약서 | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Card Surface */
+      --text-main: #ffffff;
+      --text-muted: #e4e4e7;
+      --text-desc: #71717a;
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 10px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong, td, th { word-break: keep-all; }
+
+    .container {
+      max-width: 860px; 
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 6px 20px;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .logo-text p {
+      font-size: 0.58rem;
+      color: var(--text-desc);
+      margin-top: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 120px; /* PC layout overlap prevention */
+      padding: 20px 0 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .hero h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .hero p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    /* 5-Part Main Tab Menu */
+    .part-tab-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin: 15px 0;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .part-tab {
+      flex: 1;
+      padding: 8px 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-desc);
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .part-tab:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .part-tab.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: var(--secondary-color);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Part Panel Structure */
+    .part-panel {
+      display: none;
+      animation: panelFade 0.3s ease forwards;
+    }
+
+    .part-panel.active {
+      display: block;
+    }
+
+    @keyframes panelFade {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Card styling */
+    .premium-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .premium-card h2 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .premium-card h2::before {
+      content: "";
+      width: 3px;
+      height: 11px;
+      background: var(--secondary-color);
+      border-radius: 1px;
+    }
+
+    .premium-card p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    /* Part 1: ChatGPT vs Codex Client Table */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .compare-table th, .compare-table td {
+      padding: 8px 10px;
+      font-size: 0.72rem;
+      text-align: left;
+    }
+
+    .compare-table th {
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .compare-table td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .compare-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    /* Pipeline flow visualization */
+    .pipeline-flow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      margin: 20px 0 30px;
+      padding: 0 10px;
+    }
+
+    .pipeline-line {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      right: 30px;
+      height: 2px;
+      background-image: linear-gradient(to right, rgba(59, 130, 246, 0.4) 50%, transparent 50%);
+      background-size: 8px 2px;
+      z-index: 1;
+    }
+
+    .flow-node {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .node-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-desc);
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .flow-node:hover .node-circle {
+      border-color: var(--secondary-color);
+      transform: scale(1.08);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+    }
+
+    .flow-node.active .node-circle {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-color: #ffffff;
+      color: #ffffff;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .node-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-desc);
+      margin-top: 6px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .flow-node.active .node-label {
+      color: var(--secondary-color);
+    }
+
+    .transformer-box {
+      background: rgba(9, 9, 11, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 15px;
+    }
+
+    .transformer-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .transformer-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .transformer-card {
+      background: rgba(26, 29, 36, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      padding: 10px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .transformer-card-head {
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .transformer-card-head.input-head { color: var(--accent-color); }
+    .transformer-card-head.output-head { color: var(--accent-purple); }
+
+    .card-preview {
+      background: #08090c;
+      padding: 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #a1a1aa;
+      font-size: 0.62rem;
+      margin-top: 6px;
+      max-height: 80px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .transformer-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .arrow-line {
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+    }
+
+    /* Highlight box */
+    .prompt-box {
+      background: rgba(6, 182, 212, 0.04);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+      position: relative;
+    }
+
+    .prompt-box h4 {
+      font-size: 0.78rem;
+      color: var(--secondary-color);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .prompt-box pre {
+      padding-right: 70px;
+      font-family: monospace;
+      font-size: 0.68rem;
+      color: #a1a1aa;
+      white-space: pre-wrap;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 8px;
+    }
+
+    .copy-btn {
+      z-index: 10;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      font-size: 0.58rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: var(--secondary-color);
+    }
+
+    /* Step checklist styling */
+    .checklist-list {
+      list-style-type: none;
+      margin: 10px 0 0;
+    }
+
+    .checklist-item {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .checklist-item::before {
+      content: "✓";
+      color: var(--secondary-color);
+      font-weight: 800;
+    }
+
+    /* Grid cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .grid-item {
+      background: rgba(9, 9, 11, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .grid-item h3 {
+      font-size: 0.8rem;
+      color: #93c5fd;
+      margin-bottom: 6px;
+    }
+
+    .grid-item p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    /* Bottom Actions */
+    .action-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 30px 0;
+    }
+
+    .btn-link {
+      display: inline-block;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.25s;
+    }
+
+    .btn-link.pri {
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-link.pri:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5), 0 0 10px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-link.sec {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+    }
+
+    .btn-link.sec:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        margin-top: 160px; /* Mobile layout overlap prevention */
+      }
+      .part-tab-bar {
+        flex-wrap: wrap;
+      }
+      .part-tab {
+        flex: unset;
+        width: calc(33.33% - 4px);
+        font-size: 0.65rem;
+      }
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+      .transformer-grid {
+        grid-template-columns: 1fr;
+      }
+      .transformer-arrow {
+        transform: rotate(90deg);
+        margin: 6px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 2 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day2-ai-codex-1.html">Task 1 (불일치)</a>
+        <a href="day2-ai-codex-2.html">Task 2 (변경관리)</a>
+        <a href="day2-ai-codex-3.html">Task 3 (의사결정)</a>
+        <a href="day2-ai-codex-mission1.html">Mission 1 (영향도)</a>
+        <a href="day2-ai-codex-mission2.html">Mission 2 (이슈리포트)</a>
+        <a href="day2-ai-codex-summation.html" class="summation-btn active" style="background: rgba(6, 182, 212, 0.15); color: var(--secondary-color); border-color: rgba(6, 182, 212, 0.3);">📊 요약 보기</a>
+        <a href="day2-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 2 Summary</span>
+        <span class="hero-badge">Codex AI Auditor</span>
+        <span class="hero-badge">PM Automation</span>
+      </div>
+      <h1>Day 2. Codex Client 기반 오디팅 실무 요약서</h1>
+      <p>
+        기획서 불일치 정합성 검출, 요구사항 변경에 따른 영향도 분석, 메신저 비정형 대화록 의사결정 로그 추출 등
+        실무에서 병목을 초래하는 핵심 설계 통제 업무를 Codex Workspace의 추론 능력과 접목하는 요령을 마스터합니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content Body -->
+  <section class="container" style="padding-bottom: 60px;">
+    
+    <!-- 5-Part Tab Menu -->
+    <div class="part-tab-bar">
+      <div class="part-tab active" onclick="switchPart(1)">Part 1. 도입 배경</div>
+      <div class="part-tab" onclick="switchPart(2)">Part 2. 실습 목표</div>
+      <div class="part-tab" onclick="switchPart(3)">Part 3. 따라하기</div>
+      <div class="part-tab" onclick="switchPart(4)">Part 4. 작동 원리</div>
+      <div class="part-tab" onclick="switchPart(5)">Part 5. 교육 가이드</div>
+    </div>
+
+    <!-- PART 1 PANEL -->
+    <div class="part-panel active" id="part1-panel">
+      <div class="premium-card">
+        <h2>왜 이 세 가지 업무에 Codex Client인가?</h2>
+        <p>
+          전형적인 IT 서비스 구축 과정에서 가장 많은 시간과 재작업 비용을 초래하는 지점은 **"커뮤니케이션 오차로 인한 기획/설계 불일치"**입니다.
+          ChatGPT와 같은 범용 대화 모델과 프로젝트 단위 파일 전체를 통째로 쥐고 컨텍스트를 유지하는 Codex Client의 차이점을 파악해 봅니다.
+        </p>
+
+        <h3 style="font-size: 0.8rem; margin: 12px 0 6px; color: #93c5fd;">ChatGPT와 Codex Client의 결정적 차이</h3>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>비교 항목</th>
+              <th>일반 ChatGPT (단일 대화)</th>
+              <th>Codex Client (Workspace 기반)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>분석 범위</strong></td>
+              <td>단일 또는 파편화된 복사-붙여넣기 텍스트 비교</td>
+              <td>프로젝트 디렉터리 내 다중 문서 전체 정합성 파악</td>
+            </tr>
+            <tr>
+              <td><strong>이력 추적</strong></td>
+              <td>대화가 이어지면서 이전 파일의 컨텍스트 손실 위험</td>
+              <td>변경 전/후 요구사항과 하위 명세서(API, UI)의 불일치 실시간 동기화</td>
+            </tr>
+            <tr>
+              <td><strong>대화록 정제</strong></td>
+              <td>단순 회의 결과만 기록하거나 가상의 주체 창조 위험</td>
+              <td>비정형 대화의 의미적 근거(Why) 및 미결 사항(Action Items) 정밀 분리</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="premium-card">
+        <h2>AI를 검토자(Reviewer)로 활용할 때의 생산성</h2>
+        <div class="card-grid">
+          <div class="grid-item">
+            <h3>소프트웨어 공학적 예방</h3>
+            <p>설계 단계의 오류 수정 비용은 개발 및 테스트가 완료된 상태에서 수정하는 것에 비해 **최대 100배** 저렴합니다. AI는 설계 모순을 즉각 잡아내 리워크를 방지합니다.</p>
+          </div>
+          <div class="grid-item">
+            <h3>Reviewer로서의 꼼꼼함</h3>
+            <p>AI는 사람이 전수검사하기 번거로운 미활성화 규칙 누락, 엇갈린 변수 매핑(예: 평가 주체 뒤바뀜) 등을 몇 초 만에 정확하게 팩트 위주로 짚어냅니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 2 PANEL -->
+    <div class="part-panel" id="part2-panel">
+      <div class="premium-card">
+        <h2>오늘 만들 최종 결과물</h2>
+        <div class="card-grid">
+          <div class="grid-item">
+            <h3>Task 01. 설계 불일치 검출</h3>
+            <p>회의록, 요구사항, 화면설계서 간 모순 및 누락 항목을 분류한 <strong>불일치 요약 리포트 표</strong> (출력: <code>consistency-report.md</code>)</p>
+          </div>
+          <div class="grid-item">
+            <h3>Task 02. 변경 영향도 관리</h3>
+            <p>새로운 요구사항 변경에 따라 화면 UI 기획 및 백엔드 API 명세에 반영되어야 할 구체적 액션 아이템 매핑 <strong>변경 영향도 분석 표</strong> (출력: <code>impact-analysis.md</code>)</p>
+          </div>
+          <div class="grid-item">
+            <h3>Task 03. 의사결정 추적</h3>
+            <p>비정형 구두/채팅 기록에서 최종 합의된 사항(Why) 및 향후 검토가 필요한 보류 사안을 분리한 <strong>Decision Log 및 Pending Items 표</strong> (출력: <code>decision-log.md</code>)</p>
+          </div>
+          <div class="grid-item">
+            <h3>Mission 1 (Task 06). 영향도 분석</h3>
+            <p>회원가입 휴대폰 인증 추가에 따라 영향을 받는 화면, API, DB, 문서를 분석한 <strong>영향도 분석 보고서</strong> (출력: <code>impact-analysis-report.md</code>)</p>
+          </div>
+          <div class="grid-item">
+            <h3>Mission 2 (Task 07). 이슈 리포트 작성</h3>
+            <p>프로젝트 자료를 종합 분석하여 현재 진행 상황과 주요 이슈를 요약한 <strong>프로젝트 이슈 리포트</strong> (출력: <code>project-issue-report.md</code>)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-card">
+        <h2>Input / Output 데이터 파이프라인</h2>
+        <p>실습 과정에서 입력 파일들이 Codex Client를 거치며 결과 표로 정제되는 전체 워크플로우 맵입니다.</p>
+
+        <!-- Pipeline Tab Elements -->
+        <div class="pipeline-flow">
+          <div class="pipeline-line"></div>
+          <div class="flow-node active" onclick="showPipeline(1)">
+            <div class="node-circle">01</div>
+            <div class="node-label">불일치 검출</div>
+          </div>
+          <div class="flow-node" onclick="showPipeline(2)">
+            <div class="node-circle">02</div>
+            <div class="node-label">변경 영향도</div>
+          </div>
+          <div class="flow-node" onclick="showPipeline(3)">
+            <div class="node-circle">03</div>
+            <div class="node-label">의사결정 이력</div>
+          </div>
+          <div class="flow-node" onclick="showPipeline(4)">
+            <div class="node-circle">M1</div>
+            <div class="node-label">영향도 분석</div>
+          </div>
+          <div class="flow-node" onclick="showPipeline(5)">
+            <div class="node-circle">M2</div>
+            <div class="node-label">이슈 리포트</div>
+          </div>
+        </div>
+
+        <!-- Interactive Transformer Box -->
+        <div class="transformer-box">
+          <div class="transformer-title" id="pipeline-title">Task 01. 불일치 검출 데이터 흐름</div>
+          <div class="transformer-grid">
+            <div class="transformer-card">
+              <div class="transformer-card-head input-head">📥 Input (기획/설계 문서)</div>
+              <div class="card-preview" id="pipeline-input">
+• meeting-notes.md (회의록)
+• requirements.md (요구사항 정의서)
+• screen-specification.md (화면 정의서)
+              </div>
+            </div>
+            <div class="transformer-arrow">
+              <span style="font-size:0.6rem; color:var(--text-desc);">Codex Client</span>
+              <span class="arrow-line">➔</span>
+            </div>
+            <div class="transformer-card">
+              <div class="transformer-card-head output-head">💾 Output (요약 보고서)</div>
+              <div class="card-preview" id="pipeline-output">
+| 구분 | 발견 모순점 | 영향도 | 기준 | 권장 조치 |
+| 정책 | 탈퇴 시 환불 수수료 상이 | 높음 | 회의록 | 로직 일체화 |
+| 기능 | 평가 주체 오류 | 높음 | 회의록 | FR-004 수정 |
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 3 PANEL -->
+    <div class="part-panel" id="part3-panel">
+      <div class="premium-card">
+        <h2>STEP 1. Task 01 - 불일치 검출</h2>
+        <p>프로젝트 폴더에 실습 파일을 생성한 뒤, 아래 지시문을 Codex Client 프롬프트 창에 전송하여 모순 오디팅을 진행합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt1')">Copy</button>
+          <h4>🔍 Codex 요청 프롬프트 (검토 지시)</h4>
+          <pre id="prompt1">프로젝트 폴더 내에 있는 'meeting-notes.md', 'requirements.md', 'screen-specification.md' 세 문서를 비교 분석해줘.
+
+각 문서 간에 서로 모순되거나 불일치하는 항목, 혹은 한쪽 문서에만 존재하고 다른 문서에서는 누락된 항목을 찾아서 정리해줘.
+결과는 아래 요구사항에 맞춰 출력해줘.
+
+1. 결과는 '구분', '발견 내용 및 모순점', '영향도', '권한이 가장 높은 기준 문서', '권장 조치' 칼럼을 가진 Markdown 표 형태로 정리해줘.
+2. 개발 및 테스트 진입 시 치명적인 재작업을 유발할 수 있는 사항은 영향도를 '높음'으로 표기해줘.
+3. 임의의 해답을 창조하지 말고 문서 텍스트에 기반해서 팩트 위주로만 비교 분석 결과를 도출해줘.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">회의록의 위약금 10% 수수료 정책이 요구사항 정의서에 누락된 부분이 잡혔는지 점검합니다.</li>
+          <li class="checklist-item">회원 탈퇴 처리 시 3개 문서의 정책 불일치(자동취소 vs 보관유지 vs 팝업 없이 숨김)가 잡혔는지 점검합니다.</li>
+          <li class="checklist-item">FR-004 요구사항에서 평가 주체가 Customer가 아닌 Expert로 반대로 적힌 논리 오류가 잡혔는지 점검합니다.</li>
+        </ul>
+      </div>
+
+      <div class="premium-card">
+        <h2>STEP 2. Task 02 - 변경사항 관리</h2>
+        <p>요구사항 변경 파일 2종(v1.0 vs v2.0) 및 기존 설계서/API 규격서를 준비한 뒤 변경 영향도 매핑 지시문을 전송합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt2')">Copy</button>
+          <h4>🔄 Codex 요청 프롬프트 (변경 및 영향 분석 지시)</h4>
+          <pre id="prompt2">프로젝트 폴더 내에 있는 'requirements-before.md'와 'requirements-after.md' 파일을 대조하여 어떤 정책이 변경되었는지 먼저 분석해줘.
+
+그 후, 변경된 정책 내용이 v1.0 수준에 머물러 있는 'screen-specification-v2.md' 및 'api-specification.md' 문서의 어느 부분에 반영되어야 하는지 분석해줘.
+
+결과는 아래 형식에 맞춰 Markdown 표 형태로 출력해줘:
+1. '변경 항목', '변경 전', '변경 후', '영향 범위 (화면/API)', '중요도', '조치 사항 (필요한 구체적인 수정 가이드)'
+2. 추가로, v2.0 요구사항을 기준으로 수정이 필요한 부분의 중요도를 '높음/중간/낮음' 순으로 구분하여 칼럼에 표시해줘.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">Google 소셜 로그인 반영에 따른 로그인 화면 UI 및 API 파라미터(oauth_token) 변경 가이드 수립 여부를 점검합니다.</li>
+          <li class="checklist-item">SMS 인증 도입에 따른 가입 UI 교체 및 API Payload 필수 파라미터(phone, verification_code) 반영 여부를 확인합니다.</li>
+          <li class="checklist-item">Admin 권한 구분에 따른 신규 대시보드 화면 설계 및 API role 필드 매핑 체크 여부를 확인합니다.</li>
+        </ul>
+      </div>
+
+      <div class="premium-card">
+        <h2>STEP 3. Task 03 - 의사결정 추적</h2>
+        <p>비정형 개발 대화록(messenger-chat.md)을 준비한 뒤 의사결정 로그와 후속 과제를 자동 분리 추출합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt3')">Copy</button>
+          <h4>📋 Codex 요청 프롬프트 (의사결정 추출 지시)</h4>
+          <pre id="prompt3">프로젝트 폴더 내에 있는 'messenger-chat.md' 대화록을 읽고, 프로젝트 관리 및 추적을 위한 Decision Log와 Pending Items를 작성해줘.
+
+아래 조건에 따라 분석을 수행해줘.
+1. 결정 완료된 사안에 대해서는 '의사결정 로그(Decision Log)' 표를 작성해줘. 칼럼은 '결정 항목', '결정 내용', '의사결정 배경/근거', '결정일', '담당자/주체', '상태'를 포함해야 해.
+2. 아직 결정되지 않고 후속 검토가 필요하거나 보류된 사안은 '미결 사항 (Pending Items)' 표로 정리해줘. 칼럼은 '미결 항목', '후속 조치 내용', '담당자', '예정 기한'을 포함해줘.
+3. 대화록 텍스트에 근거하지 않은 가상의 날짜나 의사결정 주체를 마음대로 작성하지 말아줘.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">1차 론칭에서 Apple 로그인을 제외하고 Google 로그인만 가져가기로 한 근거(심사 지연 등) 및 주체가 추출되었는지 확인합니다.</li>
+          <li class="checklist-item">실시간 계좌이체 보류 사유와 해외 Paypal 연동 검토의 담당자(개발팀) 및 후속 조치가 도출되었는지 확인합니다.</li>
+          <li class="checklist-item">보안실 감사 요건 충족을 위한 Super/Sub Admin 2단계 계층 권한 컴포넌트 의결 근거가 포함되었는지 확인합니다.</li>
+        </ul>
+      </div>
+
+      <div class="premium-card">
+        <h2>Mission 1. 회원가입 변경 영향도 분석 (Task 06)</h2>
+        <p>고객의 "회원가입 시 휴대폰 인증 추가" 변경 요청에 대해 Codex를 활용하여 시스템 전체(화면, API, DB, 문서) 영향도를 분석하고 보고서를 작성합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt_m1')">Copy</button>
+          <h4>🔍 Codex 요청 프롬프트 (영향도 분석 지시)</h4>
+          <pre id="prompt_m1">회원가입에 휴대폰 인증 기능이 추가될 경우 영향을 받는 화면, API, DB, 문서를 모두 찾아 영향도 분석 보고서를 작성해 주세요.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">휴대폰 인증 추가에 따라 회원가입 화면(UI)의 영향도를 '높음' 및 '화면 수정' 조치로 감지했는지 확인합니다.</li>
+          <li class="checklist-item">로그인/가입 API의 영향도를 '중간' 및 'API 수정'으로 감지했는지 확인합니다.</li>
+          <li class="checklist-item">User DB의 영향도를 '높음' 및 '컬럼 추가' 조치로 매핑했는지 점검합니다.</li>
+          <li class="checklist-item">관리자 화면의 영향도를 '낮음' 및 '조회 항목 추가' 조치로 매핑했는지 확인합니다.</li>
+        </ul>
+      </div>
+
+      <div class="premium-card">
+        <h2>Mission 2. 프로젝트 이슈 리포트 작성 (Task 07)</h2>
+        <p>회의록, 변경 이력, Action Item, 이슈 목록 등 프로젝트 원본 자료를 분석하여 현재 진행 상황과 주요 이슈 리포트를 자동 작성합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt_m2')">Copy</button>
+          <h4>📋 Codex 요청 프롬프트 (이슈 리포트 작성 지시)</h4>
+          <pre id="prompt_m2">현재 프로젝트의 주요 이슈를 요약하고, 긴급도와 우선순위를 포함한 프로젝트 이슈 리포트를 작성해 주세요.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">완료(로그인 기능) 및 진행(회원가입 기능) 현황이 올바르게 분류되었는지 확인합니다.</li>
+          <li class="checklist-item">결제 API 일정 지연 이슈의 우선순위가 '높음' 및 PM 담당으로 분석되었는지 확인합니다.</li>
+          <li class="checklist-item">요구사항 변경 예정 위험의 우선순위가 '높음' 및 기획팀 담당으로 매핑되었는지 확인합니다.</li>
+          <li class="checklist-item">관리자 권한 정책 확정 미결 사항의 우선순위가 '중' 및 기획팀 담당으로 정확하게 도출되었는지 확인합니다.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PART 4 PANEL -->
+    <div class="part-panel" id="part4-panel">
+      <div class="premium-card">
+        <h2>의미론적 디프 (Semantic Diff)</h2>
+        <p>
+          단순한 텍스트 줄(Line) 간의 비교나 변경 사항 감지가 아닙니다.
+          비즈니스 요구조건의 핵심 논리(예: 이메일 인증 ➔ SMS 휴대폰 번호 인증)가 어떻게 개정되었는지 인지하고,
+          이와 종속 관계를 갖는 물리 파일(프론트엔드 UI 와이어프레임 설계서 및 백엔드 API REST 규격서)의 변수 매핑 테이블까지 종속적으로 해석하여 수정 가이드를 매핑해주는 원리입니다.
+        </p>
+      </div>
+
+      <div class="premium-card">
+        <h2>비정형 대화 내 컨텍스트 캡슐화</h2>
+        <p>
+          "애플은 다음 회의 때 다시 이야기해요", "PG 심사 때문에 계좌이체는 일단 보류" 등의 정형화되지 않은 단톡방 구어체 흐름 속에서
+          최종 합의에 도달하게 된 배경 요인(애플 개발자 연간 계정 심사 일정, PG사 계약 승인 지연 등)을 AI가 의미론적으로 정제해 냅니다.
+          이로써 프로젝트 멤버가 변경되어도 회의실 의사결정 배경(Why)을 온전히 기억할 수 있습니다.
+        </p>
+      </div>
+
+      <div class="premium-card">
+        <h2>세 가지 Task의 연결 흐름 시너지</h2>
+        <p>
+          기획/설계 검토 프로세스는 단발적인 태스크가 아닙니다.
+          IT 프로젝트 생애주기에서 기획과 개발 격차를 메꾸는 유기적인 설계 통제 장치 역할을 수행합니다.
+        </p>
+        <div class="card-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="grid-item">
+            <h3>1. 모순 발견 (Task 01)</h3>
+            <p>기존 기획, 화면설계, 회의록 간 엇갈린 충돌이나 구멍을 단 몇 초 만에 식별.</p>
+          </div>
+          <div class="grid-item">
+            <h3>2. 결정 추적 (Task 03)</h3>
+            <p>요구사항 변경을 의결하게 된 회의 대화 속 근거와 미결 업무 리포팅.</p>
+          </div>
+          <div class="grid-item">
+            <h3>3. 통제 적용 (Task 02)</h3>
+            <p>의사결정 결과가 하위 UI 화면과 API 명세서에 빠짐 없이 매핑되도록 최종 통제.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 5 PANEL -->
+    <div class="part-panel" id="part5-panel">
+      <div class="premium-card">
+        <h2>교육 설계 스펙</h2>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th style="width: 30%;">평가 항목</th>
+              <th>상세 교육 기준 스펙</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>교육 난이도</strong></td>
+              <td>★★★☆☆ (중급 과정)</td>
+            </tr>
+            <tr>
+              <td><strong>예상 실습 시간</strong></td>
+              <td>1시간 30분 ~ 2시간 (종합 실습 및 피드백 포함)</td>
+            </tr>
+            <tr>
+              <td><strong>실무 활용도</strong></td>
+              <td>★★★★★ (IT 프로젝트 정합성 검증 및 재작업 방지)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="premium-card">
+        <h2>기획설계 단계 최종 교육 Task</h2>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>주제</th>
+              <th>AI 활용</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Task 01</strong></td>
+              <td>불일치 검출</td>
+              <td>문서 간 차이 비교 및 검증</td>
+            </tr>
+            <tr>
+              <td><strong>Task 02</strong></td>
+              <td>누락 검출</td>
+              <td>기능·정책·예외사항 누락 확인</td>
+            </tr>
+            <tr>
+              <td><strong>Task 03</strong></td>
+              <td>변경사항 관리</td>
+              <td>변경 이력 관리 및 영향 분석</td>
+            </tr>
+            <tr>
+              <td><strong>Task 04</strong></td>
+              <td>문서 버전 관리</td>
+              <td>버전 비교 및 최신 문서 관리</td>
+            </tr>
+            <tr>
+              <td><strong>Task 05</strong></td>
+              <td>의사결정 추적</td>
+              <td>회의 결정사항 및 Action Item 관리</td>
+            </tr>
+            <tr>
+              <td><strong>Task 06</strong></td>
+              <td>영향도 분석</td>
+              <td>변경 요청에 따른 영향 범위 분석</td>
+            </tr>
+            <tr>
+              <td><strong>Task 07</strong></td>
+              <td>프로젝트 이슈 리포트</td>
+              <td>프로젝트 현황 및 이슈 자동 보고</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="premium-card">
+        <h2>학습자 질문 및 토의 주제</h2>
+        <div class="checklist-list">
+          <div class="checklist-item" style="font-weight: 700; margin-bottom: 8px;">
+            "회의를 마친 직후에 이 세 가지 Task를 수행하는 것과, 개발 도중 또는 개발 끝난 후에 사람이 직접 대조하는 것의 비용 차이는 어떨까요?"
+            <p style="font-weight: 400; font-size: 0.68rem; color: var(--text-desc); margin-top: 3px; padding-left: 12px;">
+              → 초기 기획 명세 검증은 개발이 모두 완료된 뒤 코드를 뜯어고쳐야 하는 리워크 장애 대응에 비해 비용과 공수를 최대 100배 가까이 아낄 수 있어 비즈니스 출시 일정을 대폭 방어합니다.
+            </p>
+          </div>
+          <div class="checklist-item" style="font-weight: 700;">
+            "AI가 도출한 영향 범위 분석 결과 중 실제 개발자가 누락할 수 있는 마이너 필드(예: API Request Payload) 검출 성능은 어떠한가요?"
+            <p style="font-weight: 400; font-size: 0.68rem; color: var(--text-desc); margin-top: 3px; padding-left: 12px;">
+              → 소셜 로그인 토큰, SMS 인증용 전화번호 수신 규격 등 사람이 바쁜 일정 중에 API 명세서에서 무심코 누락하기 쉬운 입력 파라미터를 정확하게 식별하는 성능을 체감할 수 있습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Action Buttons -->
+    <div class="action-container">
+      <a href="day2-ai-classroom.html" class="btn-link pri">← Day 2 강의실 입장</a>
+      <a href="../index.html" class="btn-link sec">전체 로드맵 보기</a>
+    </div>
+
+  </section>
+
+  <!-- Javascript for switching tabs & pipeline mock interactive logic -->
+  <script>
+    // Tab Switching Logic
+    function switchPart(partNum) {
+      const tabs = document.querySelectorAll('.part-tab');
+      const panels = document.querySelectorAll('.part-panel');
+      
+      tabs.forEach((tab, idx) => {
+        if (idx + 1 === partNum) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+
+      panels.forEach((panel, idx) => {
+        if (idx + 1 === partNum) {
+          panel.classList.add('active');
+        } else {
+          panel.classList.remove('active');
+        }
+      });
+    }
+
+    // Pipeline Data Interactive Mockup
+    const pipelineData = {
+      1: {
+        title: "Task 01. 불일치 검출 데이터 흐름",
+        input: "• meeting-notes.md (회의록)\n• requirements.md (요구사항 정의서)\n• screen-specification.md (화면 정의서)",
+        output: "| 구분 | 발견 모순점 | 영향도 | 기준 | 권장 조치 |\n| 정책 | 탈퇴 시 환불 수수료 상이 | 높음 | 회의록 | 로직 일체화 |\n| 기능 | 평가 주체 오류 | 높음 | 회의록 | FR-004 수정 |"
+      },
+      2: {
+        title: "Task 02. 변경 영향도 데이터 흐름",
+        input: "• requirements-before.md (v1.0 요건)\n• requirements-after.md (v2.0 요건)\n• screen-specification-v2.md (v1.0 UI)\n• api-specification.md (v1.0 API)",
+        output: "| 변경항목 | 영향범위 | 중요도 | 조치사항 |\n| 소셜로그인 | UI/API | 높음 | Google 버튼 및 oauth_token 파라미터 추가 |\n| SMS 인증 | UI/API | 높음 | phone/verification_code 필드 반영 |"
+      },
+      3: {
+        title: "Task 03. 의사결정 이력 데이터 흐름",
+        input: "• messenger-chat.md (회의 및 메신저 대화 기록)",
+        output: "### Decision Log\n- Google 로그인만 1차 도입 (이유: Apple 심사 지연 / PM 승인)\n\n### Pending Items\n- 해외 결제 페이팔 연동 여부 검토 (담당: Dev_Lead)"
+      },
+      4: {
+        title: "Mission 1 (Task 06). 영향도 분석 데이터 흐름",
+        input: "• 회원가입 휴대폰 인증 추가 요청 (변경 요청 건)",
+        output: "| 변경 요청 | 영향 대상 | 영향도 | 조치 |\n| 휴대폰 인증 추가 | 회원가입 화면 | 높음 | 화면 수정 |\n| 휴대폰 인증 추가 | 로그인 API | 중간 | API 수정 |\n| 휴대폰 인증 추가 | User DB | 높음 | 컬럼 추가 |\n| 휴대폰 인증 추가 | 관리자 화면 | 낮음 | 조회 항목 추가 |"
+      },
+      5: {
+        title: "Mission 2 (Task 07). 프로젝트 이슈 리포트 데이터 흐름",
+        input: "• 회의록\n• 변경 이력\n• Action Item\n• 이슈 목록",
+        output: "| 구분 | 내용 | 우선순위 | 담당 |\n| 완료 | 로그인 기능 완료 | - | 개발팀 |\n| 진행 | 회원가입 기능 개발 중 | 중 | 개발팀 |\n| 이슈 | 결제 API 일정 지연 | 높음 | PM |\n| 위험 | 요구사항 변경 예정 | 높음 | 기획팀 |\n| 미결 | 관리자 권한 정책 확정 필요 | 중 | 기획팀 |"
+      }
+    };
+
+    function showPipeline(taskNum) {
+      const nodes = document.querySelectorAll('.flow-node');
+      nodes.forEach((node, idx) => {
+        if (idx + 1 === taskNum) {
+          node.classList.add('active');
+        } else {
+          node.classList.remove('active');
+        }
+      });
+
+      // Update contents inside transformer box
+      document.getElementById('pipeline-title').innerText = pipelineData[taskNum].title;
+      document.getElementById('pipeline-input').innerText = pipelineData[taskNum].input;
+      document.getElementById('pipeline-output').innerText = pipelineData[taskNum].output;
+    }
+
+    // Simple Copy-to-Clipboard logic
+    function copyPrompt(elementId) {
+      const textToCopy = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        alert("프롬프트가 클립보드에 복사되었습니다!");
+      }).catch(err => {
+        console.error("클립보드 복사 실패: ", err);
+      });
+    }
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

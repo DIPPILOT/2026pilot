@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 3. 기술설계 (데이터 정규화) 교육 요약서 | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Card Surface */
+      --text-main: #ffffff;
+      --text-muted: #e4e4e7;
+      --text-desc: #71717a;
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 10px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong, td, th { word-break: keep-all; }
+
+    .container {
+      max-width: 860px; 
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 6px 20px;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .logo-text p {
+      font-size: 0.58rem;
+      color: var(--text-desc);
+      margin-top: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 120px; /* PC layout overlap prevention */
+      padding: 20px 0 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .hero h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    /* Tab Menu styling */
+    .part-tab-bar {
+      display: flex;
+      gap: 4px;
+      margin: 20px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+    }
+
+    .part-tab {
+      flex: 1;
+      padding: 8px 6px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      color: var(--text-desc);
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .part-tab:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+    }
+
+    .part-tab.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.35);
+      color: #93c5fd;
+    }
+
+    .part-panel {
+      display: none;
+      animation: panelFade 0.3s ease forwards;
+    }
+
+    .part-panel.active {
+      display: block;
+    }
+
+    @keyframes panelFade {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Card styling */
+    .premium-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .premium-card h2 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .premium-card h2::before {
+      content: "";
+      width: 3px;
+      height: 11px;
+      background: var(--secondary-color);
+      border-radius: 1px;
+    }
+
+    .premium-card p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    /* Part 1: ChatGPT vs Codex Client Table */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .compare-table th, .compare-table td {
+      padding: 8px 10px;
+      font-size: 0.72rem;
+      text-align: left;
+    }
+
+    .compare-table th {
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .compare-table td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .compare-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    /* Pipeline flow visualization */
+    .pipeline-flow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      margin: 20px 0 30px;
+      padding: 0 10px;
+    }
+
+    .pipeline-line {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      right: 30px;
+      height: 2px;
+      background-image: linear-gradient(to right, rgba(59, 130, 246, 0.4) 50%, transparent 50%);
+      background-size: 8px 2px;
+      z-index: 1;
+    }
+
+    .flow-node {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .node-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-desc);
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .flow-node:hover .node-circle {
+      border-color: var(--secondary-color);
+      transform: scale(1.08);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+    }
+
+    .flow-node.active .node-circle {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-color: #ffffff;
+      color: #ffffff;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .node-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-desc);
+      margin-top: 6px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .flow-node.active .node-label {
+      color: var(--secondary-color);
+    }
+
+    .transformer-box {
+      background: rgba(9, 9, 11, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 15px;
+    }
+
+    .transformer-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .transformer-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .transformer-card {
+      background: rgba(26, 29, 36, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      padding: 10px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .transformer-card-head {
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .transformer-card-head.input-head { color: var(--accent-color); }
+    .transformer-card-head.output-head { color: var(--accent-purple); }
+
+    .card-preview {
+      background: #08090c;
+      padding: 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #a1a1aa;
+      font-size: 0.62rem;
+      margin-top: 6px;
+      max-height: 100px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .transformer-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .arrow-line {
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+    }
+
+    /* Highlight box */
+    .prompt-box {
+      background: rgba(6, 182, 212, 0.04);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+      position: relative;
+    }
+
+    .prompt-box h4 {
+      font-size: 0.78rem;
+      color: var(--secondary-color);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .prompt-box pre {
+      padding-right: 70px;
+      font-family: monospace;
+      font-size: 0.68rem;
+      color: #a1a1aa;
+      white-space: pre-wrap;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 8px;
+    }
+
+    .copy-btn {
+      z-index: 10;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      font-size: 0.58rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: var(--secondary-color);
+    }
+
+    /* Step checklist styling */
+    .checklist-list {
+      list-style-type: none;
+      margin: 10px 0 0;
+    }
+
+    .checklist-item {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .checklist-item::before {
+      content: "✓";
+      color: var(--secondary-color);
+      font-weight: 800;
+    }
+
+    /* Grid cards */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .grid-item {
+      background: rgba(9, 9, 11, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .grid-item h3 {
+      font-size: 0.8rem;
+      color: #93c5fd;
+      margin-bottom: 6px;
+    }
+
+    .grid-item p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    /* Vertical Flow Diagram */
+    .vertical-flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin: 20px 0;
+    }
+
+    .flow-box {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      color: #93c5fd;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .flow-arrow {
+      color: var(--secondary-color);
+      font-size: 1rem;
+    }
+
+    /* Bottom Actions */
+    .action-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 30px 0;
+    }
+
+    .btn-link {
+      display: inline-block;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.25s;
+    }
+
+    .btn-link.pri {
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-link.pri:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5), 0 0 10px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-link.sec {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+    }
+
+    .btn-link.sec:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        margin-top: 160px;
+      }
+      .part-tab-bar {
+        flex-wrap: wrap;
+      }
+      .part-tab {
+        flex: unset;
+        width: calc(33.33% - 4px);
+        font-size: 0.65rem;
+      }
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+      .transformer-grid {
+        grid-template-columns: 1fr;
+      }
+      .transformer-arrow {
+        transform: rotate(90deg);
+        margin: 6px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 3 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day3-ai-codex-1.html">Task 1 (데이터구조)</a>
+        <a href="day3-ai-codex-2.html">Task 2 (용어표준화)</a>
+        <a href="day3-ai-codex-3.html">Task 3 (변경영향)</a>
+        <a href="day3-ai-codex-mission1.html">Mission 1 (의사결정)</a>
+        <a href="day3-ai-codex-mission2.html">Mission 2 (예외시나리오)</a>
+        <a href="day3-ai-codex-summation.html" class="summation-btn active" style="background: rgba(6, 182, 212, 0.15); color: var(--secondary-color); border-color: rgba(6, 182, 212, 0.3);">📊 요약 보기</a>
+        <a href="day3-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 3 Summary</span>
+        <span class="hero-badge">Codex AI Architect</span>
+        <span class="hero-badge">Technical Design</span>
+      </div>
+      <h1>Day 3. 기술설계 (데이터 정규화) 교육 요약서</h1>
+      <p>
+        자연어로 작성된 회의록 내용을 데이터 구조(Mermaid ERD)로 변환하고, 프로젝트 표준 용어 사전을 구축하며, 설계 변경에 따른 영향 분석 및 의사결정을 보존하는 전체 협업 설계 파이프라인의 핵심 정보를 마스터합니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content Body -->
+  <section class="container" style="padding-bottom: 60px;">
+    
+    <!-- 6-Part Tab Menu -->
+    <div class="part-tab-bar">
+      <div class="part-tab active" onclick="switchPart(1)">Part 1. 도입 배경</div>
+      <div class="part-tab" onclick="switchPart(2)">Part 2. 실습 목표</div>
+      <div class="part-tab" onclick="switchPart(3)">Part 3. 따라하기</div>
+      <div class="part-tab" onclick="switchPart(4)">Part 4. 작동 원리</div>
+      <div class="part-tab" onclick="switchPart(5)">Part 5. 교육 가이드</div>
+      <div class="part-tab" onclick="switchPart(6)">Part 6. 최종 Task</div>
+    </div>
+
+    <!-- PART 1 PANEL -->
+    <div class="part-panel active" id="part1-panel">
+      <div class="premium-card">
+        <h2>기술설계의 병목 현상</h2>
+        <p>
+          프로젝트 현장에서 기획, 디자인, 개발 간의 이해 오차는 데이터베이스의 누락과 정합성 붕괴로 직결됩니다. 설계 단계에서의 정합성 보장이 왜 중요한지 알아봅니다.
+        </p>
+        <div class="card-grid">
+          <div class="grid-item">
+            <h3>이해 오차</h3>
+            <p>동일한 서비스 화면 기획안을 보고 기획자, 디자이너, 개발자가 연상하는 데이터 모델과 관계 설정이 어긋나 결국 누락이나 데이터 불일치(런타임 오류)로 이어집니다.</p>
+          </div>
+          <div class="grid-item">
+            <h3>어휘 오차</h3>
+            <p>'회원, 고객, User, Member' 등 동일한 주체에 대해 서로 다른 명칭을 사용하여 변수명을 네이밍할 때 불필요한 번역 및 커뮤니케이션 리워크 비용이 크게 발생합니다.</p>
+          </div>
+          <div class="grid-item" style="grid-column: span 2;">
+            <h3>공유 오차</h3>
+            <p>급격하게 추가되는 서비스 정책에 맞춰 DB 스키마만 고치고 API나 화면 기획서를 업데이트하지 않음으로써, 시스템 불일치가 눈덩이처럼 불어나 시스템 마비를 유발합니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-card">
+        <h2>ChatGPT vs Codex Client (Workspace 기반)</h2>
+        <p>
+          단일 대화 컨텍스트에 국한된 ChatGPT와 달리, 폴더 구조 전체와 다중 파일 간 종속 관계를 인지하는 Codex Client의 특성을 비교합니다.
+        </p>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>비교 항목</th>
+              <th>ChatGPT (일반 대화형 AI)</th>
+              <th>Codex Client (Workspace 기반 AI)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>컨텍스트 인지</strong></td>
+              <td>사용자가 붙여넣은 단일 파일/텍스트의 내용만 국소적으로 이해</td>
+              <td>폴더 내 DDL 스키마, 기획서, API 규격서의 다중 종속 관계를 동시에 지능적으로 인지</td>
+            </tr>
+            <tr>
+              <td><strong>용어 표준화</strong></td>
+              <td>일회성 영작 수준에 머물러 전체 프로젝트 전반의 변수명 일관성 유지 불가</td>
+              <td>프로젝트 표준 용어 사전을 기반으로 일관된 표준 네이밍 및 DB 컬럼명 자율 추천</td>
+            </tr>
+            <tr>
+              <td><strong>영향 범위 분석</strong></td>
+              <td>단편적인 스키마 오류나 가상의 테이블 수정안 제시 수준</td>
+              <td>스키마의 미세한 변경(예: 컬럼 추가)에 따른 API 규격과 화면 수정 부위 목록 역추론</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PART 2 PANEL -->
+    <div class="part-panel" id="part2-panel">
+      <div class="premium-card">
+        <h2>오늘 만들 최종 결과물 요약</h2>
+        <p>Day 3 세션 동안 학습자가 생성해 내는 최종 결과물 목록과 해당 산출물의 목적입니다.</p>
+        <div class="card-grid">
+          <div class="grid-item">
+            <h3>Task 01. 데이터 구조화</h3>
+            <p>자연어 기획서에서 엔티티 및 관계를 추출해 렌더링한 <strong>Mermaid ERD 스크립트 및 명세서</strong> (출력: <code>erd-schema.md</code>)</p>
+          </div>
+          <div class="grid-item">
+            <h3>Task 02. 용어 표준화</h3>
+            <p>파편화된 한글/영문 기획 용어들을 영문 표준 컬럼 형식으로 정의한 <strong>프로젝트 표준 용어 사전</strong> (출력: <code>project-glossary.md</code>)</p>
+          </div>
+          <div class="grid-item">
+            <h3>Task 03. 변경 영향 공유</h3>
+            <p>예약 승인제(WAIT_APPROVE) 추가에 따른 API 및 화면 수정 리스트 <strong>변경 영향도 분석서</strong> (출력: <code>change-impact-report.md</code>)</p>
+          </div>
+          <div class="grid-item">
+            <h3>Mission 01. 설계 기록</h3>
+            <p>정규화 및 데이터 설계 결정 사유와 기각된 대안을 아카이빙한 <strong>Design Decision Log (DDL)</strong> (출력: <code>design-decision-log.md</code>)</p>
+          </div>
+          <div class="grid-item" style="grid-column: span 2;">
+            <h3>Mission 02. 예외 시나리오 발굴</h3>
+            <p>동시성 결제 오류, 참조 무결성 탈퇴 유실, 트랜잭션 롤백에 대한 DB 개선책을 담은 <strong>Edge Case 분석 보고서</strong> (출력: <code>edge-case-analysis.md</code>)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-card">
+        <h2>Input / Output 데이터 파이프라인</h2>
+        <p>실습 단계에서 활용되는 입력 값과 Codex Workspace 추론을 거쳐 생성되는 결과물의 매핑입니다.</p>
+
+        <!-- Pipeline Nodes -->
+        <div class="pipeline-flow">
+          <div class="pipeline-line"></div>
+          <div class="flow-node active" onclick="showPipeline(1)">
+            <div class="node-circle">01</div>
+            <div class="node-label">데이터구조</div>
+          </div>
+          <div class="flow-node" onclick="showPipeline(2)">
+            <div class="node-circle">02</div>
+            <div class="node-label">용어표준화</div>
+          </div>
+          <div class="flow-node" onclick="showPipeline(3)">
+            <div class="node-circle">03</div>
+            <div class="node-label">변경영향</div>
+          </div>
+          <div class="flow-node" onclick="showPipeline(4)">
+            <div class="node-circle">M1</div>
+            <div class="node-label">의사결정</div>
+          </div>
+          <div class="flow-node" onclick="showPipeline(5)">
+            <div class="node-circle">M2</div>
+            <div class="node-label">예외시나리오</div>
+          </div>
+        </div>
+
+        <!-- Transformer Box -->
+        <div class="transformer-box">
+          <div class="transformer-title" id="pipeline-title">Task 01. 데이터 구조 이해 차이 해결</div>
+          <div class="transformer-grid">
+            <div class="transformer-card">
+              <div class="transformer-card-head input-head">📥 Input (기획 회의록)</div>
+              <div class="card-preview" id="pipeline-input">
+• day3_meeting_notes.md (회의록)
+- 비정형 줄글 형태의 이용자 흐름 시나리오 및 예약 프로세스 내용
+              </div>
+            </div>
+            <div class="transformer-arrow">
+              <span style="font-size:0.6rem; color:var(--text-desc);">Codex Workspace</span>
+              <span class="arrow-line">➔</span>
+            </div>
+            <div class="transformer-card">
+              <div class="transformer-card-head output-head">💾 Output (ERD 명세)</div>
+              <div class="card-preview" id="pipeline-output">
+Mermaid ERD 코드가 포함된 erd-schema.md
+- User, Expert, Reservation, Payment 엔티티의 Primary Key/Foreign Key 관계 시각화
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 3 PANEL -->
+    <div class="part-panel" id="part3-panel">
+      <!-- Step 1 -->
+      <div class="premium-card">
+        <h2>STEP 1. Task 01 - 데이터 구조 이해 차이 해결</h2>
+        <p>회의 시나리오 줄글을 입력하여 정밀 정규화 관계(1:N, 1:1)와 Mermaid 코드를 도출합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt1')">Copy</button>
+          <h4>🔍 Codex 요청 프롬프트 (데이터 구조화)</h4>
+          <pre id="prompt1">제공된 회의록 내용을 데이터 구조 관점에서 분석하여 핵심 엔티티와 관계를 도출하고, 데이터 구조 정의서 및 Mermaid ERD 코드를 작성해 주세요.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">User, Expert, Reservation, Payment 4대 엔티티의 PK, FK 설정이 시나리오 논리에 어긋나지 않는지 점검합니다.</li>
+          <li class="checklist-item">Mermaid 다이어그램 렌더링(`erDiagram`) 시 카디널리티 표기가 올바른지 확인합니다.</li>
+        </ul>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="premium-card">
+        <h2>STEP 2. Task 02 - 용어 표준화</h2>
+        <p>Figma 기획서 용어와 DB 개발 명세의 격차를 비교 분석해 도메인 용어 마스터 사전을 빌드합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt2')">Copy</button>
+          <h4>🔍 Codex 요청 프롬프트 (용어 사전 생성)</h4>
+          <pre id="prompt2">프로젝트 전반에 혼용되는 '회원/User/고객/Member', '상담사/Expert/선생님/Counselor' 등의 용어를 전수 분석하여, 프로젝트 표준 용어 사전을 Markdown 표 형태로 작성해 주세요.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">비즈니스 도메인에 부합하는 영문 표준 네이밍 및 컬럼 타입 정보가 올바르게 제시되었는지 확인합니다.</li>
+        </ul>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="premium-card">
+        <h2>STEP 3. Task 03 - 변경 영향 공유</h2>
+        <p>예약 절차에 '승인' 단계가 추가되는 릴리즈 계획 변경 시의 API 및 테이블 영향 범위를 파악합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt3')">Copy</button>
+          <h4>🔍 Codex 요청 프롬프트 (영향 범위 파악)</h4>
+          <pre id="prompt3">예약 확정 프로세스가 '승인 대기' 상태 추가 및 '전문가 승인 후 결제'로 변경됨에 따라 영향을 받는 API 스펙, DB 스키마, 화면 및 변경 공유 리포트를 작성해 주세요.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">Reservations 테이블의 status 변경 사항과 신규 API 스펙, 기획 화면의 버튼 상태 전이 연쇄 영향이 검출되었는지 확인합니다.</li>
+        </ul>
+      </div>
+
+      <!-- Mission 1 -->
+      <div class="premium-card">
+        <h2>STEP 4. Mission 01 - 설계 의사결정 기록 (Design Decision Log)</h2>
+        <p>정규화 결정, 예약 이력의 물리 분리 결정 등에 관한 기각 사유와 합의를 로그화합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt4')">Copy</button>
+          <h4>🔍 Codex 요청 프롬프트 (의사결정 기록)</h4>
+          <pre id="prompt4">회의 내용에서 정규화 및 데이터베이스 구조 설계 결정을 추출하여, 결정 항목, 배경 사유, 대안 검토, 승인자, 향후 변경 가능성을 포함하는 Design Decision Log를 작성해 주세요.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">이력 테이블 분리(DEC-003) 결정 배경과 대안(테이블 단일화 시 성능 저하)이 명확히 로깅되는지 점검합니다.</li>
+        </ul>
+      </div>
+
+      <!-- Mission 2 -->
+      <div class="premium-card">
+        <h2>STEP 5. Mission 02 - 예외 시나리오 발굴 (Edge Case)</h2>
+        <p>참조 무결성 위배(탈퇴) 및 트랜잭션 붕괴를 예방하기 위한 시스템 취약점 오디팅을 진행합니다.</p>
+        
+        <div class="prompt-box">
+          <button class="copy-btn" onclick="copyPrompt('prompt5')">Copy</button>
+          <h4>🔍 Codex 요청 프롬프트 (Edge Case 도출)</h4>
+          <pre id="prompt5">현재 정의된 User, Expert, Reservation, Payment 테이블 구조에서 발생할 수 있는 데이터 정합성 위배 Edge Case 예외 시나리오를 도출하고 개선 방안을 제시해 주세요.</pre>
+        </div>
+
+        <ul class="checklist-list">
+          <li class="checklist-item">Soft Delete(논리 삭제) 도입을 통한 참조 정합성 유지 방안 및 분산 트랜잭션 롤백 대응을 확인합니다.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PART 4 PANEL -->
+    <div class="part-panel" id="part4-panel">
+      <div class="premium-card">
+        <h2>작동 원리 및 핵심 메커니즘</h2>
+        <div class="card-grid">
+          <div class="grid-item">
+            <h3>스키마 맥락 인지 추론</h3>
+            <p>단순 텍스트 매칭을 넘어 엔티티의 참조 무결성(FK) 관계 및 트랜잭션 수명 주기를 파악하여, 자연어 기획안을 DDL DDL(Data Definition Language) 쿼리 및 상태 기계 규칙으로 자동 역추론해냅니다.</p>
+          </div>
+          <div class="grid-item">
+            <h3>메타 용어 클러스터링</h3>
+            <p>서로 다르게 표기된 용어(고객명 vs Nickname)를 의미론적으로 의미 군집화(Clustering)하여 전사 용어 마스터 사전을 도출하고, 이를 바탕으로 데이터 사전의 정합성을 동기화합니다.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-card">
+        <h2>다섯 가지 Task/Mission의 기술설계 시너지</h2>
+        <p>각 단계별로 도출된 데이터와 분석 정보가 기술설계 루프를 돌며 어떻게 품질을 극대화하는지 확인합니다.</p>
+        
+        <div class="vertical-flow">
+          <div class="flow-box">[데이터 모델링 합의] (Task 01. 구조화)</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-box">[도메인 용어 통일] (Task 02. 표준 사전)</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-box">[설계 변경 영향 추적] (Task 03. 변경 통제)</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-box">[아키텍처 의사결정 로깅] (Mission 01. Why 보존)</div>
+          <div class="flow-arrow">▼</div>
+          <div class="flow-box">[정합성 및 Edge Case 예외 방지] (Mission 02. 안전 설계)</div>
+        </div>
+
+        <p style="text-align: center; font-size: 0.76rem; color: #93c5fd; margin-top: 10px;">
+          이 5단계 협업 루프는 기획 설계 단계에서부터 예외 상황을 원천 봉쇄하여 실제 코딩 작업에 착수하는 개발자들의 생산성을 획득하고 휴먼 에러를 제거하는 데 절대적인 이점을 제공합니다.
+        </p>
+      </div>
+    </div>
+
+    <!-- PART 5 PANEL -->
+    <div class="part-panel" id="part5-panel">
+      <div class="premium-card">
+        <h2>💡 교육 설계 스펙</h2>
+        <ul class="checklist-list" style="margin-top: 5px;">
+          <li class="checklist-item"><strong>난이도</strong>: ★★★★☆ (상급 - 데이터베이스 설계 정규화 및 분산 트랜잭션 개념 포함)</li>
+          <li class="checklist-item"><strong>예상 실습 시간</strong>: 1시간 30분 ~ 2시간 (종합 설계 실습)</li>
+          <li class="checklist-item"><strong>실무 활용도</strong>: ★★★★★</li>
+        </ul>
+      </div>
+
+      <div class="premium-card">
+        <h2>학습자 질문/토의 주제</h2>
+        <p>교육 과정 중 토의하거나 면접 질문으로 활용하기 좋은 주제 리스트입니다.</p>
+        <div class="card-grid">
+          <div class="grid-item">
+            <h3>Q1. 회원 탈퇴 전략</h3>
+            <p>"회원 탈퇴 처리 시 Hard Delete대신 Soft Delete(논리 삭제)를 선택했을 때의 성능적 단점과 이를 보완할 수 있는 인덱스/DB 파티셔닝 전략은 무엇일까요?"</p>
+          </div>
+          <div class="grid-item">
+            <h3>Q2. 용어 부채 (Terminology Debt)</h3>
+            <p>"용어 표준화 사전을 작성하지 않고 프로젝트를 중반까지 진행했을 때, 개발팀 내부에서 발생하는 '용어 부채' 비용은 실제 일정에 어떤 여파를 주나요?"</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 6 PANEL -->
+    <div class="part-panel" id="part6-panel">
+      <div class="premium-card">
+        <h2>기획설계 단계 최종 교육 Task</h2>
+        <p>Day 3에 다루는 전체 실습 과제 및 미션의 구성도입니다.</p>
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>주제</th>
+              <th>AI 활용 방안</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Task 01</strong></td>
+              <td>데이터 구조 이해 차이 해결</td>
+              <td>회의 내용을 데이터 구조로 변환하고 엔티티 및 관계를 정리</td>
+            </tr>
+            <tr>
+              <td><strong>Task 02</strong></td>
+              <td>용어 표준화</td>
+              <td>프로젝트 전반의 용어를 분석하여 표준 용어 사전 생성</td>
+            </tr>
+            <tr>
+              <td><strong>Task 03</strong></td>
+              <td>변경 영향 공유</td>
+              <td>설계 변경사항의 영향도를 분석하고 관련 문서 및 기능을 추적</td>
+            </tr>
+            <tr>
+              <td><strong>Mission 01</strong></td>
+              <td>설계 의사결정 기록</td>
+              <td>Decision Log를 작성하여 설계 근거와 변경 이력 관리</td>
+            </tr>
+            <tr>
+              <td><strong>Mission 02</strong></td>
+              <td>예외 시나리오 발굴</td>
+              <td>누락된 Edge Case를 분석하고 위험 요소 및 개선 방안 도출</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="action-container">
+      <a href="day3-ai-classroom.html" class="btn-link pri">← Day 3 강의실 입장</a>
+      <a href="../index.html" class="btn-link sec">전체 로드맵 보기</a>
+    </div>
+
+  </section>
+
+  <!-- Javascript for switching tabs & pipeline mock interactive logic -->
+  <script>
+    // Tab Switching Logic
+    function switchPart(partNum) {
+      const tabs = document.querySelectorAll('.part-tab');
+      const panels = document.querySelectorAll('.part-panel');
+      
+      tabs.forEach((tab, idx) => {
+        if (idx + 1 === partNum) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+
+      panels.forEach((panel, idx) => {
+        if (idx + 1 === partNum) {
+          panel.classList.add('active');
+        } else {
+          panel.classList.remove('active');
+        }
+      });
+    }
+
+    // Pipeline Data Interactive Mockup
+    const pipelineData = {
+      1: {
+        title: "Task 01. 데이터 구조 이해 차이 해결 데이터 흐름",
+        input: "• day3_meeting_notes.md (회의록)\n- 비정형 줄글 형태의 이용자 흐름 시나리오 및 예약 프로세스 내용",
+        output: "Mermaid ERD 코드가 포함된 erd-schema.md\n- User, Expert, Reservation, Payment 엔티티의 Primary Key/Foreign Key 관계 시각화"
+      },
+      2: {
+        title: "Task 02. 용어 표준화 데이터 흐름",
+        input: "• Figma UI 기획서 용어 ('고객명', '선생님 프로필')\n• 백엔드 API 명세서 용어 ('nickname', 'MemberStatus')",
+        output: "프로젝트 표준 용어 사전 (project-glossary.md)\n- 한글 표준명, 영문 표준명, 타입, 추천 DB 컬럼명 표"
+      },
+      3: {
+        title: "Task 03. 변경 영향 공유 데이터 흐름",
+        input: "• 예약 확정 프로세스 변경 전/후 스펙 (v1.0 -> v2.0)",
+        output: "변경 영향도 분석서 (change-impact-report.md)\n- Reservations 테이블 수정 및 API 갱신 대상\n- UI 화면 버튼/상태창 수정 요구 사항"
+      },
+      4: {
+        title: "Mission 01. 설계 의사결정 기록 데이터 흐름",
+        input: "• 데이터 이력 분리 및 DDL 쿼리 의결 기록",
+        output: "Design Decision Log (design-decision-log.md)\n- 결정 항목, 배경 사유, 대안 검토, 승인자(Dev_Lead) 기록"
+      },
+      5: {
+        title: "Mission 02. 예외 시나리오 발굴 데이터 흐름",
+        input: "• 완성된 DB 데이터 모델 스키마 (v1.0, v2.0)",
+        output: "Edge Case 분석 보고서 (edge-case-analysis.md)\n- 동시 예약 중복 신청(동시성), 탈퇴 회원 이력 유실(참조 무결성), 결제 네트워크 끊김(분산 트랜잭션 롤백)"
+      }
+    };
+
+    function showPipeline(taskNum) {
+      const nodes = document.querySelectorAll('.flow-node');
+      nodes.forEach((node, idx) => {
+        if (idx + 1 === taskNum) {
+          node.classList.add('active');
+        } else {
+          node.classList.remove('active');
+        }
+      });
+
+      // Update contents inside transformer box
+      document.getElementById('pipeline-title').innerText = pipelineData[taskNum].title;
+      document.getElementById('pipeline-input').innerText = pipelineData[taskNum].input;
+      document.getElementById('pipeline-output').innerText = pipelineData[taskNum].output;
+    }
+
+    // Simple Copy-to-Clipboard logic
+    function copyPrompt(elementId) {
+      const textToCopy = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        alert("프롬프트가 클립보드에 복사되었습니다!");
+      }).catch(err => {
+        console.error("클립보드 복사 실패: ", err);
+      });
+    }
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

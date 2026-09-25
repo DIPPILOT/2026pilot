@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 1. Codex Client 기반 요구사항 정의 교육 교안 | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Card Surface */
+      --text-main: #ffffff;
+      --text-muted: #e4e4e7;
+      --text-desc: #71717a;
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 10px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong, td, th { word-break: keep-all; }
+
+    .container {
+      max-width: 860px; /* 슬라이드 메뉴 크기 기준 폭과 완벽 일치 */
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .logo-text p {
+      font-size: 0.58rem;
+      color: var(--text-desc);
+      margin-top: 1px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 48px;
+      padding: 20px 0 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .hero p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    /* 5-Part Main Tab Menu */
+    .part-tab-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin: 15px 0;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .part-tab {
+      flex: 1;
+      padding: 8px 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-desc);
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .part-tab:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .part-tab.active {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: var(--secondary-color);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Part Panel Structure */
+    .part-panel {
+      display: none;
+      animation: panelFade 0.3s ease forwards;
+    }
+
+    .part-panel.active {
+      display: block;
+    }
+
+    @keyframes panelFade {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Card styling */
+    .premium-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .premium-card h2 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .premium-card h2::before {
+      content: "";
+      width: 3px;
+      height: 11px;
+      background: var(--secondary-color);
+      border-radius: 1px;
+    }
+
+    /* Part 1: ChatGPT vs Codex Client Table */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .compare-table th, .compare-table td {
+      padding: 8px 10px;
+      font-size: 0.72rem;
+      text-align: left;
+    }
+
+    .compare-table th {
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .compare-table td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    .compare-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    /* Part 2 Components (Step Map & Transformer) */
+    .pipeline-flow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      margin: 20px 0 30px;
+      padding: 0 10px;
+    }
+
+    .pipeline-line {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      right: 30px;
+      height: 2px;
+      background-image: linear-gradient(to right, rgba(59, 130, 246, 0.4) 50%, transparent 50%);
+      background-size: 8px 2px;
+      z-index: 1;
+    }
+
+    .flow-node {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .node-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-desc);
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .flow-node:hover .node-circle {
+      border-color: var(--secondary-color);
+      transform: scale(1.08);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+    }
+
+    .flow-node.active .node-circle {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-color: #ffffff;
+      color: #ffffff;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .node-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--text-desc);
+      margin-top: 6px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .flow-node.active .node-label {
+      color: var(--secondary-color);
+    }
+
+    .transformer-box {
+      background: rgba(9, 9, 11, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 15px;
+    }
+
+    .transformer-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .transformer-grid {
+      display: grid;
+      grid-template-columns: 1.1fr auto 1.1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .transformer-card {
+      background: rgba(26, 29, 36, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 6px;
+      padding: 10px;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .transformer-card-head {
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .transformer-card-head.input-head { color: var(--accent-color); }
+    .transformer-card-head.output-head { color: var(--accent-purple); }
+
+    .card-preview {
+      background: #08090c;
+      padding: 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #a1a1aa;
+      font-size: 0.65rem;
+      margin-top: 6px;
+      max-height: 75px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .transformer-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .arrow-line {
+      font-size: 1.1rem;
+      color: var(--secondary-color);
+    }
+
+    /* Red outline highlights for Follow Steps */
+    .red-focus-box {
+      border: 2.2px solid #ef4444 !important;
+      border-radius: 5px;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.75);
+      position: relative;
+      animation: pulseBorder 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseBorder {
+      0%, 100% { border-color: #ef4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
+      50% { border-color: #f87171; box-shadow: 0 0 15px rgba(239, 68, 68, 0.9); }
+    }
+
+    .gui-tooltip {
+      position: absolute;
+      background: #ef4444;
+      color: #ffffff;
+      font-size: 0.58rem;
+      padding: 3px 7px;
+      border-radius: 3px;
+      font-weight: 800;
+      top: -20px;
+      left: 6px;
+      white-space: nowrap;
+      z-index: 100;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    /* Part 3: Codex Client Actual UI Mockup */
+    .follow-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 15px;
+      align-items: start;
+    }
+
+    .follow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .follow-step-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 10px 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.25s;
+    }
+
+    .follow-step-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .follow-step-btn.active {
+      background: rgba(59, 130, 246, 0.12);
+      border-color: var(--primary-color);
+    }
+
+    .follow-step-btn h3 {
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .follow-step-btn.active h3 {
+      color: var(--secondary-color);
+    }
+
+    .follow-step-btn p {
+      font-size: 0.64rem;
+      color: var(--text-desc);
+      line-height: 1.3;
+    }
+
+    .follow-step-btn.active p {
+      color: var(--text-muted);
+    }
+
+    /* Codex Client UI Mockup */
+    .gui-mockup {
+      background: #09090b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    }
+
+    .gui-header {
+      background: #181b20;
+      padding: 6px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .gui-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .gui-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .gui-dot.red { background: #ef4444; }
+    .gui-dot.yellow { background: #f59e0b; }
+    .gui-dot.green { background: #10b981; }
+
+    .gui-title {
+      font-size: 0.62rem;
+      color: var(--text-desc);
+      font-family: monospace;
+    }
+
+    .gui-body {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      height: 250px;
+    }
+
+    /* GUI Sidebar projects list */
+    .gui-sidebar {
+      background: #111317;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sidebar-title {
+      font-size: 0.58rem;
+      font-weight: 800;
+      color: var(--text-desc);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .sidebar-project-item {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      padding: 4px 6px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+    }
+    .sidebar-project-item.active {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--secondary-color);
+      font-weight: 700;
+    }
+
+    .sidebar-file-tree {
+      margin-left: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-top: 3px;
+    }
+
+    .sidebar-file-item {
+      font-size: 0.62rem;
+      color: var(--text-desc);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px;
+      border: 1.5px solid transparent;
+    }
+
+    /* GUI Main Area */
+    .gui-main {
+      background: #09090b;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+    }
+
+    .gui-build-welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .gui-build-welcome h3 {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .gui-build-welcome p {
+      font-size: 0.64rem;
+      color: var(--text-desc);
+    }
+
+    /* GUI Prompt Input bar */
+    .gui-input-container {
+      display: flex;
+      gap: 6px;
+      background: #14161b;
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 6px;
+      align-items: center;
+    }
+
+    .gui-input-field {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      color: #fff;
+      font-size: 0.68rem;
+    }
+
+    .gui-build-btn {
+      background: var(--primary-color);
+      border: 1.5px solid transparent;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      cursor: pointer;
+    }
+
+    /* Part 4 Dependency flowchart */
+    .dep-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 15px 0;
+    }
+
+    .dep-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dep-box {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.72rem;
+    }
+    .dep-box.active {
+      border-color: var(--secondary-color);
+      background: rgba(6, 182, 212, 0.05);
+      color: var(--secondary-color);
+      font-weight: 700;
+    }
+    .dep-box.future {
+      border-color: var(--accent-purple);
+      background: rgba(139, 92, 246, 0.05);
+      color: #d8b4fe;
+    }
+
+    .dep-connector {
+      font-size: 0.9rem;
+      color: var(--text-desc);
+      text-align: center;
+      margin: 2px 0;
+    }
+
+    /* PBL Mission Alert Box */
+    .pbl-mission-box {
+      background: rgba(139, 92, 246, 0.06);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      border-radius: var(--card-radius);
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .pbl-mission-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: var(--accent-purple);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .action-container {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-link.sec {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-link.sec:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .part-tab-bar { flex-direction: column; gap: 4px; }
+      .follow-layout { grid-template-columns: 1fr; }
+      .transformer-grid { grid-template-columns: 1fr; }
+      .pipeline-flow { flex-direction: column; gap: 10px; align-items: flex-start; }
+      .pipeline-line { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 1 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day1-ai-codex.html">실습 페이지로 이동</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 1</span>
+        <span class="hero-badge">PBL 교안</span>
+        <span class="hero-badge">Codex Client</span>
+      </div>
+      <h1>Day 1. 기획 요구사항 정의 교육 교안</h1>
+      <p>
+        비전공자 및 기획자를 대상으로 Codex Client를 활용하여 프로젝트 작업 공간(Workspace)을 세팅하고 협업 명세서를 개발하는 대학 강의 규격 교안 요약서입니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- 5-Part Main Tab Menu -->
+  <section class="tab-menu-section">
+    <div class="container">
+      <div class="part-tab-bar">
+        <div class="part-tab active" onclick="switchPart(1)">Part 1. 왜 Codex인가? (5분)</div>
+        <div class="part-tab" onclick="switchPart(2)">Part 2. 실습 목표 (5분)</div>
+        <div class="part-tab" onclick="switchPart(3)">Part 3. 따라하기 (20분)</div>
+        <div class="part-tab" onclick="switchPart(4)">Part 4. 작동 원리 (10분)</div>
+        <div class="part-tab" onclick="switchPart(5)">Part 5. PBL 미션 (10분)</div>
+        <div class="part-tab" onclick="switchPart(6)">Part 6. 추가 Skill Task (15분)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Panels -->
+  <section class="panels-section">
+    <div class="container">
+      
+      <!-- ==================== PART 1 PANEL ==================== -->
+      <div class="part-panel active" id="part-1">
+        <div class="premium-card">
+          <h2>ChatGPT와 Codex Client의 결정적 차이</h2>
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 12px;">
+            일반적인 ChatGPT 웹 대화창과 다중 파일 프로젝트 단위의 Codex Client는 요구사항 설계 시 접근 방식부터 다릅니다.
+          </p>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th>비교 항목</th>
+                <th>일반 ChatGPT (웹 브라우저)</th>
+                <th>Codex Client (Workspace 기반)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>작업 인지 범위</strong></td>
+                <td>현재 입력창에 입력한 단발성 텍스트만 인식</td>
+                <td>프로젝트 폴더(Workspace) 내의 모든 파일 인식</td>
+              </tr>
+              <tr>
+                <td><strong>파일 제어 방식</strong></td>
+                <td>화면에 출력된 결과 코드를 수동 복사·붙여넣기</td>
+                <td>AI가 지정된 마크다운 파일을 직접 생성 및 부분 수정</td>
+              </tr>
+              <tr>
+                <td><strong>다중 파일 추론</strong></td>
+                <td>이전 파일의 연계 수정을 위해 매번 수동 업로드 필요</td>
+                <td>하나의 기획 변경 시 연계된 다른 파일 내용 동시 추론</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="premium-card">
+          <h2>프로젝트 단위 개발 방식</h2>
+          <p style="font-size: 0.76rem; color: var(--text-muted); line-height: 1.45;">
+            우리는 바탕화면에 지정한 전용 폴더 <strong><code>automation</code></strong>을 AI 작업 영역(Workspace)으로 선포하고 실습합니다. 
+            이렇게 지정된 폴더 구조 아래에서 AI는 0단계 요약 메모부터 5단계 이메일 보고서까지 각 명세 파일의 인풋-아웃풋 체인을 완벽하게 연결해 줍니다.
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== PART 2 PANEL ==================== -->
+      <div class="part-panel" id="part-2">
+        <div class="premium-card">
+          <h2>오늘 만들 최종 결과물</h2>
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 10px;">
+            가공되지 않은 장황한 회의록 대화문에서 출발해, 오류 린팅이 완료된 최종 승인 정의서를 도출하고 의사결정 요청 메일까지 발송합니다.
+          </p>
+          <ul style="padding-left: 14px; font-size: 0.74rem;">
+            <li>📄 <code>requirements-specification.md</code>: 통합 비즈니스 요건 및 흐름 정의서</li>
+            <li>📧 기획 승인 요청 메일: 대표(의사결정권자) 전달용 미결정 정책 조율 초안 메일</li>
+          </ul>
+        </div>
+
+        <!-- Interactive Step map inside Part 2 -->
+        <div class="premium-card">
+          <h2>실습 데이터 파이프라인 (인터랙티브 맵)</h2>
+          <p style="font-size: 0.72rem; color: var(--text-desc); margin-bottom: 8px;">각 단계를 누르면 데이터 변환 방식(Input -> AI -> Output)이 아래 카드로 업데이트됩니다.</p>
+          
+          <div class="pipeline-flow">
+            <div class="pipeline-line"></div>
+            
+            <div class="flow-node active" data-step="prep" onclick="activateStep('prep')">
+              <div class="node-circle">P</div>
+              <span class="node-label">준비 단계. 폴더 설정</span>
+            </div>
+            <div class="flow-node" data-step="0" onclick="activateStep(0)">
+              <div class="node-circle">S0</div>
+              <span class="node-label">0단계. 대화록 전처리</span>
+            </div>
+            <div class="flow-node" data-step="1" onclick="activateStep(1)">
+              <div class="node-circle">S1</div>
+              <span class="node-label">1단계. 메모 요건 분석</span>
+            </div>
+            <div class="flow-node" data-step="2" onclick="activateStep(2)">
+              <div class="node-circle">S2</div>
+              <span class="node-label">2단계. FR 문장 정의</span>
+            </div>
+            <div class="flow-node" data-step="3" onclick="activateStep(3)">
+              <div class="node-circle">S3</div>
+              <span class="node-label">3단계. 시나리오 보완</span>
+            </div>
+            <div class="flow-node" data-step="4" onclick="activateStep(4)">
+              <div class="node-circle">S4</div>
+              <span class="node-label">4단계. 기획 질문 작성</span>
+            </div>
+            <div class="flow-node" data-step="5" onclick="activateStep(5)">
+              <div class="node-circle">S5</div>
+              <span class="node-label">5단계. 통합 및 메일 발송</span>
+            </div>
+          </div>
+
+          <div class="transformer-box">
+            <div class="transformer-title">
+              <span id="trans-title-text">준비 단계. 로컬 작업 폴더 및 AI 연동 세팅</span>
+              <span class="step-indicator" id="trans-step-text">Workspace Config</span>
+            </div>
+            <div class="transformer-grid">
+              <div class="transformer-card">
+                <div class="transformer-card-head input-head">📥 작업 공간 (Input Environment)</div>
+                <div class="transformer-card-body">
+                  <div class="card-file-name" id="input-filename">바탕화면 (Desktop)</div>
+                  <div style="font-size: 0.6rem; color: var(--text-desc);" id="input-desc">학습자 컴퓨터의 탐색기 환경</div>
+                  <div class="card-preview" id="input-preview">automation/ (빈 폴더 생성)</div>
+                </div>
+              </div>
+              <div class="transformer-arrow">
+                <span class="arrow-ai-label">Codex AI</span>
+                <span class="arrow-line">➔</span>
+                <span class="arrow-ai-label" id="trans-ai-role">Setup Workspace</span>
+              </div>
+              <div class="transformer-card">
+                <div class="transformer-card-head output-head">📤 연동 결과 (Output Workspace)</div>
+                <div class="transformer-card-body">
+                  <div class="card-file-name" id="output-filename">Codex Client 대화창</div>
+                  <div style="font-size: 0.6rem; color: var(--text-desc);" id="output-desc">폴더가 활성화된 AI 작업 공간</div>
+                  <div class="card-preview" id="output-preview">[폴더 연동 완료]
+프로젝트를 선택하면
+프로젝트 파일 연동 제어 가능</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-card-section" style="margin-top: 10px;">
+            <p style="font-size: 0.74rem;" id="detail-desc-text">사용자가 로컬에 전용 디렉토리를 구축하고, Codex AI 또는 에디터 환경에 해당 경로를 열어서 마크다운 명세 문서들을 읽고 쓸 수 있는 통로를 준비합니다.</p>
+            <div class="prompt-box" id="detail-prompt-text">로컬 환경에 바탕화면에 [automation] 폴더를 생성하고 Codex Client를 실행합니다.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==================== PART 3 PANEL ==================== -->
+      <div class="part-panel" id="part-3">
+        <div class="premium-card">
+          <h2>따라하기 가이드 &amp; 실제 Codex Client UI 흐름</h2>
+          <p style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 12px;">
+            왼쪽 버튼을 차례대로 클릭하며 실제 학습자가 Codex Client 화면에서 직접 클릭하고 입력해야 하는 **행동 위치(빨간색 가이드 상자)**를 확인하세요.
+          </p>
+
+          <div class="follow-layout">
+            
+            <!-- Left Steps List Selector -->
+            <div class="follow-steps">
+              
+              <!-- Step 1 Button -->
+              <div class="follow-step-btn active" onclick="clickFollowStep(1)">
+                <h3>STEP 1. 프로젝트 선택</h3>
+                <p>바탕화면에 빈 <code>automation</code> 폴더를 연결합니다.</p>
+              </div>
+
+              <!-- Step 2 Button -->
+              <div class="follow-step-btn" onclick="clickFollowStep(2)">
+                <h3>STEP 2. 샘플 파일 생성</h3>
+                <p>프롬프트를 이용해 <code>meeting-notes-raw.md</code>를 만듭니다.</p>
+              </div>
+
+              <!-- Step 3 Button -->
+              <div class="follow-step-btn" onclick="clickFollowStep(3)">
+                <h3>STEP 3. Prompt 입력</h3>
+                <p>요약본 작성을 위해 읽을 파일과 쓸 파일 지시</p>
+              </div>
+
+              <!-- Step 4 Button -->
+              <div class="follow-step-btn" onclick="clickFollowStep(4)">
+                <h3>STEP 4. Codex 실행</h3>
+                <p>우측 빌드 버튼을 눌러 요약본을 생성합니다.</p>
+              </div>
+
+              <!-- Step 5 Button -->
+              <div class="follow-step-btn" onclick="clickFollowStep(5)">
+                <h3>STEP 5. 새 파일 확인</h3>
+                <p>Explorer에서 생성된 <code>meeting-notes.md</code>를 더블클릭합니다.</p>
+              </div>
+
+            </div>
+
+            <!-- Right GUI Mockup (Real UX Replica with Red Box Highlight) -->
+            <div class="gui-mockup">
+              <div class="gui-header">
+                <div class="gui-dots">
+                  <div class="gui-dot red"></div>
+                  <div class="gui-dot yellow"></div>
+                  <div class="gui-dot green"></div>
+                </div>
+                <div class="gui-title">Codex Client v2026.07</div>
+                <div style="width: 30px;"></div>
+              </div>
+              <div class="gui-body">
+                
+                <!-- GUI Left Projects list -->
+                <div class="gui-sidebar" id="gui-projects-panel">
+                  <div class="sidebar-title">프로젝트</div>
+                  
+                  <div class="sidebar-project-item active" id="gui-project-target">
+                    📁 automation
+                  </div>
+                  
+                  <div class="sidebar-file-tree" id="gui-files-target">
+                    <div class="sidebar-file-item" id="gui-raw-file" style="display: none;">📄 meeting-notes-raw.md</div>
+                    <div class="sidebar-file-item" id="gui-generated-file" style="display: none;">📄 meeting-notes.md</div>
+                  </div>
+                </div>
+
+                <!-- GUI Main Area -->
+                <div class="gui-main">
+                  
+                  <div class="gui-build-welcome">
+                    <h3 id="gui-build-status">automation에서 무엇을 빌드할까요?</h3>
+                    <p id="gui-build-desc">Prompt를 입력하면 프로젝트 폴더 내 파일에 반영됩니다.</p>
+                  </div>
+
+                  <!-- Prompt input area -->
+                  <div class="gui-input-container" id="gui-input-target">
+                    <input type="text" class="gui-input-field" id="gui-input-value" value="" disabled />
+                    <button class="gui-build-btn" id="gui-build-btn-target">빌드</button>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==================== PART 4 PANEL ==================== -->
+      <div class="part-panel" id="part-4">
+        <div class="premium-card">
+          <h2>작동 원리 및 컨텍스트 의존관계 맵</h2>
+          <p style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 12px;">
+            AI가 프로젝트 폴더 내 파일을 인지하고 기획 단계를 계승해 나가는 논리적 아키텍처 맵입니다.
+          </p>
+
+          <div class="dep-flow">
+            <div class="dep-row">
+              <div class="dep-box active">대화록 원문 (meeting-notes-raw.md)</div>
+            </div>
+            <div class="dep-connector">▼ (0단계: 소음 정제 전처리)</div>
+            <div class="dep-row">
+              <div class="dep-box active">요약 기획 메모 (meeting-notes.md)</div>
+            </div>
+            <div class="dep-connector">▼ (1~3단계: 역할/기능/정상·예외 흐름 구체화)</div>
+            <div class="dep-row">
+              <div class="dep-box active">요구사항 정의서 (functional-requirements.md)</div>
+              <div style="width: 20px; text-align: center;">↔</div>
+              <div class="dep-box active">미결정 질문 (open-questions.md)</div>
+            </div>
+            <div class="dep-connector">▼ (5단계: 문서 통합 및 의사결정 요청 메일 공유)</div>
+            <div class="dep-row">
+              <div class="dep-box active">통합 요구사항 명세서 및 보고서 작성</div>
+            </div>
+            <div class="dep-connector" style="color: var(--accent-purple);">▼ [다음 세션 연계 설계 로드맵]</div>
+            <div class="dep-row">
+              <div class="dep-box future">데이터베이스 모델 설계 (ERD)</div>
+              <div style="width: 10px;"></div>
+              <div class="dep-box future">백엔드 API 규격서</div>
+              <div style="width: 10px;"></div>
+              <div class="dep-box future">프론트엔드 와이어프레임</div>
+            </div>
+          </div>
+
+          <p style="font-size: 0.74rem; color: var(--text-muted); line-height: 1.45;">
+            이처럼 단계별로 산출된 마크다운 명세 문서는 기획 단계에 그치지 않고, 다음 Day 2 ~ Day 10 교육과정에서 
+            <strong>DB ERD 설계서, 백엔드 API 명세, 프론트엔드 와이어프레임 코드</strong>를 코덱스가 자동 작성하는 핵심 기초 데이터(Context)로 그대로 계승됩니다.
+          </p>
+        </div>
+      </div>
+
+      <!-- ==================== PART 5 PANEL ==================== -->
+      <div class="part-panel" id="part-5">
+        <div class="premium-card">
+          <h2>PBL 미션: 추가 요구사항 변경 대응 및 Gmail 플러그인 전송</h2>
+          
+          <div class="pbl-mission-box">
+            <span class="pbl-mission-badge">PBL 실전 과제</span>
+            <h3 style="color: #ffffff; font-size: 0.8rem; margin-bottom: 5px;">대표의 신규 정책 추가 및 피드백 루프 작동</h3>
+            <p style="font-size: 0.74rem; color: #e9d5ff; line-height: 1.4;">
+              실제 개발 프로세스 중 대표가 회의록 끝부분에 새로운 요구사항을 덧붙였습니다.<br>
+              <strong>"회원 탈퇴 기능도 추가합시다. 사용자가 회원 탈퇴를 하면 예약된 모든 상담 일정이 자동으로 취소되고 즉각 환불되어야 합니다."</strong>
+            </p>
+          </div>
+
+          <div style="margin-top: 15px;">
+            <h3 style="font-size: 0.82rem; color: var(--secondary-color); margin-bottom: 6px;">미션 따라 하기 시퀀스</h3>
+            <ul style="padding-left: 14px; font-size: 0.74rem; line-height: 1.45;">
+              <li style="margin-bottom: 4px;"><strong>1. 원본 파일 수정</strong>: 로컬의 <code>meeting-notes-raw.md</code> 문서 최하단에 대표의 가상 추가 대사(회원 탈퇴 및 자동 예약 취소)를 추가합니다.</li>
+              <li style="margin-bottom: 4px;"><strong>2. Codex Client 명세 갱신 지시</strong>: AI 프롬프트 창에 <code>"meeting-notes-raw.md의 신규 대화를 반영하여 functional-requirements.md에 회원 탈퇴 기능(FR-005)과 그에 따른 예약 취소 예외 흐름을 업데이트해줘."</code> 라고 지시합니다.</li>
+              <li style="margin-bottom: 4px;"><strong>3. 통합서 및 질문지 업데이트</strong>: 변경된 요구사항을 린트 검증하고, 연동해둔 **Gmail 플러그인** 발송 기능을 작동시켜 대표에게 회원 탈퇴와 관련된 미결정 사안 승인 메일을 즉시 전송합니다.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== PART 6 PANEL ==================== -->
+      <div class="part-panel" id="part-6">
+        <div class="premium-card">
+          <h2>📌 추가 Skill Task 요약 — Business Understanding &amp; Domain Discovery</h2>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 15px;">
+            기존 Day 1 커리큘럼에 기술 전문성과 AI 협업 역량을 명시적으로 연결하기 위해 3개 Task를 추가합니다. 기존 Task/Mission의 목표·산출물은 유지하며, 추가 Task는 기존 결과물을 더 깊게 설계·구현·검증하는 확장 단계입니다.
+          </p>
+
+          <h3 style="font-size: 0.85rem; color: var(--secondary-color); margin-bottom: 8px;">1. 추가 Task 및 Skill Map</h3>
+          <div style="overflow-x: auto; margin-bottom: 16px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.74rem;">
+              <thead>
+                <tr style="background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1);">
+                  <th style="padding: 8px; text-align: left;">Task ID</th>
+                  <th style="padding: 8px; text-align: left;">추가 Task</th>
+                  <th style="padding: 8px; text-align: left;">영역</th>
+                  <th style="padding: 8px; text-align: left;">기술 Skill</th>
+                  <th style="padding: 8px; text-align: left;">AI 활용 Skill</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <td style="padding: 8px;"><code>ADD-D01-T01</code></td>
+                  <td style="padding: 8px;">서비스 문제와 Persona 정의</td>
+                  <td style="padding: 8px;"><span style="color: #67e8f9;">HYBRID</span></td>
+                  <td style="padding: 8px;"><code>TECH-BA</code> <code>TECH-DDD</code></td>
+                  <td style="padding: 8px;"><code>AI-CTX</code> <code>AI-ANA</code> <code>AI-DOC</code></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                  <td style="padding: 8px;"><code>ADD-D01-T02</code></td>
+                  <td style="padding: 8px;">Feature를 Domain으로 분류</td>
+                  <td style="padding: 8px;"><span style="color: #93c5fd;">TECH</span></td>
+                  <td style="padding: 8px;"><code>TECH-BA</code> <code>TECH-DDD</code></td>
+                  <td style="padding: 8px;"><code>AI-ANA</code> <code>AI-REV</code></td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px;"><code>ADD-D01-T03</code></td>
+                  <td style="padding: 8px;">Domain Map과 책임 경계 검토</td>
+                  <td style="padding: 8px;"><span style="color: #c084fc;">AI</span></td>
+                  <td style="padding: 8px;"><code>TECH-DDD</code> <code>TECH-ARCH</code></td>
+                  <td style="padding: 8px;"><code>AI-CTX</code> <code>AI-REV</code> <code>AI-DOC</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 style="font-size: 0.85rem; color: var(--secondary-color); margin-bottom: 8px;">2. 학습 연결 흐름 및 산출물</h3>
+          <div style="background: rgba(9, 9, 11, 0.5); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); font-size: 0.74rem; line-height: 1.5; margin-bottom: 16px;">
+            <p style="margin-bottom: 6px; color: var(--secondary-color); font-weight: 700;">
+              <code>ADD-D01-T01</code> 서비스 문제와 Persona 정의 → <code>ADD-D01-T02</code> Feature를 Domain으로 분류 → <code>ADD-D01-T03</code> Domain Map과 책임 경계 검토
+            </p>
+            <ul style="list-style-type: none; padding-left: 0; color: var(--text-muted);">
+              <li>• <strong>입력 Context:</strong> 서비스 아이디어, 기존 Day 1 요구사항 산출물, 사용자 후보</li>
+              <li>• <strong>Day 통합 산출물:</strong> Service Overview, Persona, Feature List, Domain Map, Responsibility Map</li>
+              <li>• <strong>권장 제출 파일:</strong> <code>01_SERVICE_OVERVIEW.md</code>, <code>03_DOMAIN_MAP.md</code></li>
+              <li>• <strong>AI 역할:</strong> Domain Analyst</li>
+            </ul>
+          </div>
+
+          <h3 style="font-size: 0.85rem; color: var(--secondary-color); margin-bottom: 8px;">3. Day 1 실습 과제 (Missions 1 ~ 4)</h3>
+          <div style="background: rgba(9, 9, 11, 0.5); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); font-size: 0.74rem; line-height: 1.6; margin-bottom: 16px;">
+            <ul style="list-style-type: none; padding-left: 0; color: var(--text-muted);">
+              <li>• <strong>Mission 1:</strong> 반려동물 홈케어 및 펫시터 매칭 서비스 기획 (Step 9)</li>
+              <li>• <strong>Mission 2:</strong> 무인 스터디카페 공간 예약 및 IoT 제어 명세화 (Step 10)</li>
+              <li>• <strong>Mission 3 (Skill Mission 1):</strong> 숏폼 VOD &amp; 라이브 커머스 플랫폼 Persona, Domain Map 및 Bounded Context 설계 (Step 11)</li>
+              <li>• <strong>Mission 4 (Skill Mission 2):</strong> 스마트 B2B 모빌리티 &amp; 차량 관제 플랫폼 데이터 소유권 및 Domain 경계 설계 (Step 12)</li>
+            </ul>
+          </div>
+
+          <h3 style="font-size: 0.85rem; color: var(--secondary-color); margin-bottom: 8px;">4. 공통 완료 Checklist</h3>
+          <ul style="padding-left: 18px; font-size: 0.74rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 16px;">
+            <li>✅ 3개 추가 Task의 결과가 기존 Day 1 산출물과 연결되어 있다.</li>
+            <li>✅ 모든 Task에 기술 Skill과 AI 활용 Skill의 수행 증거가 있다.</li>
+            <li>✅ AI가 제안한 내용의 수용·수정·거절 근거가 기록되어 있다.</li>
+            <li>✅ 4개 실습 과제(Missions)의 산출물이 모두 완수 가능하다.</li>
+            <li>✅ 결과물이 다음 Day (User Flow &amp; Sequence 설계)의 입력으로 재사용 가능하다.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Action -->
+      <div class="action-container">
+        <a href="day1-ai-codex.html" class="btn-link">🚀 실습 하러 가기</a>
+        <a href="../index.html" class="btn-link sec">목록으로</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- JavaScript to switch parts and activate interactive steps -->
+  <script>
+    // Part Menu Switcher
+    function switchPart(partNum) {
+      const tabs = document.querySelectorAll('.part-tab');
+      const panels = document.querySelectorAll('.part-panel');
+      
+      tabs.forEach((tab, index) => {
+        if (index + 1 === partNum) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+
+      panels.forEach((panel, index) => {
+        if (index + 1 === partNum) {
+          panel.classList.add('active');
+        } else {
+          panel.classList.remove('active');
+        }
+      });
+
+      // Default follow step trigger when switching to Part 3
+      if (partNum === 3) {
+        clickFollowStep(1);
+      }
+    }
+
+    // Step Data definitions for Part 2 Diagram
+    const stepData = {
+      prep: {
+        title: "준비 단계. 로컬 작업 폴더 및 AI 연동 세팅",
+        stepLabel: "Workspace Config",
+        aiRole: "Setup Workspace",
+        inputFilename: "바탕화면 (Desktop)",
+        inputDesc: "학습자 컴퓨터의 탐색기 환경",
+        inputPreview: `automation/ (빈 폴더 생성)`,
+        outputFilename: "Codex Client 대화창",
+        outputDesc: "폴더가 활성화된 AI 작업 공간",
+        outputPreview: `[폴더 연동 완료]\n프로젝트를 선택하면\n프로젝트 파일 연동 제어 가능`,
+        descText: "사용자가 로컬에 전용 디렉토리를 구축하고, Codex AI 또는 에디터 환경에 해당 경로를 열어서 마크다운 명세 문서들을 읽고 쓸 수 있는 통로를 준비합니다.",
+        promptText: "로컬 환경에 바탕화면에 [automation] 폴더를 생성하고 Codex Client를 실행합니다."
+      },
+      0: {
+        title: "0단계. 상세 대화록에서 핵심 요약 도출 (전처리)",
+        stepLabel: "Step 0 Transformer",
+        aiRole: "Summarizer",
+        inputFilename: "meeting-notes-raw.md",
+        inputDesc: "회의 시 오고 간 장황한 4인의 핑퐁 대화록",
+        inputPreview: `# 1차 Kick-off 회의록\n대표: 사용자가 회원가입 후 전문가 검색을...\nPM: 가입이 바로 되나요?\n대표: 회원가입을 마쳐야만 쓸 수 있게...`,
+        outputFilename: "meeting-notes.md",
+        outputDesc: "사담을 제거하고 15줄로 정제한 핵심 메모",
+        outputPreview: `사용자는 가입 후 전문가를 검색할 수 있다.\n결제가 완료되면 예약이 확정된다.\n알림 수단 및 취소 수수료는 아직 미정이다.`,
+        descText: "회의록 대화문에서 요구사항을 추출하기 전에, 불필요한 사담 및 문맥 흐름 등의 텍스트 노이즈를 걷어내어 엔지니어링 분석 효율을 최대화하는 요약 기획 메모를 도출합니다.",
+        promptText: `meeting-notes-raw.md의 회의록 원문을 읽고, 화자 간의 불필요한 대화 맥락과 문맥을 걷어내고 서비스 사용자, 기능 요건, 시스템 정책, 미결정 유보 사항을 15줄 내외의 컴팩트한 비정형 요약 메모 형태로 작성해줘. 원문에 없는 가상의 내용은 임의로 상상해서 추가하지 말아줘.`
+      },
+      1: {
+        title: "1단계. 요약된 기획 메모 요건 분석",
+        stepLabel: "Step 1 Transformer",
+        aiRole: "Analyst",
+        inputFilename: "meeting-notes.md",
+        inputDesc: "전처리에서 가공된 15줄 핵심 요약 메모",
+        inputPreview: `사용자는 가입 후 전문가를 검색할 수 있다.\n결제가 완료되면 예약이 확정된다.\n알림 방식과 취소 수수료는 아직 미정이다.`,
+        outputFilename: "분류된 기획 객체 목록",
+        outputDesc: "사용자, 기능 후보, 비즈니스 정책, 미결정 사항 분류",
+        outputPreview: `1. 사용자: Customer, Expert, Admin\n2. 기능: 회원가입, 전문가 조회\n3. 비즈니스 룰: 결제 승인시 예약 확정\n4. 미결정: 알림 수단`,
+        descText: "비정형 텍스트에 섞여 있는 기획 요소를 4가지(사용자, 기능, 정책, 미결정 사항) 성격에 따라 완전 분리하여 구조화 요구사항 작성을 위한 준비를 마칩니다.",
+        promptText: `meeting-notes.md를 읽고 다음 내용을 구분해줘. 1. 서비스 사용자 2. 사용자가 수행하는 기능 3. 시스템이 수행하는 기능 4. 비즈니스 규칙 5. 아직 결정되지 않은 사항. 회의 메모에 없는 내용은 추가하지 말고 불명확한 내용은 별도로 표시해줘.`
+      },
+      2: {
+        title: "2단계. 기능 요구사항 문장 정의 (FR 테이블)",
+        stepLabel: "Step 2 Transformer",
+        aiRole: "Technical Writer",
+        inputFilename: "분류된 기획 객체 목록",
+        inputDesc: "사용자 역할과 기능 후보 목록",
+        inputPreview: `1. 사용자: Customer, Expert\n2. 기능: 회원가입, 전문가 조회, 상담시간 선택\n3. 정책: 결제 성공 시 예약 확정`,
+        outputFilename: "functional-requirements.md",
+        outputDesc: "테스트 가능한 정형 요구사항 표 (ID 부여)",
+        outputPreview: `| ID | 사용자 | 기능명 | 요구사항 설명 |\n| FR-001 | Customer | 회원가입 | 사용자는 정보를 입력해 계정을 생성할 수 있어야 한다. |\n| FR-004 | System | 예약 확정 | 시스템은 결제가 완료된 경우 예약을 확정해야 한다. |`,
+        descText: "객체로 쪼개진 기능을 '[사용자/시스템]은 [특정 조건]에서 [동작]해야 한다'는 엄격한 테스팅 규칙 공식에 따라 기획 명세 문장으로 조형합니다.",
+        promptText: `1단계에서 추출한 기능 후보를 기능 요구사항으로 작성해줘. 요구사항 ID는 FR-001부터 순서대로 부여하고, 하나의 요구사항에는 하나의 기능만, 사용자를 명확히 적고, 모호한 표현을 제외하고 Markdown 표로 출력해줘.`
+      },
+      3: {
+        title: "3단계. 시나리오 보완 (정상 및 예외 흐름)",
+        stepLabel: "Step 3 Transformer",
+        aiRole: "QC Explorer",
+        inputFilename: "functional-requirements.md (초안)",
+        inputDesc: "FR-001 ~ FR-004 명세 테이블 표",
+        inputPreview: `| FR-004 | System | 예약 확정 | 시스템은 결제가 승인된 경우에만 예 예약을 확정해야 한다. |`,
+        outputFilename: "functional-requirements.md (상세)",
+        outputDesc: "정상 흐름 단계, 실패/중복 예외 처리 정책 추가",
+        outputPreview: `### FR-004 예약 확정\n- 정상 흐름: 1. 결제요청 생성 -> 2. 외부 승인 -> 3. 예약 확정\n- 예외 흐름: 1. 결제 실패 시 예약 취소\n- 검증 기준: 결제 실패 시 확정 예약 미생물 검증`,
+        descText: "사용자가 행하는 이상적인 메인 비즈니스 정상 경로 외에, 시스템 장애나 데이터 중복, 결제 실패 등 현실에서 발생할 수 있는 이상 시나리오 명세를 보충합니다.",
+        promptText: `functional-requirements.md of 각 요구사항에 정상 흐름과 예외 흐름을 추가해줘. 정상 흐름은 시작부터 완료까지 단계별로 작성하고, 예외 흐름은 실패, 중복, 데이터 없음 상황을 검토하며 임의 결정하지 않고 확인 필요로 명시해줘.`
+      },
+      4: {
+        title: "4단계. 미결정 기획 질문지 추출",
+        stepLabel: "Step 4 Transformer",
+        aiRole: "Question Maker",
+        inputFilename: "명세 속 정책 미결정 리스트",
+        inputDesc: "앞 단계에서 '확인 필요'로 마킹된 모호한 정책",
+        inputPreview: `알림 전송 수단 미정, 취소 환불 수수료 비율 검토 필요, 결제 직후 저장 실패 정책 검토 필요`,
+        outputFilename: "open-questions.md",
+        outputDesc: "우선순위, 상태가 정제된 의사결정용 질문 표",
+        outputPreview: `| 질문 ID | 관련 ID | 확인할 질문 | 결정 이유 | 영향 기능 | 우선순위 |\n| Q-001 | FR-005 | 취소 수수료 환불 비율은? | 환불 연산 필요 | 환불 | Must |\n| Q-003 | FR-006 | 알림 채널은 무엇인가? | 범위 결정 | 알림 | Should |`,
+        descTitle: "💡 이 단계의 핵심 목표",
+        descText: "개발 전에 결정되어야 하는 의사결정 쟁점 사항을 식별하고 구조화된 질문 리스트로 명문화하여, 기획 수정 루프(Feedback Loop)를 가동합니다.",
+        promptText: `현재 요구사항 문서를 검토해서 확정되지 않았거나 모호한 내용을 찾아줘. 각 항목을 기획자가 이해관계자에게 확인할 수 있는 질문 형태로 작성하고, 관련 ID, 결정 필요 이유, 영향 기능, 우선순위 표로 만들어줘.`
+      },
+      5: {
+        title: "5단계. 문서 통합 및 Gmail 발송 (플러그인)",
+        stepLabel: "Step 5 Transformer",
+        aiRole: "AI Validator & Gmail Agent",
+        inputFilename: "meeting-notes.md 등 3개 명세",
+        inputDesc: "요약본, 요구사항 명세, 오픈 질문지 목록",
+        inputPreview: `- meeting-notes.md\n- functional-requirements.md\n- open-questions.md\n- Gmail 플러그인 구글 연동`,
+        outputFilename: "통합 문서 및 메일 자동 전송",
+        outputDesc: "requirements-specification.md 및 Gmail 플러그인 전송",
+        outputPreview: `[Gmail 플러그인 메일 발송 완료]\n수신: representative@startup.com\n제목: [승인 요청] 전문가 상담 서비스 요구사항 명세서 검토...\n상태: 보낸메일함 전송 완료 (OAuth API 호출 성공)`,
+        descTitle: "💡 이 단계의 핵심 목표",
+        descText: "산발적으로 생성된 개별 마크다운 문서들을 하나의 마스터 명세 파일로 빌드 통합하고, Codex Client의 Gmail 플러그인 연동 설정을 통해 AI에게 기획 승인 요청 메일을 즉시 실제 전송하도록 명령합니다.",
+        promptText: `Gmail 플러그인을 사용하여 방금 검증 완료된 requirements-specification.md 내용과 open-questions.md의 미결정 사항들을 요약해 [의사결정권자 메일 주소]로 기획 승인 요청 메일을 전송해줘.`
+      }
+    };
+
+    function activateStep(stepNum) {
+      const nodes = document.querySelectorAll('.flow-node');
+      nodes.forEach(node => {
+        if (node.getAttribute('data-step') === String(stepNum)) {
+          node.classList.add('active');
+        } else {
+          node.classList.remove('active');
+        }
+      });
+
+      const data = stepData[stepNum];
+      if (!data) return;
+
+      document.getElementById('trans-title-text').innerText = data.title;
+      document.getElementById('trans-step-text').innerText = data.stepLabel;
+      document.getElementById('trans-ai-role').innerText = data.aiRole;
+      
+      document.getElementById('input-filename').innerText = data.inputFilename;
+      document.getElementById('input-desc').innerText = data.inputDesc;
+      document.getElementById('input-preview').innerText = data.inputPreview;
+
+      document.getElementById('output-filename').innerText = data.outputFilename;
+      document.getElementById('output-desc').innerText = data.outputDesc;
+      document.getElementById('output-preview').innerText = data.outputPreview;
+
+      document.getElementById('detail-desc-text').innerText = data.descText;
+      document.getElementById('detail-prompt-text').innerText = data.promptText;
+    }
+
+    // Part 3 Follow-Step Handler (Sample File Creation + Dynamic UX Highlights)
+    function clickFollowStep(stepNum) {
+      // 1. Toggle Step button state
+      const btns = document.querySelectorAll('.follow-step-btn');
+      btns.forEach((btn, index) => {
+        if (index + 1 === stepNum) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // 2. Target elements mapping inside Mock GUI
+      const projectItem = document.getElementById('gui-project-target');
+      const projectsPanel = document.getElementById('gui-projects-panel');
+      const inputField = document.getElementById('gui-input-target');
+      const buildBtn = document.getElementById('gui-build-btn-target');
+      
+      const rawFile = document.getElementById('gui-raw-file');
+      const generatedFile = document.getElementById('gui-generated-file');
+
+      const statusTitle = document.getElementById('gui-build-status');
+      const statusDesc = document.getElementById('gui-build-desc');
+      const inputValue = document.getElementById('gui-input-value');
+
+      // Reset all highlights and tooltips
+      const allElements = [projectItem, projectsPanel, inputField, buildBtn, rawFile, generatedFile];
+      allElements.forEach(el => {
+        el.classList.remove('red-focus-box');
+        const oldTooltip = el.querySelector('.gui-tooltip');
+        if (oldTooltip) oldTooltip.remove();
+      });
+
+      // 3. Apply changes and highlights based on step
+      switch(stepNum) {
+        case 1:
+          // STEP 1. Select Project (automation)
+          projectItem.classList.add('red-focus-box');
+          projectItem.insertAdjacentHTML('beforeend', '<div class="gui-tooltip">여기를 클릭하세요 (프로젝트 선택)</div>');
+          
+          statusTitle.innerText = "automation에서 무엇을 빌드할까요?";
+          statusDesc.innerText = "로컬 바탕화면에 automation 폴더를 생성하고 Codex Client에서 연동했습니다.";
+          rawFile.style.display = "none";
+          generatedFile.style.display = "none";
+          inputValue.value = "";
+          break;
+          
+        case 2:
+          // STEP 2. Create Sample File
+          inputField.classList.add('red-focus-box');
+          inputField.insertAdjacentHTML('beforeend', '<div class="gui-tooltip">회의록 생성 프롬프트를 입력하고 빌드를 클릭하세요</div>');
+          
+          statusTitle.innerText = "📝 meeting-notes-raw.md 파일을 생성하고 대화록을 작성합니다.";
+          statusDesc.innerText = "빈 폴더 상태에서 최초의 샘플 회의 대화록 원본 파일을 자동 생성 중입니다.";
+          
+          rawFile.style.display = "block";
+          rawFile.style.opacity = "1";
+          generatedFile.style.display = "none";
+          inputValue.value = "meeting-notes-raw.md를 생성하고 1차 회의 대화록을 적어줘.";
+          break;
+          
+        case 3:
+          // STEP 3. Input Summary Prompt
+          inputField.classList.add('red-focus-box');
+          inputField.insertAdjacentHTML('beforeend', '<div class="gui-tooltip">요약 전처리 프롬프트를 입력하세요</div>');
+          
+          statusTitle.innerText = "automation에서 무엇을 빌드할까요?";
+          statusDesc.innerText = "meeting-notes-raw.md 파일이 생성되었으므로 이제 요약 작업을 지시합니다.";
+          rawFile.style.display = "block";
+          rawFile.style.opacity = "1";
+          generatedFile.style.display = "none";
+          inputValue.value = "meeting-notes-raw.md를 읽고 meeting-notes.md를 생성해줘.";
+          break;
+          
+        case 4:
+          // STEP 4. Build execution (Click Build)
+          buildBtn.classList.add('red-focus-box');
+          buildBtn.insertAdjacentHTML('beforeend', '<div class="gui-tooltip">이 빌드 단추를 클릭하세요</div>');
+          
+          statusTitle.innerText = "🚀 AI가 meeting-notes.md 파일을 요약 빌드 중...";
+          statusDesc.innerText = "meeting-notes-raw.md 내용을 토대로 사담을 걷어낸 요약본을 제작 중입니다.";
+          rawFile.style.display = "block";
+          rawFile.style.opacity = "1";
+          generatedFile.style.display = "none";
+          inputValue.value = "meeting-notes-raw.md를 읽고 meeting-notes.md를 생성해줘.";
+          break;
+          
+        case 5:
+          // STEP 5. Confirm generated summary file
+          generatedFile.classList.add('red-focus-box');
+          generatedFile.insertAdjacentHTML('beforeend', '<div class="gui-tooltip">생성 완료! 파일을 더블클릭 하세요</div>');
+          
+          statusTitle.innerText = "✨ 빌드가 성공적으로 끝났습니다!";
+          statusDesc.innerText = "정제 완료된 meeting-notes.md를 열어서 요약 결과를 검증하세요.";
+          rawFile.style.display = "block";
+          rawFile.style.opacity = "1";
+          generatedFile.style.display = "block";
+          generatedFile.style.opacity = "1";
+          inputValue.value = "meeting-notes-raw.md를 읽고 meeting-notes.md를 생성해줘.";
+          break;
+      }
+    }
+  </script>
+
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

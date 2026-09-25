@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attendance and the Final Round — ACE Startup Academy 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#07231A;
+    --ink-2:#0E3627;
+    --paper:#F4F6F2;
+    --paper-dim:#B9C9BF;
+    --gold:#E7B23F;
+    --line:rgba(244,246,242,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--ink);
+    font-family:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    color:var(--paper);
+    display:flex;align-items:center;justify-content:center;
+    padding:2vmin;
+  }
+  .slide{
+    width:min(100%, 177.78vh);
+    aspect-ratio:16/9;
+    background:
+      radial-gradient(120% 90% at 100% 0%, var(--ink-2) 0%, var(--ink) 60%);
+    display:flex;flex-direction:column;
+    padding:5.2% 6% 0;
+    container-type:inline-size;
+    overflow:hidden;
+  }
+  .mark{
+    font-size:1.55cqw;font-weight:600;letter-spacing:.06em;
+    color:var(--paper-dim);
+  }
+  h1{
+    margin-top:2.2cqw;
+    font-size:5.4cqw;line-height:1.02;font-weight:800;
+    letter-spacing:-.028em;max-width:19ch;
+  }
+  h1 span{color:var(--gold)}
+  .rules{
+    margin-top:3.2cqw;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:0;
+    border-top:1px solid var(--line);
+  }
+  .rule{
+    padding:1.9cqw 2cqw 1.9cqw 0;
+    border-right:1px solid var(--line);
+  }
+  .rule:last-child{border-right:none}
+  .rule:not(:first-child){padding-left:2cqw}
+  .rule p{
+    font-size:1.92cqw;line-height:1.38;font-weight:500;
+    color:var(--paper);max-width:26ch;
+  }
+  .rule strong{font-weight:800}
+  .band{
+    margin:auto -6% 0;
+    background:var(--gold);color:#0A1F16;
+    padding:2.4cqw 6%;
+    display:flex;align-items:baseline;gap:4cqw;
+  }
+  .band h2{
+    font-size:2.5cqw;font-weight:800;letter-spacing:-.02em;
+    line-height:1.15;flex:1.35;
+  }
+  .band p{
+    font-size:1.8cqw;font-weight:600;line-height:1.35;flex:1;
+    border-left:2px solid rgba(10,31,22,.35);padding-left:2.4cqw;
+  }
+  @media (max-width:760px){
+    .slide{aspect-ratio:auto;min-height:100%;padding:8% 7% 0}
+    h1{font-size:8.4cqw;max-width:none}
+    .mark{font-size:3cqw}
+    .rules{grid-template-columns:1fr}
+    .rule{border-right:none;border-bottom:1px solid var(--line);padding:4cqw 0}
+    .rule:not(:first-child){padding-left:0}
+    .rule p{font-size:4.2cqw;max-width:none}
+    .band{margin:6cqw -7% 0;padding:6cqw 7%;flex-direction:column;gap:3cqw}
+    .band h2{font-size:5.6cqw}
+    .band p{font-size:4.2cqw;border-left:none;border-top:2px solid rgba(10,31,22,.35);padding:3cqw 0 0}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .slide{width:100%;height:100vh}
+    @page{size:landscape}
+  }
+</style>
+</head>
+<body>
+  <main class="slide">
+    <div class="mark">ACE Startup Academy 2026 / AI Week, Abuja</div>
+
+    <h1>Attendance decides who reaches the <span>Final Round</span>.</h1>
+
+    <section class="rules">
+      <article class="rule">
+        <p>Attendance is tracked every session, and it counts toward selection.</p>
+      </article>
+      <article class="rule">
+        <p>An excellent product <strong>will not</strong> rescue a team with attendance problems.</p>
+      </article>
+      <article class="rule">
+        <p>Diligence and consistency are assessed alongside what you build.</p>
+      </article>
+    </section>
+
+    <div class="band">
+      <h2>The Final Round is judged by Nigeria's Minister of Industry, Trade and Investment (FMITI) and the Korean Ambassador.</h2>
+      <p>Teams selected there are invited to Korea.</p>
+    </div>
+  </main>
+</body>
+</html>

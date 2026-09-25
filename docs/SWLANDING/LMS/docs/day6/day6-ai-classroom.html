@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 6 AI 강의실 | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary: #3b82f6;      /* ACE Startup Electric Blue */
+      --primary-dark: #1d4ed8; /* ACE Startup Dark Blue */
+      --primary-soft: rgba(59, 130, 246, 0.1);
+      --accent: #06b6d4;       /* Neon Cyan */
+      --accent-soft: rgba(6, 182, 212, 0.12);
+      --accent-purple: #8b5cf6; /* Vibrant Purple */
+      --accent-purple-soft: rgba(139, 92, 246, 0.15);
+      --green: #8b5cf6;        /* Purple highlight - minimal use */
+      --bg: #09090b;
+      --panel: #111827;
+      --text: #ffffff;
+      --muted: #e4e4e7;
+      --line: rgba(255, 255, 255, 0.08);
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      font-family: 'Pretendard', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .topbar-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(0, 64, 152, 0.16);
+    }
+
+    .brand-text h1 {
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+
+    .brand-text p {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: 1px solid var(--primary-soft);
+    }
+
+    .lecture-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      color: #ffffff !important;
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: none;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .lecture-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+      background: linear-gradient(135deg, #0891b2, #2563eb);
+    }
+
+    .page-wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 20px 32px;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, #eff6ff, #ffffff);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .hero-meta {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: #e0ecff;
+      color: var(--primary-dark);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .hero-card h2 {
+      font-size: 2rem;
+      line-height: 1.25;
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+
+    .hero-card p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 900px;
+    }
+
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .hero-stat {
+      padding: 10px 14px;
+      background: #fff;
+      border: 1px solid #dbeafe;
+      border-radius: 14px;
+      font-size: 0.92rem;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.25fr 0.85fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .left-col,
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .right-col {
+      position: sticky;
+      top: 96px;
+      height: calc(100vh - 120px);
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: 20px 22px;
+      border-bottom: 1px solid #eef2ff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-head h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .video-wrap {
+      padding: 18px;
+    }
+
+    .video-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #0f172a;
+      border: 1px solid #dbeafe;
+      position: relative;
+    }
+
+    .video-frame iframe,
+    .video-frame video {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #000;
+    }
+
+    .video-note {
+      padding: 0 18px 18px;
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .note-body {
+      padding: 22px;
+    }
+
+    .note-body h4 {
+      font-size: 1rem;
+      color: var(--primary-dark);
+      margin-bottom: 12px;
+      font-weight: 800;
+    }
+
+    .note-body p {
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 14px;
+    }
+
+    .note-body ul {
+      padding-left: 18px;
+      color: #334155;
+      line-height: 1.8;
+      display: grid;
+      gap: 10px;
+    }
+
+    .tip-box {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      background: #eff6ff;
+      border: 1px solid #dbeafe;
+      color: #1e3a8a;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+
+    /* Playlist Styles */
+    .playlist-wrap {
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+    }
+
+    .playlist-header {
+      padding: 16px 22px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .playlist {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .playlist-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 22px;
+      cursor: pointer;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.2s ease;
+    }
+
+    .playlist-item:last-child {
+      border-bottom: none;
+    }
+
+    .playlist-item:hover {
+      background: #f8fbff;
+    }
+
+    .playlist-item.active {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary);
+      padding-left: 18px;
+    }
+
+    .play-icon {
+      color: #cbd5e1;
+      font-size: 1rem;
+    }
+
+    .playlist-item.active .play-icon {
+      color: var(--primary);
+    }
+
+    .playlist-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .playlist-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .playlist-item.active .playlist-title {
+      color: var(--primary-dark);
+      font-weight: 800;
+    }
+
+    .playlist-duration {
+      font-size: 0.82rem;
+      color: #64748b;
+    }
+
+    .assistant-panel {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wip-overlay {
+      position: absolute;
+      top: 72px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: 0 0 20px 20px;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .wip-badge {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .wip-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .wip-desc {
+      font-size: 0.82rem;
+      color: #64748b;
+      line-height: 1.45;
+      max-width: 250px;
+      word-break: keep-all;
+    }
+
+    .assistant-head {
+      padding: 18px 20px;
+      background: #eff6ff;
+      border-bottom: 1px solid #dbeafe;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .assistant-head-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .assistant-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #bfdbfe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .assistant-head h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .assistant-head p {
+      font-size: 0.82rem;
+      color: #2563eb;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .online-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .chat-area {
+      flex: 1;
+      min-height: 0;
+      background: #f8fbff;
+      padding: 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .chat-area::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-area::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    .chat-area::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    .chat-area::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .message-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      max-width: 88%;
+    }
+
+    .message-row.user {
+      margin-left: auto;
+      flex-direction: row-reverse;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .avatar.bot {
+      background: #fff;
+      border: 1px solid var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .avatar.user {
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+
+    .bubble {
+      padding: 13px 15px;
+      border-radius: 18px;
+      line-height: 1.7;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      word-break: keep-all;
+    }
+
+    .bubble.bot {
+      background: #fff;
+      border: 1px solid #dbeafe;
+      color: #334155;
+      border-top-left-radius: 6px;
+    }
+
+    .bubble.user {
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      color: #fff;
+      border-top-right-radius: 6px;
+      box-shadow: 0 10px 20px rgba(0, 185, 239, 0.12);
+    }
+
+    .typing {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .typing span {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+      animation: bounce 1s infinite;
+    }
+
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.7; }
+      40% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    .chat-input-wrap {
+      padding: 16px;
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+    }
+
+    .chat-form {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      padding: 10px;
+    }
+
+    .chat-form:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(0, 185, 239, 0.15);
+    }
+
+    .chat-textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      resize: none;
+      min-height: 44px;
+      max-height: 140px;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: #0f172a;
+      line-height: 1.5;
+      padding: 10px 8px;
+    }
+
+    .send-btn {
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--primary));
+      color: #fff;
+      border-radius: 12px;
+      min-width: 48px;
+      height: 48px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0, 64, 152, 0.14);
+    }
+
+    .send-btn:disabled {
+      background: #bfdbfe;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .disclaimer {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .assistant-panel {
+        height: 640px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .topbar-inner,
+      .page-wrap {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .hero-card {
+        padding: 22px 18px;
+      }
+
+      .hero-card h2 {
+        font-size: 1.5rem;
+      }
+
+      .message-row {
+        max-width: 95%;
+      }
+    }
+
+    /* Cyber Modern AI Style Dark Theme Override */
+    body {
+      background: var(--bg) !important;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.05) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%) !important;
+      background-attachment: fixed !important;
+      color: #ffffff !important;
+    }
+    .topbar {
+      background: rgba(9, 9, 11, 0.7) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .brand-text h1 { color: #ffffff !important; }
+    .brand-text p { color: #71717a !important; }
+    .back-btn {
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: #ffffff !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+      transition: all 0.2s ease;
+    }
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border-color: rgba(59, 130, 246, 0.3) !important;
+    }
+    .hero-card {
+      background: rgba(26, 29, 36, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+      color: #ffffff !important;
+    }
+    .hero-card h2 { color: #ffffff !important; }
+    .hero-card p { color: #e4e4e7 !important; }
+    .hero-stat {
+      background: rgba(255, 255, 255, 0.02) !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+      color: #e4e4e7 !important;
+    }
+    .chip {
+      background: rgba(59, 130, 246, 0.15) !important;
+      color: #93c5fd !important;
+    }
+    .card {
+      background: rgba(26, 29, 36, 0.85) !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+    }
+    .card-head {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .card-head h3 {
+      color: #ffffff !important;
+    }
+    .video-frame {
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      background: #000000 !important;
+    }
+    .video-note {
+      color: #a1a1aa !important;
+    }
+    .playlist-wrap {
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      background: rgba(26, 29, 36, 0.95) !important;
+    }
+    .playlist-header {
+      color: #ffffff !important;
+      background: rgba(17, 24, 39, 0.8) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .playlist-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    }
+    .playlist-item:hover {
+      background: rgba(255, 255, 255, 0.03) !important;
+    }
+    .playlist-item.active {
+      background: rgba(59, 130, 246, 0.12) !important;
+      border-left-color: var(--primary) !important;
+    }
+    .playlist-item.active .playlist-title {
+      color: #ffffff !important;
+    }
+    .playlist-title {
+      color: #e4e4e7 !important;
+    }
+    .playlist-duration {
+      color: #71717a !important;
+    }
+    .tip-box {
+      background: rgba(6, 182, 212, 0.06) !important;
+      border: 1px solid rgba(6, 182, 212, 0.15) !important;
+      color: #a5f3fc !important;
+    }
+    .note-body h4 {
+      color: var(--accent) !important;
+    }
+    .note-body p, .note-body ul {
+      color: #e4e4e7 !important;
+    }
+    .assistant-head {
+      background: rgba(17, 24, 39, 0.8) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .assistant-head h3 {
+      color: #ffffff !important;
+    }
+    .assistant-head p {
+      color: var(--accent) !important;
+    }
+    .assistant-icon {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: var(--primary) !important;
+    }
+    .chat-area {
+      background: rgba(9, 9, 11, 0.6) !important;
+    }
+    .avatar.bot {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: var(--primary) !important;
+    }
+    .avatar.user {
+      background: rgba(59, 130, 246, 0.2) !important;
+      color: #93c5fd !important;
+    }
+    .bubble.bot {
+      background: rgba(26, 29, 36, 0.9) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      color: #ffffff !important;
+    }
+    .bubble.user {
+      background: linear-gradient(135deg, var(--accent), var(--primary)) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2) !important;
+    }
+    .chat-input-wrap {
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      background: rgba(17, 24, 39, 0.9) !important;
+    }
+    .chat-form {
+      background: rgba(9, 9, 11, 0.8) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    }
+    .chat-form:focus-within {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15) !important;
+    }
+    .chat-textarea {
+      color: #ffffff !important;
+    }
+    .send-btn {
+      background: linear-gradient(135deg, var(--accent), var(--primary)) !important;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2) !important;
+    }
+    .wip-overlay {
+      background: rgba(9, 9, 11, 0.85) !important;
+    }
+    .wip-title {
+      color: #ffffff !important;
+    }
+    .wip-desc {
+      color: #71717a !important;
+    }
+
+    /* Tasks Section Styles */
+    .tasks-section {
+      margin-top: 24px;
+    }
+
+    .tasks-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .tasks-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .task-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .task-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+    }
+
+    .task-card-thumb {
+      height: 110px;
+      background-size: cover;
+      background-position: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .task-card-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-grow: 1;
+    }
+
+    .task-card-badge {
+      display: inline-block;
+      width: fit-content;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(59, 130, 246, 0.12);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .task-card-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .task-card-desc {
+      font-size: 0.76rem;
+      color: #a1a1aa;
+      line-height: 1.45;
+    }
+
+    .task-card-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-top: auto;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .task-card-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+
+    @media (max-width: 1200px) {
+      .tasks-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">AI</div>
+        <div class="brand-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>프론트엔드 개발 & API 연동과 AI</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <a href="../../../LECTURE/docs/index.html#slide-69" class="lecture-btn" target="_blank">📖 Session 6 실습 교안 보기</a>
+        <a href="../index.html" class="back-btn">← 커리큘럼 페이지로 돌아가기</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <section class="hero-card">
+      <div class="hero-meta">
+        <span class="chip">Day 6</span>
+        <span class="chip">프론트엔드 개발 & API 연동과 AI</span>
+        <span class="chip">영상 + AI 챗봇 학습</span>
+      </div>
+      <h2>프론트엔드 개발 & API 연동과 AI 학습도우미</h2>
+      <p>
+        Figma UI를 실제 서비스 화면으로 구현하고, fetch/AJAX 기반 API 연동을 통해 서버 데이터를 화면에 바인딩하며 로딩·에러·빈 상태까지 처리하는 6일차 학습 콘텐츠입니다. <strong>특히 본 세션에서는 Codex Client Workspace를 활용하여 화면 초안을 빠르게 만들고, 디버깅을 의뢰하며, 코드 리팩토링 및 다차원 코드 품질 감사를 수행하는 AI 페어 프로그래밍 협업 방식을 학습합니다.</strong>
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">대상: UI/UX 고해상도 디자인을 완료한 학생</div>
+        <div class="hero-stat">준비물: 노트북, VS Code, 웹 브라우저</div>
+        <div class="hero-stat">구성: 2시간 이론 / 3시간 실습 / 1시간 공유</div>
+        <a href="../../../LECTURE/docs/index.html#slide-69" class="lecture-btn" target="_blank">📖 Session 6 교안 바로가기</a>
+      </div>
+    </section>
+
+    
+    <section class="tasks-section" style="margin-bottom: 24px;">
+      <div class="tasks-header">
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+          🚀 Day 6 실습 MVP Tasks 로드맵
+        </h3>
+        <a href="day6-ai-classroom_detail_task.html" class="back-btn"
+          style="padding: 8px 16px; font-size: 0.8rem; font-weight: 700; border-radius: 10px;">전체 Task 보드 가기 →</a>
+      </div>
+
+      <div class="tasks-grid">
+        <!-- Task Checklist CTA Card -->
+        <article class="task-card"
+          style="background: rgba(6, 182, 212, 0.08); border-color: rgba(6, 182, 212, 0.2); box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15);">
+          <div class="task-card-thumb"
+            style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2)); font-size: 2.2rem; display: flex; align-items: center; justify-content: center;">
+            🚀</div>
+          <div class="task-card-content"
+            style="padding: 16px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1;">
+            <span class="task-card-badge"
+              style="background: rgba(6, 182, 212, 0.15); color: #a5f3fc; border-color: rgba(6, 182, 212, 0.25);">Interactive
+              Board</span>
+            <h4 class="task-card-title" style="color: var(--accent); font-size: 0.9rem; font-weight: 800;">실습 Task 체크리스트
+            </h4>
+            <p class="task-card-desc" style="font-size: 0.76rem; color: #a1a1aa; line-height: 1.45;">필수 태스크의 진척도를 기록하고
+              상세 실습 가이드라인을 확인해보세요.</p>
+            <a href="day6-ai-classroom_detail_task.html" class="task-card-btn"
+              style="background: linear-gradient(135deg, var(--accent), var(--primary)); margin-top: auto; display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 8px 12px; border-radius: 8px; color: #ffffff; font-size: 0.78rem; font-weight: 700; transition: all 0.2s ease;">👉
+              상세 Task 보드 이동</a>
+          </div>
+        </article>
+
+        <!-- Task 1 (AI Agent Task 1) -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(0deg); color: #fff;">TASK 1</div>
+          <div class="task-card-content">
+            <span class="task-card-badge">AI Agent Task 1</span>
+            <h4 class="task-card-title">Task 1. 화면 초안 빠르게 만들기</h4>
+            <p class="task-card-desc">요구사항 명세를 기반으로 가동 가능한 반응형 대시보드 화면 초안 코드를 빌드합니다.</p>
+            <a href="day6-ai-codex-1.html" class="task-card-btn">실습실 입장</a>
+          </div>
+        </article>
+
+        <!-- Task 2 (AI Agent Task 2) -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(90deg); color: #fff;">TASK 2</div>
+          <div class="task-card-content">
+            <span class="task-card-badge">AI Agent Task 2</span>
+            <h4 class="task-card-title">Task 2. 오류 해결 도우미</h4>
+            <p class="task-card-desc">TypeError 등 비동기 바인딩 에러의 발생 라인 분석 및 방어 조치 방안을 학습합니다.</p>
+            <a href="day6-ai-codex-2.html" class="task-card-btn">실습실 입장</a>
+          </div>
+        </article>
+
+        <!-- Task 3 (AI Agent Task 3) -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(180deg); color: #fff;">TASK 3</div>
+          <div class="task-card-content">
+            <span class="task-card-badge">AI Agent Task 3</span>
+            <h4 class="task-card-title">Task 3. 코드 개선하기</h4>
+            <p class="task-card-desc">중복 HTML 조작과 모호한 임시 변수명을 실무 명명법 규칙에 맞춰 리팩토링합니다.</p>
+            <a href="day6-ai-codex-3.html" class="task-card-btn">실습실 입장</a>
+          </div>
+        </article>
+
+        <!-- Skill Task 1 -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(45deg); color: #fff;">SKILL 1</div>
+          <div class="task-card-content">
+            <span class="task-card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border-color: rgba(6, 182, 212, 0.3);">Skill Task 1</span>
+            <h4 class="task-card-title">화면–API Binding 구현</h4>
+            <p class="task-card-desc">Viewer/Advertiser Flow 화면을 실제 API Contract와 연결하고 데이터 전달을 구현합니다.</p>
+            <a href="day6-ai-codex-1.html" class="task-card-btn" style="background: linear-gradient(135deg, var(--accent), var(--primary));">실습실 입장</a>
+          </div>
+        </article>
+
+        <!-- Skill Task 2 -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(135deg); color: #fff;">SKILL 2</div>
+          <div class="task-card-content">
+            <span class="task-card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border-color: rgba(6, 182, 212, 0.3);">Skill Task 2</span>
+            <h4 class="task-card-title">상태 관리와 실패 UX 구현</h4>
+            <p class="task-card-desc">Loading, Empty, Validation, Timeout, Error 등 6대 상태 및 복구 인터랙션을 구현합니다.</p>
+            <a href="day6-ai-codex-2.html" class="task-card-btn" style="background: linear-gradient(135deg, var(--accent), var(--primary));">실습실 입장</a>
+          </div>
+        </article>
+
+        <!-- Skill Task 3 -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(225deg); color: #fff;">SKILL 3</div>
+          <div class="task-card-content">
+            <span class="task-card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border-color: rgba(6, 182, 212, 0.3);">Skill Task 3</span>
+            <h4 class="task-card-title">Front-End Debugging &amp; Refactoring</h4>
+            <p class="task-card-desc">콘솔 오류, 전역 변수 오염, 접근성 및 성능 이슈를 디버깅하고 코드를 구조화합니다.</p>
+            <a href="day6-ai-codex-3.html" class="task-card-btn" style="background: linear-gradient(135deg, var(--accent), var(--primary));">실습실 입장</a>
+          </div>
+        </article>
+
+        <!-- Mission 1 -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(270deg); color: #fff;">MISSION 1</div>
+          <div class="task-card-content">
+            <span class="task-card-badge" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border-color: rgba(139, 92, 246, 0.2);">Mission 1</span>
+            <h4 class="task-card-title">[과제] AI와 함께 오류 해결하기</h4>
+            <p class="task-card-desc">CORS/JSON 가비지 해석 오류 배경 진단을 받고 문제 방지 대책 리포트를 작성합니다.</p>
+            <a href="day6-ai-codex-mission1.html" class="task-card-btn" style="background: linear-gradient(135deg, #8b5cf6, #d946ef);">과제실 입장</a>
+          </div>
+        </article>
+
+        <!-- Mission 2 -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(320deg); color: #fff;">MISSION 2</div>
+          <div class="task-card-content">
+            <span class="task-card-badge" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border-color: rgba(139, 92, 246, 0.2);">Mission 2</span>
+            <h4 class="task-card-title">[과제] AI 코드 리뷰 받기</h4>
+            <p class="task-card-desc">작성 코드를 다차원 지표로 평가받아 최적 캡슐화 및 가독성 개선안을 도출합니다.</p>
+            <a href="day6-ai-codex-mission2.html" class="task-card-btn" style="background: linear-gradient(135deg, #8b5cf6, #d946ef);">과제실 입장</a>
+          </div>
+        </article>
+
+        <!-- Mission 3 (Skill Mission 1) -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(140deg); color: #fff;">MISSION 3</div>
+          <div class="task-card-content">
+            <span class="task-card-badge" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border-color: rgba(139, 92, 246, 0.2);">Mission 3</span>
+            <h4 class="task-card-title">[과제] 리얼타임 웹소켓 채팅 바인딩</h4>
+            <p class="task-card-desc">멀티룸 채팅 UI에 WebSocket/REST API를 연결하고 자동 재연결 UX를 구현합니다.</p>
+            <a href="day6-ai-codex-mission1.html" class="task-card-btn" style="background: linear-gradient(135deg, #8b5cf6, #d946ef);">과제실 입장</a>
+          </div>
+        </article>
+
+        <!-- Mission 4 (Skill Mission 2) -->
+        <article class="task-card">
+          <div class="task-card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(180deg); color: #fff;">MISSION 4</div>
+          <div class="task-card-content">
+            <span class="task-card-badge" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border-color: rgba(139, 92, 246, 0.2);">Mission 4</span>
+            <h4 class="task-card-title">[과제] 핀테크 대시보드 FE Debugging</h4>
+            <p class="task-card-desc">핀테크 대시보드 코드의 무한 루프와 전역 오염 원인을 디버깅하고 실패 UX를 보완합니다.</p>
+            <a href="day6-ai-codex-mission2.html" class="task-card-btn" style="background: linear-gradient(135deg, #8b5cf6, #d946ef);">과제실 입장</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <main class="layout">
+      <section class="left-col">
+        <div class="card">
+          <div class="card-head">
+            <h3>Day 6 강의 영상</h3>
+            <span class="chip">유튜브 추천 강의</span>
+          </div>
+
+          <div class="video-wrap">
+            <div class="video-frame">
+              <iframe id="mainVideo" src="https://www.youtube.com/embed/PkZNo7MFNFg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+          </div>
+
+          <div class="video-note">
+            Day 6 커리큘럼 핵심 주제(HTML/CSS/JS 구현, API 연동, 데이터 바인딩, 비동기 프로그래밍, 에러 핸들링)에 해당하는 유튜브 추천 강의 리스트입니다. (외부 퍼가기 및 재생이 허용된 무료 강의 영상으로 구성되었습니다.)
+          </div>
+
+          <div class="playlist-wrap">
+            <div class="playlist-header">📚 전체 강의 목록 (5개)</div>
+            <ul class="playlist">
+              <li class="playlist-item active" data-src="https://www.youtube.com/embed/PkZNo7MFNFg">
+                <span class="play-icon">▶</span>
+                <div class="playlist-info">
+                  <div class="playlist-title">1. Learn JavaScript - Full Course for Beginners (freeCodeCamp)</div>
+                  <div class="playlist-duration">3:26:42</div>
+                </div>
+              </li>
+              <li class="playlist-item " data-src="https://www.youtube.com/embed/w077w7FN-pg">
+                <span class="play-icon">▶</span>
+                <div class="playlist-info">
+                  <div class="playlist-title">2. WEB3 - Ajax 수업 소개 (생활코딩)</div>
+                  <div class="playlist-duration">6:20</div>
+                </div>
+              </li>
+              <li class="playlist-item " data-src="https://www.youtube.com/embed/ufjCFdG_4fo">
+                <span class="play-icon">▶</span>
+                <div class="playlist-info">
+                  <div class="playlist-title">3. WEB3 - Ajax fetch API 사용법 (생활코딩)</div>
+                  <div class="playlist-duration">8:10</div>
+                </div>
+              </li>
+              <li class="playlist-item " data-src="https://www.youtube.com/embed/XbeEc_uRCsY">
+                <span class="play-icon">▶</span>
+                <div class="playlist-info">
+                  <div class="playlist-title">4. JavaScript - jQuery Ajax 소개 (생활코딩)</div>
+                  <div class="playlist-duration">7:45</div>
+                </div>
+              </li>
+              <li class="playlist-item " data-src="https://www.youtube.com/embed/5fb2aPlgoys">
+                <span class="play-icon">▶</span>
+                <div class="playlist-info">
+                  <div class="playlist-title">5. JavaScript DOM Manipulation – Full Course for Beginners (freeCodeCamp)</div>
+                  <div class="playlist-duration">2:15:30</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>핵심 요약 노트</h3>
+            <span class="chip">Day 6 Summary</span>
+          </div>
+
+          <div class="note-body">
+            <h4>오늘의 핵심 목표</h4>
+            <p>
+              Day 6에서는 Figma UI를 실제 서비스 화면으로 구현하고, fetch/AJAX 기반 API 연동을 통해 서버 데이터를 화면에 바인딩하며 로딩·에러·빈 상태까지 처리합니다.
+            </p>
+
+            <ul>
+              <li><strong>HTML/CSS/JS 웹 화면 구현:</strong> Figma 디자인을 시맨틱 HTML 태그와 CSS 스타일로 구현</li>
+              <li><strong>반응형 레이아웃 설계:</strong> 미디어 쿼리(Media Query) 및 Flexbox/Grid 활용</li>
+              <li><strong>fetch API 기반 데이터 요청:</strong> fetch 및 async-await를 사용한 GET/POST API 호출</li>
+              <li><strong>화면 데이터 바인딩 (Data Binding):</strong> 서버에서 받은 JSON 데이터를 DOM 요소에 적용</li>
+              <li><strong>상태 처리 및 에러 핸들링:</strong> 데이터 로딩 중, 에러 발생, 빈 데이터 상태에 따른 화면 처리</li>
+            </ul>
+
+            <div class="tip-box">
+              학습 팁: 오른쪽 AI 챗봇에게 “async/await 문법을 사용해 fetch API 호출할 때 에러 처리는 어떻게 해?” 또는 “서버에서 받아온 JSON 리스트 데이터를 HTML 화면에 동적으로 뿌리는 방법은?” 같은 질문을 해보세요.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right-col">
+        <div class="card assistant-panel">
+          <div class="assistant-head">
+            <div class="assistant-head-left">
+              <div class="assistant-icon">🤖</div>
+              <div>
+                <h3>학습 도우미 AI</h3>
+                <p><span class="online-dot"></span>온라인 상태</p>
+              </div>
+            </div>
+            <span class="chip">ko-KR</span>
+          </div>
+
+          <div class="chat-area" id="chatArea">
+          </div>
+
+          <div class="chat-input-wrap">
+            <form class="chat-form" id="chatForm">
+              <textarea
+                id="chatInput"
+                class="chat-textarea"
+                placeholder="강의 내용 중 궁금한 점을 질문해보세요..."
+                rows="1"
+              ></textarea>
+              <button type="submit" class="send-btn" id="sendBtn">➤</button>
+            </form>
+            <div class="disclaimer">
+              AI 응답은 참고용입니다. 중요한 학습 내용은 강의 자료와 교안을 함께 확인해주세요.
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    // 운영 시에는 브라우저 직접 노출 대신 서버 프록시 사용 권장
+
+    const messages = [
+      {
+        role: "model",
+        text: "안녕하세요! Day 6 'Front-End Development & API Integration' 학습 도우미 AI입니다. HTML/CSS/JS 화면 퍼블리싱, fetch API 연동, 비동기 프로그래밍, DOM 조작에 대해 편하게 질문해주세요 😊"
+      }
+    ];
+
+    const chatArea = document.getElementById("chatArea");
+    const chatForm = document.getElementById("chatForm");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+        function formatMessageText(str) {
+      let escaped = escapeHtml(str);
+      escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">$1</a>');
+      escaped = escaped.replace(/(^|[^"])(https?:\/\/[^\s<]+)/g, '$1<a href="$2" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">$2</a>');
+      return escaped.replace(/\n/g, "<br>");
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function renderMessages(isLoading = false) {
+      chatArea.innerHTML = "";
+
+      messages.forEach(msg => {
+        const row = document.createElement("div");
+        row.className = `message-row ${msg.role === "user" ? "user" : ""}`;
+
+        const avatar = document.createElement("div");
+        avatar.className = `avatar ${msg.role === "user" ? "user" : "bot"}`;
+        avatar.textContent = msg.role === "user" ? "나" : "AI";
+
+        const bubble = document.createElement("div");
+        bubble.className = `bubble ${msg.role === "user" ? "user" : "bot"}`;
+        bubble.innerHTML = formatMessageText(msg.text);
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        chatArea.appendChild(row);
+      });
+
+      if (isLoading) {
+        const row = document.createElement("div");
+        row.className = "message-row";
+
+        const avatar = document.createElement("div");
+        avatar.className = "avatar bot";
+        avatar.textContent = "AI";
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble bot";
+        bubble.innerHTML = `
+          <div class="typing">
+            <span></span><span></span><span></span>
+          </div>
+        `;
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        chatArea.appendChild(row);
+      }
+
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+        async function callGeminiAPI(userMessage, currentHistory) {
+      const formattedHistory = currentHistory.map(msg => ({
+        role: msg.role === "model" ? "model" : "user",
+        text: msg.text
+      }));
+
+      const backendApiUrl = "https://labs.edunlab.kr/chatbot/api/chat";
+
+      try {
+        const response = await fetch(backendApiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userMessage: userMessage,
+            currentHistory: formattedHistory,
+            day: 6,
+            lang: "ko"
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || `서버 오류 (${response.status})`);
+        }
+
+        return data.text || "답변을 생성하지 못했습니다.";
+      } catch (error) {
+        console.error("AI Tutor Server Error:", error);
+        throw new Error(error.message || "AI 챗봇 서버 연결에 실패했습니다. 네트워크 상태를 확인해 주세요.");
+      }
+    }
+
+    let isSending = false;
+
+    async function handleSendMessage(e) {
+      if (e) e.preventDefault();
+      const userMsg = chatInput.value.trim();
+      if (!userMsg || isSending) return;
+
+      isSending = true;
+      messages.push({ role: "user", text: userMsg });
+      chatInput.value = "";
+      chatInput.style.height = "auto";
+      sendBtn.disabled = true;
+      renderMessages(true);
+
+      try {
+        const responseText = await callGeminiAPI(userMsg, messages.slice(0, -1));
+        messages.push({ role: "model", text: responseText });
+      } catch (error) {
+        messages.push({
+          role: "model",
+          text: `⚠️ ${error.message || "오류가 발생했습니다. AI 챗봇 서버 연결을 확인해 주세요."}`
+        });
+      } finally {
+        isSending = false;
+        sendBtn.disabled = false;
+        renderMessages(false);
+      }
+    }
+
+    chatForm.addEventListener("submit", handleSendMessage);
+
+    chatInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        if (e.isComposing) return;
+        e.preventDefault();
+        if (chatForm.requestSubmit) {
+          chatForm.requestSubmit();
+        } else {
+          handleSendMessage(e);
+        }
+      }
+    });
+
+    chatInput.addEventListener("input", function() {
+      this.style.height = "auto";
+      this.style.height = Math.min(this.scrollHeight, 140) + "px";
+    });
+
+    renderMessages(false);
+
+    // Video Playlist Logic (YouTube Embed Support)
+    const mainVideo = document.getElementById("mainVideo");
+    const playlistItems = document.querySelectorAll(".playlist-item");
+
+    playlistItems.forEach(item => {
+      item.addEventListener("click", function() {
+        // 모든 아이템에서 active 클래스 제거 후 클릭한 항목에 추가
+        playlistItems.forEach(el => el.classList.remove("active"));
+        this.classList.add("active");
+        
+        // 유튜브 임베드 소스 변경 및 자동 재생 추가
+        let newSrc = this.getAttribute("data-src");
+        if (newSrc.indexOf("?") > -1) {
+          newSrc += "&autoplay=1";
+        } else {
+          newSrc += "?autoplay=1";
+        }
+        mainVideo.src = newSrc;
+      });
+    });
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

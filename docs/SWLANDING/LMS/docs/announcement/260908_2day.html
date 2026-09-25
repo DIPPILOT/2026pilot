@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>USD 40 Tool Support — Slide</title>
+<style>
+  :root{
+    --ink:#161a1d;
+    --paper:#fbfaf7;
+    --rule:#cfcabd;
+    --mark:#1f5f4e;
+    --soft:#5c5f63;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:#e8e6e0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    color:var(--ink);
+  }
+  .stage{width:100%;max-width:1280px;aspect-ratio:16/9;container-type:inline-size}
+  .slide{
+    width:100%;height:100%;
+    background:var(--paper);
+    padding:3.4cqw 4.6cqw 3cqw;
+    display:grid;
+    grid-template-rows:auto auto 1fr auto;
+    row-gap:1.8cqw;
+  }
+  .sans{font-family:ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif}
+
+  .kicker{
+    font-family:ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif;
+    font-size:1.15cqw;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--soft);
+  }
+  h1{
+    font-size:4.4cqw;line-height:1.06;font-weight:600;letter-spacing:-.02em;
+    margin-top:.5cqw;
+  }
+  h1 b{color:var(--mark);font-weight:600}
+
+  .body{display:grid;grid-template-columns:1.05fr 1fr;column-gap:4cqw}
+
+  .num{
+    font-size:8.6cqw;line-height:.86;font-weight:600;color:var(--mark);
+    letter-spacing:-.03em;
+  }
+  .num small{font-size:2.4cqw;letter-spacing:0}
+  .numcap{
+    font-family:ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif;
+    font-size:1.35cqw;color:var(--soft);margin-top:.9cqw;line-height:1.5;
+  }
+  .why{
+    margin-top:2.4cqw;padding:1.6cqw 1.8cqw;
+    background:var(--mark);color:#f4f2ec;
+    font-size:1.4cqw;line-height:1.55;
+  }
+  .why strong{display:block;font-size:1.15cqw;letter-spacing:.14em;
+    text-transform:uppercase;opacity:.75;margin-bottom:.7cqw;
+    font-family:ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif;font-weight:600}
+
+  ol{list-style:none;counter-reset:s}
+  ol li{
+    counter-increment:s;
+    display:grid;grid-template-columns:2.6cqw 1fr;column-gap:1.1cqw;
+    padding:.95cqw 0;border-top:1px solid var(--rule);
+    font-size:1.5cqw;line-height:1.4;
+  }
+  ol li:last-child{border-bottom:1px solid var(--rule)}
+  ol li::before{
+    content:counter(s);
+    font-family:ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif;
+    font-size:1.3cqw;font-weight:650;color:var(--mark);
+    padding-top:.25cqw;
+  }
+  ol li b{font-weight:650}
+  ol li b.red{color:#c1121f;font-weight:700}
+  .hard{
+    margin-top:1.5cqw;padding:1.2cqw 1.5cqw;
+    background:var(--ink);color:#f4f2ec;
+    font-size:1.45cqw;line-height:1.5;
+  }
+  .hard strong{display:block;font-size:1.15cqw;letter-spacing:.14em;
+    text-transform:uppercase;color:#e9c46a;margin-bottom:.5cqw;
+    font-family:ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif;font-weight:700}
+  .hard b{color:#e9c46a}
+  .alert{
+    margin-top:1.1cqw;padding:1cqw 1.5cqw;border:1.5px solid var(--mark);
+    font-size:1.3cqw;line-height:1.5;
+  }
+  .alert b{color:var(--mark)}
+
+  footer{
+    display:flex;justify-content:space-between;align-items:baseline;
+    border-top:1px solid var(--rule);padding-top:1.3cqw;
+  }
+  .luck{font-size:2.6cqw;font-weight:600;color:var(--mark);letter-spacing:-.01em}
+  .meta{
+    font-family:ui-sans-serif,system-ui,"Helvetica Neue",Arial,sans-serif;
+    font-size:1.2cqw;color:var(--soft);
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="slide">
+
+    <p class="kicker">Notice to all teams</p>
+    <h1>We are covering your <b>AI coding tool</b></h1>
+
+    <div class="body">
+      <div>
+        <div class="num"><small>USD</small> 40</div>
+        <p class="numcap">Per team. Codex <b>or</b> Antigravity &mdash; your choice, one tool per team.<br>Paid in cash, in naira, on <b>Friday, September 11</b>.</p>
+
+        <div class="why">
+          <strong>Why</strong>
+          This was not in the original plan. The competition is close, and we want every team to reach it on equal footing &mdash; not to lose ground over a subscription fee.
+        </div>
+      </div>
+
+      <div>
+        <ol>
+          <li><span>Pick <b>Codex or Antigravity</b> and pay with your own card.</span></li>
+          <li><span>Get the receipt (<b>date, time, amount, tool name</b>) and <b class="red">print it on paper.</b></span></li>
+          <li><span><b class="red">Hand in the printed receipt on Friday</b> &mdash; collect <b>USD 40 in naira</b>.</span></li>
+        </ol>
+
+        <div class="hard">
+          <strong>Printed receipt only &mdash; no exceptions</strong>
+          A receipt shown on a <b>phone screen will NOT be accepted</b>. No paper printout, no reimbursement.
+        </div>
+
+        <div class="alert">
+          <b>Pay after 3:00 PM on Mon, Sep 7.</b> Earlier charges cannot be reimbursed. Over USD 40, the team covers the difference.
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span class="luck">Good luck &mdash; go build.</span>
+      <span class="meta">Questions? Ask the staff before you pay.</span>
+    </footer>
+
+  </div>
+</div>
+</body>
+</html>

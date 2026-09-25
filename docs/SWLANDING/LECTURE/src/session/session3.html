@@ -1,0 +1,377 @@
+<!-- Slide 34: [간지] SESSION 03 -->
+<section class="slide-card divider-slide session-3" id="slide-39">
+  <div class="slide-header" style="display: none;">
+    <div class="slide-category">3일차 | 3차시. 기술설계 (데이터 정규화)</div>
+    <div class="slide-title">[세션 오프닝] 3일차. 기술설계 (데이터 정규화)</div>
+  </div>
+
+  <div class="divider-content">
+    <div class="divider-day">DAY 3</div>
+    <div class="divider-tag">SESSION 03</div>
+    <h1 class="divider-title">기술설계 (데이터 정규화)</h1>
+    <p class="divider-subtitle">데이터 모델(ERD) 합의, 도메인 용어 통일, 변경 영향 공유 및 Edge Case 안전 설계</p>
+    <div class="divider-topics">
+      <div class="topic-badge"><span>01</span> ERD 모델링 &amp; 용어 사전 (Task 01/02)</div>
+      <div class="topic-badge"><span>02</span> 스키마 변경 영향도 (Task 03)</div>
+      <div class="topic-badge"><span>03</span> 결정 로깅 &amp; Edge Case 방어 (Mission 01/02)</div>
+    </div>
+  </div>
+
+  <div class="slide-body" style="display: none;">
+    <p>3차시. 기술설계 (데이터 정규화) 세션 시작</p>
+  </div>
+  <div class="presenter-notes" style="display:none;">3일차 세션에서는 자연어로 작성된 기획서에서 데이터 구조와 관계(ERD)를 명확히 도출하고, 파편화된 용어 사전 구축, 그리고 동시성 및 논리삭제(Soft Delete) 예외 케이스 방어 전략을 학습합니다.</div>
+</section>
+
+<!-- Slide: Day 3 Recap Slide (KO) -->
+<section class="slide-card session-3" id="slide-40">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">3일차 | 데이터 정규화 &amp; ERD 무결성 요약</div>
+      <div class="slide-title">Day 3. 요약 및 실습 리캡 (Recap)</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 16px; padding: 40px 32px; text-align: center; height: 100%; max-width: 680px; margin: 0 auto;">
+      <div style="font-size: 3.5rem; margin-bottom: 16px;">🇰🇷</div>
+      <h3 style="font-size: 1.6rem; font-weight: 700; color: #60a5fa; margin-bottom: 12px;">Day 3 학습 요약 (국문)</h3>
+      <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.6; text-align: center;">
+        엔티티/속성/관계 도출부터 Mermaid ERD, 표준 용어 사전 구축, 스키마 변경 영향도 분석, 아키텍처 결정 기록 및 데이터 무결성 예외 방어를 포함한 Day 3 통합 요약 교안입니다.
+      </p>
+      <a href="../../ADD_LECTURE/260731_Day3_Recap_Data_ERD_Codex_KR.html" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 36px; font-size: 1.1rem; background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 12px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; cursor: pointer; max-width: 320px; width: 100%;">
+        🚀 요약 슬라이드 열기 (KO)
+      </a>
+    </div>
+
+    <div class="presenter-notes" style="display:none;">이 슬라이드는 Day 3 데이터 정규화, ERD 및 무결성 관리 통합 요약 자료 링크를 제공합니다. 버튼을 클릭하면 새 창에서 슬라이드가 열립니다.</div>
+  </div>
+</section>
+
+<!-- Slide: Day 3 Supplement Guide Slide (KO) -->
+<section class="slide-card session-3" id="slide-40-2">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">3일차 | 보충 가이드 (쉬운 데이터 설계)</div>
+      <div class="slide-title">Day 3. 데이터 정규화 &amp; ERD 보충 가이드</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 16px; padding: 40px 32px; text-align: center; height: 100%; max-width: 680px; margin: 0 auto;">
+      <div style="font-size: 3.5rem; margin-bottom: 16px;">📖</div>
+      <h3 style="font-size: 1.6rem; font-weight: 700; color: #10b981; margin-bottom: 12px;">Day 3 보충 가이드 (국문)</h3>
+      <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.6; text-align: center;">
+        코드 없이 배우는 데이터 정규화, 엑셀 시트 이상 현상, 카디널리티 결정법, 변경 영향도 분석 및 Codex 실습 프롬프트를 담은 입문용 보충 학습 가이드입니다.
+      </p>
+      <a href="../../ADD_LECTURE/Supplement_day3-guide-kr.html" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 36px; font-size: 1.1rem; background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 12px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; cursor: pointer; max-width: 320px; width: 100%;">
+        🚀 보충 가이드 열기 (KO)
+      </a>
+    </div>
+
+    <div class="presenter-notes" style="display:none;">이 슬라이드는 Day 3 데이터 정규화 및 ERD 보충 가이드(국문) 링크를 제공합니다. 클릭 시 새 창에서 보충 가이드가 열립니다.</div>
+  </div>
+</section>
+
+<!-- Slide 35: 3일차 오프닝 & 7차시 안내 -->
+<section class="slide-card session-3" id="slide-41">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">7차시. 데이터 정규화 및 ERD 모델링</div>
+      <div class="slide-title">3일차 오프닝 &amp; 7차시 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">주제:</span> 데이터 구조 이해 차이 해결 (Data Structure Alignment)</li>
+      <li><span class="highlight">핵심 가치:</span> 기획자와 개발자 간의 개념 설계 간극을 좁혀 데이터 모델링 설계 누락 방지</li>
+      <li><span class="highlight">시간 계획 (총 180분):</span>
+        <ul>
+          <li>도입 (30분) - 회의록 시나리오에서 엔티티 및 관계성(카디널리티) 도출 원리</li>
+          <li>실습 설명 (30분) - day3_meeting_notes.md 파일 구성 요소 소개</li>
+          <li>실습 진행 (90분) - ERD 명세 및 Mermaid ERD 코드 자동 빌드</li>
+          <li>공유 및 피드백 (30분) - User/Expert/Reservation/Payment 맵 체크</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">7차시에서는 줄글 기획에서 데이터 구조(엔티티)를 뽑아내고 1:N, 1:1 관계를 빌드하는 과정을 배웁니다.</div>
+    <div class="visual-guide-notes" style="display:none;">다크 블루와 보라색의 조화로운 관계형 다이어그램 백그라운드 적용.</div>
+  </div>
+</section>
+
+<!-- Slide 36: 도입 질문: 기획자의 줄글과 개발자의 관계형 DB 설계 간극 -->
+<section class="slide-card session-3" id="slide-41">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">7차시. 데이터 정규화 및 ERD 모델링</div>
+      <div class="slide-title">도입 질문: 기획자의 줄글과 개발자의 관계형 DB 설계 간극</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">기획 설명:</span> "사용자가 전문가를 골라 예약하고 승인되면 결제 완료하여 확정합니다." (단순 1단계 흐름)</li>
+          <li><span class="highlight">개발자 매핑 설계:</span>
+            <ul>
+              <li>`Users` (회원 정보)</li>
+              <li>`Experts` (전문가)</li>
+              <li>`Reservations` (상태값 Pending/Approved)</li>
+              <li>`Payments` (결제 금액 및 수단)</li>
+              <li>상호 간의 FK 참조 및 카디널리티 (1:N, 1:1) 매핑</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="image-container"
+        style="display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 12px; padding: 10px;">
+        <img alt="데이터 모델 간극" src="images/slide36_illustration.png"
+          style="max-width: 100%; max-height: 320px; border-radius: 8px; object-fit: contain;" />
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">기획자가 생각하는 단순한 화면 이동도 실제 백엔드에서는 여러 데이터 테이블 간의 관계와 무결성이 얽혀 있습니다. AI를 통해 이 개념 설계의 갭을 해결합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">기획자의 단순 시나리오 흐름과 개발자의 RDB 복잡 테이블 릴레이션을 시각적 대조.</div>
+  </div>
+</section>
+
+<!-- Slide 37: 실습 진행: 회의록 기반 ERD 자동 빌드 -->
+<section class="slide-card session-3" id="slide-42">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">7차시. 데이터 정규화 및 ERD 모델링</div>
+      <div class="slide-title">실습 진행: 회의록 기반 ERD 자동 빌드</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: day3_meeting_notes.md 생성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">회원 이메일/닉네임 가입, 전문가 등록, 날짜별 상담 예약 대기, 결제 승인 예약 확정 회의록 기록.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 ERD 도출 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>ERD 모델링 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 회의록 내용을 데이터 구조 관점에서 분석하여 핵심 엔티티와 관계를 도출하고, 데이터 구조 정의서 및 Mermaid ERD 코드를 작성해줘. 임의의 엔티티를 지어내지 말고 제공된 회의록 텍스트 팩트에 기반해서 작성해줘.</pre>
+        </div>
+      </li>
+      <li style="margin-top: 5px;"><span class="highlight">기대 결과:</span> User, Expert, Reservation, Payment 간의 데이터 명세 및 Mermaid 관계도 생성.</li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">프롬프트를 보내면 AI가 비정형 회의록에서 명사(User, Expert)와 동사(예약하다, 결제하다)를 분류해 데이터 구조를 작성해 줍니다.</div>
+    <div class="visual-guide-notes" style="display:none;">Mermaid 코드가 그래픽 ERD 다이어그램 뷰로 변환되어 실시간 시각화되는 화면 예시.</div>
+  </div>
+</section>
+
+<!-- Slide 38: 실습 진행 Task 02: 용어 표준화 (Terminology Standardization) -->
+<section class="slide-card session-3" id="slide-43">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">8차시. 용어 표준화 및 변경 영향 공유</div>
+      <div class="slide-title">실습 진행 Task 02: 용어 표준화 (Terminology Standardization)</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: fragmented-terms.md 생성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">Figma 기획(회원, 선생님 프로필, 상담 예약), API(nickname, CounselorName, book_id), DB SQL(members, counselors, reservations) 혼용 문서 준비.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 표준화 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>용어 표준 사전 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">프로젝트 전반에 혼용되는 '회원/User/고객/Member', '상담사/Expert/선생님/Counselor' 등의 용어를 전수 분석하여, 표준 한글명, 표준 영문명, 데이터 타입, 용도 정의, 기존 혼용 단어, 추천 DB 컬럼명을 포함한 프로젝트 표준 용어 사전을 Markdown 표 형태로 작성해줘.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">도메인 단어들이 뒤엉키면 개발 변수명이 깨집니다. 동의어들을 의미적으로 클러스터링해 단일 표준 사전을 빌드합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">파편화 용어 목록이 정렬된 하나의 마스터 용어 사전 테이블로 합쳐지는 변환 과정 시각화.</div>
+  </div>
+</section>
+
+<!-- Slide 39: 실습 진행 Task 03: 스펙 변경 영향 추적 (Change Impact Analysis) -->
+<section class="slide-card session-3" id="slide-44">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">8차시. 용어 표준화 및 변경 영향 공유</div>
+      <div class="slide-title">실습 진행 Task 03: 스펙 변경 영향 추적</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">변경 요청: schema-change-request.md 생성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">예약 신청 시 즉시 결제 ➔ 예약 '신청 대기(WAIT_APPROVE)' 후 전문가 '승인(Approve)' 시 결제 가능 변경서 기입.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 영향 공유 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>변경 영향 분석 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">예약 확정 프로세스가 '승인 대기' 상태 추가 및 '전문가 승인 후 결제'로 변경됨에 따라 영향을 받는 API 스펙, DB 스키마, 화면 및 변경 공유 리포트를 영향영역, 변경내용, 리스크수준, 조치대상 문서 칼럼의 표 형태로 작성해줘.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">스키마 변경이 하부 API 명세와 프론트 화면 UI 컴포넌트의 노출 조건에 어떤 영향을 미치는지 영향도 맵을 자동 역추적합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">DB 스키마 한 줄의 변경이 API 경로와 화면 버튼의 비활성 상태로 전파되는 종속성 지도.</div>
+  </div>
+</section>
+
+<!-- Slide 40: Mission 01: 설계 의사결정 기록 (Design Decision Log) -->
+<section class="slide-card session-3" id="slide-45">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">9차시. 설계 결정 로깅 및 예외 Edge Case 대응</div>
+      <div class="slide-title">Mission 01: 설계 의사결정 기록 (Design Decision Log)</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: tech-design-meeting.md 생성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">예약 취소 시 메인 테이블 잠금 병목 방지 및 이력 보존을 위한 이력 테이블(1:N) 분리 회의록.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 의사결정 로깅 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>설계 결정 추출 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">회의 내용에서 정규화 및 데이터베이스 구조 설계 결정을 추출하여, 결정 항목, 배경 사유, 대안 검토, 승인자, 향후 변경 가능성을 포함하는 Design Decision Log를 작성해줘.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">기술설계 단계에서 합의된 데이터 정규화 의결 배경(Why)을 기록으로 남겨 차기 합류자의 설계 왜곡 장애를 방지합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">로깅 양식에 맞춰 결정 ID(DEC-003)와 대안 기각 사유가 정형 아카이빙되는 가시 화면.</div>
+  </div>
+</section>
+
+<!-- Slide 41: Mission 02: 예외 시나리오 발굴 (Edge Case Discovery) -->
+<section class="slide-card session-3" id="slide-46">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">9차시. 설계 결정 로깅 및 예외 Edge Case 대응</div>
+      <div class="slide-title">Mission 02: 예외 시나리오 발굴 (Edge Case Discovery)</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: database-schema.md 생성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">User, Expert, Reservation, Payment 테이블 생성 SQL DDL 명세 기입.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 Edge Case 분석 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>Edge Case 분석 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">현재 정의된 User, Expert, Reservation, Payment 테이블 구조에서 발생할 수 있는 데이터 정합성 위배 Edge Case 예외 시나리오를 도출하고 개선 방안을 제시해줘. (동시 결제 오류, 회원 탈퇴 시 외래키 참조 붕괴 등을 필수 포함할 것)</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">동시 결제 시 덮어쓰기 문제, Hard Delete 탈퇴 시 매출 통계 쿼리 폭망 리스크를 분석해 Soft Delete 등 구체적 DB 해법을 도출합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">동시성 제어 유니크 키 및 참조 무결성 Soft Delete 구조화 비교 인포그래픽.</div>
+  </div>
+</section>
+
+<!-- Slide 42: 정리: 3일차 핵심 요약 -->
+<section class="slide-card session-3" id="slide-47">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">9차시. 설계 결정 로깅 및 예외 Edge Case 대응</div>
+      <div class="slide-title">정리: 3일차 핵심 요약</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">3일차 핵심 요약:</span>
+        <ul>
+          <li><span class="highlight">데이터 구조 정렬 (Alignment):</span> 자연어 시나리오에서 핵심 엔티티를 추출해 Mermaid ERD 설계 합의.</li>
+          <li><span class="highlight">도메인 어휘 단일화 (Standardization):</span> 동의어 클러스터링을 통해 용어 부채를 제거한 용어 사전 구축.</li>
+          <li><span class="highlight">안전성 확보 (Edge Case):</span> 외래키 무결성 붕괴 방지를 위한 Soft Delete 정책 수립 및 설계 로깅 완수.</li>
+          <li><span class="highlight">다음 차시 예고:</span> 4일차. 기술설계 - API 설계 및 인터페이스 정의</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">3일차 요약입니다. 기술 설계의 논리적 오류를 제거하고 ERD, 용어, 이력, Edge Case 대응을 마쳤습니다. 다음 4일차에는 백엔드-프론트엔드 약속인 API 명세 인터페이스를 정의해 보겠습니다.</div>
+    <div class="visual-guide-notes" style="display:none;">체크리스트 형태 레이아웃. 우측 하단 4일차 예고 밝은 이펙트 노출.</div>
+  </div>
+</section>
+<!-- Slide: 3일차 강의 평가 (Daily Evaluation) -->
+<section class="slide-card session-3" id="slide-48">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">일차별 강의 평가 | Daily Feedback</div>
+      <div class="slide-title">3일차 교육 만족도 및 강의 평가 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">3일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">설문 목적:</span> 3일차 교육 내용 만족도, 난이도 체감 및 개선 의견 수렴</li>
+          <li><span class="highlight">참여 방법:</span> 우측 QR 코드를 스마트폰 카메라로 스캔하거나 아래 링크로 접속해 주세요.</li>
+          <li><span class="highlight">설문 링크:</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSdU4BjIY37vt5evdK35JYRHcFUfN0CfmloK5tg_ZFmAYOHvNQ/viewform" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; word-break: break-all;">https://docs.google.com/forms/d/e/1FAIpQLSdU4BjIY37vt5evdK35JYRHcFUfN0CfmloK5tg_ZFmAYOHvNQ/viewform</a></li>
+          <li><span class="highlight">유의 사항:</span> 작성해 주신 소중한 피드백은 다음 차시 커리큘럼 보완 및 교육 품질 향상에 즉시 반영됩니다.</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); border-radius: 16px; padding: 24px; text-align: center;">
+        <div style="background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: inline-block; margin-bottom: 16px;">
+          <img src="images/qr_eval_day3.png" alt="3일차 강의 평가 QR 코드" style="width: 220px; height: 220px; display: block; border-radius: 6px;" />
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px;">📱 카메라로 QR 코드를 스캔하세요</div>
+        <div style="font-size: 0.95rem; color: var(--text-secondary);">3일차 강의 평가 (Google Forms)</div>
+      </div>
+    </div>
+
+    <div class="presenter-notes" style="display:none;">3일차 수업을 마치며 교육 만족도 및 강의 평가를 진행합니다. 수강생분들께서는 QR 코드를 스캔하여 오늘 수업에 대한 피드백을 작성해 주시기 바랍니다.</div>
+  </div>
+</section>

@@ -1,0 +1,2441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 1. Codex 요구사항 정의 교육 미션 | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Card Surface */
+      --text-main: #ffffff; /* Primary Text */
+      --text-muted: #e4e4e7; /* Secondary Text */
+      --text-desc: #71717a; /* Description Text */
+      --border-color: rgba(255, 255, 255, 0.08);
+      --accent-color: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --card-radius: 10px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 75px; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.5;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong, td, th { word-break: keep-all; }
+
+    .container {
+      max-width: 860px; /* 14인치 화면에 맞추고 슬라이드 메뉴 실제 너비 기준으로 축소 */
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 4px;
+      height: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .logo-text p {
+      font-size: 0.58rem;
+      color: var(--text-desc);
+      margin-top: 1px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-top: 48px;
+      padding: 16px 0 10px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.04), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-content {
+      max-width: 750px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 5px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      font-size: 0.65rem;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      font-size: 1.25rem;
+      line-height: 1.25;
+      margin-bottom: 4px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.35;
+    }
+
+    /* Horizontal Scroll Step Slider Section */
+    .slider-section {
+      padding: 10px 0 2px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.005);
+    }
+
+    .slider-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .slider-title::before {
+      content: "";
+      width: 2px;
+      height: 9px;
+      background: var(--primary-color);
+      border-radius: 1px;
+    }
+
+    .slider-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .slider-btn {
+      position: absolute;
+      top: calc(50% - 13px);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(26, 29, 36, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 10;
+      box-shadow: var(--shadow-sm);
+      user-select: none;
+    }
+
+    .slider-btn:hover {
+      background: var(--bg-charcoal);
+      border-color: var(--secondary-color);
+    }
+
+    .slider-btn.prev { left: -10px; }
+    .slider-btn.next { right: -10px; }
+
+    .step-slider {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 2px 2px 8px;
+      width: 100%;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(59, 130, 246, 0.3) rgba(255, 255, 255, 0.02);
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+    }
+
+    .step-slider::-webkit-scrollbar {
+      height: 3px;
+    }
+
+    .step-slider::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .step-slider::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.2);
+      border-radius: 99px;
+    }
+
+    .step-card {
+      flex: 0 0 170px; /* 860px 레이아웃에 최적화된 카드 크기 */
+      scroll-snap-align: start;
+      background: rgba(26, 29, 36, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      position: relative;
+    }
+
+    .step-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(59, 130, 246, 0.3);
+      background: rgba(26, 29, 36, 0.95);
+    }
+
+    .step-card.active {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: var(--secondary-color);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .step-card-badge {
+      font-size: 0.55rem;
+      font-weight: 800;
+      padding: 1px 4px;
+      border-radius: 2px;
+      width: fit-content;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .step-card.active .step-card-badge {
+      background: linear-gradient(135deg, var(--secondary-color), var(--accent-purple));
+    }
+
+    .step-card h3 {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .step-card p {
+      font-size: 0.62rem;
+      color: var(--text-desc);
+      line-height: 1.3;
+      margin-top: auto;
+    }
+
+    .step-card.active p {
+      color: var(--text-muted);
+    }
+
+    /* Detail Section Layout */
+    .layout-wrapper {
+      padding: 10px 0 35px;
+    }
+
+    .detail-container {
+      min-height: 380px;
+    }
+
+    .detail-panel {
+      display: none;
+      animation: panelFadeIn 0.25s ease forwards;
+    }
+
+    .detail-panel.active {
+      display: block; /* 1-Column 형태 */
+    }
+
+    @keyframes panelFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    /* Mission Detail Card */
+    .detail-card {
+      background: rgba(26, 29, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .detail-card-head {
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 6px;
+    }
+
+    .detail-card-head h2 {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .detail-card-head h2 .badge-inline {
+      font-size: 0.6rem;
+      padding: 1px 4px;
+      border-radius: 2px;
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    /* Sub-sections within Cards */
+    .card-section {
+      margin-bottom: 12px;
+    }
+
+    .card-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-section h3 {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-section h3::before {
+      content: "";
+      width: 2px;
+      height: 8px;
+      background: var(--secondary-color);
+      border-radius: 1px;
+      display: inline-block;
+    }
+
+    .card-section p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    /* Lists */
+    ul {
+      list-style-position: inside;
+      padding-left: 2px;
+      margin-bottom: 4px;
+    }
+
+    li {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    li strong {
+      color: #ffffff;
+    }
+
+    /* Check list */
+    .checklist-ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .checklist-ul li {
+      position: relative;
+      padding-left: 14px;
+      margin-bottom: 3px;
+    }
+
+    .checklist-ul li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--accent-color);
+      font-weight: 800;
+      font-size: 0.72rem;
+    }
+
+    /* Code Block Styles (14인치 최적화 콤팩트 스크롤) */
+    pre {
+      background: #0d0f14;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 10px;
+      overflow-x: auto;
+      max-height: 180px; 
+      overflow-y: auto;  
+      margin: 6px 0 10px;
+      position: relative;
+    }
+
+    pre::-webkit-scrollbar {
+      width: 3px;
+      height: 3px;
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 99px;
+    }
+
+    code {
+      font-family: 'Fira Code', 'Courier New', Courier, monospace;
+      font-size: 0.7rem;
+      color: #e4e4e7;
+    }
+
+    .code-badge {
+      display: inline-block !important;
+      position: relative !important;
+      top: auto !important;
+      right: auto !important;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--secondary-color, #06b6d4);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    /* Table Styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0 10px;
+      background: rgba(9, 9, 11, 0.3);
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    th, td {
+      padding: 6px 8px;
+      font-size: 0.72rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(59, 130, 246, 0.08);
+      color: #93c5fd;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Box styles */
+    .info-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.06);
+      border-left: 3px solid var(--accent-color);
+      color: #a5f3fc;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box {
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: rgba(139, 92, 246, 0.06);
+      border-left: 3px solid var(--accent-purple);
+      color: #e9d5ff;
+      font-size: 0.74rem;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .guide-box h4 {
+      color: #d8b4fe;
+      margin-bottom: 3px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .criterion-box {
+      background: rgba(59, 130, 246, 0.04);
+      border: 1px solid rgba(59, 130, 246, 0.1);
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+    }
+
+    /* Inline Sidebar Box */
+    .inline-sidebar-box {
+      margin-top: 14px;
+      background: rgba(139, 92, 246, 0.04);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .inline-sidebar-box h4 {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #d8b4fe;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Button utilities */
+    .action-btn-container {
+      margin: 4px 0 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+      transition: all 0.2s;
+    }
+
+    .btn-download:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+
+    .btn-email-share {
+      background: linear-gradient(135deg, var(--accent-purple), #a855f7);
+      box-shadow: 0 2px 6px rgba(168, 85, 247, 0.25);
+    }
+
+    .btn-email-share:hover {
+      background: linear-gradient(135deg, #7e22ce, #9333ea);
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fff;
+      box-shadow: none;
+    }
+    
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.1rem; }
+      .detail-card { padding: 10px 12px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 1 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day1-textbook.html" target="_blank" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(6, 182, 212, 0.3)); color: #ffffff; border: 1px solid rgba(59, 130, 246, 0.5); font-weight: 700;">📘 1일차 교재 (PDF) 다운로드</a>
+        <a href="day1-ai-codex-summation.html" style="background: rgba(6, 182, 212, 0.15); color: var(--secondary-color); border-color: rgba(6, 182, 212, 0.3);">📊 요약/도식화 보기</a>
+        <a href="../index.html">← 목록으로</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 1</span>
+        <span class="hero-badge">Codex AI</span>
+        <span class="hero-badge">요구사항 정의</span>
+        <span class="hero-badge">환경 세팅 &amp; 실습 미션</span>
+      </div>
+      <h1>Codex 기반 요구사항 정의 교육 미션</h1>
+      <p>
+        비정형화된 회의록 대화에서 요약(전처리)을 수행하고, 기능 명세와 예외 흐름 정의, 의사결정 질문지 구축 및 최종 문서 통합 &amp; 이메일 공유까지의 전체 기획 워크플로우를 학습합니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- Horizontal Scroll Step Slider Section -->
+  <section class="slider-section">
+    <div class="container">
+      <h2 class="slider-title">진행 단계 선택</h2>
+      <div class="slider-wrapper">
+        <button class="slider-btn prev" aria-label="이전 단계">‹</button>
+        <div class="step-slider">
+          
+          <!-- Step Prep Card -->
+          <!-- AI Agent Task 1 (Step 0) -->
+          <div class="step-card active" data-step="0">
+            <span class="step-card-badge">AI Task 1</span>
+            <h3>대화록 요약 전처리</h3>
+            <p>회의 대화록 원본에서 핵심 요약 메모 추출</p>
+          </div>
+          
+          <!-- AI Agent Task 2 (Step 1) -->
+          <div class="step-card" data-step="1">
+            <span class="step-card-badge">AI Task 2</span>
+            <h3>회의 메모 분석</h3>
+            <p>회의록 요약본에서 사용자, 기능, 비즈니스 정책 분류하기</p>
+          </div>
+
+          <!-- AI Agent Task 3 (Step 2) -->
+          <div class="step-card" data-step="2">
+            <span class="step-card-badge">AI Task 3</span>
+            <h3>기능 요구사항 정의</h3>
+            <p>추출된 기능 후보를 테스트 가능한 정형 명세 문장으로 변환</p>
+          </div>
+
+          <!-- AI Agent Task 4 (Step 3) -->
+          <div class="step-card" data-step="3">
+            <span class="step-card-badge">AI Task 4</span>
+            <h3>정상 및 예외 흐름</h3>
+            <p>사용자 시나리오와 예외 케이스(실패, 중복 등) 디테일 보완</p>
+          </div>
+
+          <!-- AI Agent Task 5 (Step 4) -->
+          <div class="step-card" data-step="4">
+            <span class="step-card-badge">AI Task 5</span>
+            <h3>미결정 기획 질문</h3>
+            <p>미결정 사항을 이해관계자 확인 질문 목록으로 변경</p>
+          </div>
+
+          <!-- AI Agent Task 6 (Step 5) -->
+          <div class="step-card" data-step="5">
+            <span class="step-card-badge">AI Task 6</span>
+            <h3>문서 통합 및 메일 공유</h3>
+            <p>AI 린트 검증을 통한 문서 완성 및 Gmail 플러그인 연동 발송</p>
+          </div>
+
+          <!-- Skill Task 1 (Step 6 / ADD-D01-T01) -->
+          <div class="step-card" data-step="6">
+            <span class="step-card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Skill Task 1</span>
+            <h3>서비스 문제와 Persona 정의</h3>
+            <p>[ADD-D01-T01] Viewer·Creator·Advertiser·Admin 목표 및 필요 데이터 정의</p>
+          </div>
+
+          <!-- Skill Task 2 (Step 7 / ADD-D01-T02) -->
+          <div class="step-card" data-step="7">
+            <span class="step-card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Skill Task 2</span>
+            <h3>Feature를 Domain으로 분류</h3>
+            <p>[ADD-D01-T02] 회원, Video, Playback 등 핵심 기능을 책임 Domain에 배치</p>
+          </div>
+
+          <!-- Skill Task 3 (Step 8 / ADD-D01-T03) -->
+          <div class="step-card" data-step="8">
+            <span class="step-card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Skill Task 3</span>
+            <h3>Domain Map과 책임 경계 검토</h3>
+            <p>[ADD-D01-T03] Domain 의존성 시각화 및 Bounded Context 초안 작성</p>
+          </div>
+
+          <!-- Mission 1 (Step 9) -->
+          <div class="step-card" data-step="9">
+            <span class="step-card-badge" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3);">Mission 1</span>
+            <h3>반려동물 케어 매칭</h3>
+            <p>[과제] 펫시터 매칭 서비스 회의록 기반 기획 문서 작성</p>
+          </div>
+
+          <!-- Mission 2 (Step 10) -->
+          <div class="step-card" data-step="10">
+            <span class="step-card-badge" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3);">Mission 2</span>
+            <h3>무인 스터디룸 &amp; IoT</h3>
+            <p>[과제] 실시간 공간 예약 및 스마트 기기 제어 명세화</p>
+          </div>
+
+          <!-- Mission 3 (Step 11 - Skill Mission 1) -->
+          <div class="step-card" data-step="11">
+            <span class="step-card-badge" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3);">Mission 3</span>
+            <h3>숏폼 &amp; 라이브 커머스 Domain</h3>
+            <p>[Skill 과제 1] Persona, Feature Domain 배치 및 Bounded Context 구축</p>
+          </div>
+
+          <!-- Mission 4 (Step 12 - Skill Mission 2) -->
+          <div class="step-card" data-step="12">
+            <span class="step-card-badge" style="background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3);">Mission 4</span>
+            <h3>스마트 B2B 모빌리티 관제</h3>
+            <p>[Skill 과제 2] 법인차량 관제 플랫폼 데이터 소유권 및 Domain 경계 명세</p>
+          </div>
+
+        </div>
+        <button class="slider-btn next" aria-label="다음 단계">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Layout Wrapper for Details -->
+  <div class="container layout-wrapper">
+    <div class="detail-container">
+
+      <!-- ==================== STEP 0 PANEL ==================== -->
+      <div class="detail-panel active" id="detail-0">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline">0단계</span> 상세 대화록에서 핵심 요약 도출 (전처리)</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.72rem; margin-bottom: 2px; display: flex; align-items: center; gap: 3px;">📥 단계 입력 (Input)</h4>
+                <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 0;">비정형 핑퐁 대화 형태의 1차 회의록 원본 (<code>meeting-notes-raw.md</code>)</p>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.72rem; margin-bottom: 2px; display: flex; align-items: center; gap: 3px;">📤 단계 출력 (Output)</h4>
+                <p style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 0;">핵심 요약 메모 파일 (<code>meeting-notes.md</code>)</p>
+              </div>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 실제 따라 하기 상세 가이드</h4>
+              <ol style="padding-left: 14px; font-size: 0.72rem; line-height: 1.4;">
+                <li><strong>원본 회의록 확보</strong>: 아래 다운로드 버튼을 눌러 1차 회의록 대화록 원본인 <code>meeting-notes-raw.md</code> 파일을 다운로드하여 작업 폴더에 놓거나 파일 내용을 생성합니다.</li>
+                <li><strong>전처리 지시</strong>: 사용할 Codex/ChatGPT 대화창을 열고 아래 <strong>Codex 요청 예시</strong> 프롬프트를 전송합니다.</li>
+                <li><strong>결과물 저장</strong>: AI가 가공되지 않은 핑퐁 대화에서 뽑아낸 정제된 요약 메모 텍스트를 복사하여 <code>meeting-notes.md</code> 파일로 저장합니다. (이 파일은 다음 1단계 실습의 Input 데이터가 됩니다.)</li>
+              </ol>
+            </div>
+            
+            <div class="card-section">
+              <h3>미션 상황</h3>
+              <p style="font-size: 0.78rem;">
+                기획 회의에서 작성된 회의록 원본은 각 팀원들(대표, 기획자, 개발자, 디자이너) 간의 핑퐁 대화와 사담이 섞여 있어서 요구사항을 바로 추출해 분석하기에는 너무 산만합니다. 
+                학습자는 Codex를 전처리 도구로 활용하여 회의록에서 핵심 비즈니스 요건만 요약한 기획 메모를 도출해야 합니다.
+              </p>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 미션</h3>
+              <p style="font-size: 0.78rem; margin-bottom: 4px;">다음 1차 회의 대화록 원본을 <code>meeting-notes-raw.md</code> 파일로 작성하거나 다운로드합니다.</p>
+              
+              <div class="action-btn-container">
+                <button onclick="downloadRawMeetingNotes()" class="btn-download">
+                  📥 meeting-notes-raw.md 원본 파일 다운로드
+                </button>
+              </div>
+
+              <pre><span class="code-badge">meeting-notes-raw.md 원문 (스크롤)</span><code># 전문가 상담 서비스 구축을 위한 1차 Kick-off 회의록
+
+**일시**: 2026-07-10 14:00 - 15:30
+**참석자**: 대표(CEO), 기획자(PM), 개발자(Dev), 디자이너(Designer)
+
+---
+
+**대표**: 여러분, 안녕하세요. 오늘 회의는 우리가 새로 론칭할 "온라인 전문가 상담 서비스"의 기본 요구사항을 논의하고 방향을 잡기 위한 자리입니다. 핵심은 사용자가 우리 플랫폼에 와서 다양한 분야의 전문가를 찾고, 상담 예약을 한 뒤 결제까지 원활하게 마치는 프로세스입니다.
+
+**기획자**: 네, 대표님. 서비스의 기본적인 가입 절차부터 논의를 시작해보죠. 사용자는 회원가입을 해야 서비스를 이용할 수 있는 구조인가요?
+
+**대표**: 네, 맞습니다. 사용자는 우선 회원가입을 마쳐야만 전문가 검색이나 예약 등의 기능을 원활하게 이용할 수 있도록 합시다. 비회원 상태에서는 간단한 둘러보기만 가능하도록 하고요.
+
+**디자이너**: 가입하고 나면 전문가를 검색할 텐데, 전문가 프로필 페이지나 분류 기준은 어떻게 생각하고 계신가요?
+
+**대표**: 전문가는 일단 분야별로 구분되어야 합니다. 예를 들어 IT 컨설팅, 법률 상담, 디자인 코칭 같은 카테고리가 있겠죠. 사용자는 카테고리를 선택하거나 직접 검색어를 입력해 본인이 원하는 전문가를 빠르게 찾아낼 수 있어야 합니다.
+
+**디자이너**: 그러면 검색 결과에서 전문가 목록이 나오고, 상세 페이지로 들어가서 일정을 고르는 구조겠군요. 날짜와 시간은 어떻게 선택하나요?
+
+**대표**: 예, 사용자가 특정 전문가를 선택하면, 해당 전문가가 상담 가능한 스케줄 일정이 캘린더나 타임라인 형태로 표시되어야 해요. 사용자는 그중에서 자신이 상담받고 싶은 날짜와 시간을 자유롭게 골라 예약 신청을 할 수 있게 해야 합니다.
+
+**개발자**: 예약 신청 직후의 결제 프로세스는 어떻게 진행되나요? 예약 신청과 동시에 결제가 바로 이루어져야 예약이 확정되는 형태인가요?
+
+**대표**: 결제가 완료되어야만 최종 예약이 "확정" 상태로 넘어가야 합니다. 만약 PG사 한도 초과나 기타 원인으로 결제가 실패하면, 당연히 그 예약은 완료 처리되면 안 되고 대기 혹은 취소 상태로 묶여야겠죠.
+
+**개발자**: 결제 실패 시 예약이 생성되지 않거나 잠금 해제가 되어야 한다는 비즈니스 규칙이군요. 전문가는 자신이 예약된 스케줄을 어디서 확인하나요?
+
+**대표**: 전문가는 우리 시스템 내에 전문가 전용 대시보드가 있어서, 거기서 자신에게 들어온 예약 신청 내역이나 확정된 스케줄을 실시간으로 모니터링하고 관리할 수 있어야 합니다.
+
+**기획자**: 전문가 가입은 일반 회원가입과 다를 텐데, 인증이나 승인 절차가 별도로 필요한가요? 아무나 전문가로 활동하게 할 순 없으니까요.
+
+**대표**: 좋은 지적입니다. 전문가는 가입 신청을 한 후에 바로 활동할 수 있는 게 아니라, 사이트 관리자가 제출 서류나 자격을 심사한 뒤 "승인"을 해줘야 비로소 전문가 목록에 노출되고 예약 시스템에 참여할 수 있도록 관리자 승인 정책을 필수로 두겠습니다.
+
+**기획자**: 예약을 완료하면 사용자나 전문가에게 알림을 발송해야 개발 편의와 사용성이 높을 텐데, 알림 채널은 어떤 걸 선호하시나요?
+
+**대표**: 알림은 무조건 보내야죠. 예약이 확정되었거나 취소되었을 때 알려줘야 하니까요. 그런데 알림을 이메일로 쏠지, 아니면 휴대폰 문자로 보낼지는 개발 리소스와 비용 문제를 좀 더 따져봐야 할 것 같아요. 이 부분은 아직 확정하지 맙시다.
+
+**개발자**: 취소 수수료나 환불에 대한 규칙도 지금 정해야 하나요?
+
+**대표**: 취소 수수료 정책도 법률 검토와 마케팅 부서 협의가 필요한 사항이라서요. 오늘 당장 결정하긴 어려우니, 이것도 아직 결정되지 않은 보류 사항으로 남겨둡시다. 추후 2차 회의 때 확정 짓는 걸로 하죠.
+
+**기획자**: 알겠습니다. 오늘 결정된 정책과 보류 사항들을 대략 취합해서 명세 초안을 위한 전처리 회의 요약 메모로 정리해 보겠습니다.</code></pre>
+            </div>
+
+            <div class="card-section">
+              <h3>Codex 요청 예시 (전처리 프롬프트)</h3>
+              <pre><span class="code-badge">Prompt</span><code>meeting-notes-raw.md의 회의록 원문을 읽고, 화자 간의 불필요한 대화 맥락과 문맥을 걷어내고
+서비스 사용자, 기능 요건, 시스템 정책, 미결정 유보 사항을 15줄 내외의 컴팩트한 비정형 요약 메모 형태로 작성해줘.
+원문에 없는 가상의 내용은 임의로 상상해서 추가하지 말아줘.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🤖 이 단계에서의 Codex 역할</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                <strong>요약 및 전처리 도구 (Summarizer)</strong>: 대화 내용에서 불필요한 사담 및 화자 맥락을 제거하고 정밀 설계에 필요한 핵심 요약 메모를 발췌합니다.
+              </p>
+            </div>
+
+          </article>
+        </main>
+      </div>
+      
+      <!-- ==================== STEP 1 PANEL ==================== -->
+      <div class="detail-panel" id="detail-1">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline">1단계</span> 회의 메모에서 핵심 내용 찾기</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 단계 입력 (Input)</h4>
+                <p style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">0단계에서 정제된 요약 기획 메모 파일 (<code>meeting-notes.md</code>)</p>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 단계 출력 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 1px;">• 서비스 사용자 역할 목록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 1px;">• 기능 후보 목록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 1px;">• 비즈니스 규칙 목록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-0;">• 미결정 사항 목록</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 실제 따라 하기 상세 가이드</h4>
+              <ol style="padding-left: 14px; font-size: 0.75rem; line-height: 1.4;">
+                <li><strong>회의 메모 준비</strong>: 0단계 요약본인 <code>meeting-notes.md</code> 파일을 배치합니다. 아래 다운로드 버튼을 눌러 정제본 예시 파일을 직접 다운로드해도 됩니다.</li>
+                <li><strong>AI 분석 의뢰</strong>: 0단계 대화에 이어서 아래 <strong>Codex 요청 예시</strong> 프롬프트를 전송합니다.</li>
+                <li><strong>분류 검토</strong>: 도출된 사용자 목록(Customer, Expert, Admin)과 확정/미결정 정책 분류가 <strong>학습자 확인 사항</strong> 기준에 부합하는지 봅니다.</li>
+              </ol>
+            </div>
+            
+            <div class="card-section">
+              <h3>미션 상황</h3>
+              <p style="font-size: 0.78rem;">
+                대표와 기획자, 개발자 등의 회의 대화에서 정제된 0단계의 기획 요약 메모(`meeting-notes.md`)를 분석할 때입니다. 
+                학습자는 이 요약문을 바탕으로 서비스의 주요 객체(사용자 역할, 기능, 비즈니스 룰, 정책)를 정확히 카테고리화해야 합니다.
+              </p>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 미션</h3>
+              <p style="font-size: 0.78rem; margin-bottom: 4px;">정제된 <code>meeting-notes.md</code> 요약 파일을 준비하거나 아래 예시 다운로드를 이용합니다.</p>
+              
+              <div class="action-btn-container">
+                <button onclick="downloadMeetingNotes()" class="btn-download">
+                  📥 meeting-notes.md 요약본 다운로드
+                </button>
+              </div>
+
+              <pre><span class="code-badge">meeting-notes.md 요약문 (스크롤)</span><code>온라인 전문가 상담 서비스를 만들려고 한다.
+
+사용자는 회원가입 후 전문가를 검색할 수 있다.
+전문가는 분야별로 구분한다.
+사용자는 상담 날짜와 시간을 선택할 수 있다.
+결제가 완료되면 예약이 확정된다.
+결제가 실패하면 예약은 완료되면 안 된다.
+
+전문가는 자신의 예약을 확인할 수 있다.
+관리자는 전문가 가입을 승인할 수 있다.
+
+예약이 완료되면 알림을 보내야 한다.
+알림을 이메일로 보낼지 문자로 보낼지는 아직 정하지 않았다.
+취소 수수료 정책도 아직 정하지 않았다.</code></pre>
+            </div>
+
+            <div class="card-section">
+              <h3>Codex 요청 예시</h3>
+              <pre><span class="code-badge">Prompt</span><code>meeting-notes.md를 읽고 다음 내용을 구분해줘.
+
+1. 서비스 사용자
+2. 사용자가 수행하는 기능
+3. 시스템이 수행하는 기능
+4. 비즈니스 규칙
+5. 아직 결정되지 사항
+
+회의 메모에 없는 내용은 추가하지 말고,
+불명확한 내용은 별도로 표시해줘.
+
+아직 파일은 수정하지 말고 분석 결과만 보여줘.</code></pre>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 확인 사항</h3>
+              <ul class="checklist-ul">
+                <li>사용자는 Customer, Expert, Admin으로 구분되었는가?</li>
+                <li>결제 성공과 예약 확정의 관계가 확인되었는가?</li>
+                <li>알림 방식과 취소 정책이 미결정 사항으로 분리되었는가?</li>
+                <li>Codex가 회의 메모에 없는 기능을 추가하지 않았는가?</li>
+              </ul>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🤖 이 단계에서의 Codex 역할</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                <strong>분석 도구 (Analyst)</strong>: 정제된 기획 요약 메모에서 사용자 역할군과 명세 후보, 비즈니스 규칙을 논리적으로 식별합니다.
+              </p>
+            </div>
+
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 2 PANEL ==================== -->
+      <div class="detail-panel" id="detail-2">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline">2단계</span> 기능 요구사항 문장 만들기</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 단계 입력 (Input)</h4>
+                <p style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">1단계 출력물 (사용자 역할 목록, 기능 후보 목록, 비즈니스 규칙 목록, 미결정 사항 목록)</p>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 단계 출력 (Output)</h4>
+                <p style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;"><code>functional-requirements.md</code> (FR-001 ~ FR-004 규격화된 기능 요구사항 정의서 표)</p>
+              </div>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 실제 따라 하기 상세 가이드</h4>
+              <ol style="padding-left: 14px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>요구사항 템플릿 생성</strong>: 작업 폴더에 <code>functional-requirements.md</code> 파일을 만들고 아래 <strong>학습자 미션</strong>의 표 틀을 복사해 붙여넣습니다.</li>
+                <li><strong>프롬프트 전송</strong>: 1단계 대화에 이어 아래 <strong>Codex 요청 예시</strong> 프롬프트를 복사해 채팅창에 전송합니다.</li>
+                <li><strong>결과 복사 &amp; 저장</strong>: AI가 생성한 표 형식(Markdown)의 명세 문장을 복사하여 <code>functional-requirements.md</code>에 붙여넣고 저장합니다.</li>
+                <li><strong>모호성 필터링</strong>: 완성된 문장에 "편리하게", "빠르게"와 같은 모호한 수식어가 포함되어 있다면 AI에게 정량화 수정을 다시 요구해 봅니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>미션 상황</h3>
+              <p style="font-size: 0.78rem;">
+                1단계에서 서비스에 필요한 기능 후보를 찾았습니다. 
+                이번 단계에서는 기능 후보를 실제 요구사항 문장으로 변경합니다. 
+                단순한 기능 이름이 아니라 개발자와 기획자가 동일하게 이해할 수 있는 문장으로 작성해야 합니다.
+              </p>
+            </div>
+
+            <div class="card-section">
+              <h3>요구사항 작성 기준</h3>
+              <div class="criterion-box">
+                <p style="margin: 0; font-size: 0.74rem; font-weight: 700; color: #93c5fd; text-align: center;">
+                  [사용자 또는 시스템]은 &nbsp;&nbsp; [특정 조건]에서 &nbsp;&nbsp; [기능 또는 동작]을 수행할 수 있어야 한다.
+                </p>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 미션</h3>
+              <p style="font-size: 0.78rem;">1단계에서 추출한 기능 후보를 다음 형식으로 변경합니다.</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>요구사항 ID</th>
+                    <th>사용자</th>
+                    <th>기능명</th>
+                    <th>요구사항 설명</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>FR-001</td>
+                    <td>Customer</td>
+                    <td>회원가입</td>
+                    <td>(학습자가 채워야 할 빈 공간)</td>
+                  </tr>
+                  <tr>
+                    <td>FR-002</td>
+                    <td>Customer</td>
+                    <td>전문가 조회</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>FR-003</td>
+                    <td>Customer</td>
+                    <td>상담 시간 선택</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>FR-004</td>
+                    <td>System</td>
+                    <td>예약 확정</td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card-section">
+              <h3>Codex 요청 예시</h3>
+              <pre><span class="code-badge">Prompt</span><code>1단계에서 추출한 기능 후보를 기능 요구사항으로 작성해줘.
+
+다음 규칙을 적용해줘.
+
+1. 요구사항 ID는 FR-001부터 순서대로 부여한다.
+2. 하나의 요구사항에는 하나의 기능만 작성한다.
+3. 사용자가 누구인지 명확히 작성한다.
+4. 기능이 실행되는 조건을 포함한다.
+5. 테스트할 수 있는 문장으로 작성한다.
+6. "편리하게", "적절하게", "빠르게" 같은 모호한 표현은 사용하지 않는다.
+7. 회의 메모에 없는 내용은 추가하지 않는다.
+
+결과는 Markdown 표로 작성해줘.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🤖 이 단계에서의 Codex 역할</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                <strong>기술적 요구사항 작성 도구 (Technical Writer)</strong>: 템플릿과 정형 수식을 바탕으로 정량적이고 검증 가능한 문장을 생산합니다.
+              </p>
+            </div>
+
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 3 PANEL ==================== -->
+      <div class="detail-panel" id="detail-3">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline">3단계</span> 정상 흐름과 예외 흐름 추가하기</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 단계 입력 (Input)</h4>
+                <p style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">2단계 출력물 (<code>functional-requirements.md</code> 표)</p>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 단계 출력 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• 정상/예외 흐름 보완 설계서</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• 요구사항 검증 기준 목록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-0;">• 추가 확인 필요 정책 목록</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 실제 따라 하기 상세 가이드</h4>
+              <ol style="padding-left: 14px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>요구사항 선정</strong>: 보완 대상인 <code>FR-004 예약 확정</code> 항목을 파일 상에서 찾습니다.</li>
+                <li><strong>프롬프트 실행</strong>: 2단계 대화창에 이어 아래 <strong>Codex 요청 예시</strong> 프롬프트를 복사하여 입력합니다.</li>
+                <li><strong>흐름 보완 반영</strong>: AI가 반환한 상세 정상 흐름 및 예외 흐름, 검증 기준 텍스트 블록을 <code>functional-requirements.md</code>의 해당 ID 아래에 추가로 붙여넣고 파일을 보관합니다.</li>
+                <li><strong>임의 작성 필터링</strong>: 원문에 없는 예외 정책에 대해 AI가 상상해서 임의 규정하지 않고 "확인 필요"라고 남겨두었는지 체크합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>미션 상황</h3>
+              <p style="font-size: 0.78rem;">
+                요구사항 문장은 작성했지만, 정상적으로 작동하는 상황만 정의되어 있습니다. 
+                실제 서비스에서는 결제 실패, 데이터 없음, 중복 예약과 같은 예외 상황이 자주 발생합니다. 
+                이번 단계에서는 각 요구사항에 정상 흐름과 예외 흐름을 추가합니다.
+              </p>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 미션</h3>
+              <p style="font-size: 0.78rem;">2단계의 기능 요구사항 중 다음 기능을 선택하고 정상/예외 흐름을 정의합니다.</p>
+              <ul>
+                <li>전문가 조회</li>
+                <li>상담 시간 선택</li>
+                <li>결제 및 예약 확정</li>
+              </ul>
+              <pre><span class="code-badge">Template</span><code>### FR-004 예약 확정
+
+- 사용자:
+- 선행 조건:
+- 정상 흐름:
+- 예외 흐름:
+- 검증 기준:</code></pre>
+            </div>
+
+            <div class="card-section">
+              <h3>Codex 요청 예시</h3>
+              <pre><span class="code-badge">Prompt</span><code>functional-requirements.md의 각 요구사항에
+정상 흐름과 예외 흐름을 추가해줘.
+
+다음 기준을 적용해줘.
+
+1. 정상 흐름은 사용자의 시작 행동부터 완료 결과까지 단계별로 작성한다.
+2. 예외 흐름은 실패, 중복, 데이터 없음, 권한 없음 상황을 검토한다.
+3. 회의 메모에서 확인할 수 없는 예외 정책은 임의로 결정하지 않는다.
+4. 정책 결정이 필요한 내용은 "확인 필요"로 표시한다.
+5. 각 요구사항에 검증 기준을 한 개 이상 작성한다.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🤖 이 단계에서의 Codex 역할</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                <strong>예외 탐색 도구 (QC Explorer)</strong>: 설계의 결점과 비정상 인풋 오류(중복, 타임아웃, 예외 처리)에 대한 대응책을 검토하고 제안합니다.
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 4 PANEL ==================== -->
+      <div class="detail-panel" id="detail-4">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline">4단계</span> 미결정 사항과 기획 질문 만들기</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 단계 입력 (Input)</h4>
+                <p style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">3단계 출력물 중 '추가 확인 필요 정책 및 미결정 사항 목록'</p>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 단계 출력 (Output)</h4>
+                <p style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;"><code>open-questions.md</code> (의사결정 기획 질문 표)</p>
+              </div>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 실제 따라 하기 상세 가이드</h4>
+              <ol style="padding-left: 14px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>기획 질문지 생성</strong>: 작업 폴더에 <code>open-questions.md</code> 파일을 만듭니다.</li>
+                <li><strong>프롬프트 전송</strong>: 3단계 대화에 이어서 아래 <strong>Codex 요청 예시</strong> 프롬프트를 전송하여 미결정 리스트 표를 출력하게 합니다.</li>
+                <li><strong>질문 기록</strong>: AI가 정리해 준 표를 <code>open-questions.md</code> 파일에 붙여넣어 저장합니다.</li>
+                <li><strong>역할 감시</strong>: AI가 질문에 임의로 직접 답을 내버렸는지 체크하여, 질문의 목적(의사결정을 위한 질문 상태 유지)에 어긋나지 않았는지 확인합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>미션 상황</h3>
+              <p style="font-size: 0.78rem;">
+                요구사항을 구체화하는 과정에서 바로 결정할 수 없는 비즈니스 정책들이 발견되었습니다. 
+                이러한 미결정 사항들을 이해관계자나 의사결정권자에게 기획 피드백을 받기 위한 구체적이고 체계적인 질문으로 변환해야 합니다.
+              </p>
+            </div>
+
+            <div class="card-section">
+              <h3>Codex 요청 예시</h3>
+              <pre><span class="code-badge">Prompt</span><code>현재 요구사항 문서를 검토해서
+확정되지 않았거나 모호한 내용을 찾아줘.
+
+각 항목을 기획자가 이해관계자에게 확인할 수 있는
+질문 형태로 작성해줘.
+
+다음 항목을 포함해줘.
+
+1. 질문 ID
+2. 관련 요구사항 ID
+3. 확인할 질문
+4. 이 결정이 필요한 이유
+5. 결정되지 않았을 때 영향을 받는 기능
+6. 우선순위
+7. 상태
+
+질문에 대한 답을 임의로 만들지 말아줘.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🤖 이 단계에서의 Codex 역할</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                <strong>의사결정 촉진 도구 (Question Maker)</strong>: 보류 정책에 대해 영향받는 기능과 중요도를 나누고 합의에 필요한 쟁점 질문을 형식에 맞게 리스팅합니다.
+              </p>
+            </div>
+
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 5 PANEL ==================== -->
+      <div class="detail-panel" id="detail-5">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline">5단계</span> 요구사항 통합문서 생성 및 메일 공유 (Gmail 플러그인)</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 단계 입력 (Input)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>meeting-notes.md</code> 등 명세 파일들</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• Codex Client 내 **Gmail Plugin** 연동</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 단계 출력 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>requirements-specification.md</code> (통합본)</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• Gmail 플러그인 API를 통한 실제 이메일 발송 완료</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Gmail Plugin Setup Accordion Panel -->
+            <div class="guide-box" style="background: rgba(6, 182, 212, 0.05); border-left-color: var(--secondary-color);">
+              <h4 style="color: #cffafe; font-size: 0.78rem; font-weight: 800;">🔌 [핵심 사전준비] Codex Client Gmail 플러그인 설정 및 연동</h4>
+              <ol style="padding-left: 14px; font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #a5f3fc;">
+                <li>Codex Client 화면 우측 상단의 <strong>[Plugins (플러그인 상점)]</strong> 아이콘을 클릭합니다.</li>
+                <li>리스트에서 <strong>`Gmail`</strong> 플러그인을 찾아 **[Install (설치)]** 단추를 누릅니다.</li>
+                <li>설치가 끝나면 구글 인증창이 나타납니다. **본인의 Google/Gmail 계정으로 로그인**한 후, AI 에이전트가 메일을 발송할 수 있도록 **OAuth 이메일 권한 승인**을 완료합니다.</li>
+              </ol>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 실제 따라 하기 상세 가이드</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>문서 병합 및 1차 검증</strong>: AI 대화창에 아래 **학습자 미션 1 (통합 및 AI 검증)**의 프롬프트를 전송하여 통합 요구사항 정의서 <code>requirements-specification.md</code> 생성을 요청합니다.</li>
+                <li><strong>모호성 정정 피드백</strong>: AI가 검출한 오류 결과 창에 <code>WARNING</code> 경고 단어가 있을 시, AI와 피드백을 나누어 명세를 다듬어 최종 승인 버전으로 빌드합니다.</li>
+                <li><strong>Gmail 플러그인 메일 발송 지시</strong>: 연동된 플러그인을 활용하기 위해 **학습자 미션 2 (Gmail 플러그인 발송)** 프롬프트를 복사하여 AI 대화창에 전송합니다.</li>
+                <li><strong>발송 확인</strong>: 수신인 이메일 주소의 메일함을 열거나 본인 메일의 '보낸 메일함'을 열어 메일이 실제로 성공적으로 전송되었는지 검증합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 미션 1 (통합 및 AI 검증 프롬프트)</h3>
+              <pre><span class="code-badge">Prompt 1</span><code>다음 3개 파일을 읽고, 이를 병합한 요구사항 정의서인 requirements-specification.md 파일을 작성해줘.
+
+- meeting-notes.md
+- functional-requirements.md
+- open-questions.md
+
+동시에, 아래 6가지 규칙을 기준으로 요구사항 문서의 오류를 분석해줘.
+
+[검증 규칙]
+1. 요구사항 ID 중복 여부
+2. 요구사항 ID 누락 여부
+3. 사용자 역할 누락 여부
+4. 정상 및 예외 흐름 누락 여부
+5. 검증 기준 누락 여부
+6. 모호한 표현 사용 여부 (모호한 단어: 편리하게, 빠르게, 필요에 따라, 적절하게, 정상적으로)
+
+오류 검증 결과는 아래 포맷으로 출력창 맨 처음에 보여주고, 그 아래에 requirements-specification.md 파일 내용을 합쳐서 보여줘.
+
+[출력 포맷]
+PASS: 요구사항 ID 중복 없음
+ERROR: FR-004 검증 기준 누락
+WARNING: FR-007에 모호한 표현 "편리하게" 사용</code></pre>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 미션 2 (Gmail 플러그인 발송 프롬프트)</h3>
+              <pre><span class="code-badge">Prompt 2</span><code>Gmail 플러그인을 사용하여, 방금 검증 완료된 requirements-specification.md 파일 내용과
+open-questions.md의 미결정 질문 목록을 바탕으로 아래 조건에 맞춰 이메일을 발송해줘.
+
+- 수신인 (To): [여기에 대표 또는 피드백을 받을 의사결정권자 메일 주소를 입력하세요]
+- 메일 제목: [승인 요청] 전문가 상담 서비스 요구사항 정의서 검토 및 미결정 정책 조율의 건
+- 본문 구성:
+  - 기획 문서 통합 검증 완료 보고 내용
+  - 기획 의사결정이 급박한 주요 오픈 질문 내용들 (Q-001 ~ Q-004 요약 요령)
+  - 피드백 회신 기한 안내</code></pre>
+            </div>
+
+            <div class="card-section">
+              <h3>[대체 방안] 로컬 메일 클라이언트 및 수동 발송</h3>
+              <p style="font-size: 0.78rem; margin-bottom: 4px;">구글 계정 보안 제한으로 플러그인 전송이 어려울 경우, 아래 버튼을 눌러 메일을 작성하거나 복사할 수 있습니다.</p>
+              
+              <div class="action-btn-container">
+                <button onclick="shareViaEmail()" class="btn-download btn-email-share">
+                  📧 로컬 메일창 켜기 (mailto)
+                </button>
+                <button onclick="copyEmailDraft()" class="btn-download btn-copy">
+                  📋 이메일 초안 본문 복사
+                </button>
+              </div>
+            </div>
+
+            <!-- 병합된 사이드바 정보 박스 -->
+            <div class="inline-sidebar-box">
+              <h4>🤖 이 단계에서의 Codex 역할</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                <strong>자동화 및 플러그인 연동 도구 (Plugin Integrator)</strong>: 내부 문서 분석 단계를 마치고, Gmail 플러그인 API를 원격으로 연동하여 비즈니스 대행 커뮤니케이션 메일을 전송합니다.
+              </p>
+            </div>
+
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 6 PANEL (MISSION 1) ==================== -->
+      <div class="detail-panel" id="detail-6">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7); color: #fff;">실습 과제 1</span> 반려동물 홈케어 및 매칭 서비스</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 과제 입력 (Input)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>pet-care-meeting-notes.md</code> 회의록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 이전 1~5단계 실습에서 학습한 Codex 작성 프롬프트</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 과제 출력 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>pet-care-requirements.md</code> (기능 및 예외 흐름 요구사항 정의서)</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 미결정 정책 조율을 위한 이메일 승인 요청서</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box" style="background: rgba(139, 92, 246, 0.05); border-left-color: var(--accent-purple);">
+              <h4 style="color: #ddd6fe; font-size: 0.78rem; font-weight: 800;">💡 미션 배경 및 과제 목표</h4>
+              <p style="font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #c084fc;">
+                반려동물 보호자(고객)와 전문 펫시터를 연결해주는 플랫폼의 기획 회의록입니다. 
+                보호자의 신원과 반려동물 정보 등록, 펫시터의 자격 심사 및 관리자 승인, 매칭 수락 후 결제 기한 제약, 돌봄 상태 실시간 변경 프로세스, 그리고 서비스 취소 및 펫시터 노쇼(No-show) 발생 시의 예외 처리 로직을 명확히 명세화하는 것이 목표입니다.
+              </p>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 자가 실습 가이드</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>회의록 다운로드</strong>: 아래 버튼을 클릭하여 <code>pet-care-meeting-notes.md</code> 원본 파일을 다운로드합니다.</li>
+                <li><strong>요구사항 문서화</strong>: 다운로드한 회의록을 기반으로 Codex AI에게 사용자 역할(일반 사용자, 펫시터, 관리자), 기능(가입, 검색, 예약, 결제, 상태 변경), 그리고 예외 흐름(결제 시간 초과, 취소 위약금, 노쇼 대응)을 상세히 명세화할 것을 지시합니다.</li>
+                <li><strong>AI 린트 검증</strong>: 기획서 작성 후 5단계의 검증 규칙(ID 중복/누락 여부, 정상/예외 흐름 누락 여부, 모호한 표현 검사)을 활용해 요구사항 문서를 AI로 정밀 검수하고 최종 요구사항 정의서를 승인 버전으로 빌드합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 자가 실습 자료</h3>
+              <p style="font-size: 0.78rem; margin-bottom: 10px;">아래 버튼을 눌러 미션 1을 수행할 수 있는 회의록 원본을 다운로드하세요.</p>
+              <div class="action-btn-container">
+                <button onclick="downloadPetCareMeetingNotes()" class="btn-download" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7);">
+                  📥 pet-care-meeting-notes.md 다운로드
+                </button>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <h3>추천 AI 실습 프롬프트</h3>
+              <pre><span class="code-badge" style="background: var(--accent-purple);">Mission 1 Prompt</span><code>[역할: IT 전문 비즈니스 분석가]
+방금 다운로드한 pet-care-meeting-notes.md 파일을 분석하여, 다음 형식으로 요구사항 정의서인 pet-care-requirements.md를 작성해줘.
+
+1. 개요 및 서비스 구조
+2. 사용자 역할 정의 (보호자, 펫시터, 관리자)
+3. 핵심 기능 요구사항 목록 (ID 형식: PCR-001, PCR-002...)
+4. 정상 흐름 및 예외 흐름 (예: 결제 1시간 초과 만료 처리, 펫시터 노쇼 시 200% 포인트 보상 및 대체 펫시터 추천 프로세스 등)
+5. 비결정 질문 목록
+
+최대한 세분화되고 개발이 가능한 수준으로 명세화해주고, 5단계에서 사용한 AI 린트 검증 조건도 함께 적용해서 자가 검증 결과를 첫머리에 보여줘.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🎯 주요 평가 및 확인 기준</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                • 펫시터 등록 후 '관리자 승인' 조건이 명확히 명세화되었는가?<br>
+                • 매칭 신청 후 '1시간 이내 미결제 시 취소' 등의 기한 예외 처리가 반영되었는가?<br>
+                • 펫시터 노쇼 시의 보상 정책 및 대체 추천 보완 흐름이 기획 문서에 적절하게 명문화되었는가?
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 7 PANEL (MISSION 2) ==================== -->
+      <div class="detail-panel" id="detail-7">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7); color: #fff;">실습 과제 2</span> 무인 스터디카페 공간 예약 및 IoT 제어 서비스</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 과제 입력 (Input)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>study-cafe-meeting-notes.md</code> 회의록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 이전 1~5단계 실습에서 학습한 Codex 작성 프롬프트</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 과제 출력 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>study-cafe-requirements.md</code> (IoT 연동 예외 처리 통합 요구사항 정의서)</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 하드웨어-소프트웨어 제어 검증 시나리오 명세서</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box" style="background: rgba(139, 92, 246, 0.05); border-left-color: var(--accent-purple);">
+              <h4 style="color: #ddd6fe; font-size: 0.78rem; font-weight: 800;">💡 미션 배경 및 과제 목표</h4>
+              <p style="font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #c084fc;">
+                무인으로 운영되는 스터디카페에서 모바일을 통한 스터디룸 예약 및 오프라인 하드웨어(도어락, 스마트 전력 차단, 온도 조절기 등)를 원격 제어하는 서비스의 회의록입니다. 
+                결제 완료 시점의 핀코드 동적 생성, 입/퇴실 시의 IoT 기기 상태 동기화 및 핀코드 작동 제한 조건, 그리고 IoT 통신 장애(도어락 미작동 등) 발생 시 긴급 예외 문열기 및 경보 알림 등 다중 안전 프로세스를 도출하여 완벽한 IoT 비즈니스 명세를 수립해야 합니다.
+              </p>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 자가 실습 가이드</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>회의록 다운로드</strong>: 아래 버튼을 클릭하여 <code>study-cafe-meeting-notes.md</code> 원본 파일을 다운로드합니다.</li>
+                <li><strong>요구사항 문서화</strong>: 다운로드한 회의록을 기반으로 Codex AI에게 사용자 및 하드웨어 흐름(예약 시간 10분 전 활성화, 종료 5분 전 안내, 종료 시 전력 차단)을 명세화하도록 지시합니다.</li>
+                <li><strong>장애 예외 프로세스 구체화</strong>: IoT 통신 두절, 도어락 오작동 등 발생할 수 있는 시나리오별 예외 대처 방안(서버의 예비망 개방, 관리자 전송 실패 비상 알림, 긴급 긴급콜 등)을 다중 안전망(Fail-safe) 설계 요소를 적용하여 명확하게 작성합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 자가 실습 자료</h3>
+              <p style="font-size: 0.78rem; margin-bottom: 10px;">아래 버튼을 눌러 미션 2를 수행할 수 있는 회의록 원본을 다운로드하세요.</p>
+              <div class="action-btn-container">
+                <button onclick="downloadStudyCafeMeetingNotes()" class="btn-download" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7);">
+                  📥 study-cafe-meeting-notes.md 다운로드
+                </button>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <h3>추천 AI 실습 프롬프트</h3>
+              <pre><span class="code-badge" style="background: var(--accent-purple);">Mission 2 Prompt</span><code>[역할: IoT 시스템 비즈니스 분석가]
+다운로드한 study-cafe-meeting-notes.md 파일을 기반으로, 다음 조건을 포함하여 study-cafe-requirements.md를 작성해줘.
+
+1. 스터디룸 예약 및 결제 정상 흐름 정의
+2. 하드웨어 제어 타이밍 명세 (예약 시간 10분 전 비밀번호 활성화 및 냉난방기 켜짐, 종료 5분 전 오디오 안내, 종료 시 즉각 차단)
+3. 예외 및 장애 극복 흐름 (Fail-safe):
+   - IoT 도어락 네트워크 오프라인 장애 시 예비 무선망 자동 스위칭 및 긴급 원격 개방 프로세스
+   - 핀코드 발송 실패 시 비상 수동 문열기 버튼 제공 및 관리자 즉각 대시보드 경보 생성 규칙
+4. 요구사항 검증 기준
+
+개발자와 HW 엔지니어가 모호함 없이 연동할 수 있도록 타임라인 형태로 흐름을 아주 구체적으로 정리해줘.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🎯 주요 평가 및 확인 기준</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                • 예약 시간 전/후 하드웨어(도어락, 조명, 냉난방) 제어의 타임라인 조건이 구체적으로 명시되어 있는가?<br>
+                • IoT 기기 네트워크 불능 등 물리적 장애 발생 시의 이중 비상대응 절차가 요구사항 정의서에 포괄되어 있는가?<br>
+                • 비회원 예약 제한 및 연장 결제 정책 등의 예약 비즈니스 룰이 정형 문장으로 표현되었는가?
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 6 PANEL (ADD-D01-T01) ==================== -->
+      <div class="detail-panel" id="detail-6">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline" style="background: linear-gradient(135deg, var(--secondary-color), #3b82f6); color: #fff;">Skill Task 1</span> ADD-D01-T01 — 서비스 문제와 Persona 정의</h2>
+            </div>
+
+            <!-- Skill Marking -->
+            <div class="card-section" style="background: rgba(6, 182, 212, 0.05); padding: 10px; border-radius: 6px; border: 1px solid rgba(6, 182, 212, 0.2); margin-bottom: 12px;">
+              <h4 style="color: var(--secondary-color); font-size: 0.76rem; margin-bottom: 6px;">🏷️ Skill 마킹</h4>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.7rem;">
+                <span style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;">Task 영역: <strong>HYBRID</strong></span>
+                <span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 2px 6px; border-radius: 4px;">기술 Skill: <code>TECH-BA</code> <code>TECH-DDD</code></span>
+                <span style="background: rgba(6, 182, 212, 0.2); color: #67e8f9; padding: 2px 6px; border-radius: 4px;">AI 활용 Skill: <code>AI-CTX</code> <code>AI-ANA</code> <code>AI-DOC</code></span>
+                <span style="background: rgba(139, 92, 246, 0.2); color: #c084fc; padding: 2px 6px; border-radius: 4px;">AI 역할: Domain Analyst</span>
+              </div>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 입력 (Input Context)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• 서비스 아이디어 및 기존 Day 1 요구사항 산출물</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 사용자 후보군 데이터</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 제출 산출물 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>01_SERVICE_OVERVIEW.md</code></li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>03_DOMAIN_MAP.md</code></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box" style="background: rgba(6, 182, 212, 0.05); border-left-color: var(--secondary-color);">
+              <h4 style="color: #67e8f9; font-size: 0.78rem; font-weight: 800;">💡 Task 목표 및 배경</h4>
+              <p style="font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #a5f3fc;">
+                Viewer·Creator·Advertiser·Admin의 목표, 행동, 기능, 필요 데이터를 정의합니다. AI에게 Domain Analyst 역할과 서비스 시나리오를 제공하고 Persona 간 목표 충돌 및 누락 요소를 도출합니다.
+              </p>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 수행 절차</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>Workspace 준비</strong>: 이전 Day 또는 기존 LMS Task에서 만든 입력 문서를 프로젝트 Workspace에 준비합니다.</li>
+                <li><strong>역할 부여</strong>: 입력 문서의 확정 사항, 가정, 미결정 사항을 구분하고 AI에게 Domain Analyst 역할을 부여합니다.</li>
+                <li><strong>Persona 정의</strong>: Viewer·Creator·Advertiser·Admin의 목표, 행동, 기능, 필요 데이터를 정의합니다.</li>
+                <li><strong>결과 검증</strong>: AI 결과를 그대로 채택하지 않고 기술 Skill 기준(TECH-BA, TECH-DDD)으로 사실·구조·예외를 검증합니다.</li>
+                <li><strong>산출물 기록</strong>: 최종 선택, 수정한 내용, 거절한 AI 제안과 이유를 제출 산출물에 기록합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>추천 AI 활용 프롬프트</h3>
+              <pre><span class="code-badge" style="background: var(--secondary-color);">ADD-D01-T01 Prompt</span><code>당신은 이 프로젝트의 Domain Analyst입니다.
+
+[프로젝트 Context]
+서비스 아이디어, 기존 Day 1 요구사항 산출물, 사용자 후보
+
+[수행 Task]
+Viewer·Creator·Advertiser·Admin의 목표, 행동, 기능, 필요 데이터를 정의한다.
+
+[AI 활용 요구]
+AI에게 Domain Analyst 역할과 서비스 시나리오를 제공하고 Persona 간 목표 충돌·누락을 찾아달라고 요청한다.
+
+[출력 형식]
+1. 현재 Context에서 확인된 사실
+2. 제안 결과와 판단 근거
+3. 누락·충돌·위험 요소
+4. 사람이 최종 결정해야 하는 질문
+5. 검증 가능한 완료 Checklist
+
+추측한 내용은 사실처럼 표현하지 말고 반드시 '가정'으로 표시하세요.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🎯 주요 평가 및 확인 기준</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                • Persona별 목표·행동·기능·데이터가 표로 정리되고 서로 구분되는가?<br>
+                • 기술 산출물과 AI 검토 결과가 서로 추적 가능한가?<br>
+                • AI 제안을 수용·수정·거절한 판단 근거가 최소 1개 이상 기록되었는가?<br>
+                • 다음 Task가 추가 질문 없이 결과물을 입력 Context로 재사용할 수 있는가?
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 7 PANEL (ADD-D01-T02) ==================== -->
+      <div class="detail-panel" id="detail-7">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline" style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: #fff;">Skill Task 2</span> ADD-D01-T02 — Feature를 Domain으로 분류</h2>
+            </div>
+
+            <!-- Skill Marking -->
+            <div class="card-section" style="background: rgba(59, 130, 246, 0.05); padding: 10px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.2); margin-bottom: 12px;">
+              <h4 style="color: var(--primary-color); font-size: 0.76rem; margin-bottom: 6px;">🏷️ Skill 마킹</h4>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.7rem;">
+                <span style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;">Task 영역: <strong>TECH</strong></span>
+                <span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 2px 6px; border-radius: 4px;">기술 Skill: <code>TECH-BA</code> <code>TECH-DDD</code></span>
+                <span style="background: rgba(6, 182, 212, 0.2); color: #67e8f9; padding: 2px 6px; border-radius: 4px;">AI 활용 Skill: <code>AI-ANA</code> <code>AI-REV</code></span>
+                <span style="background: rgba(139, 92, 246, 0.2); color: #c084fc; padding: 2px 6px; border-radius: 4px;">AI 역할: Domain Analyst</span>
+              </div>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 입력 (Input Context)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>ADD-D01-T01</code> 산출물 (Persona 및 기능 요구사항)</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 제출 산출물 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>01_SERVICE_OVERVIEW.md</code></li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>03_DOMAIN_MAP.md</code></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box" style="background: rgba(59, 130, 246, 0.05); border-left-color: var(--primary-color);">
+              <h4 style="color: #93c5fd; font-size: 0.78rem; font-weight: 800;">💡 Task 목표 및 배경</h4>
+              <p style="font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #bfdbfe;">
+                회원, Channel, Video, Playback, Engagement, Advertising, Ad Serving, Billing, Analytics 기능을 책임 Domain에 명확히 배치하고 주 책임 및 중복 책임을 정제합니다.
+              </p>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 수행 절차</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>Workspace 입력 준비</strong>: 1단계 산출물을 입력 문서로 준비합니다.</li>
+                <li><strong>AI 역할 부여</strong>: AI에게 Domain Analyst 역할을 부여하고 기능별 책임 후보와 대안을 요청합니다.</li>
+                <li><strong>Domain 배치</strong>: 회원, Channel, Video, Playback, Engagement, Advertising, Ad Serving, Billing, Analytics 기능을 책임 Domain에 배치합니다.</li>
+                <li><strong>최종 경계 판단</strong>: AI의 대안 제안 중 사람이 최종 경계를 선택하고 선택 근거를 기록합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>추천 AI 활용 프롬프트</h3>
+              <pre><span class="code-badge" style="background: var(--primary-color);">ADD-D01-T02 Prompt</span><code>당신은 이 프로젝트의 Domain Analyst입니다.
+
+[프로젝트 Context]
+서비스 아이디어, 기존 Day 1 요구사항 산출물, 사용자 후보
+
+[수행 Task]
+회원, Channel, Video, Playback, Engagement, Advertising, Ad Serving, Billing, Analytics 기능을 책임 Domain에 배치한다.
+
+[AI 활용 요구]
+AI에게 기능별 책임 후보와 대안을 제시하게 한 뒤 사람이 최종 경계를 선택하고 근거를 기록한다.
+
+[출력 형식]
+1. 현재 Context에서 확인된 사실
+2. 제안 결과와 판단 근거
+3. 누락·충돌·위험 요소
+4. 사람이 최종 결정해야 하는 질문
+5. 검증 가능한 완료 Checklist
+
+추측한 내용은 사실처럼 표현하지 말고 반드시 '가정'으로 표시하세요.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🎯 주요 평가 및 확인 기준</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                • 모든 핵심 기능에 하나의 주 책임 Domain이 지정되고 중복 책임은 별도로 표시되었는가?<br>
+                • 기술 산출물과 AI 검토 결과가 서로 추적 가능한가?<br>
+                • AI 제안을 수용·수정·거절한 판단 근거가 최소 1개 이상 기록되었는가?
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 8 PANEL (ADD-D01-T03) ==================== -->
+      <div class="detail-panel" id="detail-8">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline" style="background: linear-gradient(135deg, var(--accent-purple), var(--secondary-color)); color: #fff;">Skill Task 3</span> ADD-D01-T03 — Domain Map과 책임 경계 검토</h2>
+            </div>
+
+            <!-- Skill Marking -->
+            <div class="card-section" style="background: rgba(139, 92, 246, 0.05); padding: 10px; border-radius: 6px; border: 1px solid rgba(139, 92, 246, 0.2); margin-bottom: 12px;">
+              <h4 style="color: var(--accent-purple); font-size: 0.76rem; margin-bottom: 6px;">🏷️ Skill 마킹</h4>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.7rem;">
+                <span style="background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;">Task 영역: <strong>AI</strong></span>
+                <span style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 2px 6px; border-radius: 4px;">기술 Skill: <code>TECH-DDD</code> <code>TECH-ARCH</code></span>
+                <span style="background: rgba(6, 182, 212, 0.2); color: #67e8f9; padding: 2px 6px; border-radius: 4px;">AI 활용 Skill: <code>AI-CTX</code> <code>AI-REV</code> <code>AI-DOC</code></span>
+                <span style="background: rgba(139, 92, 246, 0.2); color: #c084fc; padding: 2px 6px; border-radius: 4px;">AI 역할: Domain Analyst</span>
+              </div>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 입력 (Input Context)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>ADD-D01-T01</code>, <code>ADD-D01-T02</code> 산출물</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 제출 산출물 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>01_SERVICE_OVERVIEW.md</code></li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• <code>03_DOMAIN_MAP.md</code></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box" style="background: rgba(139, 92, 246, 0.05); border-left-color: var(--accent-purple);">
+              <h4 style="color: #c084fc; font-size: 0.78rem; font-weight: 800;">💡 Task 목표 및 배경</h4>
+              <p style="font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #e9d5ff;">
+                Domain 간 선후 관계, 의존성, 데이터 소유권을 시각화하고 Bounded Context 초안을 도출하여 시스템 아키텍처 입력으로 인계합니다.
+              </p>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 수행 절차</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>시각화 및 구조화</strong>: Domain 간 선후 관계, 의존성, 데이터 소유권을 시각화하고 Bounded Context 초안을 만듭니다.</li>
+                <li><strong>AI Review 수행</strong>: '책임이 중복되거나 누락된 Domain을 분석하라'는 Review Prompt로 AI 검토를 수행하고 수정 전후를 남깁니다.</li>
+                <li><strong>검증</strong>: AI 결과를 그대로 채택하지 않고 기술 Skill 기준(TECH-DDD, TECH-ARCH)으로 검증합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>추천 AI 활용 프롬프트</h3>
+              <pre><span class="code-badge" style="background: var(--accent-purple);">ADD-D01-T03 Prompt</span><code>당신은 이 프로젝트의 Domain Analyst입니다.
+
+[프로젝트 Context]
+서비스 아이디어, 기존 Day 1 요구사항 산출물, 사용자 후보
+
+[수행 Task]
+Domain 간 선후 관계, 의존성, 데이터 소유권을 시각화하고 Bounded Context 초안을 만든다.
+
+[AI 활용 요구]
+‘책임이 중복되거나 누락된 Domain을 분석하라’는 Review Prompt로 AI 검토를 수행하고 수정 전후를 남긴다.
+
+[출력 형식]
+1. 현재 Context에서 확인된 사실
+2. 제안 결과와 판단 근거
+3. 누락·충돌·위험 요소
+4. 사람이 최종 결정해야 하는 질문
+5. 검증 가능한 완료 Checklist
+
+추측한 내용은 사실처럼 표현하지 말고 반드시 '가정'으로 표시하세요.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🎯 주요 평가 및 확인 기준</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                • Domain Map, 책임표, 핵심 Entity 후보와 AI 검토 반영 내역이 남아있는가?<br>
+                • 기술 산출물과 AI 검토 결과가 서로 추적 가능한가?<br>
+                • AI 제안을 수용·수정·거절한 판단 근거가 최소 1개 이상 기록되었는가?
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 9 PANEL (MISSION 1) ==================== -->
+      <div class="detail-panel" id="detail-9">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7); color: #fff;">실습 과제 1</span> 반려동물 홈케어 및 펫시터 매칭 서비스</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 과제 입력 (Input)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>pet-care-meeting-notes.md</code> 회의록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 이전 1~5단계 실습에서 학습한 Codex 작성 프롬프트</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 과제 출력 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>pet-care-requirements.md</code> (기능 및 예외 흐름 요구사항 정의서)</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 미결정 정책 조율을 위한 이메일 승인 요청서</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box" style="background: rgba(139, 92, 246, 0.05); border-left-color: var(--accent-purple);">
+              <h4 style="color: #ddd6fe; font-size: 0.78rem; font-weight: 800;">💡 미션 배경 및 과제 목표</h4>
+              <p style="font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #c084fc;">
+                반려동물 보호자(고객)와 전문 펫시터를 연결해주는 플랫폼의 기획 회의록입니다. 
+                보호자의 신원과 반려동물 정보 등록, 펫시터의 자격 심사 및 관리자 승인, 매칭 수락 후 결제 기한 제약, 돌봄 상태 실시간 변경 프로세스, 그리고 서비스 취소 및 펫시터 노쇼(No-show) 발생 시의 예외 처리 로직을 명확히 명세화하는 것이 목표입니다.
+              </p>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 자가 실습 가이드</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>회의록 다운로드</strong>: 아래 버튼을 클릭하여 <code>pet-care-meeting-notes.md</code> 원본 파일을 다운로드합니다.</li>
+                <li><strong>요구사항 문서화</strong>: 다운로드한 회의록을 기반으로 Codex AI에게 사용자 역할(일반 사용자, 펫시터, 관리자), 기능(가입, 검색, 예약, 결제, 상태 변경), 그리고 예외 흐름(결제 시간 초과, 취소 위약금, 노쇼 대응)을 상세히 명세화할 것을 지시합니다.</li>
+                <li><strong>AI 린트 검증</strong>: 기획서 작성 후 5단계의 검증 규칙(ID 중복/누락 여부, 정상/예외 흐름 누락 여부, 모호한 표현 검사)을 활용해 요구사항 문서를 AI로 정밀 검수하고 최종 요구사항 정의서를 승인 버전으로 빌드합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 자가 실습 자료</h3>
+              <p style="font-size: 0.78rem; margin-bottom: 10px;">아래 버튼을 눌러 미션 1을 수행할 수 있는 회의록 원본을 다운로드하세요.</p>
+              <div class="action-btn-container">
+                <button onclick="downloadPetCareMeetingNotes()" class="btn-download" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7);">
+                  📥 pet-care-meeting-notes.md 다운로드
+                </button>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <h3>추천 AI 실습 프롬프트</h3>
+              <pre><span class="code-badge" style="background: var(--accent-purple);">Mission 1 Prompt</span><code>[역할: IT 전문 비즈니스 분석가]
+방금 다운로드한 pet-care-meeting-notes.md 파일을 분석하여, 다음 형식으로 요구사항 정의서인 pet-care-requirements.md를 작성해줘.
+
+1. 개요 및 서비스 구조
+2. 사용자 역할 정의 (보호자, 펫시터, 관리자)
+3. 핵심 기능 요구사항 목록 (ID 형식: PCR-001, PCR-002...)
+4. 정상 흐름 및 예외 흐름 (예: 결제 1시간 초과 만료 처리, 펫시터 노쇼 시 200% 포인트 보상 및 대체 펫시터 추천 프로세스 등)
+5. 비결정 질문 목록
+
+최대한 세분화되고 개발이 가능한 수준으로 명세화해주고, 5단계에서 사용한 AI 린트 검증 조건도 함께 적용해서 자가 검증 결과를 첫머리에 보여줘.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🎯 주요 평가 및 확인 기준</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                • 펫시터 등록 후 '관리자 승인' 조건이 명확히 명세화되었는가?<br>
+                • 매칭 신청 후 '1시간 이내 미결제 시 취소' 등의 기한 예외 처리가 반영되었는가?<br>
+                • 펫시터 노쇼 시의 보상 정책 및 대체 추천 보완 흐름이 기획 문서에 적절하게 명문화되었는가?
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 10 PANEL (MISSION 2) ==================== -->
+      <div class="detail-panel" id="detail-10">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7); color: #fff;">실습 과제 2</span> 무인 스터디카페 공간 예약 및 IoT 제어 서비스</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 과제 입력 (Input)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>study-cafe-meeting-notes.md</code> 회의록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 이전 1~5단계 실습에서 학습한 Codex 작성 프롬프트</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 과제 출력 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>study-cafe-requirements.md</code> (IoT 연동 예외 처리 통합 요구사항 정의서)</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 하드웨어-소프트웨어 제어 검증 시나리오 명세서</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box" style="background: rgba(139, 92, 246, 0.05); border-left-color: var(--accent-purple);">
+              <h4 style="color: #ddd6fe; font-size: 0.78rem; font-weight: 800;">💡 미션 배경 및 과제 목표</h4>
+              <p style="font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #c084fc;">
+                무인으로 운영되는 스터디카페에서 모바일을 통한 스터디룸 예약 및 오프라인 하드웨어(도어락, 스마트 전력 차단, 온도 조절기 등)를 원격 제어하는 서비스의 회의록입니다. 
+                결제 완료 시점의 핀코드 동적 생성, 입/퇴실 시의 IoT 기기 상태 동기화 및 핀코드 작동 제한 조건, 그리고 IoT 통신 장애(도어락 미작동 등) 발생 시 긴급 예외 문열기 및 경보 알림 등 다중 안전 프로세스를 도출하여 완벽한 IoT 비즈니스 명세를 수립해야 합니다.
+              </p>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 자가 실습 가이드</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>회의록 다운로드</strong>: 아래 버튼을 클릭하여 <code>study-cafe-meeting-notes.md</code> 원본 파일을 다운로드합니다.</li>
+                <li><strong>요구사항 문서화</strong>: 다운로드한 회의록을 기반으로 Codex AI에게 사용자 및 하드웨어 흐름(예약 시간 10분 전 활성화, 종료 5분 전 안내, 종료 시 전력 차단)을 명세화하도록 지시합니다.</li>
+                <li><strong>장애 예외 프로세스 구체화</strong>: IoT 통신 두절, 도어락 오작동 등 발생할 수 있는 시나리오별 예외 대처 방안(서버의 예비망 개방, 관리자 전송 실패 비상 알림, 긴급 긴급콜 등)을 다중 안전망(Fail-safe) 설계 요소를 적용하여 명확하게 작성합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>학습자 자가 실습 자료</h3>
+              <p style="font-size: 0.78rem; margin-bottom: 10px;">아래 버튼을 눌러 미션 2를 수행할 수 있는 회의록 원본을 다운로드하세요.</p>
+              <div class="action-btn-container">
+                <button onclick="downloadStudyCafeMeetingNotes()" class="btn-download" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7);">
+                  📥 study-cafe-meeting-notes.md 다운로드
+                </button>
+              </div>
+            </div>
+
+            <div class="card-section">
+              <h3>추천 AI 실습 프롬프트</h3>
+              <pre><span class="code-badge" style="background: var(--accent-purple);">Mission 2 Prompt</span><code>[역할: IoT 시스템 비즈니스 분석가]
+다운로드한 study-cafe-meeting-notes.md 파일을 기반으로, 다음 조건을 포함하여 study-cafe-requirements.md를 작성해줘.
+
+1. 스터디룸 예약 및 결제 정상 흐름 정의
+2. 하드웨어 제어 타이밍 명세 (예약 시간 10분 전 비밀번호 활성화 및 냉난방기 켜짐, 종료 5분 전 오디오 안내, 종료 시 즉각 차단)
+3. 예외 및 장애 극복 흐름 (Fail-safe):
+   - IoT 도어락 네트워크 오프라인 장애 시 예비 무선망 자동 스위칭 및 긴급 원격 개방 프로세스
+   - 핀코드 발송 실패 시 비상 수동 문열기 버튼 제공 및 관리자 즉각 대시보드 경보 생성 규칙
+4. 요구사항 검증 기준
+
+개발자와 HW 엔지니어가 모호함 없이 연동할 수 있도록 타임라인 형태로 흐름을 아주 구체적으로 정리해줘.</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🎯 주요 평가 및 확인 기준</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                • 예약 시간 전/후 하드웨어(도어락, 조명, 냉난방) 제어의 타임라인 조건이 구체적으로 명시되어 있는가?<br>
+                • IoT 기기 네트워크 불능 등 물리적 장애 발생 시의 이중 비상대응 절차가 요구사항 정의서에 포괄되어 있는가?<br>
+                • 비회원 예약 제한 및 연장 결제 정책 등의 예약 비즈니스 룰이 정형 문장으로 표현되었는가?
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 11 PANEL (MISSION 3 - SKILL MISSION 1) ==================== -->
+      <div class="detail-panel" id="detail-11">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7); color: #fff;">Skill 과제 1 (Mission 3)</span> 숏폼 VOD &amp; 라이브 커머스 플랫폼 Domain 설계</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 과제 입력 (Input)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>shortform-meeting-notes.md</code> 회의록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• Skill Task 1~3 (Persona, Domain, Bounded Context 프롬프트)</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 과제 출력 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>shortform-domain-specification.md</code></li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• 숏폼/라이브 커머스 Bounded Context 정의서</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box" style="background: rgba(139, 92, 246, 0.05); border-left-color: var(--accent-purple);">
+              <h4 style="color: #ddd6fe; font-size: 0.78rem; font-weight: 800;">💡 미션 배경 및 과제 목표</h4>
+              <p style="font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #c084fc;">
+                글로벌 숏폼 스트리밍과 라이브 커머스가 유기적으로 결합된 플랫폼 서비스 회의록입니다. 
+                Viewer·Creator·Advertiser·Admin 4대 사용자 체계의 목표와 행동을 정의하고, 회원·Video·Playback·Engagement·Ad Serving·Billing 기능을 책임 Domain에 배치한 뒤 Bounded Context 초안을 도출합니다.
+              </p>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 자가 실습 가이드</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>Skill Task 1 적용</strong>: Viewer·Creator·Advertiser·Admin 4개 Persona의 목표, 행동, 필요 데이터를 도출합니다.</li>
+                <li><strong>Skill Task 2 적용</strong>: 숏폼 VOD 업로드, 스트리밍, 타겟 광고, 결제 기능을 9대 주 책임 Domain으로 분할 배치합니다.</li>
+                <li><strong>Skill Task 3 적용</strong>: Domain 간 데이터 소유권 및 의존 관계를 시각화하여 Bounded Context 명세를 제출합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>추천 AI 실습 프롬프트</h3>
+              <pre><span class="code-badge" style="background: var(--accent-purple);">Mission 3 Prompt</span><code>[역할: Domain Analyst &amp; Solution Architect]
+글로벌 숏폼 스트리밍 및 라이브 커머스 서비스를 위해 다음 3개 섹션으로 구성된 shortform-domain-specification.md를 작성해줘.
+
+1. Viewer·Creator·Advertiser·Admin Persona 및 핵심 필요 데이터 정의
+2. 회원, Video, Playback, Engagement, Advertising, Ad Serving, Billing, Analytics 기능의 책임 Domain 배치표
+3. Domain 간 의존성 시각화 및 Bounded Context 초안 및 검증 Checklist</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🎯 주요 평가 및 확인 기준</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                • 4대 사용자 체계(Viewer/Creator/Advertiser/Admin)의 목표와 데이터가 구분되었는가?<br>
+                • VOD와 Live Streaming의 재생 및 광고 책임 Domain이 명확히 매핑되었는가?<br>
+                • Bounded Context 경계와 AI 결과물 검증 판단 근거가 작성되었는가?
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+      <!-- ==================== STEP 12 PANEL (MISSION 4 - SKILL MISSION 2) ==================== -->
+      <div class="detail-panel" id="detail-12">
+        <main class="left-col">
+          <article class="detail-card">
+            <div class="detail-card-head">
+              <h2><span class="badge-inline" style="background: linear-gradient(135deg, var(--accent-purple), #a855f7); color: #fff;">Skill 과제 2 (Mission 4)</span> 스마트 B2B 모빌리티 &amp; 차량 관제 플랫폼 Domain 설계</h2>
+            </div>
+
+            <!-- Input & Output definition -->
+            <div class="card-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(9, 9, 11, 0.4); padding: 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, 0.1);">
+              <div>
+                <h4 style="color: var(--accent-color); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📥 과제 입력 (Input)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>fleet-meeting-notes.md</code> 회의록</li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• Skill Task 1~3 (Persona, Domain, Bounded Context 프롬프트)</li>
+                </ul>
+              </div>
+              <div>
+                <h4 style="color: var(--accent-purple); font-size: 0.74rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">📤 과제 출력 (Output)</h4>
+                <ul style="list-style-type: none; margin-bottom: 0; padding-left: 0;">
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 2px;">• <code>fleet-domain-specification.md</code></li>
+                  <li style="font-size: 0.68rem; color: var(--text-muted); margin-bottom: 0;">• B2B 차량관제 Bounded Context &amp; Responsibility Map</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="guide-box" style="background: rgba(139, 92, 246, 0.05); border-left-color: var(--accent-purple);">
+              <h4 style="color: #ddd6fe; font-size: 0.78rem; font-weight: 800;">💡 미션 배경 및 과제 목표</h4>
+              <p style="font-size: 0.72rem; line-height: 1.45; margin-top: 4px; color: #c084fc;">
+                법인차량 운행 관리, 드라이버 실시간 관제, 주유/정비 자동 연동 커머스 시스템의 회의록입니다. 
+                복잡한 기업(법인 Admin), 운전자(Driver), 정비 제휴사(Vendor) 체계의 Persona와 차량 데이터 관제/결제 책임 Domain을 정밀하게 구조화합니다.
+              </p>
+            </div>
+
+            <div class="guide-box">
+              <h4>🛠️ 자가 실습 가이드</h4>
+              <ol style="padding-left: 18px; font-size: 0.78rem; line-height: 1.45;">
+                <li><strong>Skill Task 1 적용</strong>: 법인 관리자, 드라이버, 제휴 정비소, 관제 Operator의 필요 데이터와 목표를 정의합니다.</li>
+                <li><strong>Skill Task 2 적용</strong>: GPS 실시간 관제, 운행일지 자동생성, 정비 커머스, 법인 정산 기능을 책임 Domain에 배치합니다.</li>
+                <li><strong>Skill Task 3 적용</strong>: 외부 정비망/주유망 API 연동 시의 데이터 소유권 및 Bounded Context 초안을 명세화합니다.</li>
+              </ol>
+            </div>
+
+            <div class="card-section">
+              <h3>추천 AI 실습 프롬프트</h3>
+              <pre><span class="code-badge" style="background: var(--accent-purple);">Mission 4 Prompt</span><code>[역할: B2B Enterprise Domain Analyst]
+법인차량 모빌리티 관제 플랫폼의 fleet-meeting-notes.md를 바탕으로 fleet-domain-specification.md를 작성해줘.
+
+1. Corporate Admin, Driver, Vendor, Dispatcher의 Persona 및 목표/필요 데이터
+2. GPS Telematics, Fleet Management, Maintenance, Billing &amp; Expense 책임 Domain 배치
+3. 데이터 소유권 및 Domain 간 의존 관계 시각화 Bounded Context</code></pre>
+            </div>
+
+            <div class="inline-sidebar-box">
+              <h4>🎯 주요 평가 및 확인 기준</h4>
+              <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px;">
+                • B2B 법인 조직과 텔레매틱스(GPS 관제) 데이터 소유권 분리가 반영되었는가?<br>
+                • 주유/정비 외부 연동 커머스 영역과 법인 정산 Domain 경계가 구분되었는가?<br>
+                • Bounded Context의 의존성 및 AI 제안 수정/거절 내역이 포함되었는가?
+              </p>
+            </div>
+          </article>
+        </main>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JavaScript for Tab Management, Scroll, mailto and Clipboard -->
+  <script>
+    function shareViaEmail() {
+      const subject = encodeURIComponent("[승인 요청] 전문가 상담 서비스 요구사항 명세서 검토 및 미결정 정책 조율의 건");
+      const body = encodeURIComponent(`안녕하세요 대표님, 기획팀 OOO입니다.
+
+신규 '온라인 전문가 상담 서비스'의 요구사항 정의서(requirements-specification.md) 작성을 완료하여 공유해 드립니다.
+
+이번 문서 작성 시 AI 린터(Linter)를 가동하여 모호한 요건을 자체 필터링하고 정상/예외 흐름을 보완하였습니다. 다만, 본격적인 개발 진입 전 대표님의 최종 결정이 필요한 주요 미결정 사안이 존재하여 아래와 같이 공유해 드립니다.
+
+[주요 미결정 사항 및 의사결정 필요 사안]
+1. Q-001: 사용자는 상담 시작 몇 시간 전까지 예약을 취소할 수 있습니까?
+2. Q-002: 예약 취소 시 수수료와 환불 비율은 어떻게 적용합니까?
+3. Q-003: 예약 완료 알림 방식은 무엇을 도입하겠습니까? (이메일/SMS/앱알림)
+4. Q-004: 결제 성공 후 예약 저장에 실패했을 시 예외 정책은 어떻게 처리합니까?
+
+바쁘시겠지만 본 사안들은 개발 연동 범위와 직결되는 핵심 비즈니스 로직이오니, 다음 주 화요일까지 피드백을 주시면 감사하겠습니다.
+
+상세 문서는 첨부파일(requirements-specification.md)을 참조해 주시기 바랍니다.
+
+감사합니다.
+기획팀 OOO 드림`);
+      
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    }
+
+    function copyEmailDraft() {
+      const emailDraftText = `제목: [승인 요청] 전문가 상담 서비스 요구사항 명세서 검토 및 미결정 정책 조율의 건
+
+안녕하세요 대표님, 기획팀 OOO입니다.
+
+신규 '온라인 전문가 상담 서비스'의 요구사항 정의서(requirements-specification.md) 작성을 완료하여 공유해 드립니다.
+
+이번 문서 작성 시 AI 린터(Linter)를 가동하여 모호한 요건을 자체 필터링하고 정상/예외 흐름을 보완하였습니다. 다만, 본격적인 개발 진입 전 대표님의 최종 결정이 필요한 주요 미결정 사안이 존재하여 아래와 같이 공유해 드립니다.
+
+[주요 미결정 사항 및 의사결정 필요 사안]
+1. Q-001: 사용자는 상담 시작 몇 시간 전까지 예약을 취소할 수 있습니까?
+2. Q-002: 예약 취소 시 수수료와 환불 비율은 어떻게 적용합니까?
+3. Q-003: 예약 완료 알림 방식은 무엇을 도입하겠습니까? (이메일/SMS/앱알림)
+4. Q-004: 결제 성공 후 예약 저장에 실패했을 시 예외 정책은 어떻게 처리합니까?
+
+바쁘시겠지만 본 사안들은 개발 연동 범위와 직결되는 핵심 비즈니스 로직이오니, 다음 주 화요일까지 피드백을 주시면 감사하겠습니다.
+
+상세 문서는 첨부파일(requirements-specification.md)을 참조해 주시기 바랍니다.
+
+감사합니다.
+기획팀 OOO 드림`;
+
+      navigator.clipboard.writeText(emailDraftText).then(() => {
+        alert("이메일 보고서 초안 본문이 클립보드에 성공적으로 복사되었습니다! 메일 창에 붙여넣어 공유하세요.");
+      }).catch(err => {
+        console.error("클립보드 복사 실패: ", err);
+      });
+    }
+
+    function downloadRawMeetingNotes() {
+      const rawText = `# 전문가 상담 서비스 구축을 위한 1차 Kick-off 회의록
+
+**일시**: 2026-07-10 14:00 - 15:30
+**참석자**: 대표(CEO), 기획자(PM), 개발자(Dev), 디자이너(Designer)
+
+---
+
+**대표**: 여러분, 안녕하세요. 오늘 회의는 우리가 새로 론칭할 "온라인 전문가 상담 서비스"의 기본 요구사항을 논의하고 방향을 잡기 위한 자리입니다. 핵심은 사용자가 우리 플랫폼에 와서 다양한 분야의 전문가를 찾고, 상담 예약을 한 뒤 결제까지 원활하게 마치는 프로세스입니다.
+
+**기획자**: 네, 대표님. 서비스의 기본적인 가입 절차부터 논의를 시작해보죠. 사용자는 회원가입을 해야 서비스를 이용할 수 있는 구조인가요?
+
+**대표**: 네, 맞습니다. 사용자는 우선 회원가입을 마쳐야만 전문가 검색이나 예약 등의 기능을 원활하게 이용할 수 있도록 합시다. 비회원 상태에서는 간단한 둘러보기만 가능하도록 하고요.
+
+**디자이너**: 가입하고 나면 전문가를 검색할 텐데, 전문가 프로필 페이지나 분류 기준은 어떻게 생각하고 계신가요?
+
+**대표**: 전문가는 일단 분야별로 구분되어야 합니다. 예를 들어 IT 컨설팅, 법률 상담, 디자인 코칭 같은 카테고리가 있겠죠. 사용자는 카테고리를 선택하거나 직접 검색어를 입력해 본인이 원하는 전문가를 빠르게 찾아낼 수 있어야 합니다.
+
+**디자이너**: 그러면 검색 결과에서 전문가 목록이 나오고, 상세 페이지로 들어가서 일정을 고르는 구조겠군요. 날짜와 시간은 어떻게 선택하나요?
+
+**대표**: 예, 사용자가 특정 전문가를 선택하면, 해당 전문가가 상담 가능한 스케줄 일정이 캘린더나 타임라인 형태로 표시되어야 해요. 사용자는 그중에서 자신이 상담받고 싶은 날짜와 시간을 자유롭게 골라 예약 신청을 할 수 있게 해야 합니다.
+
+**개발자**: 예약 신청 직후의 결제 프로세스는 어떻게 진행되나요? 예약 신청과 동시에 결제가 바로 이루어져야 예약이 확정되는 형태인가요?
+
+**대표**: 결제가 완료되어야만 최종 예약이 "확정" 상태로 넘어가야 합니다. 만약 PG사 한도 초과나 기타 원인으로 결제가 실패하면, 당연히 그 예약은 완료 처리되면 안 되고 대기 혹은 취소 상태로 묶여야겠죠.
+
+**개발자**: 결제 실패 시 예약이 생성되지 않거나 잠금 해제가 되어야 한다는 비즈니스 규칙이군요. 전문가는 자신이 예약된 스케줄을 어디서 확인하나요?
+
+**대표**: 전문가는 우리 시스템 내에 전문가 전용 대시보드가 있어서, 거기서 자신에게 들어온 예약 신청 내역이나 확정된 스케줄을 실시간으로 모니터링하고 관리할 수 있어야 합니다.
+
+**기획자**: 전문가 가입은 일반 회원가입과 다를 텐데, 인증이나 승인 절차가 별도로 필요한가요? 아무나 전문가로 활동하게 할 순 없으니까요.
+
+**대표**: 좋은 지적입니다. 전문가는 가입 신청을 한 후에 바로 활동할 수 있는 게 아니라, 사이트 관리자가 제출 서류나 자격을 심사한 뒤 "승인"을 해줘야 비로소 전문가 목록에 노출되고 예약 시스템에 참여할 수 있도록 관리자 승인 정책을 필수로 두겠습니다.
+
+**기획자**: 예약을 완료하면 사용자나 전문가에게 알림을 발송해야 개발 편의와 사용성이 높을 텐데, 알림 채널은 어떤 걸 선호하시나요?
+
+**대표**: 알림은 무조건 보내야죠. 예약이 확정되었거나 취소되었을 때 알려줘야 하니까요. 그런데 알림을 이메일로 쏠지, 아니면 휴대폰 문자로 보낼지는 개발 리소스와 비용 문제를 좀 더 따져봐야 할 것 같아요. 이 부분은 아직 확정하지 맙시다.
+
+**개발자**: 취소 수수료나 환불에 대한 규칙도 지금 정해야 하나요?
+
+**대표**: 취소 수수료 정책도 법률 검토와 마케팅 부서 협의가 필요한 사항이라서요. 오늘 당장 결정하기 어려우니, 이것도 아직 결정되지 않은 보류 사항으로 남겨둡시다. 추후 2차 회의 때 확정 짓는 걸로 하죠.
+
+**기획자**: 알겠습니다. 오늘 결정된 정책과 보류 사항들을 대략 취합해서 명세 초안을 위한 전처리 회의 요약 메모로 정리해 보겠습니다.`;
+
+      const blob = new Blob([rawText], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'meeting-notes-raw.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadMeetingNotes() {
+      const text = `온라인 전문가 상담 서비스를 만들려고 한다.
+
+사용자는 회원가입 후 전문가를 검색할 수 있다.
+전문가는 분야별로 구분한다.
+사용자는 상담 날짜와 시간을 선택할 수 있다.
+결제가 완료되면 예약이 확정된다.
+결제가 실패하면 예약은 완료되면 안 된다.
+
+전문가는 자신의 예약을 확인할 수 있다.
+관리자는 전문가 가입을 승인할 수 있다.
+
+예약이 완료되면 알림을 보내야 한다.
+알림을 이메일로 보낼지 문자로 보낼지는 아직 정하지 않았다.
+취소 수수료 정책도 아직 정하지 않았다.`;
+      
+      const blob = new Blob([text], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'meeting-notes.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadPetCareMeetingNotes() {
+      const text = `# 반려동물 홈케어 및 매칭 서비스 1차 기획 회의록
+
+**일시**: 2026-07-12 10:00 - 11:30
+**참석자**: PM(기획자), Dev(개발자), CEO(대표)
+
+---
+
+**CEO**: 우리 서비스의 본질은 신뢰할 수 있는 펫시터와 반려동물 보호자를 매칭해주는 것입니다. 보호자가 믿고 맡길 수 있도록 신원 확인과 실시간 모니터링이 핵심이에요.
+
+**PM**: 네, 맞습니다. 우선 사용자는 가입 시 보호자(일반 회원)와 펫시터(전문 회원)로 구분되어야 합니다. 펫시터는 프로필 등록 후 관리자가 자격증 및 신원을 심사하여 '승인'해야 목록에 노출되도록 합시다.
+
+**Dev**: 펫시터 매칭 신청 후 결제는 어떻게 진행되나요?
+**CEO**: 보호자가 원하는 일정과 펫시터를 선택해 신청하면, 펫시터가 이를 '수락'해야 결제 창이 열리는 형태로 갑시다. 펫시터 수락 후 1시간 이내에 결제하지 않으면 신청은 자동 취소됩니다.
+**Dev**: 결제가 성공하면 예약이 확정되고 실시간 돌봄 상태를 변경할 수 있는 건가요?
+**PM**: 맞습니다. 예약 당일 펫시터가 방문하여 '돌봄 시작', '산책 중', '식사 급여', '돌봄 종료' 등 실시간 상태를 변경할 때마다 보호자에게 푸시 알림이 가야 합니다.
+
+**Dev**: 예약 취소 정책은 어떻게 설정할까요?
+**CEO**: 서비스 시작 24시간 전까지는 100% 환불해주고, 24시간 이내~2시간 전 취소는 50% 위약금 발생, 2시간 미만 취소는 환불 불가로 정합시다. 펫시터가 노쇼(No-show)할 경우 보호자에게 100% 환불 및 200% 포인트 보상을 제공하고 대체 펫시터 추천 프로세스를 가동해야 합니다. 이 대체 추천 흐름은 구체적인 정책 조율이 필요합니다.`;
+      
+      const blob = new Blob([text], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pet-care-meeting-notes.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadStudyCafeMeetingNotes() {
+      const text = `# 무인 스터디카페 공간 예약 및 IoT 제어 서비스 1차 기획 회의록
+
+**일시**: 2026-07-13 14:00 - 15:30
+**참석자**: PM(기획자), IoT Dev(하드웨어 개발자), Web Dev(웹 개발자)
+
+---
+
+**PM**: 무인 스터디카페 서비스는 사용자가 모바일로 예약/결제하고 현장 도어락 및 냉난방기 제어를 완전 자동화하는 것이 목표입니다.
+
+**IoT Dev**: 예약이 확정(결제 완료)되면 서버에서 IoT 게이트웨이로 도어락 비밀번호(핀코드) 생성 명령을 내려야 합니다. 핀코드는 보안상 예약 시작 10분 전부터 종료 시점까지만 활성화되도록 할 것입니다.
+**Web Dev**: 사용자는 예약 시작 10분 전 알림톡이나 앱 푸시로 일회용 비밀번호를 받게 되는군요.
+**PM**: 그렇습니다. 또한 예약이 시작되면 자동으로 에어컨(냉난방기)과 룸 조명이 켜지고, 종료 5분 전에는 룸 내부 스피커로 "이용 시간이 5분 남았습니다."라는 안내 음성이 나가야 합니다. 종료 시간이 되면 전력과 조명이 즉시 차단되고 도어락 작동도 멈춰야 합니다.
+
+**Web Dev**: 만약 사용자가 이용 시간을 연장하고 싶다면요?
+**PM**: 뒤 타임에 예약이 없을 때만 최소 1시간 단위로 연장 예약 및 결제가 가능합니다.
+**IoT Dev**: 만약 IoT 통신 장애로 예약 시간에 문이 열리지 않거나, 핀코드 전송이 실패하는 예외 상황이 발생하면 어떻게 처리해야 할까요?
+**PM**: 아주 중요한 예외 처리입니다! 핀코드 전송 실패 시 즉시 관리자 웹 대시보드로 실시간 장애 경고가 떠야 하고, 사용자가 '비상 문열기' 버튼을 누르면 서버가 예비 통신망을 통해 원격으로 문을 개방하거나, 관리자에게 즉시 긴급 전화를 연결하는 다중 안전망(Fail-safe)이 필요합니다. 이 예외 대응 매뉴얼과 알림 조건은 추가 설계가 필요합니다.`;
+      
+      const blob = new Blob([text], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'study-cafe-meeting-notes.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.step-card');
+      const panels = document.querySelectorAll('.detail-panel');
+
+      cards.forEach(card => {
+        card.addEventListener('click', () => {
+          const stepNumber = card.getAttribute('data-step');
+
+          // Remove active class from all cards and panels
+          cards.forEach(c => c.classList.remove('active'));
+          panels.forEach(p => p.classList.remove('active'));
+
+          // Add active class to clicked card and relative panel
+          card.classList.add('active');
+          const targetPanel = document.getElementById(`detail-${stepNumber}`);
+          if (targetPanel) {
+            targetPanel.classList.add('active');
+          }
+
+          // Smoothly scroll the card inside the container to make it centered
+          card.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+          });
+        });
+      });
+
+      // Slider navigation buttons
+      const slider = document.querySelector('.step-slider');
+      const prevBtn = document.querySelector('.slider-btn.prev');
+      const nextBtn = document.querySelector('.slider-btn.next');
+
+      if (slider && prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+          slider.scrollBy({ left: -180, behavior: 'smooth' });
+        });
+
+        nextBtn.addEventListener('click', () => {
+          slider.scrollBy({ left: 180, behavior: 'smooth' });
+        });
+
+        const updateButtons = () => {
+          const scrollLeft = slider.scrollLeft;
+          const maxScroll = slider.scrollWidth - slider.clientWidth;
+          
+          prevBtn.style.opacity = scrollLeft <= 5 ? '0.3' : '1';
+          prevBtn.style.pointerEvents = scrollLeft <= 5 ? 'none' : 'auto';
+          
+          nextBtn.style.opacity = scrollLeft >= maxScroll - 5 ? '0.3' : '1';
+          nextBtn.style.pointerEvents = scrollLeft >= maxScroll - 5 ? 'none' : 'auto';
+        };
+
+        slider.addEventListener('scroll', updateButtons);
+        window.addEventListener('resize', updateButtons);
+        // Run once on load
+        setTimeout(updateButtons, 200);
+      }
+
+      // Auto select step based on query parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const stepParam = urlParams.get('step');
+      if (stepParam !== null) {
+        const targetCard = document.querySelector(`.step-card[data-step="${stepParam}"]`);
+        if (targetCard) {
+          setTimeout(() => {
+            targetCard.click();
+          }, 300);
+        }
+      }
+    });
+  </script>
+
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

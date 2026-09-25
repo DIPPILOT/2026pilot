@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 9 Payment Service & Trust Audit Tasks | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background: Deep Black */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Surface/Card: Dark Gray */
+      --text-main: #ffffff; /* Primary: White */
+      --text-muted: #e4e4e7; /* Secondary: Light Gray */
+      --text-desc: #71717a; /* Description: Gray */
+      --border-color: rgba(255, 255, 255, 0.08); /* Thin border with low opacity */
+      --accent-color: #06b6d4; /* Neon Cyan */
+      --accent-purple: #8b5cf6; /* Purple highlight */
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.65;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong { word-break: keep-all; }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    section { padding: 60px 0; }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 16px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    .hero {
+      margin-top: 70px;
+      padding: 100px 0 70px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .hero-center {
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      font-size: 0.8rem;
+      color: #93c5fd;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 750px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .task-board {
+      background: #09090b;
+      position: relative;
+    }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .task-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .task-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(59, 130, 246, 0.3);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-thumb {
+      height: 160px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .card-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex-grow: 1;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-badge {
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .card-badge.mission {
+      background: rgba(139, 92, 246, 0.1);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .card-step {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-desc);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .card-outcomes {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .outcomes-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .outcome-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .outcome-item {
+      font-size: 0.8rem;
+      color: var(--text-desc);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .outcome-item::before {
+      content: "✓";
+      color: var(--secondary-color);
+      font-weight: bold;
+    }
+
+    .enter-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 12px;
+      text-decoration: none;
+    }
+
+    .enter-btn:hover {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    @media (max-width: 1200px) {
+      .task-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.2rem; }
+      .task-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        ACE AI Startup Bootcamp
+      </a>
+      <ul class="nav-links">
+        <li><a href="day9-ai-classroom.html">← 메인 강의실로 복귀</a></li>
+        <li><a href="../homework_week1.html" style="color: #c084fc !important; font-weight: 700 !important; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 14px; border-radius: 8px;">📝 과제페이지</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container hero-center">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">DAY 9</span>
+        <span class="hero-badge">Payment Service & Trust Audit</span>
+        <span class="hero-badge">Codex AI Lab</span>
+      </div>
+      <h1>결제 서비스 설계하기</h1>
+      <p>
+        외부 PG사 연동을 기계적으로 처리하기에 앞서, 사용자가 이탈 없이 안심하고 결제할 수 있는 흐름을 설계하고 실패 장애 예외와 UX 신뢰 요건을 보강하는 AI 오디팅 실습입니다.
+      </p>
+      <a href="day9-ai-classroom.html" class="back-btn">← Day 9 메인 강의실 가기</a>
+    </div>
+  </section>
+
+  <!-- Task Board Section -->
+  <section class="task-board">
+    <div class="container">
+      <div class="task-grid">
+
+        <!-- Task 1 -->
+        <article class="task-card">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(0deg);">TASK 1</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge">Planning</span>
+              <span class="card-step">Task 01</span>
+            </div>
+            <h3 class="card-title">결제 흐름 설계하기</h3>
+            <p class="card-desc">상품 선택 후 최종 승인까지의 다단계 팝업과 불필요 요소를 병합해 이탈을 획기적으로 줄이는 3단계 간소 결제 흐름서를 설계합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day9_current_checkout_flow.md</code> 개선</li>
+                <li class="outcome-item">간소화된 TO-BE 주문 결제 흐름서</li>
+              </ul>
+            </div>
+            <a href="day9-ai-codex-1.html" class="enter-btn">Task 1 실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Task 2 -->
+        <article class="task-card">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(90deg);">TASK 2</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge">Exceptions</span>
+              <span class="card-step">Task 02</span>
+            </div>
+            <h3 class="card-title">결제 실패 시나리오 검토하기</h3>
+            <p class="card-desc">카드 한도 초과, 통신 지연, 중복 제출 등 원시 오류별 행동 제안형 안심 문구집과 이중 청구 차단 락(disabled/UUID)을 수립합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day9_raw_payment_errors.json</code> 매핑</li>
+                <li class="outcome-item">안심 문구집 및 이중 승인 제어책</li>
+              </ul>
+            </div>
+            <a href="day9-ai-codex-2.html" class="enter-btn">Task 2 실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Task 3 -->
+        <article class="task-card">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(180deg);">TASK 3</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge">UX Audit</span>
+              <span class="card-step">Task 03</span>
+            </div>
+            <h3 class="card-title">결제 경험 개선하기</h3>
+            <p class="card-desc">흰 배경에 가격만 덜렁 있어 피싱 사이트 같은 불안을 지우기 위해 영수증식 가격 세분화 할인 표기, 보안 통신 알림, 환불 링크를 UI에 이식합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day9_payment_ui.html</code> 취약 진단</li>
+                <li class="outcome-item">보안 배지 및 영수증 세분화 HTML</li>
+              </ul>
+            </div>
+            <a href="day9-ai-codex-3.html" class="enter-btn">Task 3 실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Skill Task 1 -->
+        <article class="task-card" style="border-color: rgba(6, 182, 212, 0.3);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(45deg);">SKILL 1</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">Skill Task</span>
+              <span class="card-step">Skill Task 1</span>
+            </div>
+            <h3 class="card-title">광고 후보 검색과 선택 Rule 구현</h3>
+            <p class="card-desc">ADD-D09-T01: Active, Budget, Target Match, Frequency Cap을 만족하는 Campaign 후보와 선택 순서를 구현합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>11_TEST_SCENARIO.md</code></li>
+                <li class="outcome-item">Ad Targeting Rule Logic</li>
+              </ul>
+            </div>
+            <a href="day9-ai-codex-1.html" class="enter-btn">실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Skill Task 2 -->
+        <article class="task-card" style="border-color: rgba(6, 182, 212, 0.3);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(135deg);">SKILL 2</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">Skill Task</span>
+              <span class="card-step">Skill Task 2</span>
+            </div>
+            <h3 class="card-title">Billing·Analytics Domain Event 연결</h3>
+            <p class="card-desc">ADD-D09-T02: AdRequested, AdServed, Impression, Click, Charge 이벤트와 멱등성 파이프라인 흐름을 설계합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>ad-pipeline-integration.js</code></li>
+                <li class="outcome-item">Billing &amp; Event Payload Specification</li>
+              </ul>
+            </div>
+            <a href="day9-ai-codex-2.html" class="enter-btn">실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Skill Task 3 -->
+        <article class="task-card" style="border-color: rgba(6, 182, 212, 0.3);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(225deg);">SKILL 3</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">Skill Task</span>
+              <span class="card-step">Skill Task 3</span>
+            </div>
+            <h3 class="card-title">Viewer–Ad–Billing E2E 검증</h3>
+            <p class="card-desc">ADD-D09-T03: 영상 선택부터 광고 노출, 재생, 비용 차감, Analytics 반영까지 E2E 통합 실행 및 원인 분석을 수행합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>streaming-billing-audit-report.md</code></li>
+                <li class="outcome-item">E2E Flow State Recovery Log</li>
+              </ul>
+            </div>
+            <a href="day9-ai-codex-3.html" class="enter-btn">실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Mission 1 -->
+        <article class="task-card" style="border-color: rgba(139, 92, 246, 0.15);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(270deg);">MISSION 1</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge mission">Failure Guide</span>
+              <span class="card-step">Mission 01</span>
+            </div>
+            <h3 class="card-title">결제 실패 상황 대응하기</h3>
+            <p class="card-desc">PG창 강제 닫힘, 은행 점검 중복 결제 시도 시 사용자의 공포를 완화하고 재도전이나 마이페이지 상태 체크를 제안하는 에러 대안집을 조립합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day9_failure_scenarios.md</code></li>
+                <li class="outcome-item">상황별 행동 솔루션 피드백 안내서</li>
+              </ul>
+            </div>
+            <a href="day9-ai-codex-mission1.html" class="enter-btn">Mission 1 실습실 입장 →</a>
+          </div>
+        </article>
+
+        <!-- Mission 2 -->
+        <article class="task-card" style="border-color: rgba(139, 92, 246, 0.15);">
+          <div class="card-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(320deg);">MISSION 2</div>
+          <div class="card-content">
+            <div class="card-meta">
+              <span class="card-badge mission">Friction Audit</span>
+              <span class="card-step">Mission 02</span>
+            </div>
+            <h3 class="card-title">구매 완료까지 직접 점검하기</h3>
+            <p class="card-desc">장바구니부터 주문 완료 페이지까지의 전 단계를 거치며 쿠폰 탐색 복귀 시 배송지 폼 소실 피크 마찰을 발굴하고 우선 수리 보고서를 제출합니다.</p>
+            <div class="card-outcomes">
+              <h4 class="outcomes-title">예상 산출물</h4>
+              <ul class="outcome-list">
+                <li class="outcome-item"><code>day9_checkout_journey.md</code></li>
+                <li class="outcome-item">구매 이탈률 제거 우선순위 A/B 처방</li>
+              </ul>
+            </div>
+            <a href="day9-ai-codex-mission2.html" class="enter-btn">Mission 2 실습실 입장 →</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

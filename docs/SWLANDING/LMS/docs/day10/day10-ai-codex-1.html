@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 10. Task 01 - 서비스 런칭 준비하기 | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color:#3b82f6; --secondary-color:#06b6d4; --bg-dark:#09090b;
+      --bg-card:#1a1d24; --text-main:#ffffff; --text-muted:#e4e4e7;
+      --text-desc:#71717a; --border-color:rgba(255,255,255,0.06);
+      --accent-color:#06b6d4; --accent-purple:#8b5cf6; --card-radius:10px;
+      --shadow-sm:0 4px 20px rgba(0,0,0,.5),0 0 1px rgba(255,255,255,.1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Pretendard',sans-serif; color:var(--text-main); line-height:1.5;
+      background:var(--bg-dark);
+      background-image:radial-gradient(circle at 10% 20%,rgba(59,130,246,.04) 0%,transparent 40%),
+                       radial-gradient(circle at 90% 80%,rgba(6,182,212,.04) 0%,transparent 40%),
+                       linear-gradient(to bottom,#09090b 0%,#111827 100%);
+      background-attachment:fixed;
+    }
+    h1,h2,h3,h4,p,li,span,strong,td,th { word-break:keep-all; }
+    .container { max-width:860px; margin:0 auto; padding:0 20px; }
+    .navbar {
+      position:fixed; top:0; width:100%; z-index:1000;
+      background:rgba(9,9,11,.85); backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .nav-container {
+      min-height:48px; display:flex; align-items:center;
+      justify-content:space-between; flex-wrap:wrap; padding:6px 20px;
+    }
+    .logo { font-size:.9rem; font-weight:800; color:#fff; text-decoration:none; display:flex; align-items:center; gap:5px; }
+    .logo::before { content:""; width:4px; height:12px; background:linear-gradient(135deg,var(--primary-color),var(--accent-color)); border-radius:999px; display:inline-block; }
+    .logo-text p { font-size:.58rem; color:var(--text-desc); margin-top:1px; }
+    .nav-links { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .nav-links a {
+      text-decoration:none; color:var(--text-muted); font-weight:600; font-size:.72rem;
+      background:rgba(255,255,255,.05); padding:4px 8px; border-radius:5px;
+      border:1px solid rgba(255,255,255,.08); transition:all .2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      background:rgba(255,255,255,.1); color:var(--secondary-color); border-color:rgba(6,182,212,.3);
+    }
+    .hero {
+      margin-top:120px; padding:16px 0 10px;
+      background:radial-gradient(circle at 50% 50%,rgba(59,130,246,.04),transparent 60%),#09090b;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .hero-content { max-width:750px; margin:0 auto; text-align:center; }
+    .hero-badge-wrap { display:flex; justify-content:center; gap:5px; flex-wrap:wrap; margin-bottom:4px; }
+    .hero-badge {
+      display:inline-flex; align-items:center; padding:1px 5px; border-radius:999px;
+      background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.15);
+      font-size:.65rem; color:#93c5fd; font-weight:700;
+    }
+    .hero h1 {
+      font-size:1.25rem; font-weight:800; margin-bottom:4px;
+      background:linear-gradient(135deg,#fff 40%,#93c5fd 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:-.02em;
+    }
+    .hero p { font-size:.78rem; color:var(--text-muted); max-width:600px; margin:0 auto; line-height:1.35; }
+    .layout-wrapper { padding:15px 0 35px; }
+    .detail-card {
+      background:rgba(26,29,36,.85); border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--card-radius); padding:14px 16px; box-shadow:var(--shadow-sm);
+    }
+    .detail-card-head { margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,.06); padding-bottom:6px; }
+    .detail-card-head h2 { font-size:.98rem; font-weight:800; color:#fff; display:flex; align-items:center; gap:5px; }
+    .detail-card-head h2 .badge-inline { font-size:.6rem; padding:1px 4px; border-radius:2px; background:var(--primary-color); color:#fff; }
+    .card-section { margin-bottom:12px; }
+    .card-section h3 {
+      font-size:.82rem; font-weight:700; color:var(--secondary-color); margin-bottom:4px;
+      display:flex; align-items:center; gap:4px;
+    }
+    .card-section h3::before { content:""; width:2px; height:8px; background:var(--secondary-color); border-radius:1px; display:inline-block; }
+    .card-section p { font-size:.76rem; color:var(--text-muted); margin-bottom:4px; }
+    ul { list-style-position:inside; padding-left:2px; margin-bottom:4px; }
+    li { font-size:.74rem; color:var(--text-muted); margin-bottom:2px; line-height:1.45; }
+    .prompt-box {
+      background:rgba(9,9,11,.6); border:1px solid rgba(255,255,255,.08);
+      border-radius:8px; padding:16px; position:relative; margin-bottom:8px;
+    }
+    .prompt-box pre {
+      padding-right: 70px; margin:0; white-space:pre-wrap; word-wrap:break-word; font-family:'Fira Code',monospace; font-size:.82rem; color:var(--text-muted); line-height:1.5; }
+    .copy-btn {
+      z-index: 10;
+      position:absolute; top:12px; right:12px;
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+      color:var(--text-muted); padding:4px 10px; border-radius:6px;
+      font-size:.74rem; font-weight:600; cursor:pointer; transition:all .2s;
+    }
+    .copy-btn:hover { background:rgba(255,255,255,.1); color:var(--secondary-color); border-color:rgba(6,182,212,.3); }
+    .action-btn-container { margin:4px 0 8px; display:flex; gap:8px; flex-wrap:wrap; }
+    .btn-download {
+      display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border-radius:4px;
+      background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));
+      color:#fff; font-size:.7rem; font-weight:700; border:none; cursor:pointer;
+      text-decoration:none; transition:all .2s;
+    }
+    .btn-download:hover { transform:translateY(-1px); }
+    @media(max-width:768px) {
+      .hero { margin-top:160px; }
+      .hero h1 { font-size:1.1rem; }
+      .detail-card { padding:10px 12px; }
+      .nav-container { flex-direction:column; gap:8px; padding:10px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">
+        <div class="logo-text">
+          <h1>ACE AI Startup Bootcamp</h1>
+          <p>Day 10 Codex AI Lecture</p>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="day10-ai-codex-1.html" class='active'>Task 1 (런칭 준비)</a>
+        <a href="day10-ai-codex-2.html" >Task 2 (사용자 점검)</a>
+        <a href="day10-ai-codex-3.html" >Task 3 (성과 정리)</a>
+        <a href="day10-ai-codex-mission1.html" >Mission 1 (패키지)</a>
+        <a href="day10-ai-codex-mission2.html" >Mission 2 (최종 발표)</a>
+        <a href="day10-ai-codex-summation.html" style="background:rgba(6,182,212,.15);color:var(--secondary-color);border-color:rgba(6,182,212,.3);">📊 요약 보기</a>
+        <a href="day10-ai-classroom.html">← 강의실</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container hero-content">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 10</span>
+        <span class="hero-badge">Task 01</span>
+        <span class="hero-badge">런칭 준비</span>
+      </div>
+      <h1>Task 01. 서비스 런칭 준비하기</h1>
+      <p>5초 안에 이해되는 서비스 소개서와 채널별 오픈 공지, 사용자 친화적 이용약관 초안을 완성합니다.</p>
+    </div>
+  </section>
+
+  <div class="container layout-wrapper">
+    <main>
+      <article class="detail-card">
+        <div class="detail-card-head">
+          <h2><span class="badge-inline">Task 01</span> 서비스 런칭 준비하기 실습 가이드</h2>
+        </div>
+
+        <div class="card-section" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:rgba(9,9,11,.4);padding:10px;border-radius:6px;border:1px dashed rgba(255,255,255,.1);">
+          <div>
+            <h4 style="color:var(--accent-color);font-size:.74rem;margin-bottom:2px;">📥 실습 입력 (Input)</h4>
+            <ul style="list-style-type:none;margin-bottom:0;padding-left:0;">
+              <li style="font-size:.68rem;color:var(--text-muted);">• <code>day10_service_overview.md</code></li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="color:var(--accent-purple);font-size:.74rem;margin-bottom:2px;">💾 실습 출력 (Output)</h4>
+            <ul style="list-style-type:none;margin-bottom:0;padding-left:0;">
+              <li style="font-size:.68rem;color:var(--text-muted);">• <code>day10_launch_materials.md</code></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <h3>1. 스토리 및 실습 배경</h3>
+          <p>9일간의 개발 과정 끝에 드디어 서비스가 완성되었습니다. 팀원 모두가 고생했고, 결과물도 훌륭합니다. 하지만 지금 이 순간 대표가 한 가지 질문을 던집니다. '우리 서비스, 지금 당장 사용자에게 공개할 수 있나요? 사용자는 이 서비스가 무엇인지 단번에 이해할 수 있나요?' 세상에 아무리 훌륭한 서비스라도 잘 소개하지 못하면 아무도 사용하지 않습니다. 이번 실습에서는 Codex를 활용하여 런칭 자료 패키지를 완성합니다.</p>
+        </div>
+
+        <div class="card-section">
+          <h3>2. 학습 목표</h3>
+          <ul>
+            <li>AI를 활용하여 서비스의 핵심 가치를 명확하고 설득력 있게 전달하는 소개서를 작성할 수 있다.</li>
+            <li>이메일, 홈페이지, SNS 등 채널별로 다른 톤과 형식으로 오픈 공지를 작성할 수 있다.</li>
+            <li>이용약관·개인정보 처리방침 등 서비스 운영에 필수적인 정책 문서 초안을 AI와 함께 작성할 수 있다.</li>
+          </ul>
+        </div>
+
+        <div class="card-section">
+          <h3>3. Codex AI 프롬프트 카드</h3>
+          <p>아래 프롬프트를 복사하여 Codex Client에 붙여넣고 결과를 받으세요.</p>
+            <div class="prompt-box" style="margin-bottom:12px;">
+              <button class="copy-btn" onclick="copyPrompt(this, 'prompt1_1')">📋 복사</button>
+              <pre id="prompt1_1">우리 서비스를 처음 이용하는 사용자가 5초 안에 핵심 가치를 이해할 수 있도록 서비스 소개서를 작성해줘. 서비스명, 핵심 기능 3가지, 대상 사용자, 차별점을 포함해줘.</pre>
+            </div>
+            <div class="prompt-box" style="margin-bottom:12px;">
+              <button class="copy-btn" onclick="copyPrompt(this, 'prompt1_2')">📋 복사</button>
+              <pre id="prompt1_2">서비스 오픈을 알리는 공지를 이메일 뉴스레터 형식과 홈페이지 상단 배너 텍스트 형식, SNS(인스타그램/X) 해시태그 포함 버전으로 각각 작성해줘.</pre>
+            </div>
+            <div class="prompt-box" style="margin-bottom:12px;">
+              <button class="copy-btn" onclick="copyPrompt(this, 'prompt1_3')">📋 복사</button>
+              <pre id="prompt1_3">서비스 이용약관과 개인정보 처리방침 초안을 작성해줘. 법적 용어보다는 사용자가 쉽게 이해할 수 있는 언어로 작성해줘.</pre>
+            </div>
+        </div>
+      </article>
+
+      <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;">
+        <a href="day10-ai-classroom.html" style="color:var(--text-muted);text-decoration:none;font-size:.8rem;font-weight:700;background:rgba(255,255,255,.05);padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.06);">&larr; 이전 단계</a>
+        <a href="day10-ai-codex-2.html" style="color:#fff;text-decoration:none;font-size:.8rem;font-weight:700;background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));padding:8px 16px;border-radius:8px;box-shadow:0 4px 10px rgba(59,130,246,.25);">다음 단계 &rarr;</a>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function copyPrompt(btn, id) {
+      const text = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✅ 복사 완료!';
+        btn.style.color = '#34d399';
+        btn.style.borderColor = 'rgba(52,211,153,.4)';
+        setTimeout(() => { btn.textContent = orig; btn.style.color=''; btn.style.borderColor=''; }, 2000);
+      });
+    }
+  </script>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

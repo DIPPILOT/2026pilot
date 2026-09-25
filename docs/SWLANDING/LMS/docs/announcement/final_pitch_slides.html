@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day 4: Reminder for Final Pitch — KB Park</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #090d16;
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #f1f5f9;
+    }
+
+    .viewer-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      height: 52px;
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      z-index: 20;
+      flex-shrink: 0;
+      gap: 12px;
+    }
+
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .doc-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .doc-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .doc-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.25));
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      color: #e9d5ff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .top-btn {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .top-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .top-btn.primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .top-btn.primary:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+    }
+
+    /* Main Slide Viewport */
+    .slide-stage {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #020617;
+    }
+
+    .swiper.pitchSwiper {
+      width: 100%;
+      height: 100%;
+    }
+
+    .swiper-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 12px;
+    }
+
+    .slide-img-wrapper {
+      max-width: 100%;
+      max-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .slide-img {
+      display: block;
+      max-width: 100%;
+      max-height: calc(100vh - 128px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    /* Side Nav Buttons */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-arrow:hover {
+      background: rgba(99, 102, 241, 0.85);
+      border-color: rgba(168, 85, 247, 0.8);
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .nav-arrow.prev { left: 16px; }
+    .nav-arrow.next { right: 16px; }
+
+    .nav-arrow.swiper-button-disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Bottom Control Bar */
+    .bottom-bar {
+      height: 54px;
+      background: rgba(15, 23, 42, 0.95);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 20;
+      flex-shrink: 0;
+      gap: 16px;
+    }
+
+    .bottom-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .counter-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    .counter-input {
+      width: 44px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 0.88rem;
+      font-weight: 800;
+      text-align: center;
+      padding: 3px 0;
+      outline: none;
+    }
+
+    .counter-input:focus {
+      border-color: #818cf8;
+      background: rgba(99, 102, 241, 0.15);
+    }
+
+    .progress-track {
+      flex: 1;
+      max-width: 420px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      width: 1.5%;
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+
+    .bottom-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .ctrl-btn.active {
+      background: rgba(99, 102, 241, 0.25);
+      border-color: rgba(99, 102, 241, 0.6);
+      color: #e0e7ff;
+    }
+
+    /* Thumbnail Tray Drawer */
+    .thumb-drawer {
+      position: absolute;
+      bottom: 54px;
+      left: 0;
+      width: 100%;
+      height: 110px;
+      background: rgba(11, 15, 25, 0.95);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      overflow-x: auto;
+      gap: 10px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+      transform: translateY(110%);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .thumb-drawer.open {
+      transform: translateY(0);
+    }
+
+    .thumb-item {
+      flex: 0 0 auto;
+      height: 86px;
+      aspect-ratio: 1.44;
+      border-radius: 5px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      position: relative;
+      background: #1e293b;
+      transition: all 0.15s ease;
+    }
+
+    .thumb-item:hover {
+      border-color: #818cf8;
+      transform: scale(1.04);
+    }
+
+    .thumb-item.active {
+      border-color: #a855f7;
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+    }
+
+    .thumb-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb-num {
+      position: absolute;
+      bottom: 2px;
+      right: 4px;
+      background: rgba(0, 0, 0, 0.7);
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #fff;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="viewer-container" id="viewerRoot">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="top-left">
+        <span class="doc-icon">📑</span>
+        <h1 class="doc-title">Day 4: Reminder for Final Pitch — KB Park</h1>
+        <span class="doc-badge">총 66 슬라이드</span>
+      </div>
+      <div class="top-right">
+        <a href="260910_DAY%204_Reminder%20for%20Final%20Pitch_KB%20Park.pdf" download="260910_DAY 4_Reminder for Final Pitch_KB Park.pdf" class="top-btn" title="원본 PDF 다운로드">
+          📥 원본 PDF 다운로드
+        </a>
+        <a href="260910_DAY%204_Reminder%20for%20Final%20Pitch_KB%20Park.pdf" target="_blank" class="top-btn" title="PDF 새 창 열기">
+          ↗ PDF 뷰어
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Slide Stage -->
+    <main class="slide-stage">
+      <div class="swiper pitchSwiper">
+        <div class="swiper-wrapper" id="slidesWrapper">
+          <!-- Slides injected by JS -->
+        </div>
+      </div>
+
+      <!-- Arrow Buttons -->
+      <button class="nav-arrow prev" id="btnPrev" title="이전 슬라이드 (←)">❮</button>
+      <button class="nav-arrow next" id="btnNext" title="다음 슬라이드 (→)">❯</button>
+    </main>
+
+    <!-- Bottom Control Bar -->
+    <footer class="bottom-bar">
+      <div class="bottom-left">
+        <button class="ctrl-btn" id="btnThumbToggle" title="썸네일 목록 보기">
+          🖼️ 썸네일
+        </button>
+        <div class="counter-wrap">
+          <input type="number" id="pageInput" class="counter-input" min="1" max="66" value="1">
+          <span>/ 66</span>
+        </div>
+      </div>
+
+      <div class="progress-track" id="progressTrack" title="클릭하여 해당 위치로 이동">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="bottom-right">
+        <button class="ctrl-btn" id="btnFirst" title="첫 슬라이드">⏮</button>
+        <button class="ctrl-btn" id="btnLast" title="마지막 슬라이드">⏭</button>
+        <button class="ctrl-btn" id="btnFullscreen" title="전체화면 전환 (F)">
+          ⛶ 전체화면
+        </button>
+      </div>
+    </footer>
+
+    <!-- Thumbnail Drawer -->
+    <div class="thumb-drawer" id="thumbDrawer">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    const TOTAL_SLIDES = 66;
+    const slidesWrapper = document.getElementById('slidesWrapper');
+    const thumbDrawer = document.getElementById('thumbDrawer');
+    const pageInput = document.getElementById('pageInput');
+    const progressFill = document.getElementById('progressFill');
+    const progressTrack = document.getElementById('progressTrack');
+    const btnThumbToggle = document.getElementById('btnThumbToggle');
+    const btnFullscreen = document.getElementById('btnFullscreen');
+    const btnFirst = document.getElementById('btnFirst');
+    const btnLast = document.getElementById('btnLast');
+
+    // Build Slides & Thumbnails
+    let slidesHtml = '';
+    let thumbsHtml = '';
+    for (let i = 1; i <= TOTAL_SLIDES; i++) {
+      const padNum = String(i).padStart(2, '0');
+      const imgSrc = `final_pitch_slides/slide_${padNum}.jpg`;
+      const isEager = i <= 3;
+      
+      slidesHtml += `
+        <div class="swiper-slide">
+          <div class="slide-img-wrapper">
+            <img src="${imgSrc}" class="slide-img" alt="Slide ${i}" ${isEager ? '' : 'loading="lazy"'}>
+          </div>
+        </div>
+      `;
+
+      thumbsHtml += `
+        <div class="thumb-item ${i === 1 ? 'active' : ''}" data-index="${i - 1}">
+          <img src="${imgSrc}" alt="Thumb ${i}" loading="lazy">
+          <span class="thumb-num">${i}</span>
+        </div>
+      `;
+    }
+    slidesWrapper.innerHTML = slidesHtml;
+    thumbDrawer.innerHTML = thumbsHtml;
+
+    // Init Swiper
+    const swiper = new Swiper('.pitchSwiper', {
+      slidesPerView: 1,
+      spaceBetween: 0,
+      speed: 350,
+      grabCursor: true,
+      keyboard: {
+        enabled: true,
+        onlyInViewport: false,
+      },
+      navigation: {
+        nextEl: '#btnNext',
+        prevEl: '#btnPrev',
+      },
+      on: {
+        slideChange: function () {
+          updateUi(this.activeIndex);
+        }
+      }
+    });
+
+    function updateUi(index) {
+      const page = index + 1;
+      pageInput.value = page;
+      
+      const pct = (page / TOTAL_SLIDES) * 100;
+      progressFill.style.width = pct + '%';
+
+      // Update active thumbnail
+      document.querySelectorAll('.thumb-item').forEach((th, i) => {
+        if (i === index) {
+          th.classList.add('active');
+          th.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        } else {
+          th.classList.remove('active');
+        }
+      });
+    }
+
+    // Page input change
+    pageInput.addEventListener('change', () => {
+      let val = parseInt(pageInput.value, 10);
+      if (isNaN(val)) val = 1;
+      val = Math.max(1, Math.min(TOTAL_SLIDES, val));
+      swiper.slideTo(val - 1);
+    });
+
+    // Progress track click
+    progressTrack.addEventListener('click', (e) => {
+      const rect = progressTrack.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const ratio = clickX / rect.width;
+      const targetIndex = Math.floor(ratio * TOTAL_SLIDES);
+      swiper.slideTo(Math.max(0, Math.min(TOTAL_SLIDES - 1, targetIndex)));
+    });
+
+    // Thumbnail click
+    thumbDrawer.addEventListener('click', (e) => {
+      const item = e.target.closest('.thumb-item');
+      if (item) {
+        const idx = parseInt(item.dataset.index, 10);
+        swiper.slideTo(idx);
+      }
+    });
+
+    // Toggle thumbnail drawer
+    btnThumbToggle.addEventListener('click', () => {
+      thumbDrawer.classList.toggle('open');
+      btnThumbToggle.classList.toggle('active');
+    });
+
+    // First / Last buttons
+    btnFirst.addEventListener('click', () => swiper.slideTo(0));
+    btnLast.addEventListener('click', () => swiper.slideTo(TOTAL_SLIDES - 1));
+
+    // Fullscreen toggle
+    btnFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        btnFullscreen.textContent = '⛶ 축소';
+      } else {
+        btnFullscreen.textContent = '⛶ 전체화면';
+      }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'f' || e.key === 'F') {
+        if (!['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+          btnFullscreen.click();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

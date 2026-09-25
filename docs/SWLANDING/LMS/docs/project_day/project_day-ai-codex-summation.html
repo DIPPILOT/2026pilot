@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      var loggedInUser = getCookie('currentUser');
+      if (!loggedInUser && window.location.pathname.indexOf('login.html') === -1) {
+        window.location.href = '../login/login.html';
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Day 기획서 요약 및 가이드 | LMS</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    body { font-family: 'Pretendard', sans-serif; background: #09090b; color: #fff; padding: 24px; max-width: 1000px; margin: 0 auto; line-height: 1.6; }
+    h1 { font-size: 1.8rem; margin-bottom: 8px; color: #38bdf8; }
+    .nav-bar { display: flex; gap: 12px; margin-bottom: 24px; }
+    .btn { padding: 8px 16px; background: rgba(255,255,255,0.08); color: #fff; border-radius: 8px; text-decoration: none; font-size: 0.9rem; }
+    .card { background: #111827; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    .card h3 { color: #f43f5e; margin-bottom: 12px; }
+    pre { background: #000; padding: 14px; border-radius: 8px; color: #fef08a; font-size: 0.88rem; overflow-x: auto; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="nav-bar">
+    <a href="project_day-ai-classroom.html" class="btn">← Project Day AI 강의실로 돌아가기</a>
+  </div>
+  <h1>Project Day 기획서 요약 및 프롬프트 가이드</h1>
+  <p style="color: #94a3b8; margin-bottom: 24px;">Markdown 명세서 중심의 코덱스 대화형 개발 핵심 패턴 요약</p>
+
+  <div class="card">
+    <h3>📌 5대 기획 문서 구조 가이드</h3>
+    <pre>SITE_SPEC.md            # 목적, 사용자, 완료 기준 체크리스트
+USER_FLOWS.md           # 학생 &amp; 선생님 단계별 이용 동선
+DATA_MODEL.md           # 이름, 출석 시간, 상태 데이터 구조
+IMPLEMENTATION_PLAN.md  # 구현 순서 및 테스트 항목
+CONVERSATION.md         # 대화 프롬프트 및 결정 이력 기록</pre>
+  </div>
+
+  <div class="card">
+    <h3>💡 코덱스 구현 요청 핵심 프롬프트</h3>
+    <pre>"위 5개 기획 문서를 정독하고, website/ 폴더 아래 
+1) 학생 출석 카드 선택 및 QR 생성 화면
+2) 선생님 출석 현황 실시간 모니터링 화면
+을 HTML/CSS/JS로 구현해 줘. 모바일 레이아웃과 예외 처리를 반영해 줘."</pre>
+  </div>
+</body>
+</html>

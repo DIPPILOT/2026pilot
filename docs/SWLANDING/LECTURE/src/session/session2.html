@@ -1,0 +1,769 @@
+<!-- Slide 12: [간지] SESSION 02 -->
+<section class="slide-card divider-slide session-2" id="slide-16">
+  <div class="slide-header" style="display: none;">
+    <div class="slide-category">2일차 | 2차시. 일관성 검증, 변경 관리 및 의사결정 추적</div>
+    <div class="slide-title">[세션 오프닝] 2일차. 일관성 검증, 변경 관리 및 의사결정 추적</div>
+  </div>
+
+  <div class="divider-content">
+    <div class="divider-day">DAY 2</div>
+    <div class="divider-tag">SESSION 02</div>
+    <h1 class="divider-title">일관성 검증, 변경 관리 및 의사결정 추적</h1>
+    <p class="divider-subtitle">문서 간 모순 비교 검수, 요구사항 변경에 따른 영향 범위 분석 및 의사결정 이력 관리</p>
+    <div class="divider-topics">
+      <div class="topic-badge"><span>01</span> 다중 문서 불일치 감사 (Task 01)</div>
+      <div class="topic-badge"><span>02</span> 변경 영향도 분석 (Task 02 / Mission 1)</div>
+      <div class="topic-badge"><span>03</span> 의사결정 로그 &amp; 이슈 리포트 (Task 03 / Mission 2)</div>
+    </div>
+  </div>
+
+  <div class="slide-body" style="display: none;">
+    <p>2차시. 일관성 검증, 변경 관리 및 의사결정 추적 세션 시작</p>
+  </div>
+  <div class="presenter-notes" style="display:none;">2일차 세션에서는 프로젝트 마일스톤 후반부에 터지는 '문서 간 불일치 및 모순' 문제를 자동으로 검출하는 법, 변경 이력 영향 범위 분석, 그리고 의사결정 이력을 구조화하여 아카이빙하는 실무 기법을 완벽히 정복해 보겠습니다.</div>
+</section>
+
+<!-- Slide: Day 2 Recap Slide (KO) -->
+<section class="slide-card session-2" id="slide-17">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">2일차 | 시스템 설계 &amp; 프로젝트 감사 요약</div>
+      <div class="slide-title">Day 2. 요약 및 실습 리캡 (Recap)</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 16px; padding: 40px 32px; text-align: center; height: 100%; max-width: 680px; margin: 0 auto;">
+      <div style="font-size: 3.5rem; margin-bottom: 16px;">🇰🇷</div>
+      <h3 style="font-size: 1.6rem; font-weight: 700; color: #60a5fa; margin-bottom: 12px;">Day 2 학습 요약 (국문)</h3>
+      <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.6; text-align: center;">
+        요구사항 정의부터 시퀀스 다이어그램 설계, 다중 문서 불일치 검출, 변경 영향 분석 및 의사결정 로그 관리를 포함한 Day 2 통합 요약 교안입니다.
+      </p>
+      <a href="../../ADD_LECTURE/260729_Day2_Recap_AI_Design_Audit_KR.html" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 36px; font-size: 1.1rem; background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 12px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; cursor: pointer; max-width: 320px; width: 100%;">
+        🚀 요약 슬라이드 열기 (KO)
+      </a>
+    </div>
+
+    <div class="presenter-notes" style="display:none;">이 슬라이드는 Day 2 요구사항부터 시스템 설계 및 프로젝트 감사까지의 통합 요약 자료 링크를 제공합니다. 버튼을 클릭하면 새 창에서 슬라이드가 열립니다.</div>
+  </div>
+</section>
+
+<!-- Slide 13: 2일차 오프닝 & 4차시 안내 -->
+<section class="slide-card session-2" id="slide-18">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">4차시. 다중 문서 불일치 검출</div>
+      <div class="slide-title">2일차 오프닝 &amp; 4차시 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">주제:</span> 다중 문서 불일치 검출 (Consistency Check)</li>
+      <li><span class="highlight">핵심 가치:</span> 기획서, 화면 설계서, 개발 명세서가 각기 다른 버전으로 유통되어 엉뚱한 제품이 빌드되는 장애 방지</li>
+      <li><span class="highlight">시간 계획 (총 180분):</span>
+        <ul>
+          <li>도입 (30분) - 문서 간 불일치가 유발하는 재작업(Rework) 비용과 AI 검토 비서의 역할</li>
+          <li>실습 설명 (30분) - 3대 기획 명세 파일 설계 및 모순점 예시 소개</li>
+          <li>실습 진행 (90분) - 다중 문서 모순 감사 프롬프트 실행 및 검수</li>
+          <li>공유 및 피드백 (30분) - 별점 평가 주체 반전 오류 등 자가 진단 및 피드백</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">4차시에서는 다중 문서 간의 모순을 감지하는 오디팅 실습을 진행합니다. 사람이 일일이 대조하려면 며칠씩 걸릴 작업을 AI를 통해 단 몇 초 만에 처리하는 프로세스입니다.</div>
+    <div class="visual-guide-notes" style="display:none;">다크 네이비 배경에 형광 오렌지/레드 계열의 경고 일러스트 효과를 주어 버전 불일치 리스크를 시각화.</div>
+  </div>
+</section>
+
+<!-- Slide 14: 도입 질문: 엇갈린 문서들이 유발하는 소통 비용 -->
+<section class="slide-card session-2" id="slide-18">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">4차시. 다중 문서 불일치 검출</div>
+      <div class="slide-title">도입 질문: 엇갈린 문서들이 유발하는 소통 비용</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">기획 삼각 모순 시나리오:</span>
+            <ul>
+              <li><span class="highlight">기획 회의록:</span> 탈퇴 시 "예약 즉시 자동 취소 및 전액 환불" 합의.</li>
+              <li><span class="highlight">요구사항서:</span> 탈퇴 시 "예약 상담 레코드는 시스템 안전상 보관 유지".</li>
+              <li><span class="highlight">화면설계서:</span> 탈퇴 시 "별도 안내 팝업 없이 화면 상에서만 예약 숨김".</li>
+            </ul>
+          </li>
+          <li><span class="highlight">발생 결과:</span> 출시 전 개발팀과 디자인팀의 로직 엇갈림으로 인한 치명적인 재작업(Rework) 발생.</li>
+        </ul>
+      </div>
+      <div class="image-container"
+        style="display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 12px; padding: 10px;">
+        <img alt="기획 삼각 모순" src="images/slide14_illustration.png"
+          style="max-width: 100%; max-height: 320px; border-radius: 8px; object-fit: contain;" />
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">보통 기획자가 회의 결과를 칠판에 적어놓고 사양서 업데이트를 깜빡하면, 개발팀은 이전 버전으로 코딩을 하고 디자이너는 또 엇갈린 구성으로 작업합니다. AI를 활용하면 사람이 눈으로 찾아내기 힘든 의미적 모순점을 조기에 색출해 낼 수 있습니다.</div>
+    <div class="visual-guide-notes" style="display:none;">회의록, 요구사항, 화면정의 3대 노드를 화살표로 연결하고 중앙에 모순이 발생하여 스파크가 튀는 일러스트.</div>
+  </div>
+</section>
+
+<!-- Slide 15: 핵심 설명: AI 기획 검수 비서(Reviewer)의 작동 원리 -->
+<section class="slide-card session-2" id="slide-19">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">4차시. 다중 문서 불일치 검출</div>
+      <div class="slide-title">핵심 설명: AI 기획 검수 비서(Reviewer)의 작동 원리</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="flow-diagram">
+      <div class="flow-step active">
+        <div class="flow-badge">1</div>
+        <div class="flow-title">문맥 디코딩</div>
+        <div class="flow-desc">회의록, 요구사항서, 화면기획서의 마크다운 텍스트 속 비즈니스 룰을 문맥적으로 디코딩</div>
+      </div>
+      <div class="flow-arrow">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 11h12.59l-5.3 5.3 1.42 1.42L20 12l-7.29-7.29-1.42 1.42 5.3 5.3H4v2z"></path>
+        </svg>
+      </div>
+      <div class="flow-step">
+        <div class="flow-badge">2</div>
+        <div class="flow-title">크로스 오디팅</div>
+        <div class="flow-desc">각 문서 간의 의미론적 충돌 지점(평가 주체 뒤바뀜, 버튼 활성/비활성 여부) 자동 대조 검사</div>
+      </div>
+      <div class="flow-arrow">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 11h12.59l-5.3 5.3 1.42 1.42L20 12l-7.29-7.29-1.42 1.42 5.3 5.3H4v2z"></path>
+        </svg>
+      </div>
+      <div class="flow-step">
+        <div class="flow-badge">3</div>
+        <div class="flow-title">조치 리포팅</div>
+        <div class="flow-desc">위험도(높음/중간/낮음) 분류와 기준 문서에 기반한 수정 권장 방향 자동 도출</div>
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">AI 기획 검수 비서의 핵심은 크로스 오디팅입니다. 요구사항 정의서와 화면 정의서의 사양이 맞는지, 회의록의 최신 정책이 다 연동되었는지를 의미 단위로 대조하여 조치 가이드를 제공합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">AI 돋보기가 3개의 파일 폴더 내부 텍스트를 관통하며 정합성을 비교하는 입체 다이어그램.</div>
+  </div>
+</section>
+
+<!-- Slide 16: 실습 안내: 4차시 실습 파일 준비 -->
+<section class="slide-card session-2" id="slide-20">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">4차시. 다중 문서 불일치 검출</div>
+      <div class="slide-title">실습 안내: 4차시 실습 파일 준비</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">1단계: meeting-notes.md 생성</span>
+        <div style="font-size: 12.5px; color: var(--text-secondary); margin: 2px 0;">위약금 수수료 10%, 탈퇴 시 자동 취소 전액 환불, 별점 평가, 비회원 예약버튼 비활성화 기록.</div>
+      </li>
+      <li><span class="highlight">2단계: requirements.md 생성</span>
+        <div style="font-size: 12.5px; color: var(--text-secondary); margin: 2px 0;">회원탈퇴 시 기존 예약 보관(유지), <strong>FR-004 별점 평가 주체 반대로 작성 (Expert가 Customer 평가)</strong>.</div>
+      </li>
+      <li><span class="highlight">3단계: screen-specification.md 생성</span>
+        <div style="font-size: 12.5px; color: var(--text-secondary); margin: 2px 0;">비회원 홈 화면 예약하기 활성화, 회원탈퇴 팝업 없음, Customer가 전문가 평가하도록 설계.</div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">준비된 예제 마크다운 파일 3개를 각각의 이름으로 로컬 폴더(automation/) 내에 직접 작성해 둡니다. 각 파일의 내용은 의도적인 기획 충돌을 포함하고 있습니다.</div>
+    <div class="visual-guide-notes" style="display:none;">작업 디렉토리 폴더 안에 3개 파일 아이콘이 정렬되는 UI 안내.</div>
+  </div>
+</section>
+
+<!-- Slide 17: 실습 진행: 다중 문서 모순점 자동 필터링 -->
+<section class="slide-card session-2" id="slide-21">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">4차시. 다중 문서 불일치 검출</div>
+      <div class="slide-title">실습 진행: 다중 문서 모순점 자동 필터링</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">실습 지시: AI 창에 대조 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>불일치 감사 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 140px; overflow-y: auto;">프로젝트 폴더 내에 있는 'meeting-notes.md', 'requirements.md', 'screen-specification.md' 세 문서를 비교 분석해줘. 각 문서 간에 서로 모순되거나 불일치하는 항목, 혹은 한쪽 문서에만 존재하고 다른 문서에서는 누락된 항목을 찾아서 정리해줘. 결과는 '구분(기능/화면/정책/용어 등)', '발견 내용 및 모순점', '영향도(높음/중간/낮음)', '권한이 가장 높은 기준 문서', '권장 조치' 칼럼을 가진 Markdown 표 형태로 정리해줘. 개발 및 테스트 진입 시 치명적인 리워크를 유발하는 사항은 영향도를 '높음'으로 표기해줘.</pre>
+        </div>
+      </li>
+      <li style="margin-top: 5px;"><span class="highlight">기대 결과:</span> 세 문서에 분산된 위약금 누락, 별점 주체 반전, 비회원 권한, 탈퇴 환불 정책 충돌 보고서 획득.</li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">프롬프트를 전송하면 AI가 폴더 전체 맥락을 뒤져 요구사항서와 화면기획서, 회의록 간 버전 충돌을 일목요연한 테이블 보고서로 출력해 줍니다.</div>
+    <div class="visual-guide-notes" style="display:none;">프롬프트 입력 및 실시간 빌드로 도출된 모순점 분류 표 렌더링 화면 예시.</div>
+  </div>
+</section>
+
+<!-- Slide 18: 실습 공유 및 피드백: 별점 주체 오류 & 권한 모순 검출 -->
+<section class="slide-card session-2" id="slide-22">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">4차시. 다중 문서 불일치 검출</div>
+      <div class="slide-title">실습 공유 및 피드백: 별점 주체 오류 &amp; 권한 모순 검출</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">주요 오디팅 발견 항목 점검:</span>
+        <ul>
+          <li>1. **평가 주체 반전**: 회의록과 화면설계서는 Customer가 Expert를 평가하도록 되어 있으나, 요구사항 정의서(FR-004)는 Expert가 Customer를 평가하도록 모순됨. (영향도: **높음**)</li>
+          <li>2. **회원 탈퇴 프로세스 불일치**: 회의록(자동 취소 및 전액 환불) vs 요구사항서(데이터 유지 보관) vs 화면설계서(안내 없이 숨김)로 세 문서가 모두 다름. (영향도: **높음**)</li>
+          <li>3. **비회원 권한 모순**: 회의록(예약 버튼 비활성화) vs 화면설계서(비회원 예약하기 활성화 및 즉시 진입) 충돌. (영향도: **중간**)</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">결과 표를 서로 비교해 봅시다. 특히 별점 평가의 주체나 탈퇴 시 예약금 환불 로직처럼 개발자가 코딩하기 전에 반드시 일체화해야 하는 비즈니스 규칙 오류들을 AI가 정확히 잡아냈는지가 검수 포인트입니다.</div>
+    <div class="visual-guide-notes" style="display:none;">발견된 삼각 모순 내용들을 빨간 경고창과 함께 정상화 가이드 화살표로 매핑한 그래픽.</div>
+  </div>
+</section>
+
+<!-- Slide 19: 5차시 안내: 변경 관리와 나비효과 -->
+<section class="slide-card session-2" id="slide-23">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">5차시. 요구사항 변경 및 영향도 분석</div>
+      <div class="slide-title">5차시 안내: 변경 관리와 나비효과</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">주제:</span> 요구사항 변경 및 영향도 분석 (Impact Analysis)</li>
+      <li><span class="highlight">핵심 가치:</span> 요구사항 개정(v1.0 ➔ v2.0) 시, 종속된 화면 UI, 백엔드 API 명세, DB 스키마 컬럼의 동시 변경 범위 식별</li>
+      <li><span class="highlight">시간 계획 (총 180분):</span>
+        <ul>
+          <li>도입 (30분) - 변경 요청 한 줄이 시스템 전반에 유발하는 나비효과와 의미론적 디프</li>
+          <li>실습 설명 (30분) - 변경 전/후 명세서와 잔존 v1.0 문서 매핑 구조 이해</li>
+          <li>실습 진행 (90분) - Google 로그인, SMS 인증, Admin 다원 권한 변경 영향 분석 실습</li>
+          <li>공유 및 피드백 (30분) - DB 스키마 컬럼 및 API Payload 변수 매핑 검수</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">5차시에서는 기획 변경에 대응하는 영향 범위 분석 파이프라인을 다룹니다. 요구사항이 바뀔 때 다른 문서들도 유기적으로 함께 변경되도록 영향도를 맵핑합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">기획 변경(v2.0) 노드에서 출발한 전선들이 UI 화면, API 서버, DB 드럼통으로 거미줄처럼 이어져 빛나는 인포그래픽.</div>
+  </div>
+</section>
+
+<!-- Slide 20: 도입 질문: 요구사항 변경의 나비효과 -->
+<section class="slide-card session-2" id="slide-24">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">5차시. 요구사항 변경 및 영향도 분석</div>
+      <div class="slide-title">도입 질문: 요구사항 변경의 나비효과</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">변경 요청:</span> "회원가입에 휴대폰 번호를 통한 SMS 인증번호 확인 절차를 추가해 주세요."</li>
+          <li><span class="highlight">연쇄 영향:</span>
+            <ul>
+              <li><span class="highlight">화면:</span> 이메일 단일 가입 폼 ➔ 휴대폰 번호 및 인증코드 입력 필드 UI 교체.</li>
+              <li><span class="highlight">API:</span> signup API Payload에 <code>phone</code> 및 <code>verification_code</code> 변수 필수 추가.</li>
+              <li><span class="highlight">DB:</span> Users 테이블에 <code>phone</code> 및 <code>is_verified</code> 컬럼 추가.</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="image-container"
+        style="display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 12px; padding: 10px;">
+        <img alt="변경 영향 범위" src="images/slide20_illustration.png"
+          style="max-width: 100%; max-height: 320px; border-radius: 8px; object-fit: contain;" />
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">버튼 하나 추가하는 간단한 요구사항 변경도 실제로는 프론트엔드, API, 데이터베이스 설계 전체를 고치는 연쇄 누락 장애를 동반하기 쉽습니다. AI를 영향 분석 도구로 배치하여 해결합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">작은 모바일 폼 변경이 백엔드 소스코드 라인과 DB 테이블 테이블로 확대되어 전파되는 레이어 계층도.</div>
+  </div>
+</section>
+
+<!-- Slide 21: 핵심 설명: 의미론적 디프(Semantic Diff)와 영향도 맵 -->
+<section class="slide-card session-2" id="slide-25">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">5차시. 요구사항 변경 및 영향도 분석</div>
+      <div class="slide-title">핵심 설명: 의미론적 디프(Semantic Diff)와 영향도 맵</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="diagram-nested">
+      <div class="nested-container">
+        <span class="nested-label">Semantic Diff (의미론적 디프)</span>
+        <div class="nested-desc-top">단순 텍스트의 라인 비교가 아닌, 기획 비즈니스 정책 개정 내용의 차이를 문맥으로 감지</div>
+        <div class="nested-sub-1">
+          <span class="nested-label">영향 범위 자동 맵핑</span>
+          <div class="nested-desc-top">요구사항 변화에 맞춰 하부 종속성을 지닌 화면 정의서, API 명세서 파일 연계 탐색</div>
+          <div class="nested-sub-2">
+            <span class="nested-label">조치 가이드라인 도출</span>
+            <div class="nested-desc-top">프론트엔드 UI 컴포넌트 추가 및 백엔드 API Payload 변수 매핑 등 상세 조치 사항 가이드 자동 생성</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">의미론적 디프는 단순 코드 디프를 넘어 기획 논리의 변경을 감지하는 원리입니다. 이를 하위 아키텍처에 매핑함으로써, 수정되어야 할 좌표를 정확히 조언받을 수 있습니다.</div>
+    <div class="visual-guide-notes" style="display:none;">단순 코드 비교 화면(Line Diff)과 기획 의미 해석 화면(Semantic Diff)의 시각적 비교 대조.</div>
+  </div>
+</section>
+
+<!-- Slide 22: 실습 안내: 5차시 실습 파일 준비 -->
+<section class="slide-card session-2" id="slide-26">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">5차시. 요구사항 변경 및 영향도 분석</div>
+      <div class="slide-title">실습 안내: 5차시 실습 파일 준비</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">1단계: requirements-before.md 생성</span>
+        <div style="font-size: 13px; color: var(--text-secondary); margin: 2px 0;">v1.0 요구사항 정의서 (이메일 로그인/가입, 모든 가입자 User 권한 자동 부여).</div>
+      </li>
+      <li><span class="highlight">2단계: requirements-after.md 생성</span>
+        <div style="font-size: 13px; color: var(--text-secondary); margin: 2px 0;">v2.0 요구사항 정의서 (Google 소셜 로그인 지원, 휴대폰 SMS 가입 인증, User/Admin 권한 다원화).</div>
+      </li>
+      <li><span class="highlight">3단계: screen-specification-v2.md 생성</span>
+        <div style="font-size: 13px; color: var(--text-secondary); margin: 2px 0;">v1.0 기준의 잔존 화면 설계서 (이메일/비밀번호 필드만 있음, 이메일 링크 인증 가이드, 일반 마이페이지만 표시).</div>
+      </li>
+      <li><span class="highlight">4단계: api-specification.md 생성</span>
+        <div style="font-size: 13px; color: var(--text-secondary); margin: 2px 0;">v1.0 기준의 잔존 백엔드 API 명세서 (login, signup API Payload 변수에 email, password만 존재).</div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">실습용 4개 파일을 폴더에 순서대로 생성합니다. 변경 전/후 파일을 기반으로 AI가 하위 문서의 조치 사항을 유추하도록 할 예정입니다.</div>
+    <div class="visual-guide-notes" style="display:none;">폴더 내 v1.0 파일들과 v2.0 요구사항 파일의 생성 형태 가이드 UI.</div>
+  </div>
+</section>
+
+<!-- Slide 23: 실습 진행: 변경 이력 및 영향도 추적 -->
+<section class="slide-card session-2" id="slide-27">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">5차시. 요구사항 변경 및 영향도 분석</div>
+      <div class="slide-title">실습 진행: 변경 이력 및 영향도 추적</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">실습 지시: AI 창에 변경 영향 분석 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>영향도 매핑 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">requirements-before.md와 requirements-after.md의 변경점을 대조해줘. 그 후, 변경된 정책이 v1.0 수준에 머물러 있는 'screen-specification-v2.md' 및 'api-specification.md' 문서의 어느 부분에 반영되어야 하는지 분석해서 '변경 항목', '변경 전', '변경 후', '영향 범위 (화면/API)', '중요도', '조치 사항 (필요한 구체적인 수정 가이드)' 칼럼을 가진 Markdown 표 형태로 출력해줘.</pre>
+        </div>
+      </li>
+      <li style="margin-top: 5px;"><span class="highlight">기대 결과:</span> Google 소셜 로그인, 휴대폰 가입, Super/Sub Admin 권한 다원화 요건 매핑 테이블 획득.</li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">지시문을 전송하면 AI가 전/후 요구사항 차이를 파싱하고, 로그인/가입 화면의 UI 변경과 signup API Payload에 추가될 필드를 알려 줍니다.</div>
+    <div class="visual-guide-notes" style="display:none;">AI가 출력한 소셜 로그인 연동용 버튼 배치 가이드 및 API Payload 매개변수 수정 리포트 화면 예시.</div>
+  </div>
+</section>
+
+<!-- Slide 24: 종합 실습 Mission 1: 휴대폰 인증 추가 영향도 분석 -->
+<section class="slide-card session-2" id="slide-28">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">5차시. 요구사항 변경 및 영향도 분석</div>
+      <div class="slide-title">종합 실습 Mission 1: 휴대폰 인증 추가 영향도 분석</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">종합 실습 과제 (Task 06):</span>
+        <div style="font-size: 13.5px; color: var(--text-secondary); margin: 3px 0 5px 0;">
+          "회원가입에 휴대폰 인증 기능이 추가될 경우 영향을 받는 화면, API, DB, 문서를 모두 찾아 영향도 분석 보고서를 작성해 주세요."
+        </div>
+      </li>
+      <li><span class="highlight">핵심 피드백 포인트:</span>
+        <ul>
+          <li><span class="highlight">화면 기획:</span> 가입 UI에 휴대폰 및 인증번호 확인 폼 추가 (중요도: **높음**)</li>
+          <li><span class="highlight">API 명세:</span> signup API Payload에 <code>phone</code>, <code>verification_code</code> 필드 추가 (중요도: **중간**)</li>
+          <li><span class="highlight">DB 스키마:</span> Users 테이블에 <code>phone</code>(VARCHAR) 및 <code>is_verified</code>(BOOLEAN) 컬럼 추가 (중요도: **높음**)</li>
+          <li><span class="highlight">관리자 화면:</span> 관리자 백오피스 회원 목록에 컬럼 노출 추가 (중요도: **낮음**)</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">이어서 종합 미션 1을 해봅니다. 휴대폰 인증 추가라는 한 문장의 기획 수정 요구사항이 백엔드와 프론트엔드, 오프라인 DB 물리 스키마까지 미치는 연쇄 영향 지도(Impact Map)를 AI를 통해 자동으로 빌드해 봅시다.</div>
+    <div class="visual-guide-notes" style="display:none;">영향도 분석 보고서(Impact Analysis Report) 마크다운 표 구조 가이드.</div>
+  </div>
+</section>
+
+<!-- Slide 25: 실습 공유 및 피드백: DB 스키마 컬럼 및 API Payload 검수 -->
+<section class="slide-card session-2" id="slide-29">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">5차시. 요구사항 변경 및 영향도 분석</div>
+      <div class="slide-title">실습 공유 및 피드백: DB 스키마 컬럼 및 API Payload 검수</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">가치 검증 체크리스트:</span>
+        <ul>
+          <li>1. 단순 화면 변경 수준을 넘어 데이터베이스 스키마 테이블 컬럼 추가 요건이 제대로 식별되었는가?</li>
+          <li>2. API 수정 가이드에 Payload 변수명(`phone`, `verification_code` 등)이 개발 구현 수준으로 정의되었는가?</li>
+          <li>3. 중요도 분류(높음/중간/낮음)가 리스크 크기에 맞게 이성적으로 분류되었는가?</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">결과를 공유해 주세요. 팩트 데이터베이스 스키마 갱신과 API 파라미터가 정확히 나와야 개발자가 헤매지 않고 한 번에 코딩을 완료합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">API 통신 구조와 데이터베이스 컬럼 추가 내역이 정상적으로 싱크 매핑된 다이어그램.</div>
+  </div>
+</section>
+
+<!-- Slide 26: 6차시 안내: 의사결정 추적과 리스크 보고 -->
+<section class="slide-card session-2" id="slide-30">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">6차시. 의사결정 추적 및 프로젝트 이슈 리포트</div>
+      <div class="slide-title">6차시 안내: 의사결정 추적과 리스크 보고</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">주제:</span> 의사결정 추적(Decision Tracking) 및 프로젝트 이슈 리포트 작성</li>
+      <li><span class="highlight">핵심 가치:</span> 비정형 대화 내 의사결정 원인/배경 캡슐화, 우선순위 상태 리스크 보고서 자동화</li>
+      <li><span class="highlight">시간 계획 (총 180분):</span>
+        <ul>
+          <li>도입 (30분) - 결정을 내린 배경(Why)의 실실과 미결 안건 누수 리스크</li>
+          <li>실습 설명 (30분) - 미팅 대화록 및 의사결정 로그 구조 설명</li>
+          <li>실습 진행 (90분) - Decision Log 추출 및 종합 주간 이슈 보고서(Project Issue Report) 빌드</li>
+          <li>공유 및 피드백 (30분) - 우선순위 우선 과제 필터링 및 전체 회고</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">마지막 6차시에는 미팅 대화록에서 완료된 의사결정과 보류 안건을 추출해 내고, 프로젝트 정보들을 모아 이슈 보고서를 작성하는 방법을 학습합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">대화형 데이터 흐름이 깔끔한 테이블 리포트(Decision Log / Issue Report)로 정렬되어 시각화되는 그래픽.</div>
+  </div>
+</section>
+
+<!-- Slide 27: 도입 질문: 결정 사항의 배경(Why)을 유실했을 때의 리스크 -->
+<section class="slide-card session-2" id="slide-31">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">6차시. 의사결정 추적 및 프로젝트 이슈 리포트</div>
+      <div class="slide-title">도입 질문: 결정 사항의 배경(Why)을 유실했을 때의 리스크</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">문제 상황:</span> "1차 론칭에서 Apple 로그인을 빼고 구글 로그인만 넣기로 함." (회의록 결과)</li>
+          <li><span class="highlight">실종된 맥락:</span>
+            <ul>
+              <li><span class="highlight">Why:</span> 애플 개발자 연간 계정 심사 지연 및 촉박한 일정 사유.</li>
+              <li><span class="highlight">Who:</span> PM 최종 결정.</li>
+            </ul>
+          </li>
+          <li><span class="highlight">발생 비용:</span> 이력 실종 시 다음 릴리즈 미팅 때 동일 쟁점을 두고 소모적인 중복 회의 핑퐁 재발.</li>
+        </ul>
+      </div>
+      <div class="image-container"
+        style="display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 12px; padding: 10px;">
+        <img alt="결정 근거 실종" src="images/slide27_illustration.png"
+          style="max-width: 100%; max-height: 320px; border-radius: 8px; object-fit: contain;" />
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">결정 사항 뒤에 숨겨진 리스크나 심사 지연 사유 같은 컨텍스트가 기록되지 않으면 차후에 회의가 중복되거나 잘못된 선택을 반복하게 됩니다. AI로 대화 기록에서 의사결정 이력을 아카이빙해야 합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">회의실 테이블에서 사람들이 의문을 띄우고 있는 모습과 뒤편에 의사결정 로그가 문서화되는 그래픽.</div>
+  </div>
+</section>
+
+<!-- Slide 28: 핵심 설명: 의사결정 로그(Decision Log)와 미결 안건(Pending Items) -->
+<section class="slide-card session-2" id="slide-32">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">6차시. 의사결정 추적 및 프로젝트 이슈 리포트</div>
+      <div class="slide-title">핵심 설명: 의사결정 로그(Decision Log)와 미결 안건(Pending Items)</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="matrix-grid two-col" style="width: 100%; max-width: 1100px; margin-top: 15px;">
+      <div class="code-container" style="margin-bottom:0; display: flex; flex-direction: column; background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2);">
+        <div class="code-header" style="color: #10b981; border-color: rgba(16, 185, 129, 0.2);">
+          <span>의사결정 로그 (Decision Log) - 완료</span>
+        </div>
+        <div style="padding: 15px; text-align: left; font-size: 13.5px; line-height: 1.5;">
+          • 결정 항목 및 최종 결정 내용<br>
+          • <strong>의사결정 배경 및 논리적 근거 (Context)</strong><br>
+          • 결정일 / 담당자(의사결정 주체) / 현재 상태<br>
+          <span style="color: var(--text-secondary); font-size: 12px; display:block; margin-top:10px;">예: Google 로그인만 적용(배경: 심사 지연, 담당: PM, 결정일: 7/15)</span>
+        </div>
+      </div>
+      <div class="code-container" style="margin-bottom:0; display: flex; flex-direction: column; background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.2);">
+        <div class="code-header" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.2);">
+          <span>미결 사항 (Pending Items) - 보류</span>
+        </div>
+        <div style="padding: 15px; text-align: left; font-size: 13.5px; line-height: 1.5;">
+          • 미결 항목 (결론 보류 안건)<br>
+          • **후속 조치 내용 및 책임 계획**<br>
+          • 담당자 / 예정 완료 기한<br>
+          <span style="color: var(--text-secondary); font-size: 12px; display:block; margin-top:10px;">예: 해외 결제 수단 PayPal 연동 여부(조치: 기술 검토 후 보고, 담당: 개발팀)</span>
+        </div>
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">의사결정 추적의 핵심은 완료된 것과 보류된 것을 명확히 가려내는 것입니다. 결정된 정책은 비즈니스 배경을 남기고, 보류된 안건은 담당자와 기한을 지정해 누수를 막습니다.</div>
+    <div class="visual-guide-notes" style="display:none;">화면이 좌/우로 분할되어 왼쪽은 초록색 'Decision Log(완료)', 오른쪽은 노란색 'Pending Items(보류)' 카드로 대비 노출.</div>
+  </div>
+</section>
+
+<!-- Slide 29: 실습 안내: 6차시 실습 준비 -->
+<section class="slide-card session-2" id="slide-33">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">6차시. 의사결정 추적 및 프로젝트 이슈 리포트</div>
+      <div class="slide-title">실습 안내: 6차시 실습 준비</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">실습 1단계: messenger-chat.md 생성</span>
+        <div style="font-size: 13px; color: var(--text-secondary); margin: 3px 0;">
+          작업 공간에 <code>messenger-chat.md</code> 파일을 만들고 기획-개발 3차 의사결정 미팅 대화록을 붙여넣습니다.
+        </div>
+      </li>
+      <li><span class="highlight">대화 이력 속성:</span>
+        <ul>
+          <li>7/15: 일정 문제 및 계정 승인 지연으로 Apple 로그인 보류하고 Google만 우선 적용 합의.</li>
+          <li>7/16: PG 심사 지연 사유로 계좌이체 보류, PayPal 결제 기술 검토 지시.</li>
+          <li>7/17: 보안 감사 대비 Super/Sub Admin 2단계 계층 권한 설계 승인.</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">메신저 대화록을 생성해 줍니다. 핑퐁식으로 진행되는 구어체 대화 속에서 의사결정 메타데이터를 정제하겠습니다.</div>
+    <div class="visual-guide-notes" style="display:none;">마크다운 파일 아이콘과 내부에 구어체 대화 코드가 작성된 화면 캡처 UI 가이드.</div>
+  </div>
+</section>
+
+<!-- Slide 30: 실습 진행: 대화록 내 의사결정 맥락 구조화 -->
+<section class="slide-card session-2" id="slide-34">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">6차시. 의사결정 추적 및 프로젝트 이슈 리포트</div>
+      <div class="slide-title">실습 진행: 대화록 내 의사결정 맥락 구조화</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">실습 지시: AI 창에 의사결정 추출 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>의사결정 추출 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">프로젝트 폴더 내에 있는 'messenger-chat.md' 대화록을 읽고, 프로젝트 관리 및 추적을 위한 Decision Log(결정항목, 내용, 배경, 결정일, 담당자, 상태)와 Pending Items(미결항목, 후속조치, 담당자, 예정기한) 표를 작성해줘. 대화록에 없는 가상의 데이터를 꾸며내지 말아줘.</pre>
+        </div>
+      </li>
+      <li style="margin-top: 5px;"><span class="highlight">기대 결과:</span> 완료된 의사결정 3건 및 PayPal 결제, Apple 로그인 보류 2건 미결 안건 자동 도출.</li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">프롬프트 명령을 빌드합니다. AI가 핑퐁식의 대화에서 배경 근거들을 요약해 결정 로그 표와 미결 항목 표로 구조화해 줍니다.</div>
+    <div class="visual-guide-notes" style="display:none;">AI 빌드 후 폴더 내에 의사결정 로그 표와 미결 항목 표가 정렬 렌더링된 화면 예시.</div>
+  </div>
+</section>
+
+<!-- Slide 31: 종합 실습 Mission 2: 프로젝트 주간 이슈 리포트 자동 작성 -->
+<section class="slide-card session-2" id="slide-35">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">6차시. 의사결정 추적 및 프로젝트 이슈 리포트</div>
+      <div class="slide-title">종합 실습 Mission 2: 프로젝트 주간 이슈 리포트 자동 작성</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">종합 실습 과제 (Task 07):</span>
+        <div style="font-size: 13px; color: var(--text-secondary); margin: 3px 0 5px 0;">
+          "현재 프로젝트의 주요 이슈를 요약하고, 긴급도와 우선순위를 포함한 프로젝트 이슈 리포트를 작성해 주세요."
+        </div>
+      </li>
+      <li><span class="highlight">긴급도/우선순위 기반 리스크 감지 보고:</span>
+        <ul>
+          <li><span class="highlight">완료:</span> 로그인 및 사용자 인증 기능 구현 완료 (담당: 개발팀)</li>
+          <li><span class="highlight">진행:</span> 회원가입 기능(SMS 가입 인증 연동) 개발 및 테스트 중 (담당: 개발팀, 중요도: **중간**)</li>
+          <li><span class="highlight">이슈:</span> 외부 PG사 계약 승인 심사 지연에 따른 연동 병목 (담당: PM, 중요도: **높음**)</li>
+          <li><span class="highlight">위험:</span> 해외 PayPal 연동 신규 변경사항 유입에 따른 일정 압박 (담당: 기획팀, 중요도: **높음**)</li>
+          <li><span class="highlight">미결:</span> 관리자 백오피스 접근 권한(Super/Sub Admin) 정책 미확정 (담당: 기획팀, 중요도: **중간**)</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">이어서 종합 미션 2를 수행합니다. 폴더 내 흩어진 미팅 기록들을 모아 프로젝트 리스크 등급 분류와 주간 이슈 보고서를 빌드해 봅니다.</div>
+    <div class="visual-guide-notes" style="display:none;">프로젝트 주간 이슈 리포트(Project Issue Report) 표 구조 레이아웃 가이드.</div>
+  </div>
+</section>
+
+<!-- Slide 32: 실습 공유 및 피드백: 긴급도/우선순위 기반 리스크 통제 -->
+<section class="slide-card session-2" id="slide-36">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">6차시. 의사결정 추적 및 프로젝트 이슈 리포트</div>
+      <div class="slide-title">실습 공유 및 피드백: 긴급도/우선순위 기반 리스크 통제</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">가치 검증 체크리스트:</span>
+        <ul>
+          <li>1. 단순 작업 요약을 넘어 프로젝트 일정을 지연시키는 외부 요인(PG사 심사 지연)을 이슈로 올바르게 잡아냈는가?</li>
+          <li>2. 위험 요소(해외 결제 도입 예정)가 우선순위 '높음'으로 책정되어 선제적 관리 대상에 들어갔는가?</li>
+          <li>3. 해결해야 할 책임자(PM, 기획팀, 개발팀)가 명확히 명시되었는가?</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">결과를 공유해 봅시다. 이 리포트가 있어야 PM이나 의사결정권자가 프로젝트 전체의 병목과 위험 요소를 시각적으로 파악하고 대안을 지시할 수 있습니다.</div>
+    <div class="visual-guide-notes" style="display:none;">리스크 등급별 우선순위 가시화 아이콘 그래픽(경고, 보류, 진행).</div>
+  </div>
+</section>
+
+<!-- Slide 33: 정리: 2일차 핵심 요약 -->
+<section class="slide-card session-2" id="slide-37">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">6차시. 의사결정 추적 및 프로젝트 이슈 리포트</div>
+      <div class="slide-title">정리: 2일차 핵심 요약</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">2일차 요약 및 마일스톤 회고:</span>
+        <ul>
+          <li><span class="highlight">일관성 확인 (Consistency):</span> 기획서-화면설계서-회의록을 대조해 숨겨진 삼각 모순을 조기에 정밀 색출 완료.</li>
+          <li><span class="highlight">변경 영향 (Impact):</span> 이메일 가입 ➔ SMS 인증 변경 시, UI/API/DB 물리 컬럼 갱신 가이드 자동화.</li>
+          <li><span class="highlight">역사성 보존 (Decision):</span> 미팅 핑퐁 대화에서 결정 배경과 미결 안건을 분리해 주간 이슈 보고서로 피드백 완료.</li>
+          <li><span class="highlight">핵심 가치:</span> 2일간의 AI 파이프라인 협업을 통해 요구사항 생애주기 전반의 리워크 방지 설계 기법 완전 체득!</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">2일간의 모든 교육 일정을 마칩니다. 우리는 단순히 질문을 던지는 수준을 넘어, 프로젝트를 완수하기 위한 요구사항 생애주기 관리 설계 기법을 직접 기획하고 셀프 검증까지 완수했습니다. 수고 많으셨습니다. 감사합니다!</div>
+    <div class="visual-guide-notes" style="display:none;">AI 협업 로드맵이 성공 완료 깃발에 도달하는 입체적 3D 타임라인 맵 그래픽.</div>
+  </div>
+</section>
+<!-- Slide: 2일차 강의 평가 (Daily Evaluation) -->
+<section class="slide-card session-2" id="slide-38">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">일차별 강의 평가 | Daily Feedback</div>
+      <div class="slide-title">2일차 교육 만족도 및 강의 평가 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">2일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">설문 목적:</span> 2일차 교육 내용 만족도, 난이도 체감 및 개선 의견 수렴</li>
+          <li><span class="highlight">참여 방법:</span> 우측 QR 코드를 스마트폰 카메라로 스캔하거나 아래 링크로 접속해 주세요.</li>
+          <li><span class="highlight">설문 링크:</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSfKRxZtYQNzhQPj1IJ3cKBWk7UK3GjSLNIAECuJzViBgtp2OQ/viewform" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; word-break: break-all;">https://docs.google.com/forms/d/e/1FAIpQLSfKRxZtYQNzhQPj1IJ3cKBWk7UK3GjSLNIAECuJzViBgtp2OQ/viewform</a></li>
+          <li><span class="highlight">유의 사항:</span> 작성해 주신 소중한 피드백은 다음 차시 커리큘럼 보완 및 교육 품질 향상에 즉시 반영됩니다.</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); border-radius: 16px; padding: 24px; text-align: center;">
+        <div style="background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: inline-block; margin-bottom: 16px;">
+          <img src="images/qr_eval_day2.png" alt="2일차 강의 평가 QR 코드" style="width: 220px; height: 220px; display: block; border-radius: 6px;" />
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px;">📱 카메라로 QR 코드를 스캔하세요</div>
+        <div style="font-size: 0.95rem; color: var(--text-secondary);">2일차 강의 평가 (Google Forms)</div>
+      </div>
+    </div>
+
+    <div class="presenter-notes" style="display:none;">2일차 수업을 마치며 교육 만족도 및 강의 평가를 진행합니다. 수강생분들께서는 QR 코드를 스캔하여 오늘 수업에 대한 피드백을 작성해 주시기 바랍니다.</div>
+  </div>
+</section>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>수료를 축하합니다! | ACE AI Startup Bootcamp 최종 설문조사</title>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --secondary-color: #06b6d4;
+      --bg-dark: #09090b;
+      --bg-card: #1a1d24;
+      --text-main: #ffffff;
+      --text-muted: #e4e4e7;
+      --text-desc: #9ca3af;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --card-radius: 20px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      color: var(--text-main);
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      height: 70px;
+      padding: 0 30px;
+      background: rgba(9, 9, 11, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-logo {
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 800;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .back-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 60px 20px 80px 20px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Graduation Celebration Banner */
+    .celebration-hero {
+      text-align: center;
+      margin-bottom: 50px;
+      padding: 40px;
+      background: rgba(26, 29, 36, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    .celebration-icon {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .celebration-title {
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      line-height: 1.3;
+      background: linear-gradient(135deg, #ffffff 40%, #a5f3fc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .celebration-message {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .highlight-text {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    /* QR Code Cards Grid */
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 30px;
+    }
+
+    .qr-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 30px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(59, 130, 246, 0.4);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .qr-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #06b6d4);
+    }
+
+    .qr-badge {
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .qr-card-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .qr-card-desc {
+      font-size: 0.92rem;
+      color: var(--text-desc);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* QR Code Image Box */
+    .qr-img-box {
+      width: 220px;
+      height: 220px;
+      padding: 12px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-link:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-desc);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top Header Navigation -->
+  <nav class="navbar">
+    <a href="index.html" class="brand-logo">
+      <i class="fa-solid fa-graduation-cap text-primary"></i>
+      <span>ACE AI Startup Bootcamp</span>
+    </a>
+    <a href="index.html" class="back-btn">
+      <i class="fa-solid fa-arrow-left"></i> 과정 홈으로 돌아가기
+    </a>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="container">
+    <!-- Graduation Celebration Banner -->
+    <section class="celebration-hero">
+      <div class="celebration-icon">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <h1 class="celebration-title">수료를 진심으로 축하합니다! 🎉</h1>
+      <p class="celebration-message">
+        SW 랜딩 교육생의 모든 수업 일정이 성공적으로 종료되었습니다.<br>
+        그동안 열정적으로 참여해 주신 모든 수강생 여러분께 <span class="highlight-text">진심으로 감사드립니다.</span><br>
+        여러분의 앞날에 무궁한 발전과 행복이 가득하기를 기원합니다. 🙏
+      </p>
+    </section>
+
+    <!-- QR Code Survey Cards Grid -->
+    <section class="qr-grid" style="display: flex; justify-content: center;">
+      <!-- 1. Post-Course Survey QR Card -->
+      <article class="qr-card" style="max-width: 480px; width: 100%;">
+        <span class="qr-badge"><i class="fa-solid fa-clipboard-check"></i> 최종 만족도 조사</span>
+        <h2 class="qr-card-title">사후 설문조사</h2>
+        <p class="qr-card-desc">수업 과정 개선 및 만족도 평가를 위한 최종 설문조사에 참여해 주세요.</p>
+        
+        <div class="qr-img-box">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://forms.gle/zkj9c9jU1JdKc3LY6" 
+               alt="사후 설문조사 QR 코드" />
+        </div>
+
+        <a href="https://forms.gle/zkj9c9jU1JdKc3LY6" target="_blank" rel="noopener noreferrer" class="btn-link">
+          <i class="fa-solid fa-square-poll-vertical"></i> 사후 설문조사 바로가기
+        </a>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2026 ACE AI Startup Bootcamp. All rights reserved.</p>
+  </footer>
+</body>
+
+</html>

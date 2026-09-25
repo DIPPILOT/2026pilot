@@ -1,0 +1,299 @@
+<!-- Slide 79: [간지] SESSION 08 -->
+<section class="slide-card divider-slide session-8" id="slide-89">
+  <div class="slide-header" style="display: none;">
+    <div class="slide-category">8일차 | 8차시. 회원 서비스 만들기 (User Management)</div>
+    <div class="slide-title">[세션 오프닝] 8일차. 회원 서비스 만들기 (User Management)</div>
+  </div>
+
+  <div class="divider-content">
+    <div class="divider-day">DAY 8</div>
+    <div class="divider-tag">SESSION 08</div>
+    <h1 class="divider-title">회원 서비스 만들기</h1>
+    <p class="divider-subtitle">가입 장벽(Friction Block) 해소, 중복 가입 방어, 무작위 대입 공격 보안 및 품질 평가</p>
+    <div class="divider-topics">
+      <div class="topic-badge"><span>01</span> 회원 가이드라인 &amp; 로드맵 (Task 01)</div>
+      <div class="topic-badge"><span>02</span> Friction Block UX 개선 (Task 02)</div>
+      <div class="topic-badge"><span>03</span> 정합성 감사 &amp; 실버 온보딩 FGI (Task 03 / Mission 01/02)</div>
+    </div>
+  </div>
+
+  <div class="slide-body" style="display: none;">
+    <p>8차시. 회원 서비스 만들기 (User Management) 세션 시작</p>
+  </div>
+  <div class="presenter-notes" style="display:none;">8일차 세션에서는 사용자가 처음 들어와 회원이 되는 과정의 가입 피로도를 최소화하고, 중복 가입 체크 유효 가드식 및 로그인 실패 시 계정 탈취를 예방하는 통합 경고 문구 설계법을 학습합니다.</div>
+</section>
+
+<!-- Slide 80: 8일차 오프닝 & 22차시 안내 -->
+<section class="slide-card session-8" id="slide-90">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">22차시. 회원 기능 설계 및 구현 우선순위</div>
+      <div class="slide-title">8일차 오프닝 &amp; 22차시 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">8일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">주제:</span> 회원 기능 설계하기 (User Feature Planning)</li>
+      <li><span class="highlight">핵심 가치:</span> 개발 한계와 사용자 편의성의 균형을 고려한 온보딩(Onboarding) 기능 우선순위 조율</li>
+      <li><span class="highlight">시간 계획 (총 180분):</span>
+        <ul>
+          <li>도입 (30분) - 주소/추천인 다 받으려는 욕심과 3초 가입의 밸런스</li>
+          <li>실습 설명 (30분) - day8_service_intro.md 서비스 정의 분석</li>
+          <li>실습 진행 (90분) - 필수(이메일 가입)/선택(SNS 연동) 뼈대 리스트 및 표 빌드</li>
+          <li>공유 및 피드백 (30분) - 회원 탈퇴 시 개인정보 즉시 파기 대기 처리 검수</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">22차시에서는 회원 계정의 시작과 끝(가입/로그인/탈퇴)을 관리하기 위한 구현 체크리스트를 정립합니다.</div>
+  </div>
+</section>
+
+<!-- Slide 81: 도입 질문: 기획 의욕이 과해 15개 입력란으로 고객을 쫓아내는 대참사 -->
+<section class="slide-card session-8" id="slide-91">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">22차시. 회원 기능 설계 및 구현 우선순위</div>
+      <div class="slide-title">도입 질문: 기획 의욕이 과해 15개 입력란으로 고객을 쫓아내는 대참사</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">8일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">가입 장벽 (Friction Block):</span>
+            <ul>
+              <li>"아이디, 비번, 상세 주소, 추천인 ID, 마케팅 동의 등 15칸을 다 채워야 가입을 허가합니다." ➔ 결제 전 가입 단계에서 70%가 탈출.</li>
+              <li>오류 한 개 발생 시 기존 입력 데이터(비밀번호 등)가 전부 초기화되는 최악의 인지 좌절.</li>
+            </ul>
+          </li>
+          <li><span class="highlight">해결책:</span>
+            <ul>
+              <li>이메일/비번만 받아 가입 승인(1단계) ➔ 본예약 신청 시 배송지 기입 유도(2단계 Friction Delay).</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="image-container"
+        style="display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 12px; padding: 10px;">
+        <img alt="가입 장벽 이탈" src="images/slide81_illustration.png"
+          style="max-width: 100%; max-height: 320px; border-radius: 8px; object-fit: contain;" />
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">사용자가 느끼는 인지적 부하를 AI와 시뮬레이션해, 필요한 필드를 시점별로 분할하는 동선 기획을 배웁니다.</div>
+  </div>
+</section>
+
+<!-- Slide 82: 실습 진행 Task 01: 회원 기능 설계하기 (User Feature Planning) -->
+<section class="slide-card session-8" id="slide-92">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">22차시. 회원 기능 설계 및 구현 우선순위</div>
+      <div class="slide-title">실습 진행 Task 01: 회원 기능 설계하기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">8일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: day8_service_intro.md 작성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">상담 예약 매칭 플랫폼의 기본 목적 및 타겟 유저 연령군 기술서.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 회원 요건 도출 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>회원 설계 브레인스토밍 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 서비스 개요(day8_service_intro.md)를 기반으로, 예약 플랫폼에 필요한 회원 관리 기능 목록을 브레인스토밍해 주세요. 1) 필수 기본 기능과 2) 선택 확장 기능으로 이원화하여 목록을 구성하고, 개발 진척을 점검할 수 있는 우선순위 구현 체크리스트를 표(Table) 형태로 반환해 주세요.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">AI가 필수 기능(가입, 로그인, 재발급)과 추가 기능(SNS 연합 로그인, 마이페이지 정보 수정)을 정립해 줍니다.</div>
+  </div>
+</section>
+
+<!-- Slide 83: 실습 진행 Task 02: 사용자 관점에서 회원 기능 검토하기 (User Flow Review) -->
+<section class="slide-card session-8" id="slide-93">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">23차시. 인지 마찰 지점 분해 및 정합성 검증</div>
+      <div class="slide-title">실습 진행 Task 02: 사용자 관점 기능 검토</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">8일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: day8_signup_spec.md 작성</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">아이디 중복확인 버튼 무조건 누르게 하기, 비밀번호 정규식 힌트 가이드 부재 등의 사양서.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 사용성 피드백 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>가입 마찰 감사 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 회원가입 사양서 day8_signup_spec.md를 분석하여, 처음 가입하는 일반 유저가 마주칠 사용성 저해 요소를 3가지 지적해 주세요. 그리고 입력 양식 개수를 줄이고 오류 시 비밀번호가 리셋되는 현상을 예방하는 개선안 보고서(User Flow Report)를 제안해 주세요.</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">가이드 텍스트 사전 노출 유무와 단계를 뒤로 늦추는 UX 개선 보고서를 도출해 냅니다.</div>
+  </div>
+</section>
+
+<!-- Slide 84: 실습 진행 Task 03: 회원 기능 점검하기 (User Feature Review) -->
+<section class="slide-card session-8" id="slide-94">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">23차시. 인지 마찰 지점 분해 및 정합성 검증</div>
+      <div class="slide-title">실습 진행 Task 03: 회원 기능 점검하기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">8일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">준비 데이터: day8_user_service.js 준비</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 2px 0;">중복 가입 체크가 빠져 메일이 중복 저장되는 위험천만한 자바스크립트 초안.</div>
+      </li>
+      <li><span class="highlight">실습 지시: AI 창에 정합성 감사 프롬프트 전송</span>
+        <div class="code-container" style="margin-top: 5px; width: 100%;">
+          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
+            <span>정합성 감사 및 보안 통일 프롬프트 (복사 가능)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">제공된 day8_user_service.js 회원 가입 및 로그인 스크립트를 감사하여 1) 중복 가입 체크 누락 위험, 2) 비밀번호 분실 시 기존 패스워드 즉시 폐기 등의 결함을 도출하고, 서비스 안정성을 높이기 위한 유효 가드가 보강된 최종 자바스크립트 개선본을 제안해 주세요. (로그인 오류 실패 메시지 통합 보완 포함)</pre>
+        </div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">로그인 오류 시 "없는 이메일"과 "비밀번호 틀림"을 과도하게 다르게 주어 계정 사냥을 허가하던 약점을 단일 안내문으로 정렬합니다.</div>
+  </div>
+</section>
+
+<!-- Slide 85: Mission 01: 처음 가입하는 사용자 되어보기 (First-Time User) -->
+<section class="slide-card session-8" id="slide-95">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">24차시. 실버 계층 온보딩 모의 테스트 &amp; 다차원 감사</div>
+      <div class="slide-title">Mission 01: 처음 가입하는 사용자 되어보기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">8일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">60대 실버 가상 유저 페르소나 매칭:</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 3px 0 5px 0;">"비밀번호 조건이 틀릴 때 입력 양식이 초기화되어 짜증난다"는 감정 반응 로그 수집.</div>
+      </li>
+      <li><span class="highlight">개선 스크립트 작성 및 저장:</span>
+        <div style="font-size:13px; color: var(--text-secondary); margin-top:5px;">수동 중복 확인 버튼을 제거하고 input 포커스 아웃(`blur`) 시점 백그라운드 자동 중복 감사 로직 탑재 및 `day8_first_user_review.md` 요약.</div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">실시간 비밀번호 규칙 부합 피드백 인디케이터를 적용하여 실버 유저의 회원 이탈 마찰을 제거합니다.</div>
+  </div>
+</section>
+
+<!-- Slide 86: Mission 02: 회원 서비스 품질 평가하기 (Usability Metric) -->
+<section class="slide-card session-8" id="slide-96">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">24차시. 실버 계층 온보딩 모의 테스트 &amp; 다차원 감사</div>
+      <div class="slide-title">Mission 02: 회원 서비스 품질 평가하기</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">8일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
+      <li><span class="highlight">3대 품질 기준 점수화 감사:</span>
+        <div style="font-size:12.5px; color: var(--text-secondary); margin: 3px 0 5px 0;">조작성, 에러 예방성, 보안 안전도 등 다차원 채점 진행 (종합 3.9 / 5.0).</div>
+      </li>
+      <li><span class="highlight">품질 지표 저장:</span>
+        <div style="font-size:13px; color: var(--text-secondary); margin-top:5px;">보안 해킹 취약점 제거 및 3초 가입 동선 보장을 분석한 마크다운 품질 보고서 `day8_usability_evaluation.md` 저장 완료.</div>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">무작위 공격을 무력화하는 통합 에러 카피 처방전이 최종 포함되었는지 검수합니다.</div>
+  </div>
+</section>
+
+<!-- Slide 87: 정리: 8일차 핵심 요약 -->
+<section class="slide-card session-8" id="slide-97">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">24차시. 실버 계층 온보딩 모의 테스트 &amp; 다차원 감사</div>
+      <div class="slide-title">정리: 8일차 핵심 요약</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">8일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <ul class="bullet-list">
+      <li><span class="highlight">8일차 핵심 요약:</span>
+        <ul>
+          <li><span class="highlight">가입 장벽 해소 (Onboarding):</span> 15개 조밀한 입력창을 1차(즉시가입), 2차(첫예약시 기입)로 마찰 지연 분산.</li>
+          <li><span class="highlight">중복 데이터 방어 (Integrity):</span> blur 포커스 아웃 시점에 중복 이메일을 식별하는 가드 구축.</li>
+          <li><span class="highlight">보안 예외 제어 (Security):</span> ID/PW 오류 문구를 통합하여 계정 수집 힌트 유출 리스크 전원 차단.</li>
+          <li><span class="highlight">다음 차시 예고:</span> 9일차. 결제 서비스 설계하기 (Payment Service)</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="presenter-notes" style="display:none;">8일차 회원 처리를 완료했습니다. 다음 9일차에는 플랫폼 수익의 종착지인 결제 흐름 3단계 단축 및 한도초과 등 결제 실패 예외 대응 가이드라인을 기획해 보겠습니다.</div>
+  </div>
+</section>
+<!-- Slide: 8일차 강의 평가 (Daily Evaluation) -->
+<section class="slide-card session-8" id="slide-98">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">일차별 강의 평가 | Daily Feedback</div>
+      <div class="slide-title">8일차 교육 만족도 및 강의 평가 안내</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">8일차</span>
+      <span>ACE Startup SW/AI 파일럿</span>
+    </div>
+  </div>
+
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <ul class="bullet-list">
+          <li><span class="highlight">설문 목적:</span> 8일차 교육 내용 만족도, 난이도 체감 및 개선 의견 수렴</li>
+          <li><span class="highlight">참여 방법:</span> 우측 QR 코드를 스마트폰 카메라로 스캔하거나 아래 링크로 접속해 주세요.</li>
+          <li><span class="highlight">설문 링크:</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSe9yxtgqMu97YrtnNVKJnXFN9v_luDLuPdJIPmOarHHFllNhw/viewform" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; word-break: break-all;">https://docs.google.com/forms/d/e/1FAIpQLSe9yxtgqMu97YrtnNVKJnXFN9v_luDLuPdJIPmOarHHFllNhw/viewform</a></li>
+          <li><span class="highlight">유의 사항:</span> 작성해 주신 소중한 피드백은 다음 차시 커리큘럼 보완 및 교육 품질 향상에 즉시 반영됩니다.</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); border-radius: 16px; padding: 24px; text-align: center;">
+        <div style="background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: inline-block; margin-bottom: 16px;">
+          <img src="images/qr_eval_day8.png" alt="8일차 강의 평가 QR 코드" style="width: 220px; height: 220px; display: block; border-radius: 6px;" />
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px;">📱 카메라로 QR 코드를 스캔하세요</div>
+        <div style="font-size: 0.95rem; color: var(--text-secondary);">8일차 강의 평가 (Google Forms)</div>
+      </div>
+    </div>
+
+    <div class="presenter-notes" style="display:none;">8일차 수업을 마치며 교육 만족도 및 강의 평가를 진행합니다. 수강생분들께서는 QR 코드를 스캔하여 오늘 수업에 대한 피드백을 작성해 주시기 바랍니다.</div>
+  </div>
+</section>

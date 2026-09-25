@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      
+      var loggedInUser = getCookie('currentUser');
+      
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      
+      // Determine if this is the login.html page
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      
+      if (isLoginPage) {
+        if (loggedInUser) {
+          window.location.href = '../index.html';
+        }
+      } else {
+        if (!loggedInUser) {
+          var redirectPath = 'login/login.html';
+          if (window.location.pathname.indexOf('/day') !== -1) {
+            redirectPath = '../login/login.html';
+          }
+          window.location.href = redirectPath;
+        }
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Day 5 Data Structure & Collaboration Tasks | ACE AI Startup Bootcamp</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary-color: #3b82f6; /* Electric Blue */
+      --secondary-color: #06b6d4; /* Neon Cyan */
+      --bg-dark: #09090b; /* Primary Background: Deep Black */
+      --bg-charcoal: #111827; /* Secondary Background */
+      --bg-card: #1a1d24; /* Surface/Card: Dark Gray */
+      --text-main: #ffffff; /* Primary: White */
+      --text-muted: #e4e4e7; /* Secondary: Light Gray */
+      --text-desc: #71717a; /* Description: Gray */
+      --border-color: rgba(255, 255, 255, 0.08); /* Thin border with low opacity */
+      --accent-color: #06b6d4; /* Neon Cyan */
+      --accent-purple: #8b5cf6; /* Purple highlight */
+      --card-radius: 18px;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
+      --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+    body {
+      font-family: 'Pretendard', sans-serif;
+      color: var(--text-main);
+      line-height: 1.65;
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, #09090b 0%, #111827 100%);
+      background-attachment: fixed;
+    }
+
+    h1, h2, h3, h4, p, li, span, strong { word-break: keep-all; }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    section { padding: 60px 0; }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(9, 9, 11, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-container {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .logo::before {
+      content: "";
+      width: 8px;
+      height: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 16px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--secondary-color);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+
+    .hero {
+      margin-top: 70px;
+      padding: 100px 0 70px;
+      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.08), transparent 60%), #09090b;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .hero-center {
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      font-size: 0.88rem;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.03em;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      color: #ffffff;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .section-title::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      margin: 12px auto 0;
+      border-radius: 999px;
+    }
+
+    .section-desc {
+      max-width: 860px;
+      margin: 0 auto 48px;
+      text-align: center;
+      color: var(--text-desc);
+      font-size: 1.02rem;
+    }
+
+    /* Grid Layout */
+    .curriculum-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .course-card {
+      background: rgba(26, 29, 36, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 520px;
+    }
+
+    .course-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-md), 0 0 25px rgba(59, 130, 246, 0.2);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .course-card.mission-card:hover {
+      box-shadow: var(--shadow-md), 0 0 25px rgba(139, 92, 246, 0.25);
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    .course-thumb {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .course-content {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-grow: 1;
+    }
+
+    .day-label {
+      display: inline-block;
+      width: fit-content;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .day-label.mission {
+      background: rgba(139, 92, 246, 0.15);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .course-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.35;
+      color: #ffffff;
+      transition: color 0.2s ease;
+    }
+
+    .course-card:hover .course-title {
+      color: var(--secondary-color);
+    }
+
+    .course-card.mission-card:hover .course-title {
+      color: #c4b5fd;
+    }
+
+    .course-subtitle {
+      font-size: 0.88rem;
+      color: var(--secondary-color);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .course-card.mission-card .course-subtitle {
+      color: #a78bfa;
+    }
+
+    .course-desc {
+      color: #a1a1aa;
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+    }
+
+    .meta-item {
+      color: #e4e4e7;
+      line-height: 1.5;
+    }
+
+    .meta-item strong {
+      color: var(--primary-color);
+      margin-right: 6px;
+    }
+
+    .mission-card .meta-item strong {
+      color: #a78bfa;
+    }
+
+    .time-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.82rem;
+      border-left: 2px solid rgba(255, 255, 255, 0.08);
+      padding-left: 12px;
+      margin: 4px 0;
+    }
+
+    .time-row {
+      color: #d4d4d8;
+    }
+
+    .time-row strong {
+      color: #ffffff;
+      margin-right: 4px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      color: #a1a1aa;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .ai-class-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+      transition: all 0.25s ease;
+      margin-top: auto;
+      text-decoration: none;
+    }
+
+    .ai-class-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4), 0 0 10px rgba(6, 182, 212, 0.3);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+    }
+
+    .ai-class-btn.mission-btn {
+      background: linear-gradient(135deg, var(--accent-purple), #6d28d9);
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+    }
+
+    .ai-class-btn.mission-btn:hover {
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4), 0 0 10px rgba(139, 92, 246, 0.3);
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    }
+
+    /* Section divider for missions */
+    .mission-divider {
+      margin: 50px 0 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .mission-divider::before,
+    .mission-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    .mission-divider-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border-radius: 999px;
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      color: #c4b5fd;
+      font-size: 0.88rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .footer-cta {
+      background: #09090b;
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 40px;
+    }
+
+    .footer-cta h3 {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+
+    .footer-cta p {
+      max-width: 760px;
+      margin: 0 auto;
+      opacity: 0.8;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 1024px) {
+      .curriculum-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .curriculum-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero h1 { font-size: 2.2rem; }
+      section { padding: 50px 0; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="../index.html" class="logo">대구 SW 랜딩</a>
+      <ul class="nav-links">
+        <li><a href="day5-ai-classroom.html">← Day 5 강의실</a></li>
+        <li><a href="../homework_week1.html" style="color: #c084fc !important; font-weight: 700 !important; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 14px; border-radius: 8px;">📝 과제페이지</a></li>
+        <li><a href="../index.html">← 전체 로드맵</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container hero-center">
+      <div class="hero-badge-wrap">
+        <span class="hero-badge">Day 5 Data Structure</span>
+        <span class="hero-badge">Codex AI Architect</span>
+      </div>
+      <h1>Codex Client Workspace 기반 서비스 설계(UI/UX) Tasks</h1>
+      <p>
+        스타트업들이 서비스 기획 단계에서 직면하는 사용자 편의성 한계, 화면 간 일관성 붕괴, 불필요한 이동 동선 문제를<br />
+        Codex를 활용해 자동으로 분석하고 개선하는 사용자 중심(User-Centered) 리뷰 Task 보드입니다.
+      </p>
+    </div>
+  </section>
+
+  <section class="container">
+    <h2 class="section-title">Day 5 Startup MVP Tasks</h2>
+    <p class="section-desc">
+      화면 검토부터 일관성 수립, Journey 최적화까지 — Codex를 UI/UX 리뷰어이자 첫 번째 유저로 활용하는 핵심 워크플로우를 경험해보세요.
+    </p>
+
+    <div class="curriculum-grid">
+      <!-- Task 1 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(200deg); background-size: cover; background-position: center;">TASK 1</div>
+        <div class="course-content">
+          <span class="day-label">Task 1</span>
+          <h3 class="course-title">Task 1. 사용자 관점에서 화면 검토하기</h3>
+          <p class="course-subtitle">Task 01: 초보 사용자 관점에서 화면 구조 및 배치 검토 (User Experience Review)</p>
+          <p class="course-desc">
+            자연어로 작성된 기획 회의록에서 핵심 엔티티와 관계(Mermaid ERD)를 도출하여, 기획자와 개발자 간 데이터 모델 이해 차이를 AI로 해소합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>UX Review Report 및 개선 포인트</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Data Structure Alignment</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📂 회의록 파일(day5_meeting_notes.md) 준비 및 Codex 업로드</div>
+            <div class="time-row"><strong>2단계</strong> 🔍 Codex에 사용자 관점 사용성 분석 및 개선안 제안 요청</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">ERD</span>
+            <span class="tag">User Perspective</span>
+            <span class="tag">UX Auditing</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>erd-schema.md</code> (데이터 명세 및 ERD)
+          </div>
+
+          <a href="day5-ai-codex-1.html" class="ai-class-btn">Task 1 실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Task 2 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(260deg); background-size: cover; background-position: center;">TASK 2</div>
+        <div class="course-content">
+          <span class="day-label">Task 2</span>
+          <h3 class="course-title">Task 2. 화면의 일관성 검토하기</h3>
+          <p class="course-subtitle">Task 02: 화면 간 용어, 버튼, 피드백 일관성 정렬 (Screen Consistency Review)</p>
+          <p class="course-desc">
+            여러 화면에 흩어진 버튼 위치 규칙, 공통 명칭, 상태 메시지 규격을 매핑해 일관성 위배 지점을 도출하고 공통 가이드를 만듭니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>UI 일관성 보고서 및 가이드 완성</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Standardization Standardization</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 화면 설계 명세 파일(day5_signup_flow.md) 준비 및 업로드</div>
+            <div class="time-row"><strong>2단계</strong> 📋 Codex로 화면 간 버튼/용어 비교 및 공통 규칙 제안 의뢰</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">UI Consistency</span>
+            <span class="tag">Standardization</span>
+            <span class="tag">Design System</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>project-glossary.md</code> (표준 용어 사전)
+          </div>
+
+          <a href="day5-ai-codex-2.html" class="ai-class-btn">Task 2 실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Task 3 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(320deg); background-size: cover; background-position: center;">TASK 3</div>
+        <div class="course-content">
+          <span class="day-label">Task 3</span>
+          <h3 class="course-title">Task 3. 사용자 동선 개선하기</h3>
+          <p class="course-subtitle">Task 03: 목적 달성을 위한 이탈 최소화 플로우 뎁스 단축 (User Journey Review)</p>
+          <p class="course-desc">
+            상담 예약에 도달하기까지의 기나긴 9단계 사용자 동선을 정성/정량적으로 파악하여 불필요한 단독 동의 단계를 4단계로 통합/축약합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>User Journey Report 및 흐름 개선안</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Change Friction Audit</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📂 화면 설계 명세 파일(day5_signup_flow.md) 준비 및 업로드</div>
+            <div class="time-row"><strong>2단계</strong> 🔄 Codex로 User Journey 분석 및 불필요 동선 단축안 도출 의뢰</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">User Journey</span>
+            <span class="tag">Friction Audit</span>
+            <span class="tag">Journey Sync</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>change-impact-report.md</code> (변경 영향도 분석서)
+          </div>
+
+          <a href="day5-ai-codex-3.html" class="ai-class-btn">실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Skill Task 1 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(45deg); background-size: cover; background-position: center;">SKILL 1</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Skill Task 1</span>
+          <h3 class="course-title">Skill Task 1. Persona별 Information Architecture 설계</h3>
+          <p class="course-subtitle">ADD-D05-T01: Viewer/Creator/Marketer IA 및 Screen Flow</p>
+          <p class="course-desc">
+            Viewer·Creator·Advertiser의 목표에 맞춰 화면 목록, 메뉴 구조, Screen Flow를 설계합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>IA 구조도 &amp; Screen Flow 명세 완료</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client</div>
+            <div class="meta-item"><strong>실습 범위</strong>Skill Task (TECH)</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 3대 Persona별 목적 화면 매핑</div>
+            <div class="time-row"><strong>2단계</strong> ⚙️ 권한 미부합 진입점 및 과다 뎁스 필터링</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Skill Task</span>
+            <span class="tag">Information Architecture</span>
+            <span class="tag">TECH-UX</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>08_IA_SPEC.md</code>
+          </div>
+
+          <a href="day5-ai-codex-1.html" class="ai-class-btn">실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Skill Task 2 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(135deg); background-size: cover; background-position: center;">SKILL 2</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Skill Task 2</span>
+          <h3 class="course-title">Skill Task 2. Component와 UI State 정의</h3>
+          <p class="course-subtitle">ADD-D05-T02: 공통 Component &amp; 6대 UI State 명세</p>
+          <p class="course-desc">
+            공통 Component, Form, Loading, Empty, Error, Disabled, Success 상태를 UI Spec으로 작성합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>UI Component State Spec 완료</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client</div>
+            <div class="meta-item"><strong>실습 범위</strong>Skill Task (HYBRID)</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 공통 디자인 시스템 Component 분류</div>
+            <div class="time-row"><strong>2단계</strong> ⚙️ 6대 상태별 인터랙션 가이드 정의</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Skill Task</span>
+            <span class="tag">UI Component</span>
+            <span class="tag">UI State</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>08_COMPONENT_SPEC.md</code>
+          </div>
+
+          <a href="day5-ai-codex-2.html" class="ai-class-btn">실습실 입장</a>
+        </div>
+      </article>
+
+      <!-- Skill Task 3 -->
+      <article class="course-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(225deg); background-size: cover; background-position: center;">SKILL 3</div>
+        <div class="course-content">
+          <span class="day-label" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Skill Task 3</span>
+          <h3 class="course-title">Skill Task 3. 초보 사용자 UX Walkthrough</h3>
+          <p class="course-subtitle">ADD-D05-T03: 신규 유저 이탈 및 곤경 검증</p>
+          <p class="course-desc">
+            처음 방문한 사용자가 주요 과업(재생/캠페인)을 완수하는 여정에서의 이탈 및 혼란 요소를 평가합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>UX Walkthrough 보고서 작성</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client</div>
+            <div class="meta-item"><strong>실습 범위</strong>Skill Task (AI)</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📁 초보 사용자 Persona 과업 부여</div>
+            <div class="time-row"><strong>2단계</strong> 🛡️ 이탈 구간 피드백 분석 및 개선안 반영</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Skill Task</span>
+            <span class="tag">UX Walkthrough</span>
+            <span class="tag">Friction Audit</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>ux-walkthrough-report.md</code>
+          </div>
+
+          <a href="day5-ai-codex-3.html" class="ai-class-btn">실습실 입장</a>
+        </div>
+      </article>
+    </div>
+
+    <!-- Mission Divider -->
+    <div class="mission-divider">
+      <span class="mission-divider-label">🚀 심화 Mission — 서비스 설계 마스터 과정</span>
+    </div>
+
+    <div class="curriculum-grid" style="grid-template-columns: repeat(2, 1fr);">
+      <!-- Mission 1 -->
+      <article class="course-card mission-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(270deg) saturate(0.6); background-size: cover; background-position: center;">MISSION 1</div>
+        <div class="course-content">
+          <span class="day-label mission" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border: 1px solid rgba(139, 92, 246, 0.2);">Mission 1</span>
+          <h3 class="course-title">Mission 1. 처음 사용하는 사용자 되어보기</h3>
+          <p class="course-subtitle">Mission 01: 고연령/초보 페르소나 실시간 곤경 리뷰</p>
+          <p class="course-desc">
+            스마트폰 사용이 다소 서툰 고연령 자영업자 페르소나를 AI에 투입해 겪을 심리적 불편 사항을 추적합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>초보 유저 피드백 보고서 완성</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Design AI Persona Log</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📂 화면 설계 명세 파일 준비 및 업로드</div>
+            <div class="time-row"><strong>2단계</strong> 🔍 Codex에 가상 페르소나 조건 설정 요청</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">AI Persona</span>
+            <span class="tag">Emotional Log</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>persona-feedback-log.md</code>
+          </div>
+
+          <a href="day5-ai-codex-mission1.html" class="ai-class-btn mission-btn" style="background: linear-gradient(135deg, #8b5cf6, #d946ef);">과제실 입장</a>
+        </div>
+      </article>
+
+      <!-- Mission 2 -->
+      <article class="course-card mission-card">
+        <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(300deg) saturate(0.6); background-size: cover; background-position: center;">MISSION 2</div>
+        <div class="course-content">
+          <span class="day-label mission" style="background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border: 1px solid rgba(139, 92, 246, 0.2);">Mission 2</span>
+          <h3 class="course-title">Mission 2. AI와 함께 서비스 품질 평가하기</h3>
+          <p class="course-subtitle">Mission 02: 종합 사용성 평점 및 서비스 품질 분석</p>
+          <p class="course-desc">
+            가독성, 회복성, 접근성, 동선 효율성 등 표준 지표를 기반으로 사용성 종합 평가서를 빌드합니다.
+          </p>
+
+          <div class="meta-grid">
+            <div class="meta-item"><strong>목표 수치</strong>종합 서비스 품질 평가서 완성</div>
+            <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
+            <div class="meta-item"><strong>실습 범위</strong>Edge Case Discovery & Integrity Guard</div>
+          </div>
+
+          <div class="time-list">
+            <div class="time-row"><strong>1단계</strong> 📂 화면 설계 명세 파일(day5_signup_flow.md) 준비 및 업로드</div>
+            <div class="time-row"><strong>2단계</strong> 🛡️ Codex에 다차원 품질 항목 점수화 및 평가서 제안 의뢰</div>
+          </div>
+
+          <div class="tag-list">
+            <span class="tag">Usability Metric</span>
+            <span class="tag">Usability Score</span>
+            <span class="tag">Quality Audit</span>
+          </div>
+
+          <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
+            <strong>예상 산출물</strong>
+            <code>edge-case-analysis.md</code> (예외 시나리오 리포트)
+          </div>
+
+          <a href="day5-ai-codex-mission2.html" class="ai-class-btn mission-btn">Mission 2 실습실 입장</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer class="footer-cta">
+    <div class="container">
+      <h3>ACE AI Startup Bootcamp</h3>
+      <p style="margin-top: 10px;">
+        © 2026 ACE Startup &amp; ACE Ministry. All Rights Reserved. 본 교육 과정은 실물 개발 키트 중심의 실전형 MVP 프로젝트 과정입니다.
+      </p>
+    </div>
+  </footer>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
