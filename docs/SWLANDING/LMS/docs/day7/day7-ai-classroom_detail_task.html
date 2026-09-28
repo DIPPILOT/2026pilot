@@ -52,7 +52,7 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Day 7 Data Structure & Collaboration Tasks | ACE AI Startup Bootcamp</title>
+  <title>Day 7 Data Structure & Collaboration Tasks | 대구 DIP SW 랜딩</title>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <style>
     :root {
@@ -556,32 +556,32 @@
         <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(200deg); background-size: cover; background-position: center;">TASK 1</div>
         <div class="course-content">
           <span class="day-label">Task 1</span>
-          <h3 class="course-title">Task 1. 데이터 구조 이해 차이 해결 실습</h3>
-          <p class="course-subtitle">Task 01: 기획-개발 간 데이터 구조 이해 정렬 (Data Structure Alignment)</p>
+          <h3 class="course-title">Task 1. 기능 연결하기 실습</h3>
+          <p class="course-subtitle">Task 01: 회원가입 데이터 저장과 화면 전환 연결 (Feature Integration)</p>
           <p class="course-desc">
-            자연어로 작성된 기획 회의록에서 핵심 엔티티와 관계(Mermaid ERD)를 도출하여, 기획자와 개발자 간 데이터 모델 이해 차이를 AI로 해소합니다.
+            회원가입 폼 전송을 제어하고 입력 데이터를 로컬 스토리지에 저장한 뒤 완료 화면으로 이동하는 기능 흐름을 연결합니다.
           </p>
 
           <div class="meta-grid">
-            <div class="meta-item"><strong>목표 수치</strong>ERD 스키마 및 데이터 구조 정의서 완성</div>
+            <div class="meta-item"><strong>목표 수치</strong>회원가입 저장·화면 전환 기능 완성</div>
             <div class="meta-item"><strong>핵심 도구</strong>Codex Client Workspace</div>
-            <div class="meta-item"><strong>실습 범위</strong>Data Structure Alignment</div>
+            <div class="meta-item"><strong>실습 범위</strong>Feature Integration</div>
           </div>
 
           <div class="time-list">
-            <div class="time-row"><strong>1단계</strong> 📂 회의록 파일(day7_meeting_notes.md) 준비 및 Codex 업로드</div>
-            <div class="time-row"><strong>2단계</strong> 🔍 Codex에 엔티티 도출 및 Mermaid ERD 생성 의뢰</div>
+            <div class="time-row"><strong>1단계</strong> 📂 회원가입 폼 이벤트와 입력 데이터 확인</div>
+            <div class="time-row"><strong>2단계</strong> 🔍 저장·화면 전환 구현 후 새로고침과 중복 제출 검증</div>
           </div>
 
           <div class="tag-list">
-            <span class="tag">ERD</span>
-            <span class="tag">Entity Mapping</span>
-            <span class="tag">Data Alignment</span>
+            <span class="tag">Form Submit</span>
+            <span class="tag">Local Storage</span>
+            <span class="tag">Feature Integration</span>
           </div>
 
           <div class="meta-item" style="font-size: 0.8rem; color: #a1a1aa; margin-top: 4px;">
             <strong>예상 산출물</strong>
-            <code>erd-schema.md</code> (데이터 명세 및 ERD)
+            <code>signup-integration.js</code> (회원가입 기능 연결 코드)
           </div>
 
           <a href="day7-ai-codex-1.html" class="ai-class-btn">Task 1 실습실 입장</a>
@@ -785,10 +785,10 @@
         <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(270deg) saturate(0.6); background-size: cover; background-position: center;">MISSION 1</div>
         <div class="course-content">
           <span class="day-label mission">Mission 1</span>
-          <h3 class="course-title">Mission 1. 설계 의사결정 기록 실습</h3>
-          <p class="course-subtitle">Mission 01: Design Decision Log 자동 작성 (Why 기록)</p>
+          <h3 class="course-title">Mission 1. AI와 서비스 완성도 점검</h3>
+          <p class="course-subtitle">Mission 01: AI 진단의 사실·가정·누락 항목 공동 검증</p>
           <p class="course-desc">
-            데이터베이스 정규화 및 아키텍처 의결 배경을 Codex로 정형화된 Design Decision Log로 작성하여, 신규 팀원 합류 시 중복 논의와 설계 실수를 원천 방지합니다.
+            기획자와 개발자가 AI 품질 진단을 함께 검토해 로딩 피드백, 저장 실패, 정책 이탈의 근거와 조치 우선순위를 합의합니다.
           </p>
 
           <div class="meta-grid">
@@ -822,10 +822,10 @@
         <div class="course-thumb" style="background-image: url('../img/day2_dataflow.png'); filter: hue-rotate(300deg) saturate(0.6); background-size: cover; background-position: center;">MISSION 2</div>
         <div class="course-content">
           <span class="day-label mission">Mission 2</span>
-          <h3 class="course-title">Mission 2. 예외 시나리오 발굴 실습</h3>
-          <p class="course-subtitle">Mission 02: 동시성·무결성 Edge Case 전수 도출 (Edge Case Discovery)</p>
+          <h3 class="course-title">Mission 2. 처음부터 끝까지 사용해보기</h3>
+          <p class="course-subtitle">Mission 02: 기획자–개발자 E2E 사용자 흐름 공동 검증</p>
           <p class="course-desc">
-            정의된 DB 스키마와 외래키 참조 구조에서 발생 가능한 동시성 오류, 참조 무결성 붕괴, Hard Delete 장애 등 Edge Case를 Codex로 사전에 전수 발굴합니다.
+            AI가 제안한 E2E 시나리오를 그대로 수용하지 않고 초보 사용자 관점의 동선, 실패 복구, 데이터 보존 여부를 함께 검증합니다.
           </p>
 
           <div class="meta-grid">
@@ -858,7 +858,7 @@
 
   <footer class="footer-cta">
     <div class="container">
-      <h3>ACE AI Startup Bootcamp</h3>
+      <h3>대구 DIP SW 랜딩</h3>
       <p style="margin-top: 10px;">
         © 2026 ACE Startup &amp; ACE Ministry. All Rights Reserved. 본 교육 과정은 실물 개발 키트 중심의 실전형 MVP 프로젝트 과정입니다.
       </p>
@@ -877,5 +877,7 @@
       </div>
     </div>
   </footer>
+  <script src="../shared/curriculum-content.js"></script>
+  <script src="../shared/curriculum-cards.js"></script>
 </body>
 </html>

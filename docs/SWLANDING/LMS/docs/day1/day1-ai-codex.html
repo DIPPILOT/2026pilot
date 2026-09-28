@@ -52,7 +52,7 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Day 1. Codex 요구사항 정의 교육 미션 | ACE AI Startup Bootcamp</title>
+  <title>Day 1. Codex 요구사항 정의 교육 미션 | 대구 DIP SW 랜딩</title>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <style>
     :root {
@@ -702,7 +702,7 @@
     <div class="container nav-container">
       <a href="../index.html" class="logo">
         <div class="logo-text">
-          <h1>ACE AI Startup Bootcamp</h1>
+          <h1>대구 DIP SW 랜딩</h1>
           <p>Day 1 Codex AI Lecture</p>
         </div>
       </a>
@@ -2352,6 +2352,14 @@ Domain 간 선후 관계, 의존성, 데이터 소유권을 시각화하고 Boun
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Skill Task 1~3은 메인/상세 보드의 Developer Skill 카드로 분리했고,
+      // 기존 Mission 1~4는 추가 Mission 5~8로 이전했다.
+      // 통합 Codex 실습실에는 AI Task 1~6만 남긴다.
+      ['6', '7', '8', '9', '10', '11', '12'].forEach(step => {
+        document.querySelector(`.step-card[data-step="${step}"]`)?.remove();
+        document.querySelectorAll(`#detail-${step}`).forEach(panel => panel.remove());
+      });
+
       const cards = document.querySelectorAll('.step-card');
       const panels = document.querySelectorAll('.detail-panel');
 

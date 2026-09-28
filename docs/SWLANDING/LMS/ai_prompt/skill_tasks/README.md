@@ -1,10 +1,10 @@
 # 추가 Skill Task 문서
 
-> 이 디렉터리는 기존 LMS Task를 대체하지 않는다. 기존 Task를 유지한 상태에서 기술 역량과 AI 협업 역량을 명시적으로 보강할 추가 Task 설계안이다.
+> 이 디렉터리는 기존 LMS Task를 대체하지 않는다. 기존 Task를 유지한 상태에서 개발자가 기술을 직접 익히는 추가 Task 설계안이다. AI는 구현을 대신 수행하는 Agent가 아니라 개념 Tutor, 초안 Reviewer, 반례·테스트 생성기로 제한한다.
 
 ## 8일 기준안의 10일 LMS 매핑
 
-| LMS Day | 추가 역량 축 | AI 역할 | 문서 |
+| LMS Day | 추가 역량 축 | AI 보조 역할 | 문서 |
 |---:|---|---|---|
 | 1 | Business Understanding & Domain Discovery | Domain Analyst | [day01_skill_tasks.md](./day01_skill_tasks.md) |
 | 2 | User Flow & Sequence Modeling | System Analyst | [day02_skill_tasks.md](./day02_skill_tasks.md) |
@@ -59,8 +59,9 @@
 1. 기존 Task ID와 문구는 유지한다.
 2. 추가 Task는 `ADD-DNN-TNN` ID를 사용해 기존 Task와 구분한다.
 3. 카드 또는 상세 페이지에 `Task 영역`, `기술 Skill`, `AI 활용 Skill`을 함께 표시한다.
-4. AI 생성 결과 자체가 아니라 Context 제공, 판단 근거, 검증 기록을 완료 기준에 포함한다.
+4. 개발자가 AI 사용 전에 자신의 초안 또는 가설을 작성하고, AI 생성 결과가 아니라 직접 수정한 결과·판단 근거·검증 기록을 완료 기준에 포함한다.
 5. 각 Day 산출물은 다음 Day의 입력 문서가 되며 동일 프로젝트 폴더에 누적한다.
+6. Mission은 기획자와 개발자가 AI Agent 활용 중 발생한 누락·가정·해석 차이·책임 문제를 함께 해결하고 공동 Decision Log를 남기는 과제로 구성한다.
 
 ## 공통 프로젝트 문서 체계
 

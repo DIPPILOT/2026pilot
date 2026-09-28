@@ -8,6 +8,8 @@
 - `ai_prompt/dayN_codex_mission.md`: 일차별 Task·Mission 상세 수행 가이드
 - `ai_prompt/dayN_codex_summation.md`: 일차별 학습 요약과 완료 기준
 - 그 외 `ai_prompt/*.md`: 요구사항·데이터·설계 검토에 사용하는 실습 입력 자료
+- `CURRICULUM_CONTENT_POLICY.md`: Developer Skill과 Planner × Developer Mission 콘텐츠 운영 기준
+- `docs/shared/curriculum-content.js`: Day 1~10 Skill·Mission 카드와 공용 실습실의 단일 콘텐츠 원본
 
 ## 10일 커리큘럼
 
@@ -30,4 +32,5 @@
 2. 화면 제목보다 실제 Task·Mission 본문과 학습 산출물을 우선합니다.
 3. 템플릿 복제 문구가 실제 일차 내용과 충돌하면 해당 일차의 메인 커리큘럼과 개별 실습 페이지를 기준으로 수정합니다.
 4. 각 Markdown의 `LMS 커리큘럼 기준` 블록을 변경하면 관련 LMS 페이지도 함께 검토합니다.
+5. Skill은 개발자의 직접 학습, Mission은 기획자–개발자의 AI Agent 이슈 해결을 기준으로 하며 세부 원칙은 `CURRICULUM_CONTENT_POLICY.md`를 따릅니다.
 <!-- LMS_SYNC:END -->
