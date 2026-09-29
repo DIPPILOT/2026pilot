@@ -454,6 +454,10 @@
       box-shadow: var(--glow-blue);
     }
 
+    #openQrResourcesCard::after {
+      content: "QR보기 ↗";
+    }
+
     .course-thumb {
       height: 220px;
       background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(6, 182, 212, 0.05));
@@ -514,6 +518,93 @@
     .course-card:hover .course-title {
       color: var(--secondary-color);
       text-shadow: var(--glow-cyan);
+    }
+
+    .qr-resource-card {
+      grid-column: 1 / -1;
+      padding: 32px;
+      background:
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.14), transparent 34%),
+        rgba(26, 29, 36, 0.9);
+      border: 1px solid rgba(6, 182, 212, 0.22);
+      border-radius: var(--card-radius);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .qr-resource-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .qr-resource-header .course-title {
+      margin-top: 10px;
+      font-size: 1.45rem;
+    }
+
+    .qr-resource-copy {
+      max-width: 680px;
+      color: var(--text-muted);
+      font-size: 0.96rem;
+    }
+
+    .qr-resource-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .qr-resource-item {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px;
+      color: var(--text-main);
+      text-decoration: none;
+      background: rgba(9, 9, 11, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .qr-resource-item:hover,
+    .qr-resource-item:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(6, 182, 212, 0.48);
+      box-shadow: var(--glow-cyan);
+      outline: none;
+    }
+
+    .qr-image-shell {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      aspect-ratio: 1;
+      padding: 10px;
+      overflow: hidden;
+      background: #ffffff;
+      border-radius: 12px;
+    }
+
+    .qr-image-shell img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .qr-resource-name {
+      font-size: 0.95rem;
+      font-weight: 750;
+      line-height: 1.4;
+    }
+
+    .qr-resource-action {
+      color: var(--secondary-color);
+      font-size: 0.8rem;
+      font-weight: 700;
     }
 
     .course-subtitle {
@@ -852,6 +943,10 @@
       .modal-grid {
         grid-template-columns: 1fr 1fr;
       }
+
+      .qr-resource-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
 
     @media (max-width: 768px) {
@@ -888,6 +983,22 @@
       .modal-title {
         font-size: 1.55rem;
       }
+
+      .qr-resource-card {
+        padding: 24px 18px;
+      }
+
+      .qr-resource-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .qr-resource-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .ai-class-btn {
@@ -921,7 +1032,7 @@
         <li><a href="index.html">과정 홈</a></li>
         <li><a href="homework_week1.html" style="color: #c084fc !important; font-weight: 700 !important; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 12px; border-radius: 8px;">1주차 과제</a></li>
         <li><a href="homework_week2.html" style="color: #22d3ee !important; font-weight: 700 !important; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); padding: 6px 12px; border-radius: 8px;">2주차 과제</a></li>
-        <li><a href="homework_codex_field.html" style="color: #fbbf24 !important; font-weight: 700 !important; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 6px 12px; border-radius: 8px;">코덱스 현업업 과제</a></li>
+        <li><a href="homework_codex_field.html" style="color: #fbbf24 !important; font-weight: 700 !important; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 6px 12px; border-radius: 8px;">코덱스 현업 과제</a></li>
         <li><a href="#overview">프로그램 소개</a></li>
         <li><a href="#curriculum">10일 커리큘럼</a></li>
         <li><a href="#final">최종 결과</a></li>
@@ -1610,6 +1721,39 @@
             <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
               <a href="survey.html" class="ai-class-btn" style="background: linear-gradient(135deg, #f59e0b, #ec4899);">
                 📋 설문조사 QR 코드 페이지 열기
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Student QR Resources Card -->
+        <article class="course-card is-clickable" id="openQrResourcesCard" tabindex="0" role="link" aria-label="설문·클래스룸·커뮤니티 QR 코드" onclick="location.href='qr_resources.html'" onkeydown="if(event.key==='Enter'||event.key===' '){location.href='qr_resources.html';event.preventDefault();}">
+          <div class="course-thumb" style="background-image: linear-gradient(rgba(9, 9, 11, 0.2), rgba(9, 9, 11, 0.65)), url('img/qr_resource_cover.png'); background-size: cover; background-position: center; color: #fff;">
+            QR CODES &amp; RESOURCES</div>
+          <div class="course-content">
+            <span class="day-label" style="background: linear-gradient(135deg, #06b6d4, #3b82f6); color: #fff;">수강생 바로가기 · QR 안내</span>
+            <h3 class="course-title">설문·클래스룸·커뮤니티 QR 코드</h3>
+            <p class="course-subtitle">학습성향 분석, 과정 만족도 조사, Google 클래스룸 및 Discord 커뮤니티</p>
+            <p class="course-desc">
+              교육 참여에 필요한 필수 설문 및 온라인 학습 커뮤니티 입장 QR 코드를 한곳에서 확인하고 간편하게 스캔할 수 있습니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>제공 리소스</strong>학습성향 분석 설문, SW 랜딩 만족도 조사, Google Classroom, Discord 커뮤니티</div>
+              <div class="meta-item"><strong>이용 방법</strong>스마트폰 카메라로 QR 스캔 또는 바로가기 링크 접속</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">QR 코드</span>
+              <span class="tag">학습성향 분석</span>
+              <span class="tag">만족도 조사</span>
+              <span class="tag">Google Classroom</span>
+              <span class="tag">Discord</span>
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <a href="qr_resources.html" class="ai-class-btn" style="background: linear-gradient(135deg, #06b6d4, #2563eb);">
+                📱 QR 코드 모음 페이지 열기
               </a>
             </div>
           </div>

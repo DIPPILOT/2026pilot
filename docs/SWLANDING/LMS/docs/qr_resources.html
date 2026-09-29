@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>설문·클래스룸·커뮤니티 QR 코드 | 대구 SW 랜딩</title>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --cyan: #06b6d4;
+      --cyan-light: #22d3ee;
+      --purple: #8b5cf6;
+      --amber: #f59e0b;
+      --green: #10b981;
+      --bg-dark: #09090b;
+      --bg-surface: #131720;
+      --bg-card: rgba(26, 29, 36, 0.85);
+      --bg-card-hover: rgba(32, 36, 46, 0.95);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(6, 182, 212, 0.35);
+      --text-main: #ffffff;
+      --text-muted: #cbd5e1;
+      --text-dim: #94a3b8;
+      --card-radius: 20px;
+      --glow-cyan: 0 0 24px rgba(6, 182, 212, 0.25);
+      --glow-blue: 0 0 24px rgba(59, 130, 246, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-main);
+      background: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 20% 15%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 80% 25%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 85%, rgba(59, 130, 246, 0.1) 0%, transparent 55%),
+        linear-gradient(to bottom, #09090b 0%, #0d1117 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: 72px;
+      padding: 0 32px;
+      background: rgba(9, 9, 11, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-logo {
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 800;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo i {
+      color: var(--cyan-light);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-link-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-link-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-link-btn.primary {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2));
+      border-color: rgba(6, 182, 212, 0.4);
+      color: #a5f3fc;
+    }
+
+    .nav-link-btn.primary:hover {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.35), rgba(59, 130, 246, 0.35));
+      color: #fff;
+      box-shadow: var(--glow-cyan);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 48px 24px 80px 24px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.18), transparent 45%),
+        linear-gradient(135deg, rgba(26, 29, 36, 0.9), rgba(19, 23, 32, 0.95));
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      border-radius: var(--card-radius);
+      padding: 44px 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(12px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cyan-light);
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+    }
+
+    .hero-title {
+      font-size: 2.2rem;
+      font-weight: 850;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      color: #ffffff;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #22d3ee, #60a5fa, #c084fc);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      max-width: 780px;
+      margin-bottom: 24px;
+    }
+
+    .guide-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .guide-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .guide-pill i {
+      color: var(--cyan-light);
+    }
+
+    /* Grid of QR Cards */
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+    }
+
+    .qr-box-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--card-radius);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-box-card:hover {
+      transform: translateY(-5px);
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), var(--glow-cyan);
+    }
+
+    .qr-card-top {
+      margin-bottom: 24px;
+    }
+
+    .qr-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 14px;
+    }
+
+    .badge-survey-1 {
+      background: rgba(139, 92, 246, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(139, 92, 246, 0.35);
+    }
+
+    .badge-survey-2 {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .badge-classroom {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .badge-discord {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.35);
+    }
+
+    .qr-box-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .qr-box-desc {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text-dim);
+    }
+
+    /* QR Body: image & scan helper */
+    .qr-card-body {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      background: rgba(9, 9, 11, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .qr-image-wrapper {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      flex-shrink: 0;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 10px;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .qr-image-wrapper:hover {
+      transform: scale(1.04);
+      box-shadow: 0 10px 24px rgba(6, 182, 212, 0.35);
+    }
+
+    .qr-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .zoom-hint {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      opacity: 0.85;
+      transition: opacity 0.2s ease;
+    }
+
+    .qr-image-wrapper:hover .zoom-hint {
+      opacity: 1;
+      background: var(--primary);
+    }
+
+    .qr-info-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .scan-tip-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scan-tip-title i {
+      color: var(--cyan-light);
+    }
+
+    .scan-tip-text {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text-dim);
+    }
+
+    /* Actions bottom */
+    .qr-card-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action.primary {
+      background: linear-gradient(135deg, #06b6d4, #2563eb);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.25);
+    }
+
+    .btn-action.primary:hover {
+      background: linear-gradient(135deg, #0891b2, #1d4ed8);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.35);
+    }
+
+    .btn-action.secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-action.secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Lightbox Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: #151820;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 20px;
+      max-width: 500px;
+      width: 100%;
+      padding: 32px;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), var(--glow-cyan);
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(239, 68, 68, 0.8);
+      transform: rotate(90deg);
+    }
+
+    .modal-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .modal-desc {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    .modal-qr-frame {
+      width: 280px;
+      height: 280px;
+      margin: 0 auto 24px auto;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 16px;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-qr-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    /* Footer */
+    .site-footer {
+      background: #09090b;
+      border-top: 1px solid var(--border-color);
+      padding: 32px 20px;
+      text-align: center;
+      color: #a1a1aa;
+      font-size: 0.82rem;
+      line-height: 1.8;
+      margin-top: auto;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .qr-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-title {
+        font-size: 1.8rem;
+      }
+
+      .hero-banner {
+        padding: 30px 24px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar {
+        padding: 0 16px;
+      }
+
+      .container {
+        padding: 24px 16px 60px 16px;
+      }
+
+      .qr-card-body {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .qr-image-wrapper {
+        width: 180px;
+        height: 180px;
+      }
+
+      .qr-info-right {
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <a href="index.html" class="brand-logo">
+      <i class="fa-solid fa-qrcode"></i>
+      <span>대구 SW 랜딩</span>
+    </a>
+    <div class="nav-actions">
+      <a href="index.html" class="nav-link-btn">
+        <i class="fa-solid fa-arrow-left"></i> 과정 홈
+      </a>
+      <a href="homework_week1.html" class="nav-link-btn">1주차 과제</a>
+      <a href="homework_week2.html" class="nav-link-btn">2주차 과제</a>
+      <a href="homework_codex_field.html" class="nav-link-btn primary">코덱스 현업 과제</a>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="container">
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <div class="eyebrow">
+        <i class="fa-solid fa-bolt"></i> STUDENT RESOURCES · INSTANT ACCESS
+      </div>
+      <h1 class="hero-title">설문·클래스룸·커뮤니티 <span>QR 코드 안내</span></h1>
+      <p class="hero-desc">
+        대구 SW 랜딩 교육 참여에 필요한 주요 설문 및 온라인 학습 커뮤니티 QR 코드 모음입니다.<br>
+        스마트폰 카메라로 원하는 QR 코드를 비추어 즉시 스캔하거나, 각 카드의 버튼을 클릭하여 바로 이동하실 수 있습니다.
+      </p>
+
+      <div class="guide-pills">
+        <div class="guide-pill">
+          <i class="fa-solid fa-camera"></i> 스마트폰 카메라로 QR 즉시 스캔
+        </div>
+        <div class="guide-pill">
+          <i class="fa-solid fa-magnifying-glass-plus"></i> QR 클릭 시 고해상도 확대
+        </div>
+        <div class="guide-pill">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> 바로가기 링크 지원
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 QR Resource Cards Grid -->
+    <section class="qr-grid">
+      <!-- 1. 학습성향 분석 설문지 -->
+      <article class="qr-box-card">
+        <div class="qr-card-top">
+          <span class="qr-badge badge-survey-1">
+            <i class="fa-solid fa-chart-pie"></i> 학습 분석 · 진단
+          </span>
+          <h2 class="qr-box-title">학습성향 분석 설문지</h2>
+          <p class="qr-box-desc">
+            개인별 학습 스타일과 선호 방식을 분석하여, 보다 효과적이고 맞춤화된 실무 AI 학습 지원을 제공하기 위한 설문조사입니다.
+          </p>
+        </div>
+
+        <div class="qr-card-body">
+          <div class="qr-image-wrapper"
+            onclick="openQrModal('img/qr/learning-style-survey.png', '학습성향 분석 설문지', '휴대폰 기본 카메라 앱을 열고 아래 QR 코드를 비추면 설문 페이지로 자동 이동합니다.')">
+            <img src="img/qr/learning-style-survey.png" alt="학습성향 분석 설문지 QR 코드" width="720" height="720" />
+            <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+          </div>
+          <div class="qr-info-right">
+            <div class="scan-tip-title">
+              <i class="fa-solid fa-mobile-screen"></i> 카메라로 스캔
+            </div>
+            <p class="scan-tip-text">
+              스마트폰 카메라로 QR 코드를 비추면 분석 설문지 화면으로 즉시 연결됩니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="qr-card-actions">
+          <button class="btn-action primary"
+            onclick="openQrModal('img/qr/learning-style-survey.png', '학습성향 분석 설문지', '스마트폰 카메라로 스캔하거나 아래 링크를 통해 바로 응답하실 수 있습니다.', 'https://ko.surveymonkey.com/r/V26H3JJ')">
+            <i class="fa-solid fa-expand"></i> QR 크게 보기
+          </button>
+          <a href="https://ko.surveymonkey.com/r/V26H3JJ" target="_blank" rel="noopener noreferrer" class="btn-action secondary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> 새 창에서 보기
+          </a>
+        </div>
+      </article>
+
+      <!-- 2. 2026 SW 랜딩 만족도 조사 -->
+      <article class="qr-box-card">
+        <div class="qr-card-top">
+          <span class="qr-badge badge-survey-2">
+            <i class="fa-solid fa-clipboard-check"></i> 교육 만족도 조사
+          </span>
+          <h2 class="qr-box-title">2026 SW 랜딩 만족도 조사</h2>
+          <p class="qr-box-desc">
+            교육 과정 전반에 대한 소중한 의견과 피드백을 수렴하여 향후 교육 품질 향상과 지원 체계를 고도화하기 위한 만족도 조사입니다.
+          </p>
+        </div>
+
+        <div class="qr-card-body">
+          <div class="qr-image-wrapper"
+            onclick="openQrModal('img/qr/satisfaction-survey.png', '2026 SW 랜딩 만족도 조사', '휴대폰 기본 카메라 앱으로 스캔하거나 바로가기 버튼을 눌러 온라인 만족도 조사에 참여해 주세요.')">
+            <img src="img/qr/satisfaction-survey.png" alt="2026 SW 랜딩 만족도 조사 QR 코드" width="1104" height="1110" />
+            <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+          </div>
+          <div class="qr-info-right">
+            <div class="scan-tip-title">
+              <i class="fa-solid fa-clipboard-list"></i> 온라인 폼 바로가기
+            </div>
+            <p class="scan-tip-text">
+              PC 환경에서는 바로가기 링크를 클릭하여 Google Forms 설문에 바로 응답하실 수 있습니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="qr-card-actions">
+          <button class="btn-action primary"
+            onclick="openQrModal('img/qr/satisfaction-survey.png', '2026 SW 랜딩 만족도 조사', '스마트폰 카메라로 스캔하거나 아래 링크를 통해 바로 만족도 조사에 참여해 주세요.', 'https://docs.google.com/forms/d/e/1FAIpQLSdQtyqj6xdRtEPD631uO1hN-B8dl93VJ5EMPjdxfK-FHGkTiw/viewform')">
+            <i class="fa-solid fa-expand"></i> QR 크게 보기
+          </button>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSdQtyqj6xdRtEPD631uO1hN-B8dl93VJ5EMPjdxfK-FHGkTiw/viewform" target="_blank" rel="noopener noreferrer" class="btn-action secondary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> 새 창에서 보기
+          </a>
+        </div>
+      </article>
+
+      <!-- 3. Google Classroom 학생 초대 -->
+      <article class="qr-box-card">
+        <div class="qr-card-top">
+          <span class="qr-badge badge-classroom">
+            <i class="fa-solid fa-graduation-cap"></i> 클래스룸 입장
+          </span>
+          <h2 class="qr-box-title">Google Classroom 학생 초대</h2>
+          <p class="qr-box-desc">
+            과제 제출, 수업 공지 확인 및 강사진 피드백 수신을 위한 대구 SW 랜딩 공식 Google Classroom 초대 링크입니다.
+          </p>
+        </div>
+
+        <div class="qr-card-body">
+          <div class="qr-image-wrapper"
+            onclick="openQrModal('img/qr/google-classroom-invite.png', 'Google Classroom 학생 초대', '휴대폰 카메라 또는 Google Classroom 앱에서 QR 코드를 스캔하여 수업 공간에 참여하세요.')">
+            <img src="img/qr/google-classroom-invite.png" alt="Google Classroom 학생 초대 QR 코드" width="742" height="742" />
+            <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+          </div>
+          <div class="qr-info-right">
+            <div class="scan-tip-title">
+              <i class="fa-solid fa-door-open"></i> 클래스룸 참여
+            </div>
+            <p class="scan-tip-text">
+              QR 코드를 스캔하거나 새 창 열기를 통해 본인 구글 계정으로 클래스룸에 등록하세요.
+            </p>
+          </div>
+        </div>
+
+        <div class="qr-card-actions">
+          <button class="btn-action primary"
+            onclick="openQrModal('img/qr/google-classroom-invite.png', 'Google Classroom 학생 초대', '휴대폰 카메라 또는 Google Classroom 앱에서 QR 코드를 스캔하거나 아래 링크로 참여하세요.', 'https://classroom.google.com/c/ODczMDM4OTY3MjY4?cjc=qxrgrpxz')">
+            <i class="fa-solid fa-expand"></i> QR 크게 보기
+          </button>
+          <a href="https://classroom.google.com/c/ODczMDM4OTY3MjY4?cjc=qxrgrpxz" target="_blank" rel="noopener noreferrer" class="btn-action secondary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> 새 창에서 보기
+          </a>
+        </div>
+      </article>
+
+      <!-- 4. Discord 커뮤니티 초대 -->
+      <article class="qr-box-card">
+        <div class="qr-card-top">
+          <span class="qr-badge badge-discord">
+            <i class="fa-brands fa-discord"></i> 실시간 소통 채널
+          </span>
+          <h2 class="qr-box-title">Discord 커뮤니티 초대</h2>
+          <p class="qr-box-desc">
+            동료 수강생들과의 실시간 질의응답, 문제 해결 팁 공유, 팀 프로젝트 협업 및 네트워킹을 위한 디스코드 채널입니다.
+          </p>
+        </div>
+
+        <div class="qr-card-body">
+          <div class="qr-image-wrapper"
+            onclick="openQrModal('img/qr/discord-invite.png', 'Discord 커뮤니티 초대', '디스코드 모바일 앱 카메라 또는 기본 카메라로 QR 코드를 스캔하여 커뮤니티 서버에 접속하세요.')">
+            <img src="img/qr/discord-invite.png" alt="Discord 커뮤니티 초대 QR 코드" width="656" height="656" />
+            <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+          </div>
+          <div class="qr-info-right">
+            <div class="scan-tip-title">
+              <i class="fa-solid fa-comments"></i> 실시간 질의응답
+            </div>
+            <p class="scan-tip-text">
+              수업 중 발생하는 코드 오류나 질문을 자유롭게 남기고 강사진과 소통할 수 있습니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="qr-card-actions">
+          <button class="btn-action primary"
+            onclick="openQrModal('img/qr/discord-invite.png', 'Discord 커뮤니티 초대', '디스코드 앱 또는 기본 카메라로 QR 코드를 스캔하거나 아래 링크로 커뮤니티 서버에 접속하세요.', 'https://discord.gg/kJdcYrfj6F')">
+            <i class="fa-solid fa-expand"></i> QR 크게 보기
+          </button>
+          <a href="https://discord.gg/kJdcYrfj6F" target="_blank" rel="noopener noreferrer" class="btn-action secondary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> 새 창에서 보기
+          </a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <!-- Interactive Lightbox Modal -->
+  <div class="modal-overlay" id="qrModal" onclick="closeQrModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeQrModal()" aria-label="닫기">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <h3 class="modal-title" id="modalTitle">QR 코드 확대</h3>
+      <p class="modal-desc" id="modalDesc">스마트폰 기본 카메라 앱으로 비추어 스캔하세요.</p>
+      <div class="modal-qr-frame">
+        <img id="modalQrImg" src="" alt="확대된 QR 코드" />
+      </div>
+      <div class="modal-actions">
+        <a id="modalDirectLink" href="" target="_blank" rel="noopener noreferrer" class="btn-action primary" style="min-width: 130px;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> 새 창에서 열기
+        </a>
+        <a id="modalDownloadBtn" href="" download class="btn-action secondary" style="min-width: 110px;">
+          <i class="fa-solid fa-download"></i> 이미지 저장
+        </a>
+        <button class="btn-action secondary" onclick="closeQrModal()" style="min-width: 80px;">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span>
+        | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function openQrModal(imageSrc, title, desc, linkUrl) {
+      document.getElementById('modalQrImg').src = imageSrc;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalDesc').textContent = desc;
+      document.getElementById('modalDownloadBtn').href = imageSrc;
+
+      const directLink = document.getElementById('modalDirectLink');
+      if (directLink) {
+        if (linkUrl) {
+          directLink.href = linkUrl;
+          directLink.style.display = 'inline-flex';
+        } else {
+          directLink.style.display = 'none';
+        }
+      }
+
+      const modal = document.getElementById('qrModal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeQrModal(event) {
+      if (event && event.target !== event.currentTarget && !event.target.closest('.modal-close')) {
+        return;
+      }
+      const modal = document.getElementById('qrModal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // ESC key close
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeQrModal();
+      }
+    });
+  </script>
+</body>
+
+</html>
