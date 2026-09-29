@@ -24,51 +24,287 @@
   <title>Project Day 상세 실습과제 가이드 | LMS</title>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <style>
-    body { font-family: 'Pretendard', sans-serif; background: #09090b; color: #fff; padding: 24px; max-width: 1000px; margin: 0 auto; line-height: 1.6; }
-    h1 { font-size: 1.8rem; margin-bottom: 8px; color: #60a5fa; }
-    .nav-bar { display: flex; gap: 12px; margin-bottom: 24px; }
-    .btn { padding: 8px 16px; background: rgba(255,255,255,0.08); color: #fff; border-radius: 8px; text-decoration: none; font-size: 0.9rem; }
-    .card { background: #111827; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
-    .card h3 { color: #38bdf8; margin-bottom: 12px; }
-    pre { background: #000; padding: 14px; border-radius: 8px; color: #a5f3fc; font-size: 0.9rem; overflow-x: auto; margin-top: 10px; }
+    :root { --bg:#09090b; --panel:#111827; --panel2:#171d2a; --line:rgba(255,255,255,.1); --text:#fff; --muted:#cbd5e1; --blue:#60a5fa; --cyan:#22d3ee; --purple:#c084fc; --amber:#fbbf24; --green:#34d399; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+    body { font-family: 'Pretendard', sans-serif; background: radial-gradient(circle at 12% 2%,rgba(59,130,246,.12),transparent 26%),var(--bg); color: var(--text); line-height: 1.68; }
+    a { color: inherit; }
+    code { color:#67e8f9; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .top-nav { position:sticky; top:0; z-index:30; background:rgba(9,9,11,.88); backdrop-filter:blur(16px); border-bottom:1px solid var(--line); }
+    .top-nav-in { width:min(1160px,calc(100% - 32px)); margin:auto; min-height:66px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .nav-bar { display:flex; gap:8px; flex-wrap:wrap; }
+    .btn { padding:8px 13px; background:rgba(255,255,255,.07); border:1px solid var(--line); color:#fff; border-radius:8px; text-decoration:none; font-size:.86rem; font-weight:700; }
+    .btn:hover { background:rgba(59,130,246,.22); border-color:rgba(96,165,250,.45); }
+    .brand { font-weight:850; color:#fff; white-space:nowrap; }
+    .page { width:min(1160px,calc(100% - 32px)); margin:0 auto; padding:44px 0 80px; }
+    .hero { padding:32px; background:linear-gradient(135deg,#172033,#0f172a); border:1px solid var(--line); border-radius:20px; }
+    .eyebrow { color:var(--cyan); font-size:.78rem; font-weight:900; letter-spacing:.12em; margin-bottom:10px; }
+    h1 { font-size:clamp(2rem,5vw,3rem); line-height:1.2; margin-bottom:12px; }
+    .hero > p { color:var(--muted); max-width:880px; }
+    .journey { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:22px; }
+    .journey a { padding:10px 8px; text-align:center; text-decoration:none; color:#bfdbfe; background:rgba(59,130,246,.09); border:1px solid rgba(59,130,246,.2); border-radius:9px; font-size:.78rem; font-weight:800; }
+    .journey a:hover { color:#07111f; background:var(--cyan); }
+    .section-title { margin:38px 0 16px; font-size:1.45rem; }
+    .intro-note { padding:18px 20px; color:var(--muted); background:rgba(34,211,238,.06); border:1px solid rgba(34,211,238,.2); border-radius:12px; }
+    .legacy-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px; }
+    .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; }
+    .card h3 { color:#38bdf8; font-size:1rem; margin-bottom:10px; }
+    .card p,.card li { color:var(--muted); font-size:.88rem; }
+    .card ul { padding-left:20px; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; background:#05070b; border:1px solid var(--line); padding:14px; border-radius:8px; color:#a5f3fc; font-size:.82rem; overflow-x:auto; margin-top:10px; }
+    .phase { margin-top:28px; border:1px solid var(--line); border-radius:20px; overflow:hidden; background:linear-gradient(145deg,rgba(23,29,42,.98),rgba(13,17,25,.98)); }
+    .phase-head { padding:25px 26px; border-bottom:1px solid var(--line); background:rgba(59,130,246,.055); }
+    .phase-label { display:inline-block; color:#93c5fd; background:rgba(59,130,246,.13); border:1px solid rgba(59,130,246,.28); border-radius:999px; padding:4px 10px; font-size:.75rem; font-weight:850; margin-bottom:8px; }
+    .phase-head h2 { font-size:1.5rem; line-height:1.35; margin-bottom:7px; }
+    .phase-head p { color:var(--muted); font-size:.92rem; }
+    .phase-body { padding:26px; }
+    .summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px; }
+    .summary-box { padding:16px; background:rgba(255,255,255,.035); border:1px solid var(--line); border-radius:11px; }
+    .summary-box h3 { color:var(--cyan); font-size:.86rem; margin-bottom:7px; }
+    .summary-box p,.summary-box li { color:#d4d4d8; font-size:.84rem; }
+    .summary-box ul { padding-left:18px; }
+    .guide-grid { display:grid; grid-template-columns:1.1fr .9fr; gap:14px; }
+    .guide-block { padding:20px; background:rgba(255,255,255,.025); border:1px solid var(--line); border-radius:12px; margin-bottom:14px; }
+    .guide-block h3 { color:var(--purple); font-size:1rem; margin-bottom:10px; }
+    .guide-block ul,.guide-block ol { padding-left:21px; color:var(--muted); font-size:.89rem; }
+    .guide-block li + li { margin-top:7px; }
+    .steps { list-style:none!important; padding:0!important; counter-reset:step; }
+    .steps li { counter-increment:step; position:relative; padding:10px 8px 10px 42px; border-bottom:1px solid var(--line); }
+    .steps li:last-child { border-bottom:0; }
+    .steps li::before { content:counter(step); position:absolute; left:4px; top:9px; width:26px; height:26px; display:grid; place-items:center; border-radius:50%; color:#07111f; background:var(--cyan); font-weight:900; }
+    .steps strong { color:#fff; }
+    .warning { border-color:rgba(251,191,36,.25); background:rgba(251,191,36,.045); }
+    .warning h3 { color:var(--amber); }
+    .done { border-color:rgba(52,211,153,.25); background:rgba(52,211,153,.045); }
+    .done h3 { color:var(--green); }
+    .prompt h3 { color:var(--cyan); }
+    .artifact { display:flex; flex-wrap:wrap; gap:7px; margin-top:8px; }
+    .artifact span { padding:5px 8px; color:#bbf7d0; background:rgba(52,211,153,.08); border:1px solid rgba(52,211,153,.2); border-radius:6px; font-size:.76rem; font-weight:750; }
+    .sub-link { display:inline-flex; margin-top:10px; padding:8px 11px; color:#bfdbfe; background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.25); border-radius:8px; text-decoration:none; font-size:.82rem; font-weight:750; }
+    footer { padding:30px; text-align:center; color:#64748b; border-top:1px solid var(--line); font-size:.8rem; }
+    @media(max-width:850px){.journey{grid-template-columns:repeat(3,1fr)}.summary-grid{grid-template-columns:1fr}.guide-grid,.legacy-grid{grid-template-columns:1fr}.top-nav-in{padding:10px 0;align-items:flex-start;flex-direction:column}}
+    @media(max-width:520px){.page{width:min(100% - 22px,1160px);padding-top:24px}.hero,.phase-body,.phase-head{padding:20px}.journey{grid-template-columns:1fr 1fr}}
   </style>
 </head>
 <body>
-  <div class="nav-bar">
-    <a href="project_day-ai-classroom.html" class="btn">← Project Day AI 강의실로 돌아가기</a>
-  </div>
-  <h1>Project Day 상세 실습과제 가이드</h1>
-  <p style="color: #94a3b8; margin-bottom: 24px;">Markdown 기획서 기반 웹사이트 구축 6단계 상세 과제 명세</p>
+  <header class="top-nav">
+    <div class="top-nav-in">
+      <div class="brand">대구 DIP SW 랜딩 · Project Day</div>
+      <nav class="nav-bar">
+        <a href="project_day-ai-classroom.html" class="btn">← AI 강의실</a>
+        <a href="project_day-ai-codex-summation.html" class="btn">기획서 요약 가이드</a>
+        <a href="../index.html" class="btn">전체 커리큘럼</a>
+      </nav>
+    </div>
+  </header>
 
-  <div class="card">
-    <h3>Task 01. 아이디어 구체화 및 세 문장 정의 (Phase 1)</h3>
-    <p>Codex에게 전달할 프로젝트의 목적과 사용자 역할을 다음 세 문장 양식으로 작성합니다.</p>
-    <pre>1. 사이트 목적: 학생이 자신의 카드를 선택하여 QR 코드로 출석하고, 선생님이 실시간으로 확인하는 시스템이다.
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">PROJECT DAY · SIX PHASE GUIDE</div>
+      <h1>Project Day 상세 실습과제 가이드</h1>
+      <p>Markdown 기획서 기반 웹사이트 구축 과정을 실제 프로젝트처럼 진행하기 위한 안내서입니다. 각 페이즈에서 “무엇을 하는지”, “왜 필요한지”, “어떤 결과물을 남겨야 하는지”를 확인하고 완료 기준을 충족한 뒤 다음 단계로 이동하세요.</p>
+      <nav class="journey" aria-label="6개 페이즈 바로가기">
+        <a href="#phase1">1. 아이디어</a><a href="#phase2">2. 기획 문서</a><a href="#phase3">3. 구현</a>
+        <a href="#phase4">4. 테스트</a><a href="#phase5">5. 변경 개선</a><a href="#phase6">6. 회고 발표</a>
+      </nav>
+    </section>
+
+    <h2 class="section-title">기존 Task 과제 명세</h2>
+    <p class="intro-note">기존 Task의 요구사항은 변경하지 않았습니다. 아래 Task를 기본 과제로 수행하고, 이어지는 6개 페이즈 상세 가이드를 이용해 결과물의 품질과 프로젝트 진행 과정을 보완하세요.</p>
+    <section class="legacy-grid" aria-label="기존 Task 과제">
+      <div class="card">
+        <h3>Task 01. 아이디어 구체화 및 세 문장 정의 (Phase 1)</h3>
+        <p>Codex에게 전달할 프로젝트의 목적과 사용자 역할을 다음 세 문장 양식으로 작성합니다.</p>
+        <pre>1. 사이트 목적: 학생이 자신의 카드를 선택하여 QR 코드로 출석하고, 선생님이 실시간으로 확인하는 시스템이다.
 2. 학생 역할: 이름 검색 ➔ ID 카드 클릭 ➔ 모바일 QR 스캔 ➔ 출석 버튼 클릭
 3. 선생님 역할: 전체 출석 현황 모니터링 대시보드 ➔ 실시간 갱신 확인 ➔ 출석/미출석 필터링</pre>
-  </div>
+      </div>
+      <div class="card">
+        <h3>Task 02. 5대 Markdown 기획 문서 팩 작성 (Phase 2)</h3>
+        <p>Codex에 다음 5개 파일 생성을 요청하고 완료 기준을 검토합니다.</p>
+        <ul>
+          <li><code>SITE_SPEC.md</code>: 화면 구성, 기능, 디자인, 완료 검수 기준</li>
+          <li><code>USER_FLOWS.md</code>: 사용자별 단계별 동선</li>
+          <li><code>DATA_MODEL.md</code>: 학생 및 출석 데이터 모델</li>
+          <li><code>IMPLEMENTATION_PLAN.md</code>: 구현 순서</li>
+          <li><code>CONVERSATION.md</code>: 대화 기록</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Task 03. 코덱스 코드 생성 및 테스트 (Phase 3 &amp; 4)</h3>
+        <p>Codex에 기획서를 읽게 한 후 <code>website/</code> 폴더 생성을 요청합니다.</p>
+        <pre>프롬프트: "작성된 기획서 문서를 먼저 읽고, website/ 폴더 아래 학생 출석 QR 페이지와 선생님 모니터링 페이지를 완성해 줘."</pre>
+      </div>
+      <div class="card">
+        <h3>Task 04. 요구사항 변경 및 발표 준비 (Phase 5 &amp; 6)</h3>
+        <p>기획 문서를 먼저 수정한 후 코드를 개정하고, 대화 이력을 CONVERSATION.md에 정리하여 발표를 진행합니다.</p>
+      </div>
+    </section>
 
-  <div class="card">
-    <h3>Task 02. 5대 Markdown 기획 문서 팩 작성 (Phase 2)</h3>
-    <p>Codex에 다음 5개 파일 생성을 요청하고 완료 기준을 검토합니다.</p>
-    <ul>
-      <li><code>SITE_SPEC.md</code>: 화면 구성, 기능, 디자인, 완료 검수 기준</li>
-      <li><code>USER_FLOWS.md</code>: 사용자별 단계별 동선</li>
-      <li><code>DATA_MODEL.md</code>: 학생 및 출석 데이터 모델</li>
-      <li><code>IMPLEMENTATION_PLAN.md</code>: 구현 순서</li>
-      <li><code>CONVERSATION.md</code>: 대화 기록</li>
-    </ul>
-  </div>
+    <h2 class="section-title">6개 페이즈 상세 프로젝트 가이드</h2>
 
-  <div class="card">
-    <h3>Task 03. 코덱스 코드 생성 및 테스트 (Phase 3 &amp; 4)</h3>
-    <p>Codex에 기획서를 읽게 한 후 <code>website/</code> 폴더 생성을 요청합니다.</p>
-    <pre>프롬프트: "작성된 기획서 문서를 먼저 읽고, website/ 폴더 아래 학생 출석 QR 페이지와 선생님 모니터링 페이지를 완성해 줘."</pre>
-  </div>
+    <article class="phase" id="phase1">
+      <header class="phase-head"><span class="phase-label">PHASE 1 · DISCOVER</span><h2>아이디어 구체화: 만들기 전에 문제를 정의하는 단계</h2><p>화면과 기능을 떠올리기 전에 누구의 어떤 불편을 해결할지, 이번 프로젝트에서 어디까지 만들지를 팀이 합의하는 페이즈입니다.</p></header>
+      <div class="phase-body">
+        <div class="summary-grid">
+          <section class="summary-box"><h3>이 페이즈에서 하는 일</h3><p>사용자 인터뷰를 가정해 문제, 사용자, 사용 상황, 핵심 행동과 성공 조건을 좁힙니다.</p></section>
+          <section class="summary-box"><h3>필수 결과물</h3><div class="artifact"><span>PROJECT_BRIEF.md</span><span>3문장 정의</span><span>범위표</span><span>성공 지표</span></div></section>
+          <section class="summary-box"><h3>가장 중요한 기준</h3><p>팀원과 Codex가 같은 사용자를 상상하고 “무엇을 만들지 않는지”까지 설명할 수 있어야 합니다.</p></section>
+        </div>
+        <div class="guide-grid">
+          <section class="guide-block"><h3>학생 수행 순서</h3><ol class="steps">
+            <li><strong>문제를 관찰합니다.</strong> 출석 확인에서 학생과 선생님이 겪는 불편을 각각 3개씩 적습니다.</li>
+            <li><strong>핵심 사용자를 선택합니다.</strong> 모든 사용자를 만족시키려 하지 말고 학생·선생님 중 각자의 가장 중요한 목표를 한 문장으로 정합니다.</li>
+            <li><strong>핵심 행동을 연결합니다.</strong> 수업 입장부터 출석 완료 확인까지 시작-행동-결과 흐름을 작성합니다.</li>
+            <li><strong>범위를 나눕니다.</strong> 필수(Must), 가능하면(Should), 이번에는 제외(Out)로 기능을 분류합니다.</li>
+            <li><strong>성공 조건을 수치화합니다.</strong> 예: 학생이 30초 안에 출석하고 선생님이 미출석자를 10초 안에 찾을 수 있다.</li>
+          </ol></section>
+          <div>
+            <section class="guide-block warning"><h3>실제 프로젝트에서 고려할 것</h3><ul><li>QR을 친구에게 전달하는 대리 출석과 중복 출석을 어떻게 다룰지 결정합니다.</li><li>이름, 학번, 위치, IP 같은 개인정보는 꼭 필요한 항목만 수집하고 목적과 보관 기간을 정합니다.</li><li>인터넷 불안정, 카메라 권한 거부, 동명이인처럼 이상적인 흐름 밖의 상황을 미리 적습니다.</li><li>하루 안에 만들 수 있는 규모인지 시간과 팀 역량을 기준으로 범위를 줄입니다.</li></ul></section>
+            <section class="guide-block done"><h3>완료 체크</h3><ul><li>사용자, 문제, 핵심 행동이 각각 한 문장으로 명확하다.</li><li>필수 기능과 제외 기능이 구분되어 있다.</li><li>성공 여부를 확인할 지표가 최소 2개 있다.</li><li>팀원 전원이 같은 3문장 정의에 동의했다.</li></ul></section>
+          </div>
+        </div>
+        <section class="guide-block prompt"><h3>Codex 활용 포인트</h3><pre>우리 팀의 출석 서비스 아이디어를 비판적으로 검토해 줘. 바로 기능을 추가하지 말고 ① 모호한 표현 ② 확인되지 않은 가정 ③ 가장 위험한 예외 상황 ④ 하루 프로젝트에서 제외해야 할 범위를 질문 형태로 제시해 줘. 답변 후 합의된 내용만 PROJECT_BRIEF.md 구조로 정리해 줘.</pre></section>
+      </div>
+    </article>
 
-  <div class="card">
-    <h3>Task 04. 요구사항 변경 및 발표 준비 (Phase 5 &amp; 6)</h3>
-    <p>기획 문서를 먼저 수정한 후 코드를 개정하고, 대화 이력을 CONVERSATION.md에 정리하여 발표를 진행합니다.</p>
-  </div>
+    <article class="phase" id="phase2">
+      <header class="phase-head"><span class="phase-label">PHASE 2 · DEFINE</span><h2>기획 문서화: 생각을 구현 가능한 약속으로 바꾸는 단계</h2><p>아이디어를 화면, 사용자 흐름, 데이터, 구현 순서와 완료 기준으로 나누어 팀과 Codex가 함께 사용할 단일 기준을 만듭니다.</p></header>
+      <div class="phase-body">
+        <div class="summary-grid">
+          <section class="summary-box"><h3>이 페이즈에서 하는 일</h3><p>5개 Markdown 문서가 서로 연결되도록 요구사항 ID, 흐름, 데이터 필드와 테스트 기준을 구체화합니다.</p></section>
+          <section class="summary-box"><h3>필수 결과물</h3><div class="artifact"><span>SITE_SPEC.md</span><span>USER_FLOWS.md</span><span>DATA_MODEL.md</span><span>IMPLEMENTATION_PLAN.md</span><span>CONVERSATION.md</span></div></section>
+          <section class="summary-box"><h3>가장 중요한 기준</h3><p>“좋게”, “빠르게”, “실시간” 같은 표현 대신 누가 보아도 확인 가능한 완료 기준을 사용합니다.</p></section>
+        </div>
+        <div class="guide-grid">
+          <section class="guide-block"><h3>학생 수행 순서</h3><ol class="steps">
+            <li><strong>SITE_SPEC을 작성합니다.</strong> 화면 목록, 기능 요구사항 ID, 디자인 원칙, 반응형 조건과 완료 기준을 적습니다.</li>
+            <li><strong>USER_FLOWS를 작성합니다.</strong> 학생·선생님의 정상 흐름과 QR 만료, 중복 출석, 검색 결과 없음 등 예외 흐름을 분리합니다.</li>
+            <li><strong>DATA_MODEL을 작성합니다.</strong> Student, ClassSession, Attendance의 필드, 타입, 필수 여부, 관계와 상태값을 정의합니다.</li>
+            <li><strong>IMPLEMENTATION_PLAN을 작성합니다.</strong> 기반 화면 → 데이터 → 핵심 기능 → 예외 처리 → 테스트 순으로 작은 작업을 나눕니다.</li>
+            <li><strong>문서 간 모순을 검사합니다.</strong> 화면의 기능이 흐름과 데이터에 모두 존재하는지 요구사항 추적표로 확인합니다.</li>
+          </ol></section>
+          <div>
+            <section class="guide-block warning"><h3>실제 프로젝트에서 고려할 것</h3><ul><li>UI에 보이는 “출석 완료”와 실제 저장된 Attendance 상태가 일치해야 합니다.</li><li>학생 이름을 고유키로 사용하지 말고 별도 studentId를 둡니다.</li><li>날짜·시간대, 지각 기준, QR 만료 시각, 선생님의 수동 수정 권한을 명시합니다.</li><li>문서마다 같은 개념에 다른 이름을 사용하지 않도록 용어집을 만듭니다.</li></ul></section>
+            <section class="guide-block done"><h3>완료 체크</h3><ul><li>모든 핵심 기능에 요구사항 ID와 수용 기준이 있다.</li><li>정상 흐름과 3개 이상의 예외 흐름이 있다.</li><li>데이터 필드의 타입·필수 여부·관계가 정의됐다.</li><li>구현 순서와 각 작업의 완료 조건이 명확하다.</li></ul><a class="sub-link" href="project_day-ai-codex-summation.html">기존 5대 기획 문서 요약 가이드 보기 →</a></section>
+          </div>
+        </div>
+        <section class="guide-block prompt"><h3>Codex 활용 포인트</h3><pre>PROJECT_BRIEF.md를 기준으로 5개 기획 문서를 작성해 줘. 먼저 필요한 확인 질문을 하고, 답변되지 않은 내용은 [미결정]으로 표시해 줘. 각 기능에는 FR-001 형식의 ID와 Given-When-Then 수용 기준을 붙이고, 다섯 문서 사이의 모순과 누락을 마지막에 별도 표로 검토해 줘.</pre></section>
+      </div>
+    </article>
+
+    <article class="phase" id="phase3">
+      <header class="phase-head"><span class="phase-label">PHASE 3 · BUILD</span><h2>Codex 기반 구현: 문서를 작동하는 제품으로 옮기는 단계</h2><p>Codex가 임의로 제품을 결정하게 하지 않고, 기획 문서를 기준으로 작업 계획과 변경 범위를 검토하며 작은 단위로 구현합니다.</p></header>
+      <div class="phase-body">
+        <div class="summary-grid">
+          <section class="summary-box"><h3>이 페이즈에서 하는 일</h3><p>프로젝트 구조를 만들고 학생 출석 화면과 선생님 대시보드를 우선순위에 따라 구현합니다.</p></section>
+          <section class="summary-box"><h3>필수 결과물</h3><div class="artifact"><span>website/</span><span>README.md</span><span>실행 화면</span><span>구현 로그</span></div></section>
+          <section class="summary-box"><h3>가장 중요한 기준</h3><p>코드가 많아지는 것보다 기획서의 수용 기준이 실제로 동작하고 다른 사람이 실행할 수 있어야 합니다.</p></section>
+        </div>
+        <div class="guide-grid">
+          <section class="guide-block"><h3>학생 수행 순서</h3><ol class="steps">
+            <li><strong>Codex에 문서를 먼저 읽힙니다.</strong> 이해한 요구사항, 미결정 사항, 구현 순서를 요약하게 하고 팀이 승인합니다.</li>
+            <li><strong>실행 환경을 고정합니다.</strong> 기술 스택, 폴더 구조, 실행 명령, 지원 브라우저와 데이터 저장 방식을 README에 적습니다.</li>
+            <li><strong>핵심 흐름부터 만듭니다.</strong> 학생 선택 → QR 확인 → 출석 저장 → 선생님 현황 반영의 세로 흐름을 먼저 완성합니다.</li>
+            <li><strong>작은 변경마다 실행합니다.</strong> 한 기능을 구현할 때마다 브라우저와 콘솔을 확인하고 다음 작업으로 넘어갑니다.</li>
+            <li><strong>문서와 구현을 대조합니다.</strong> 요구사항 ID별 구현 위치와 확인 방법을 IMPLEMENTATION_PLAN에 표시합니다.</li>
+          </ol></section>
+          <div>
+            <section class="guide-block warning"><h3>실제 프로젝트에서 고려할 것</h3><ul><li>API 키와 비밀번호를 코드에 직접 넣거나 저장소에 올리지 않습니다.</li><li>새 라이브러리를 추가하기 전에 꼭 필요한지, 팀원이 같은 환경에서 설치할 수 있는지 확인합니다.</li><li>AI가 기존 파일을 크게 바꾸려 할 때는 변경 diff와 영향 범위를 먼저 검토합니다.</li><li>데모용 임시 데이터와 실제 저장 데이터를 명확히 구분합니다.</li><li>모바일 QR 화면은 터치 영역, 로딩, 카메라 권한 거부를 고려합니다.</li></ul></section>
+            <section class="guide-block done"><h3>완료 체크</h3><ul><li>README의 명령만으로 다른 팀원이 실행할 수 있다.</li><li>학생·선생님 핵심 흐름이 연결되어 동작한다.</li><li>브라우저 콘솔에 해결되지 않은 오류가 없다.</li><li>기획서에 없는 기능을 임의로 추가하지 않았다.</li></ul></section>
+          </div>
+        </div>
+        <section class="guide-block prompt"><h3>Codex 활용 포인트</h3><pre>5개 기획 문서를 먼저 읽고 요구사항 ID, 미결정 사항, 구현 순서를 요약해 줘. 아직 코드를 작성하지 말고 생성·수정할 파일과 이유를 제안해 줘. 내가 계획을 확인한 뒤 website/ 아래에 가장 작은 실행 단위부터 구현하고, 각 단계마다 실행 방법과 확인할 수용 기준을 알려 줘.</pre></section>
+      </div>
+    </article>
+
+    <article class="phase" id="phase4">
+      <header class="phase-head"><span class="phase-label">PHASE 4 · VERIFY</span><h2>기능 및 시나리오 테스트: “되는 것 같다”를 증거로 바꾸는 단계</h2><p>정상 사용뿐 아니라 실수, 중복, 만료, 권한 거부와 화면 크기 변화에서도 제품이 예측 가능하게 동작하는지 확인합니다.</p></header>
+      <div class="phase-body">
+        <div class="summary-grid">
+          <section class="summary-box"><h3>이 페이즈에서 하는 일</h3><p>요구사항별 테스트 시나리오를 실행하고 실제 결과, 증거, 결함과 재검증 결과를 기록합니다.</p></section>
+          <section class="summary-box"><h3>필수 결과물</h3><div class="artifact"><span>TEST_PLAN.md</span><span>테스트 결과표</span><span>오류 캡처</span><span>BUG_LOG.md</span></div></section>
+          <section class="summary-box"><h3>가장 중요한 기준</h3><p>테스트 통과 개수보다 실패가 재현되고 수정 후 다시 검증되었는지가 중요합니다.</p></section>
+        </div>
+        <div class="guide-grid">
+          <section class="guide-block"><h3>학생 수행 순서</h3><ol class="steps">
+            <li><strong>수용 기준을 테스트로 변환합니다.</strong> 사전 조건, 행동, 기대 결과, 실제 결과, 증거 항목을 만듭니다.</li>
+            <li><strong>정상 시나리오를 확인합니다.</strong> 학생 출석과 선생님 현황 반영의 전체 흐름을 처음부터 끝까지 실행합니다.</li>
+            <li><strong>예외 시나리오를 실행합니다.</strong> 빈 검색, 동명이인, 중복 클릭, 만료 QR, 네트워크 실패, 권한 거부를 시험합니다.</li>
+            <li><strong>다양한 환경을 확인합니다.</strong> 모바일·태블릿·데스크톱, 키보드 조작, 긴 이름과 많은 학생 데이터를 점검합니다.</li>
+            <li><strong>결함을 수정하고 회귀 테스트합니다.</strong> 원인과 수정 내용을 기록하고 관련된 기존 기능까지 다시 실행합니다.</li>
+          </ol></section>
+          <div>
+            <section class="guide-block warning"><h3>최소 테스트 시나리오</h3><ul><li>정상 출석 후 대시보드 인원과 학생 상태가 즉시 일치한다.</li><li>같은 학생이 두 번 제출해도 한 건만 유효 처리된다.</li><li>만료된 QR과 잘못된 수업 QR은 이유와 함께 거절된다.</li><li>검색 결과가 없거나 동명이인일 때 잘못된 학생을 선택하지 않는다.</li><li>저장 실패 시 성공 메시지를 보여 주지 않고 재시도 방법을 안내한다.</li><li>375px 모바일 화면에서 가로 스크롤 없이 핵심 기능을 사용할 수 있다.</li></ul></section>
+            <section class="guide-block done"><h3>완료 체크</h3><ul><li>각 요구사항 ID에 테스트 결과가 연결되어 있다.</li><li>정상·예외·반응형·접근성 테스트를 수행했다.</li><li>실패 항목에는 재현 절차와 증거가 있다.</li><li>수정한 결함을 다시 테스트해 통과를 확인했다.</li></ul></section>
+          </div>
+        </div>
+        <section class="guide-block prompt"><h3>Codex 활용 포인트</h3><pre>기획 문서의 수용 기준을 바탕으로 테스트 표를 만들어 줘. 정상 경로만 작성하지 말고 중복 출석, 만료 QR, 동명이인, 네트워크 오류, 모바일 레이아웃, 키보드 접근 시나리오를 포함해 줘. 각 테스트에 사전 조건, 수행 단계, 기대 결과, 증거 방법을 작성하고 아직 실행하지 않은 항목은 PASS로 표시하지 마.</pre></section>
+      </div>
+    </article>
+
+    <article class="phase" id="phase5">
+      <header class="phase-head"><span class="phase-label">PHASE 5 · ITERATE</span><h2>사이트·문서 연쇄 개선: 변경을 안전하게 반영하는 단계</h2><p>새 요구사항을 코드에 바로 넣지 않고 명세, 사용자 흐름, 데이터, 테스트에 미치는 영향을 먼저 확인한 뒤 구현합니다.</p></header>
+      <div class="phase-body">
+        <div class="summary-grid">
+          <section class="summary-box"><h3>이 페이즈에서 하는 일</h3><p>변경 요청을 분석해 기획 문서를 먼저 갱신하고 최소 코드 변경과 회귀 테스트로 개선합니다.</p></section>
+          <section class="summary-box"><h3>필수 결과물</h3><div class="artifact"><span>CHANGE_REQUEST.md</span><span>영향 분석표</span><span>문서 diff</span><span>코드 diff</span><span>회귀 결과</span></div></section>
+          <section class="summary-box"><h3>가장 중요한 기준</h3><p>새 기능을 추가한 뒤에도 문서와 코드가 같은 제품을 설명하고 기존 핵심 흐름이 유지되어야 합니다.</p></section>
+        </div>
+        <div class="guide-grid">
+          <section class="guide-block"><h3>학생 수행 순서</h3><ol class="steps">
+            <li><strong>변경 요청을 한 문장으로 재작성합니다.</strong> 요청자, 이유, 기대 결과와 완료 기준을 확인합니다.</li>
+            <li><strong>영향 범위를 분석합니다.</strong> 화면, 흐름, 데이터 모델, 권한, 테스트, 일정에 미치는 영향을 표로 만듭니다.</li>
+            <li><strong>문서를 먼저 수정합니다.</strong> 관련 요구사항 ID와 버전을 갱신하고 변경 전·후 차이를 팀이 승인합니다.</li>
+            <li><strong>최소 범위로 구현합니다.</strong> Codex에게 수정 대상 파일과 예상 diff를 먼저 보여 달라고 한 뒤 코드를 변경합니다.</li>
+            <li><strong>회귀 테스트합니다.</strong> 새 수용 기준과 영향을 받는 기존 시나리오를 모두 재검증합니다.</li>
+          </ol></section>
+          <div>
+            <section class="guide-block warning"><h3>실제 프로젝트에서 고려할 것</h3><ul><li>“실시간 현황” 추가가 새로고침, polling, WebSocket 중 어떤 의미인지 합의합니다.</li><li>데이터 필드 변경 시 기존 데이터와 화면이 깨지지 않는지 마이그레이션을 생각합니다.</li><li>요청 하나 때문에 전체 코드를 다시 만드는 것보다 작은 diff를 우선합니다.</li><li>변경 요청이 프로젝트 시간과 목표를 벗어나면 구현 대신 다음 버전 백로그로 보냅니다.</li><li>요청자의 말과 실제 사용자 가치가 충돌하면 질문하고 결정 근거를 남깁니다.</li></ul></section>
+            <section class="guide-block done"><h3>완료 체크</h3><ul><li>변경 이유와 완료 기준이 문서화됐다.</li><li>영향받는 문서와 코드 파일을 설명할 수 있다.</li><li>문서 변경이 코드 변경보다 먼저 승인됐다.</li><li>새 테스트와 관련 회귀 테스트가 모두 기록됐다.</li></ul></section>
+          </div>
+        </div>
+        <section class="guide-block prompt"><h3>Codex 활용 포인트</h3><pre>변경 요청을 바로 구현하지 말고 SITE_SPEC, USER_FLOWS, DATA_MODEL, IMPLEMENTATION_PLAN, 기존 테스트에 미치는 영향을 분석해 줘. 수정이 필요한 문서 항목과 코드 파일, 기존 기능이 깨질 위험, 추가할 회귀 테스트를 표로 보여 줘. 내가 승인한 뒤 문서를 먼저 수정하고 최소 diff로 구현해 줘.</pre></section>
+      </div>
+    </article>
+
+    <article class="phase" id="phase6">
+      <header class="phase-head"><span class="phase-label">PHASE 6 · SHARE</span><h2>작업 이력·회고·발표: 프로젝트 판단을 전달 가능한 지식으로 만드는 단계</h2><p>완성 화면만 시연하는 것이 아니라 문제, 결정, 실패, 개선과 검증 증거를 5분 안에 이해할 수 있도록 정리합니다.</p></header>
+      <div class="phase-body">
+        <div class="summary-grid">
+          <section class="summary-box"><h3>이 페이즈에서 하는 일</h3><p>Codex 대화와 팀의 판단을 정리하고 재현 가능한 실행 방법, 데모, 한계와 다음 단계를 발표합니다.</p></section>
+          <section class="summary-box"><h3>필수 결과물</h3><div class="artifact"><span>CONVERSATION.md</span><span>README.md</span><span>5분 발표자료</span><span>DEMO_SCRIPT.md</span><span>RETROSPECTIVE.md</span></div></section>
+          <section class="summary-box"><h3>가장 중요한 기준</h3><p>화려한 화면보다 팀이 어떤 근거로 선택하고 AI의 제안을 어떻게 검토했는지 전달해야 합니다.</p></section>
+        </div>
+        <div class="guide-grid">
+          <section class="guide-block"><h3>학생 수행 순서</h3><ol class="steps">
+            <li><strong>대화 이력을 편집합니다.</strong> 모든 채팅을 복사하지 말고 질문, 핵심 제안, 팀의 수용·수정·거절과 이유를 남깁니다.</li>
+            <li><strong>재현 방법을 완성합니다.</strong> 설치, 실행, 테스트, 데모 계정과 알려진 제한을 README에서 확인합니다.</li>
+            <li><strong>5분 발표 흐름을 만듭니다.</strong> 문제 40초, 사용자·해결책 50초, 데모 2분, 판단·검증 1분, 회고·다음 단계 30초로 구성합니다.</li>
+            <li><strong>실패를 대비한 데모를 준비합니다.</strong> 초기화된 데이터, 시연 순서, 예비 화면 캡처와 발표자 역할을 정합니다.</li>
+            <li><strong>팀 회고를 작성합니다.</strong> 잘한 점, 어려웠던 점, AI 오류, 다시 한다면 바꿀 점과 다음 실험을 구체적으로 적습니다.</li>
+          </ol></section>
+          <div>
+            <section class="guide-block warning"><h3>발표에서 반드시 보여 줄 것</h3><ul><li>해결하려는 실제 사용자 문제와 프로젝트 범위</li><li>학생 출석부터 선생님 확인까지의 핵심 데모</li><li>가장 어려웠던 결정 하나와 선택 근거</li><li>Codex 제안을 그대로 사용하지 않고 수정하거나 거절한 사례</li><li>테스트 증거와 아직 해결하지 못한 한계</li><li>다음 버전에서 가장 먼저 개선할 한 가지</li></ul></section>
+            <section class="guide-block done"><h3>완료 체크</h3><ul><li>5분 이내 발표를 실제로 리허설했다.</li><li>네트워크 없이도 설명 가능한 예비 자료가 있다.</li><li>모든 팀원이 자신의 기여와 판단을 설명할 수 있다.</li><li>실행 방법, 테스트 결과, 한계가 저장소에 남아 있다.</li></ul></section>
+          </div>
+        </div>
+        <section class="guide-block prompt"><h3>Codex 활용 포인트</h3><pre>CONVERSATION.md와 프로젝트 문서를 바탕으로 5분 발표 초안을 만들어 줘. 기능 목록이 아니라 문제-사용자-핵심 결정-데모-검증 증거-한계-다음 단계 순서로 구성해 줘. 팀이 AI 제안을 수용·수정·거절한 사례를 구분하고, 증거가 없는 성과는 추가하지 마.</pre></section>
+      </div>
+    </article>
+  </main>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
