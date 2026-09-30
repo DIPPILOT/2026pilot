@@ -12,6 +12,8 @@
 
 `docs/homework-log.js`는 세 과제 페이지의 카드 클릭을 감지합니다. 페이지 표시나 모달 열기를 기다리지 않고 비동기 POST를 보내며, 학생 ID는 현재 LMS 로그인 세션에서 가져오고 Apps Script가 `출석부` 명부와 다시 대조합니다.
 
+과제 로그 전송 직전에는 `localStorage.currentUserSession.expiresAt`을 검사합니다. 세션이 없거나 만료됐거나 학생 ID가 유효하지 않으면 쿠키·로컬 세션을 정리하고 로그인 페이지로 이동하며, Apps Script API는 호출하지 않습니다.
+
 배포된 웹 앱 URL:
 
 `https://script.google.com/macros/s/AKfycbx4kGWSG4D41ZpElazYgGKkY4V7AbnkBRir8uKRhYNGneAM6xxJKxpJJPdbU2GfDtwz/exec`

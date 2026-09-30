@@ -7,18 +7,7 @@
     "homework_week2.html": "2주차 개인 과제",
     "homework_codex_field.html": "코덱스 협업 과제"
   };
-
-  function getCookie(name) {
-    var prefix = name + "=";
-    var cookies = document.cookie.split(";");
-    for (var i = 0; i < cookies.length; i += 1) {
-      var cookie = cookies[i].trim();
-      if (cookie.indexOf(prefix) === 0) {
-        return decodeURIComponent(cookie.substring(prefix.length));
-      }
-    }
-    return null;
-  }
+  var isRedirectingToLogin = false;
 
   function parseUser(raw) {
     if (!raw) return null;
@@ -30,21 +19,41 @@
     }
   }
 
-  function getCurrentUser() {
-    var user = parseUser(getCookie("currentUser"));
-    if (user) return user;
-
+  function getValidSessionUser() {
     var sessionRaw = localStorage.getItem("currentUserSession");
     if (!sessionRaw) return null;
 
     try {
       var session = JSON.parse(sessionRaw);
-      if (Date.now() >= Number(session.expiresAt || 0)) return null;
-      return parseUser(session.value);
+      var expiresAt = Number(session.expiresAt || 0);
+      if (!Number.isFinite(expiresAt) || Date.now() >= expiresAt) return null;
+
+      var user = parseUser(session.value);
+      var studentId = user && String(user.studentId || user.id || "").trim();
+      return studentId ? user : null;
     } catch (error) {
       console.error("과제 로그 세션 정보 해석 실패:", error);
       return null;
     }
+  }
+
+  function clearLoginSession() {
+    document.cookie = "currentUser=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax";
+    localStorage.removeItem("currentUserSession");
+    localStorage.removeItem("currentUser");
+    sessionStorage.removeItem("lmsLoginSessionId");
+  }
+
+  function requireValidLoginSession() {
+    var user = getValidSessionUser();
+    if (user) return user;
+
+    clearLoginSession();
+    if (!isRedirectingToLogin) {
+      isRedirectingToLogin = true;
+      window.location.replace("login/login.html");
+    }
+    return null;
   }
 
   function makeEventId() {
@@ -83,12 +92,10 @@
   }
 
   function logHomeworkClick(card) {
-    var user = getCurrentUser();
+    var user = requireValidLoginSession();
+    if (!user) return;
+
     var studentId = user && String(user.studentId || user.id || "").trim();
-    if (!studentId) {
-      console.warn("학생 ID가 없어 과제 클릭 로그를 전송하지 않았습니다.");
-      return;
-    }
 
     var mission = getMission(card);
     if (!mission.id || !mission.title) {
