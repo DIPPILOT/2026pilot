@@ -53,9 +53,10 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ACE Startup AI SW 파일럿 | 로그인</title>
+  <title>대구 SW 랜딩 | 학생 로그인</title>
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     :root {
       --primary-color: #3b82f6;
@@ -66,20 +67,20 @@
       /* Deep Black */
       --bg-charcoal: #111827;
       /* Secondary Background */
-      --bg-card: rgba(26, 29, 36, 0.7);
-      /* Surface/Card with glass transparency */
+      --bg-card: #1a1d24;
+      /* Surface/Card: Dark Gray */
       --text-main: #ffffff;
       /* Primary: White */
       --text-muted: #e4e4e7;
       /* Secondary: Light Gray */
-      --text-desc: #71717a;
-      /* Description: Gray */
+      --text-desc: #9ca3af;
+      /* Description: Clean Gray */
       --border-color: rgba(255, 255, 255, 0.08);
       --accent-color: #06b6d4;
       --accent-purple: #8b5cf6;
       --card-radius: 18px;
       --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
-      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.1), 0 0 1px rgba(255, 255, 255, 0.2);
+      --shadow-md: 0 8px 30px rgba(59, 130, 246, 0.12), 0 0 1px rgba(255, 255, 255, 0.2);
       --glow-blue: 0 0 15px rgba(59, 130, 246, 0.35);
       --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.35);
     }
@@ -91,7 +92,7 @@
     }
 
     body {
-      font-family: 'Pretendard', sans-serif;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
       color: var(--text-main);
       background: var(--bg-dark);
       background-image:
@@ -102,33 +103,49 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Main Container to give generous room from footer */
+    .login-wrapper {
+      flex: 1;
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 60px 20px 80px 20px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      padding: 40px 20px;
     }
 
     .brand-section {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 36px;
       max-width: 600px;
     }
 
     .brand-logo {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 800;
       color: #ffffff;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      transition: opacity 0.2s ease;
+    }
+
+    .brand-logo:hover {
+      opacity: 0.9;
     }
 
     .brand-logo::before {
       content: "";
       width: 8px;
       height: 24px;
-      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       border-radius: 999px;
       display: inline-block;
     }
@@ -139,6 +156,7 @@
       margin-bottom: 10px;
       background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       letter-spacing: -0.02em;
     }
@@ -146,50 +164,62 @@
     .brand-section p {
       font-size: 0.95rem;
       color: var(--text-desc);
+      line-height: 1.6;
     }
 
     /* Search Bar */
     .search-container {
       width: 100%;
       max-width: 900px;
-      margin-bottom: 30px;
+      margin-bottom: 36px;
     }
 
     .search-input {
       width: 100%;
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(26, 29, 36, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 14px 20px;
+      border-radius: 14px;
+      padding: 15px 24px;
       color: #ffffff;
       font-size: 0.95rem;
       outline: none;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       text-align: center;
     }
 
     .search-input:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.25);
+      background: rgba(26, 29, 36, 0.95);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-desc);
     }
 
     /* Cards Grid */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 30px;
+      gap: 28px;
       width: 100%;
       max-width: 900px;
+      margin-bottom: 60px;
     }
 
     .profile-card {
-      background: var(--bg-card);
+      width: 100%;
+      background: rgba(26, 29, 36, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border-color);
       border-radius: var(--card-radius);
-      padding: 30px 24px;
+      padding: 28px 20px;
       text-align: center;
+      color: inherit;
+      font: inherit;
       cursor: pointer;
       position: relative;
       overflow: hidden;
@@ -202,8 +232,14 @@
 
     .profile-card:hover {
       transform: translateY(-6px);
-      box-shadow: var(--shadow-md);
-      border-color: rgba(6, 182, 212, 0.4);
+      background: rgba(32, 36, 46, 0.95);
+      box-shadow: var(--shadow-md), 0 0 20px rgba(6, 182, 212, 0.2);
+      border-color: rgba(6, 182, 212, 0.45);
+    }
+
+    .profile-card:focus-visible {
+      outline: 3px solid var(--secondary-color);
+      outline-offset: 4px;
     }
 
     /* Scanning animation overlay */
@@ -242,66 +278,115 @@
       width: 80px;
       height: 80px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-color);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 2.5rem;
-      margin-bottom: 20px;
-      box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.05);
+      margin-bottom: 16px;
+      box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.05);
       transition: all 0.3s;
     }
 
     .profile-card:hover .avatar-wrapper {
       border-color: var(--secondary-color);
-      box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
       transform: scale(1.05);
     }
 
+    /* Team Badges */
     .track-badge {
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       font-weight: 700;
       color: var(--secondary-color);
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 30px;
-      background: rgba(6, 182, 212, 0.1);
-      border: 1px solid rgba(6, 182, 212, 0.2);
-      margin-bottom: 12px;
-      letter-spacing: 0.05em;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      margin-bottom: 14px;
+      letter-spacing: 0.03em;
     }
 
-    .track-badge.mobility {
-      color: var(--accent-purple);
-      background: rgba(139, 92, 246, 0.1);
-      border-color: rgba(139, 92, 246, 0.2);
-    }
-
-    .track-badge.robotics {
-      color: #ff9f43;
-      background: rgba(255, 159, 67, 0.1);
-      border-color: rgba(255, 159, 67, 0.2);
-    }
+    .track-badge.team-1 { color: #22d3ee; background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.3); }
+    .track-badge.team-2 { color: #60a5fa; background: rgba(59, 130, 246, 0.12); border-color: rgba(59, 130, 246, 0.3); }
+    .track-badge.team-3 { color: #c084fc; background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.3); }
+    .track-badge.team-4 { color: #fbbf24; background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.3); }
+    .track-badge.team-5 { color: #34d399; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); }
 
     .founder-name {
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: #ffffff;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
     }
 
-    .startup-name {
-      font-size: 0.85rem;
+    /* Enhanced Student ID Badge */
+    .student-id-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      margin-top: 4px;
+      margin-bottom: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .student-id-badge .id-label {
+      color: #93c5fd;
+      font-weight: 700;
+      font-size: 0.74rem;
+      padding: 2px 6px;
+      background: rgba(59, 130, 246, 0.25);
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .student-id-badge .id-value {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.92rem;
+      letter-spacing: 0.05em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .profile-card:hover .student-id-badge {
+      background: rgba(6, 182, 212, 0.16);
+      border-color: rgba(6, 182, 212, 0.45);
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.25);
+    }
+
+    .profile-card:hover .student-id-badge .id-label {
+      background: rgba(6, 182, 212, 0.3);
+      color: #22d3ee;
+    }
+
+    /* Login Action Hint */
+    .login-action-hint {
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-desc);
-      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
     }
 
-    .email-label {
-      font-size: 0.75rem;
-      color: var(--text-desc);
-      word-break: break-all;
+    .login-action-hint .arrow-icon {
+      transition: transform 0.2s ease;
+      display: inline-block;
+    }
+
+    .profile-card:hover .login-action-hint {
+      color: var(--secondary-color);
+    }
+
+    .profile-card:hover .login-action-hint .arrow-icon {
+      transform: translateX(4px);
     }
 
     /* Auth Verification Overlay */
@@ -397,26 +482,44 @@
       border-color: rgba(255, 255, 255, 0.2);
       color: #ffffff;
     }
+
+    /* Site Footer */
+    .site-footer {
+      margin-top: auto;
+      width: 100%;
+      background: #09090b;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 36px 20px;
+      text-align: center;
+      color: #a1a1aa;
+      font-size: 0.82rem;
+      line-height: 1.8;
+      position: relative;
+      z-index: 10;
+    }
   </style>
 </head>
 
 <body>
-  <!-- Brand Header -->
-  <div class="brand-section">
-    <a href="../index.html" class="brand-logo">대구 SW 랜딩</a>
-    <h1>Verify Your Identity</h1>
-    <p>보유하신 참가자 프로필 카드를 클릭하여 안전하게 워크스페이스에 로그인해 주세요.</p>
-  </div>
+  <!-- Main Wrapper -->
+  <main class="login-wrapper">
+    <!-- Brand Header -->
+    <div class="brand-section">
+      <a href="../index.html" class="brand-logo">대구 SW 랜딩</a>
+      <h1>학생 로그인</h1>
+      <p>본인의 학생 프로필 카드를 선택해 학습 공간에 로그인해 주세요.</p>
+    </div>
 
-  <!-- Search Panel -->
-  <div class="search-container">
-    <input type="text" class="search-input" id="searchBar" placeholder="이름 또는 스타트업명으로 검색하세요..." />
-  </div>
+    <!-- Search Panel -->
+    <div class="search-container">
+      <input type="text" class="search-input" id="searchBar" placeholder="이름, 학생 ID 또는 소속팀으로 검색하세요..." />
+    </div>
 
-  <!-- Cards Grid Container -->
-  <div class="cards-grid" id="cardsGrid">
-    <!-- Generated dynamically -->
-  </div>
+    <!-- Cards Grid Container -->
+    <div class="cards-grid" id="cardsGrid">
+      <!-- Generated dynamically -->
+    </div>
+  </main>
 
   <!-- Dynamic Authentication Screen -->
   <div class="auth-overlay" id="authOverlay">
@@ -428,271 +531,8 @@
     <button class="cancel-btn" onclick="cancelAuth()">인증 취소</button>
   </div>
 
-  <script>
-    // Startup founder cards database
-    const founders = [
-      {
-        id: 1,
-        name: "김민준",
-        startup: "TechSync AI",
-        track: "web",
-        trackName: "AI & Web Software",
-        avatar: "👨🏻‍💻",
-        email: "minjun.kim@techsync.ai"
-      },
-      {
-        id: 2,
-        name: "이서연",
-        startup: "DataMind Systems",
-        track: "mobility",
-        trackName: "Mobility & AI IoT",
-        avatar: "👩🏻‍💼",
-        email: "seoyeon.lee@datamind.io"
-      },
-      {
-        id: 3,
-        name: "박도현",
-        startup: "PayNext Solutions",
-        track: "web",
-        trackName: "AI & Web Software",
-        avatar: "👨🏻‍🔬",
-        email: "dohyun.park@paynext.kr"
-      },
-      {
-        id: 4,
-        name: "최지우",
-        startup: "SmartEdu AI",
-        track: "robotics",
-        trackName: "Robotics & ROS",
-        avatar: "👩🏻‍🏫",
-        email: "jiu.choi@smartedu.ai"
-      },
-      {
-        id: 5,
-        name: "정현우",
-        startup: "LogiRoute AI",
-        track: "mobility",
-        trackName: "Mobility & AI IoT",
-        avatar: "👨🏻‍💻",
-        email: "hyunwoo.jung@logiroute.com"
-      },
-      {
-        id: 6,
-        name: "강예은",
-        startup: "NextBot AI",
-        track: "robotics",
-        trackName: "Robotics & ROS",
-        avatar: "👩🏻‍🔧",
-        email: "yeeun.kang@nextbot.kr"
-      },
-      {
-        id: 7,
-        name: "윤성민",
-        startup: "Genius AI",
-        track: "web",
-        trackName: "AI & Web Software",
-        avatar: "👨🏻‍💼",
-        email: "sungmin.yoon@geniusai.kr"
-      },
-      {
-        id: 8,
-        name: "조은서",
-        startup: "CloudPulse",
-        track: "mobility",
-        trackName: "Mobility & AI IoT",
-        avatar: "👩🏻‍💻",
-        email: "eunseo.cho@cloudpulse.io"
-      },
-      {
-        id: 9,
-        name: "한지호",
-        startup: "EcoGrid Energy",
-        track: "robotics",
-        trackName: "Robotics & ROS",
-        avatar: "👨🏻‍💻",
-        email: "jiho.han@ecogrid.kr"
-      },
-      {
-        id: 10,
-        name: "오유진",
-        startup: "VisionTech AI",
-        track: "web",
-        trackName: "AI & Web Software",
-        avatar: "👩🏻‍💻",
-        email: "yujin.oh@visiontech.kr"
-      },
-      {
-        id: 11,
-        name: "송태양",
-        startup: "MedVitals Health",
-        track: "mobility",
-        trackName: "Mobility & AI IoT",
-        avatar: "👨🏻‍⚕️",
-        email: "taeyang.song@medvitals.ai"
-      },
-      {
-        id: 12,
-        name: "배서현",
-        startup: "SafeNet AI",
-        track: "robotics",
-        trackName: "Robotics & ROS",
-        avatar: "👩🏻‍💼",
-        email: "seohyun.bae@safenet.kr"
-      },
-      {
-        id: 13,
-        name: "임재원",
-        startup: "MediaWave AI",
-        track: "web",
-        trackName: "AI & Web Software",
-        avatar: "👨🏻‍💻",
-        email: "jaewon.lim@mediawave.io"
-      },
-      {
-        id: 14,
-        name: "류다인",
-        startup: "AutoFleet AI",
-        track: "mobility",
-        trackName: "Mobility & AI IoT",
-        avatar: "👩🏻‍🎓",
-        email: "dain.ryu@autofleet.kr"
-      },
-      {
-        id: 15,
-        name: "권혁진",
-        startup: "RoboSort Systems",
-        track: "robotics",
-        trackName: "Robotics & ROS",
-        avatar: "👨🏻‍💻",
-        email: "hyukjin.kwon@robosort.com"
-      },
-      {
-        id: 16,
-        name: "서수빈",
-        startup: "SmartWave AI",
-        track: "web",
-        trackName: "AI & Web Software",
-        avatar: "👩🏻‍💻",
-        email: "subin.seo@smartwave.ai"
-      }
-    ];
-
-    const cardsGrid = document.getElementById('cardsGrid');
-    const searchBar = document.getElementById('searchBar');
-    const authOverlay = document.getElementById('authOverlay');
-    const authTitle = document.getElementById('authTitle');
-    const authStatus = document.getElementById('authStatus');
-
-    let cancelTimer1, cancelTimer2, cancelTimer3;
-
-    // Render profile cards
-    function renderCards(filterQuery = '') {
-      cardsGrid.innerHTML = '';
-      
-      const query = filterQuery.toLowerCase();
-      const filtered = founders.filter(f => 
-        f.name.toLowerCase().includes(query) || 
-        f.startup.toLowerCase().includes(query) ||
-        f.trackName.toLowerCase().includes(query)
-      );
-
-      if (filtered.length === 0) {
-        cardsGrid.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 60px 0; color: var(--text-desc);">
-            <h4>일치하는 참가자 프로필이 없습니다.</h4>
-          </div>
-        `;
-        return;
-      }
-
-      filtered.forEach(f => {
-        const card = document.createElement('div');
-        card.className = 'profile-card';
-        card.onclick = () => startAuth(f);
-
-        // Customize class for badges
-        let badgeClass = '';
-        if (f.track === 'mobility') badgeClass = 'mobility';
-        if (f.track === 'robotics') badgeClass = 'robotics';
-
-        card.innerHTML = `
-          <div class="scan-line"></div>
-          <span class="track-badge ${badgeClass}">${f.trackName}</span>
-          <div class="avatar-wrapper">
-            <span>${f.avatar}</span>
-          </div>
-          <h4 class="founder-name">${f.name}</h4>
-          <span class="startup-name">${f.startup}</span>
-          <span class="email-label">${f.email}</span>
-        `;
-        cardsGrid.appendChild(card);
-      });
-    }
-
-    // Dynamic verification simulation flow
-    function startAuth(founder) {
-      authOverlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-
-      authTitle.textContent = `Establishing Secure Connection...`;
-      authStatus.textContent = `Node: secure.bootcamp.kr`;
-
-      // Step 1: scan credentials
-      cancelTimer1 = setTimeout(() => {
-        authTitle.textContent = `Analyzing Credentials...`;
-        authStatus.textContent = `User: ${founder.name} | ${founder.startup}`;
-      }, 700);
-
-      // Step 2: access granted
-      cancelTimer2 = setTimeout(() => {
-        authTitle.textContent = `Access Granted!`;
-        authStatus.textContent = `Welcome back, ${founder.name}. Redirecting...`;
-        
-        const userData = JSON.stringify({
-          name: founder.name,
-          email: founder.email,
-          avatar: founder.avatar,
-          startup: founder.startup,
-          track: founder.track
-        });
-        
-        // Set cookie (10 hours)
-        const expiryHours = 10;
-        const d = new Date();
-        d.setTime(d.getTime() + (expiryHours * 60 * 60 * 1000));
-        document.cookie = "currentUser=" + encodeURIComponent(userData) + "; expires=" + d.toUTCString() + "; path=/";
-
-        // Set localStorage session backup (for local file:// compatibility)
-        localStorage.setItem('currentUserSession', JSON.stringify({
-          value: userData,
-          expiresAt: Date.now() + (expiryHours * 60 * 60 * 1000)
-        }));
-      }, 1500);
-
-      // Step 3: redirect
-      cancelTimer3 = setTimeout(() => {
-        window.location.href = '../index.html';
-      }, 2300);
-    }
-
-    // Cancel dynamic login flow
-    function cancelAuth() {
-      clearTimeout(cancelTimer1);
-      clearTimeout(cancelTimer2);
-      clearTimeout(cancelTimer3);
-      authOverlay.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-
-    // Input search binding
-    searchBar.addEventListener('input', (e) => {
-      renderCards(e.target.value);
-    });
-
-    // Initial load
-    renderCards();
-  </script>
-  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+  <script src="login.js?v=20260930-student-id"></script>
+  <footer class="site-footer">
     <div style="max-width: 1200px; margin: 0 auto;">
       <div style="margin-bottom: 6px; word-break: keep-all;">
         <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
