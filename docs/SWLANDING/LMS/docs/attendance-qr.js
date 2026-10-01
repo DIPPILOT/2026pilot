@@ -1,13 +1,12 @@
 (function () {
   "use strict";
-  // QR코드관리!B8:H17 snapshot, 2026-09-30. All ten rows share this URL.
+  // QR코드관리!B8:H11 snapshot, 2026-10-01. All four rows share this URL.
   const checkInUrl = "https://script.google.com/macros/s/AKfycbwQMnJ5neDDl2_ttRaLTP1EMZOgsaHxMKm6-E01teHuwoSargeG5KAYqgyHHtuZJJYs/exec";
   const dates = [
-    ["2026-09-29","2026-09-30"], ["2026-10-05","2026-10-06"],
-    ["2026-10-12","2026-10-13"], ["2026-10-19","2026-10-20"],
-    ["2026-10-26","2026-10-27"], ["2026-11-02","2026-11-03"],
-    ["2026-11-09","2026-11-10"], ["2026-11-16","2026-11-17"],
-    ["2026-11-23","2026-11-24"], ["2026-11-30","2026-12-01"]
+    ["2026-10-23", "2026-10-24"],
+    ["2026-10-30", "2026-10-31"],
+    ["2026-11-06", "2026-11-07"],
+    ["2026-11-13", "2026-11-14"]
   ];
   const today = new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
   const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=" + encodeURIComponent(checkInUrl);
