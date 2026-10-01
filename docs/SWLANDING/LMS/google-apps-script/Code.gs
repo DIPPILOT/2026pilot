@@ -25,6 +25,7 @@ function doGet(e) {
 function doPost(e) {
   var action = String((e && e.parameter && e.parameter.action) || "login");
   if (action === "homeworkClick") return handleHomeworkClick_(e);
+  if (action === "preLearningClick") return handlePreLearningClick_(e);
   return handleLogin_(e);
 }
 

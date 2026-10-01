@@ -2424,9 +2424,7 @@ Domain 간 선후 관계, 의존성, 데이터 소유권을 시각화하고 Boun
       if (stepParam !== null) {
         const targetCard = document.querySelector(`.step-card[data-step="${stepParam}"]`);
         if (targetCard) {
-          setTimeout(() => {
-            targetCard.click();
-          }, 300);
+          targetCard.click();
         }
       }
     });
@@ -2445,5 +2443,6 @@ Domain 간 선후 관계, 의존성, 데이터 소유권을 시각화하고 Boun
       </div>
     </div>
   </footer>
+  <script src="../shared/pre-learning-log.js"></script>
 </body>
 </html>
