@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>설문·클래스룸·커뮤니티 QR 코드 | 대구 SW 랜딩</title>
+  <title>역량조사·설문·클래스룸·커뮤니티 QR 코드 | 대구 SW 랜딩</title>
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -17,6 +17,7 @@
       --purple: #8b5cf6;
       --amber: #f59e0b;
       --green: #10b981;
+      --rose: #f43f5e;
       --bg-dark: #09090b;
       --bg-surface: #131720;
       --bg-card: rgba(26, 29, 36, 0.85);
@@ -251,6 +252,18 @@
       font-weight: 700;
       letter-spacing: 0.03em;
       margin-bottom: 14px;
+    }
+
+    .badge-pre-survey {
+      background: rgba(6, 182, 212, 0.15);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.35);
+    }
+
+    .badge-post-survey {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.35);
     }
 
     .badge-survey-1 {
@@ -605,9 +618,9 @@
       <div class="eyebrow">
         <i class="fa-solid fa-bolt"></i> STUDENT RESOURCES · INSTANT ACCESS
       </div>
-      <h1 class="hero-title">설문·클래스룸·커뮤니티 <span>QR 코드 안내</span></h1>
+      <h1 class="hero-title">역량조사·설문·클래스룸·커뮤니티 <span>QR 코드 안내</span></h1>
       <p class="hero-desc">
-        대구 SW 랜딩 교육 참여에 필요한 주요 설문 및 온라인 학습 커뮤니티 QR 코드 모음입니다.<br>
+        대구 SW 랜딩 교육 참여에 필요한 AI 활용 역량 진단, 과정 설문 및 온라인 학습 커뮤니티 QR 코드 모음입니다.<br>
         스마트폰 카메라로 원하는 QR 코드를 비추어 즉시 스캔하거나, 각 카드의 버튼을 클릭하여 바로 이동하실 수 있습니다.
       </p>
 
@@ -624,9 +637,87 @@
       </div>
     </section>
 
-    <!-- 4 QR Resource Cards Grid -->
+    <!-- QR Resource Cards Grid -->
     <section class="qr-grid">
-      <!-- 1. 학습성향 분석 설문지 -->
+      <!-- 1. AI 활용 역량 사전 조사 -->
+      <article class="qr-box-card">
+        <div class="qr-card-top">
+          <span class="qr-badge badge-pre-survey">
+            <i class="fa-solid fa-chart-line"></i> 사전 역량 진단
+          </span>
+          <h2 class="qr-box-title">AI 활용 역량 사전 조사</h2>
+          <p class="qr-box-desc">
+            교육 시작 전 수강생의 AI 도구 활용 경험과 SW 개발 역량 수준을 진단하여, 최적의 맞춤형 실무 학습 가이드를 제공하기 위한 사전 조사입니다.
+          </p>
+        </div>
+
+        <div class="qr-card-body">
+          <div class="qr-image-wrapper"
+            onclick="openQrModal('img/qr/ai-competency-pre-survey.png', 'AI 활용 역량 사전 조사', '휴대폰 기본 카메라 앱을 열고 아래 QR 코드를 비추면 설문 페이지로 자동 이동합니다.', 'https://docs.google.com/forms/d/e/1FAIpQLSeBbYnPt7QwFZxRtQoVaVFv-40-VfA9gQIZuGeRE9gybY9CAQ/viewform?usp=header')">
+            <img src="img/qr/ai-competency-pre-survey.png" alt="AI 활용 역량 사전 조사 QR 코드" width="1000" height="1000" />
+            <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+          </div>
+          <div class="qr-info-right">
+            <div class="scan-tip-title">
+              <i class="fa-solid fa-mobile-screen"></i> 카메라로 스캔
+            </div>
+            <p class="scan-tip-text">
+              스마트폰 카메라로 QR 코드를 비추면 Google 설문지 화면으로 즉시 연결됩니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="qr-card-actions">
+          <button class="btn-action primary"
+            onclick="openQrModal('img/qr/ai-competency-pre-survey.png', 'AI 활용 역량 사전 조사', '스마트폰 카메라로 스캔하거나 아래 링크를 통해 바로 응답하실 수 있습니다.', 'https://docs.google.com/forms/d/e/1FAIpQLSeBbYnPt7QwFZxRtQoVaVFv-40-VfA9gQIZuGeRE9gybY9CAQ/viewform?usp=header')">
+            <i class="fa-solid fa-expand"></i> QR 크게 보기
+          </button>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSeBbYnPt7QwFZxRtQoVaVFv-40-VfA9gQIZuGeRE9gybY9CAQ/viewform?usp=header" target="_blank" rel="noopener noreferrer" class="btn-action secondary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> 새 창에서 보기
+          </a>
+        </div>
+      </article>
+
+      <!-- 2. AI 활용 역량 사후 조사 -->
+      <article class="qr-box-card">
+        <div class="qr-card-top">
+          <span class="qr-badge badge-post-survey">
+            <i class="fa-solid fa-award"></i> 사후 역량 평가
+          </span>
+          <h2 class="qr-box-title">AI 활용 역량 사후 조사</h2>
+          <p class="qr-box-desc">
+            교육 수료 후 AI 도구 활용 능력 향상도 및 문제 해결력, 프로젝트 완성도를 종합 점검하기 위한 사후 역량 조사입니다.
+          </p>
+        </div>
+
+        <div class="qr-card-body">
+          <div class="qr-image-wrapper"
+            onclick="openQrModal('img/qr/ai-competency-post-survey.png', 'AI 활용 역량 사후 조사', '휴대폰 기본 카메라 앱을 열고 아래 QR 코드를 비추면 설문 페이지로 자동 이동합니다.', 'https://docs.google.com/forms/d/e/1FAIpQLSdJ0quslSzp6tcVJzUh3kyHUY5yl9PVSx4lNgaQ4ws6uwuQ5Q/viewform?usp=header')">
+            <img src="img/qr/ai-competency-post-survey.png" alt="AI 활용 역량 사후 조사 QR 코드" width="1000" height="1000" />
+            <span class="zoom-hint"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+          </div>
+          <div class="qr-info-right">
+            <div class="scan-tip-title">
+              <i class="fa-solid fa-mobile-screen"></i> 카메라로 스캔
+            </div>
+            <p class="scan-tip-text">
+              스마트폰 카메라로 QR 코드를 비추면 Google 설문지 화면으로 즉시 연결됩니다.
+            </p>
+          </div>
+        </div>
+
+        <div class="qr-card-actions">
+          <button class="btn-action primary"
+            onclick="openQrModal('img/qr/ai-competency-post-survey.png', 'AI 활용 역량 사후 조사', '스마트폰 카메라로 스캔하거나 아래 링크를 통해 바로 응답하실 수 있습니다.', 'https://docs.google.com/forms/d/e/1FAIpQLSdJ0quslSzp6tcVJzUh3kyHUY5yl9PVSx4lNgaQ4ws6uwuQ5Q/viewform?usp=header')">
+            <i class="fa-solid fa-expand"></i> QR 크게 보기
+          </button>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSdJ0quslSzp6tcVJzUh3kyHUY5yl9PVSx4lNgaQ4ws6uwuQ5Q/viewform?usp=header" target="_blank" rel="noopener noreferrer" class="btn-action secondary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> 새 창에서 보기
+          </a>
+        </div>
+      </article>
+
+      <!-- 3. 학습성향 분석 설문지 -->
       <article class="qr-box-card">
         <div class="qr-card-top">
           <span class="qr-badge badge-survey-1">
@@ -665,7 +756,7 @@
         </div>
       </article>
 
-      <!-- 2. 2026 SW 랜딩 만족도 조사 -->
+      <!-- 4. 2026 SW 랜딩 만족도 조사 -->
       <article class="qr-box-card">
         <div class="qr-card-top">
           <span class="qr-badge badge-survey-2">
@@ -704,7 +795,7 @@
         </div>
       </article>
 
-      <!-- 3. Google Classroom 학생 초대 -->
+      <!-- 5. Google Classroom 학생 초대 -->
       <article class="qr-box-card">
         <div class="qr-card-top">
           <span class="qr-badge badge-classroom">
@@ -743,7 +834,7 @@
         </div>
       </article>
 
-      <!-- 4. Discord 커뮤니티 초대 -->
+      <!-- 6. Discord 커뮤니티 초대 -->
       <article class="qr-box-card">
         <div class="qr-card-top">
           <span class="qr-badge badge-discord">
