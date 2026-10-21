@@ -4,17 +4,29 @@
   var APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4kGWSG4D41ZpElazYgGKkY4V7AbnkBRir8uKRhYNGneAM6xxJKxpJJPdbU2GfDtwz/exec";
   var SESSION_HOURS = 10;
   var students = [
-    { studentId: "STU001", name: "김민수", team: "1팀", avatar: "👨🏻‍💻" },
-    { studentId: "STU002", name: "이서연", team: "1팀", avatar: "👩🏻‍💻" },
-    { studentId: "STU003", name: "박도현", team: "2팀", avatar: "👨🏻‍🔬" },
-    { studentId: "STU004", name: "정예은", team: "2팀", avatar: "👩🏻‍🔬" },
-    { studentId: "STU005", name: "최지훈", team: "3팀", avatar: "👨🏻‍🎓" },
-    { studentId: "STU006", name: "강하늘", team: "3팀", avatar: "👩🏻‍🎓" },
-    { studentId: "STU007", name: "윤서준", team: "4팀", avatar: "🧑🏻‍💻" },
-    { studentId: "STU008", name: "한지우", team: "4팀", avatar: "👩🏻‍💻" },
-    { studentId: "STU009", name: "임재원", team: "5팀", avatar: "👨🏻‍💻" },
-    { studentId: "STU010", name: "송채원", team: "5팀", avatar: "👩🏻‍🎓" },
-    { studentId: "STU011", name: "이호준", team: "5팀", avatar: "👨🏻‍🔬" }
+    { studentId: "STU001", name: "이윤지", team: "팀미정", avatar: "👩🏻‍💻" },
+    { studentId: "STU002", name: "최윤", team: "팀미정", avatar: "👨🏻‍💻" },
+    { studentId: "STU003", name: "이지민", team: "팀미정", avatar: "👩🏻‍🔬" },
+    { studentId: "STU004", name: "하정무", team: "팀미정", avatar: "👨🏻‍🔬" },
+    { studentId: "STU005", name: "서상호", team: "팀미정", avatar: "👨🏻‍🎓" },
+    { studentId: "STU006", name: "강모세", team: "팀미정", avatar: "🧑🏻‍💻" },
+    { studentId: "STU007", name: "장예린", team: "팀미정", avatar: "👩🏻‍💻" },
+    { studentId: "STU008", name: "권태주", team: "팀미정", avatar: "👨🏻‍💻" },
+    { studentId: "STU009", name: "이진녕", team: "팀미정", avatar: "🧑🏻‍🔬" },
+    { studentId: "STU010", name: "석지윤", team: "팀미정", avatar: "👩🏻‍🎓" },
+    { studentId: "STU011", name: "허동후", team: "팀미정", avatar: "👨🏻‍🎓" },
+    { studentId: "STU012", name: "손영준", team: "팀미정", avatar: "👨🏻‍💻" },
+    { studentId: "STU013", name: "김예원", team: "팀미정", avatar: "👩🏻‍💻" },
+    { studentId: "STU014", name: "김예찬", team: "팀미정", avatar: "🧑🏻‍💻" },
+    { studentId: "STU015", name: "김고원", team: "팀미정", avatar: "👨🏻‍🔬" },
+    { studentId: "STU016", name: "최영찬", team: "팀미정", avatar: "👨🏻‍💻" },
+    { studentId: "STU017", name: "김나연", team: "팀미정", avatar: "👩🏻‍🔬" },
+    { studentId: "STU018", name: "이루다", team: "팀미정", avatar: "👩🏻‍💻" },
+    { studentId: "STU019", name: "정리나", team: "팀미정", avatar: "👩🏻‍🎓" },
+    { studentId: "STU020", name: "유승혁", team: "팀미정", avatar: "👨🏻‍💻" },
+    { studentId: "STU021", name: "류승지", team: "팀미정", avatar: "🧑🏻‍💻" },
+    { studentId: "STU022", name: "김지훈", team: "팀미정", avatar: "👨🏻‍🔬" },
+    { studentId: "STU023", name: "은대영", team: "팀미정", avatar: "👨🏻‍🎓" }
   ];
   var isAuthenticating = false;
   var activeRequestController = null;
@@ -74,8 +86,8 @@
 
     var teamNum = (student.team || "").replace(/[^0-9]/g, "");
     var teamBadge = document.createElement("span");
-    teamBadge.className = "track-badge" + (teamNum ? " team-" + teamNum : "");
-    teamBadge.textContent = student.team || "소속팀 미지정";
+    teamBadge.className = "track-badge" + (teamNum ? " team-" + teamNum : " team-none");
+    teamBadge.textContent = student.team || "팀미정";
 
     var avatarWrapper = document.createElement("span");
     avatarWrapper.className = "avatar-wrapper";
@@ -178,11 +190,18 @@
     authStatus.textContent = student.name + " · " + student.studentId;
 
     try {
-      var verifiedStudent = await requestLogin(student);
+      var verifiedStudent = null;
+      try {
+        verifiedStudent = await requestLogin(student);
+      } catch (reqError) {
+        console.warn("서버 로그인 기록 실패 또는 미등록 ID (로컬 세션으로 진행):", reqError);
+        verifiedStudent = student;
+      }
+
       var sessionStudent = {
-        studentId: String(verifiedStudent.studentId),
-        name: String(verifiedStudent.name),
-        team: String(verifiedStudent.team || ""),
+        studentId: String((verifiedStudent && verifiedStudent.studentId) || student.studentId),
+        name: String((verifiedStudent && verifiedStudent.name) || student.name),
+        team: String((verifiedStudent && verifiedStudent.team) || student.team || ""),
         avatar: student.avatar
       };
       saveUserSession(sessionStudent);
