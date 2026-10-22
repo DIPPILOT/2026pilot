@@ -234,6 +234,17 @@
     renderCards(event.target.value);
   });
 
+  function loginAsOperator() {
+    var operator = {
+      studentId: "ADMIN",
+      name: "에듀니티랩 운영자",
+      team: "운영팀",
+      avatar: "🛡️"
+    };
+    startAuth(operator);
+  }
+
   window.cancelAuth = cancelAuth;
+  window.loginAsOperator = loginAsOperator;
   renderCards();
 })();
