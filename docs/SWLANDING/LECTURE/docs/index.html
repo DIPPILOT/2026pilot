@@ -2722,218 +2722,297 @@ header {
 <!-- Slide 1: [간지] SESSION 01 -->
 <section class="slide-card divider-slide active session-1 session-1" id="slide-1">
   <div class="slide-header" style="display: none;">
-    <div class="slide-category">1일차 | 1차시. Codex Client 개요 및 Workspace 이해</div>
-    <div class="slide-title">[세션 오프닝] 1차시. Codex Client 개요 및 Workspace 이해</div>
+    <div class="slide-category">1일차 | Codex 요구사항 명세 &amp; Figma 화면 설계</div>
+    <div class="slide-title">[세션 오프닝] 1일차. Codex 요구사항 명세 &amp; Figma 화면 설계</div>
   </div>
 
   <div class="divider-content">
     <div class="divider-day">DAY 1</div>
     <div class="divider-tag">SESSION 01</div>
-    <h1 class="divider-title">Codex Client 개요 및 Workspace 이해</h1>
-    <p class="divider-subtitle">Workspace 프로젝트 콘텍스트 이해, 회의록 전처리 및 요약 객체 분류</p>
+    <h1 class="divider-title">Codex 요구사항 명세 &amp; Figma 화면 설계</h1>
+    <p class="divider-subtitle">Figma 기초를 익히고 Codex Client를 활용해 요구사항 명세 및 보고 체계를 자동화하는 융합 실습</p>
     <div class="divider-topics">
-      <div class="topic-badge"><span>01</span> ChatGPT vs Codex Client 차이</div>
-      <div class="topic-badge"><span>02</span> Workspace 프로젝트 개념</div>
-      <div class="topic-badge"><span>03</span> 회의 대화록 요약 전처리</div>
+      <div class="topic-badge"><span>01</span> Codex AI 기획 가이드 &amp; Figma 인터페이스</div>
+      <div class="topic-badge"><span>02</span> 핵심 화면 와이어프레임 &amp; 단계별 FR 명세화</div>
+      <div class="topic-badge"><span>03</span> Gmail 플러그인 보고 발송 &amp; 기획 검수</div>
     </div>
   </div>
 
   <div class="slide-body" style="display: none;">
-    <p>1차시. Codex Client 개요 및 Workspace 이해 세션 시작</p>
-    <p>Workspace 프로젝트 콘텍스트 이해, 회의록 전처리 및 요약 객체 분류</p>
+    <p>1일차. Codex 요구사항 명세 &amp; Figma 화면 설계 세션 시작</p>
+    <p>Figma 기초 화면 설계와 Codex Client를 통한 기획 자동화 파이프라인</p>
   </div>
-  <div class="presenter-notes" style="display:none;">1차시에서는 생성형 AI와 Codex Client가 어떻게 다른지 개념적으로 완벽히 정리하고, 에이전트의 내부 구조가 어떻게 돌아가는지 핵심 작동 원리를 파악해 보겠습니다.</div>
+  <div class="presenter-notes" style="display:none;">1일차 세션에서는 비정형화된 회의록 원본에서 시작하여 Codex Client를 통한 기능 명세(FR), 정상 및 예외 흐름 정의, Gmail 연동 발송을 진행하고, 동시에 Figma 화면 와이어프레임 설계 기초를 이해하는 융합 실습을 진행합니다.</div>
 </section>
 
-<!-- Slide 2: 사전 설문조사 (Pre-Course Survey) -->
+<!-- Slide 2: 1주차 출석 체크인 (출석부 QR 코드) -->
 <section class="slide-card session-1 session-1" id="slide-2">
   <div class="slide-header">
     <div>
-      <div class="slide-category">사전 설문조사 | Pre-Course Survey</div>
-      <div class="slide-title">교육 사전 설문조사 안내</div>
+      <div class="slide-category">출결 관리 | Attendance Check-in</div>
+      <div class="slide-title">1주차 출석 체크인 안내</div>
     </div>
     <div class="slide-meta">
-      <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span class="day-badge" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff;">1주차 출석</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
 
   <div class="slide-body">
     <div class="split-layout">
       <div>
-        <ul class="bullet-list">
-          <li><span class="highlight">설문 목적:</span> 교육 수강생의 AI 및 SW 개발 사전 경험, 학습 기대사항 파악</li>
-          <li><span class="highlight">참여 방법:</span> 우측 QR 코드를 스마트폰 카메라로 스캔하거나 아래 링크로 접속해 주세요.</li>
-          <li><span class="highlight">설문 링크:</span> <a href="https://forms.gle/M33mFEgMro7TPkbt6" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; word-break: break-all;">https://forms.gle/M33mFEgMro7TPkbt6</a></li>
-          <li><span class="highlight">유의 사항:</span> 본 설문 결과는 수강생 맞춤형 교육 진행 및 성과 분석을 위해서만 활용됩니다.</li>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3);">
+            🕒 실시간 출석 체크인
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(6, 182, 212, 0.15); color: #22d3ee; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(6, 182, 212, 0.3);">
+            📅 금~토 과정 (1주차)
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); color: #cbd5e1; font-size: 0.8rem; font-weight: 600; border: 1px solid rgba(255, 255, 255, 0.12);">
+            TK-20260928-W01
+          </span>
+        </div>
+
+        <ul class="bullet-list" style="margin-bottom: 18px;">
+          <li><span class="highlight">체크인 목적:</span> 1주차 정규 수업 출석 관리 (기준 시간 준수 여부에 따라 실시간 출석/지각 자동 판정)</li>
+          <li><span class="highlight">참여 방법:</span> 우측 QR 코드를 스마트폰 기본 카메라로 스캔하거나 아래 출석 링크로 직접 접속해 주세요.</li>
+          <li><span class="highlight">출석 링크:</span> <a href="https://script.google.com/macros/s/AKfycbwQMnJ5neDDl2_ttRaLTP1EMZOgsaHxMKm6-E01teHuwoSargeG5KAYqgyHHtuZJJYs/exec" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; word-break: break-all;">https://script.google.com/macros/s/AKfycbwQMnJ5neDDl2_ttRaLTP1EMZOgsaHxMKm6-E01teHuwoSargeG5KAYqgyHHtuZJJYs/exec</a></li>
         </ul>
+
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 14px 18px;">
+          <div style="font-weight: 700; color: #34d399; margin-bottom: 8px; font-size: 0.92rem;">⏰ 1주차 기준 시간 안내</div>
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.86rem; color: var(--text-secondary);">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 8px;">
+              <span><strong>1일차</strong> · 2026-10-23 (금)</span>
+              <span style="color: #6ee7b7; font-weight: 700;">18:00 기준</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 8px;">
+              <span><strong>2일차</strong> · 2026-10-24 (토)</span>
+              <span style="color: #6ee7b7; font-weight: 700;">09:00 기준</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); border-radius: 16px; padding: 24px; text-align: center;">
         <div style="background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: inline-block; margin-bottom: 16px;">
-          <img src="images/qr_pre_survey.png" alt="사전 설문조사 QR 코드" style="width: 220px; height: 220px; display: block; border-radius: 6px;" />
+          <img src="images/attendance_checkin_qr_w1.png" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=https%3A%2F%2Fscript.google.com%2Fmacros%2Fs%2FAKfycbwQMnJ5neDDl2_ttRaLTP1EMZOgsaHxMKm6-E01teHuwoSargeG5KAYqgyHHtuZJJYs%2Fexec'" alt="1주차 출석 QR 코드" style="width: 220px; height: 220px; display: block; border-radius: 6px;" />
         </div>
-        <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 6px;">📱 카메라로 QR 코드를 스캔하세요</div>
-        <div style="font-size: 0.95rem; color: var(--text-secondary);">사전 설문조사 (Google Forms)</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: #34d399; margin-bottom: 6px;">📱 카메라로 QR 코드를 스캔하세요</div>
+        <div style="font-size: 0.92rem; color: var(--text-secondary);">1주차 정규 출석 체크인 (Google Apps Script)</div>
       </div>
     </div>
 
-    <div class="presenter-notes" style="display:none;">수업 시작 전 사전 설문조사 진행 안내 슬라이드입니다. 수강생들의 AI 및 프로그래밍 경험 수준을 파악하기 위해 화면의 QR 코드를 스캔하여 사전 설문을 완료해 주시기 바랍니다.</div>
+    <div class="presenter-notes" style="display:none;">1주차 정규 수업 출석 체크인 슬라이드입니다. 수강생분들께서는 스마트폰 기본 카메라로 화면의 QR 코드를 비추어 출석 페이지에 접속한 뒤 출석 체크인을 완료해 주시기 바랍니다.</div>
   </div>
 </section>
 
-<!-- Slide 3: 사후 조사 및 만족도 조사 (Post-Course Survey) -->
+<!-- Slide 3: 과정 오프닝 & Day 1 커리큘럼 안내 -->
 <section class="slide-card session-1 session-1" id="slide-3">
   <div class="slide-header">
     <div>
-      <div class="slide-category">사후 설문조사 | Post-Course Survey</div>
-      <div class="slide-title">사후 조사 및 교육 만족도 조사 안내</div>
+      <div class="slide-category">1일차 | Codex 요구사항 명세 &amp; Figma 화면 설계</div>
+      <div class="slide-title">과정 오프닝 &amp; Day 1 커리큘럼 로드맵</div>
     </div>
     <div class="slide-meta">
       <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
-    </div>
-  </div>
-
-  <div class="slide-body">
-    <div class="split-layout">
-      <div>
-        <ul class="bullet-list">
-          <li><span class="highlight">설문 목적:</span> 교육 성과 측정, 과목별 만족도 수집 및 향후 커리큘럼 개선 반영</li>
-          <li><span class="highlight">참여 방법:</span> 우측 QR 코드를 스마트폰 카메라로 스캔하거나 아래 링크로 접속해 주세요.</li>
-          <li><span class="highlight">설문 링크:</span> <a href="https://forms.gle/7B8Ge3GexroPLQXeA" target="_blank" style="color: var(--accent-purple); text-decoration: underline; word-break: break-all;">https://forms.gle/7B8Ge3GexroPLQXeA</a></li>
-          <li><span class="highlight">유의 사항:</span> 교육 완료 후 만족도 조사를 작성해 주시면 향후 더 나은 프로그램 제공에 큰 도움이 됩니다.</li>
-        </ul>
-      </div>
-
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); border-radius: 16px; padding: 24px; text-align: center;">
-        <div style="background: #ffffff; padding: 12px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: inline-block; margin-bottom: 16px;">
-          <img src="images/qr_post_survey.png" alt="사후 조사 및 만족도 조사 QR 코드" style="width: 220px; height: 220px; display: block; border-radius: 6px;" />
-        </div>
-        <div style="font-size: 1.1rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 6px;">📱 카메라로 QR 코드를 스캔하세요</div>
-        <div style="font-size: 0.95rem; color: var(--text-secondary);">사후 조사 및 만족도 조사 (Google Forms)</div>
-      </div>
-    </div>
-
-    <div class="presenter-notes" style="display:none;">교육 사후 조사 및 만족도 조사 안내 슬라이드입니다. 수강생분들께서는 교육 후 제공된 QR 코드 또는 링크를 통해 교육 만족도와 의견을 작성해 주시기 바랍니다.</div>
-  </div>
-</section>
-
-<!-- Slide 2: 과정 오프닝 & 1차시 안내 -->
-<section class="slide-card session-1 session-1" id="slide-4">
-  <div class="slide-header">
-    <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">과정 오프닝 &amp; 1차시 안내</div>
-    </div>
-    <div class="slide-meta">
-      <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
 
   <div class="slide-body">
     <ul class="bullet-list">
-      <li><span class="highlight">과정명:</span> [ACE Startup SW/AI 파일럿 과정] Day 1. Codex Client 기반 요구사항 정의 교육 과정</li>
-      <li><span class="highlight">1차시 주제:</span> Codex Client 및 Workspace 이해 (AI 협업의 첫걸음)</li>
-      <li><span class="highlight">시간 계획 (총 180분):</span>
+      <li><span class="highlight">과정 개요:</span> [대구 DIP SW 랜딩] Day 1. Codex 요구사항 명세 &amp; Figma 화면 설계</li>
+      <li><span class="highlight">교육 대상:</span> 기획자, 개발 입문자, 예비 창업가 (준비물: 노트북, Codex Client, Figma 계정)</li>
+      <li><span class="highlight">주요 세션 구성 (총 6시간):</span>
         <ul>
-          <li>도입 (30분) - 수업 오프닝 및 생각 열기</li>
-          <li>실습 설명 (30분) - ChatGPT vs Codex Client 차이 및 Workspace 프로젝트 개념</li>
-          <li>실습 진행 (90분) - 회의록 전처리 및 요약 객체 분류 실습</li>
-          <li>공유 및 정리 (30분) - 실습 산출물 공유 및 피드백</li>
+          <li><strong>Session 1 (2시간):</strong> Codex AI 기획 가이드 및 Figma 기본 인터페이스 이해 (ChatGPT vs Codex 차이, 프레임 &amp; 오토레이아웃 기초)</li>
+          <li><strong>Session 2 (3시간):</strong> 핵심 화면 와이어프레임 제작 및 기능 요구사항(FR) 설계 (0~4단계 전처리, 표준 명세 테이블, 정상/예외 흐름)</li>
+          <li><strong>Session 3 (1시간):</strong> Gmail 플러그인 실제 발송 및 결과물 공유 (승인 요청 메일 연동, 4대 기획 검수 자가진단)</li>
         </ul>
       </li>
+      <li><span class="highlight">오늘의 핵심 산출물:</span> <code>requirements-specification.md</code>, 보낸메일함 내 최종 승인 요청 메일, Figma 핵심 화면(Landing/Dashboard/Auth) 와이어프레임 시안</li>
     </ul>
 
-    <div class="presenter-notes" style="display:none;">여러분 안녕하세요! 오늘부터 시작되는 'ACE Startup SW/AI 파일럿 과정 및 ACE AI Startup Bootcamp'의 첫 번째 시간입니다. 1차시에서는 우리가 매일 사용하는 생성형 AI와 앞으로 직접 설계하게 될 'AI 에이전트'가 어떻게 다른지 개념적으로 완벽히 정리하고, 에이전트의 내부 구조가 어떻게 돌아가는지 핵심 작동 원리를 파악해 보겠습니다.</div>
-    <div class="visual-guide-notes" style="display:none;">신뢰감을 주는 다크 네이비 배경에 세련된 네온 블루 그라데이션 타이포그래피 활용. 우측에는 지능형 동작을 연상시키는 3D 메쉬 구체 그래픽 배치.</div>
+    <div class="presenter-notes" style="display:none;">오늘부터 시작되는 대구 DIP SW 랜딩의 첫 번째 시간입니다. 1일차에는 서비스 아이디어를 실제 제품 화면 구조(Figma)로 구체화하고, 비정형 회의록에서 AI를 활용해 오점 없는 기능 요구사항 명세서를 도출하여 이메일 보고까지 자동화하는 전체 흐름을 실습합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">3단계 세션 카드와 핵심 기대 산출물을 강조하는 모던한 레이아웃.</div>
   </div>
 </section>
 
-<!-- Slide 6: Day 1 Boom-up Introduction Slide -->
-<section class="slide-card session-1 session-1" id="slide-5">
+<!-- Slide 4: Day 1 Boom-up Introduction Slide -->
+<section class="slide-card session-1 session-1" id="slide-4">
   <div class="slide-header">
     <div>
       <div class="slide-category">도입 | 생각 열기 (Intro)</div>
-      <div class="slide-title">Day 1. 오프닝 인트로 강의안</div>
+      <div class="slide-title">Day 1. 오프닝 인트로 &amp; AI 스타트업 트렌드</div>
     </div>
     <div class="slide-meta">
       <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
 
   <div class="slide-body">
-    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 16px; padding: 40px 32px; text-align: center; height: 100%; max-width: 680px; margin: 0 auto;">
-      <div style="font-size: 3.5rem; margin-bottom: 16px;">🇰🇷</div>
-      <h3 style="font-size: 1.6rem; font-weight: 700; color: #60a5fa; margin-bottom: 12px;">오프닝 인트로 (국문)</h3>
-      <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.6; text-align: center;">
-        AI 시대의 1인 기업 사례와 실시간 트렌드 분석을 포함한 Day 1 오프닝 인트로 강의안입니다.
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(59, 130, 246, 0.04); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 16px; padding: 40px 32px; text-align: center; height: 100%; max-width: 760px; margin: 0 auto;">
+      <div style="font-size: 3.5rem; margin-bottom: 16px;">🚀</div>
+      <h3 style="font-size: 1.6rem; font-weight: 700; color: #60a5fa; margin-bottom: 14px;">오프닝 인트로: AI 시대의 1인 기업과 제품 기획</h3>
+      <p style="font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.7; text-align: center;">
+        AI 에이전트와 화면 설계 툴의 결합으로 개발 생산성이 10배 이상 향상되는 스타트업 생태계 변화와 실전 사례를 확인해보세요.
       </p>
-      <a href="../../ADD_LECTURE/260727_ACE_Bootcamp_Intro_Day1_v2_kr.html" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 36px; font-size: 1.1rem; background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 12px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; cursor: pointer; max-width: 320px; width: 100%;">
-        🚀 슬라이드 열기 (KO)
-      </a>
+      
+      <div class="matrix-grid three-col" style="width: 100%; gap: 14px; text-align: left; margin-top: 8px;">
+        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+          <div style="font-weight: 700; color: #38bdf8; margin-bottom: 6px; font-size: 0.95rem;">💡 기획의 자동화</div>
+          <div style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5;">비정형 회의록에서 표준 기능 명세서(FR) 및 검증 시나리오 즉시 추출</div>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+          <div style="font-weight: 700; color: #a78bfa; margin-bottom: 6px; font-size: 0.95rem;">🎨 화면 설계의 가속</div>
+          <div style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5;">Figma Auto Layout과 3대 핵심 화면(Landing/Dashboard/Auth) 시각화</div>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px;">
+          <div style="font-weight: 700; color: #34d399; margin-bottom: 6px; font-size: 0.95rem;">⚡ 1인 빌더의 탄생</div>
+          <div style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5;">기획부터 보고, 개발 착수까지 원스톱 파이프라인 완성</div>
+        </div>
+      </div>
     </div>
 
-    <div class="presenter-notes" style="display:none;">이 슬라이드는 Day 1 도입부 30분 동안 진행되는 오프닝 인트로 강의안 링크를 제공합니다. 버튼을 클릭하면 새 창에서 슬라이드가 열립니다.</div>
+    <div class="presenter-notes" style="display:none;">Day 1 도입부에서는 생성형 AI가 단순한 챗봇을 넘어 실제 프로덕트 개발과 비즈니스 워크플로우를 어떻게 바꾸고 있는지 살펴봅니다. 1인 창업가도 전문 팀 수준의 기획서와 화면 설계를 반나절 만에 도출할 수 있는 시대를 맞이했습니다.</div>
   </div>
 </section>
 
-<!-- Slide 3: 도입 질문: 질문과 설계의 차이 -->
+<!-- Slide 5: 핵심 개념: ChatGPT 질의 vs Codex Workspace 설계 -->
+<section class="slide-card session-1 session-1" id="slide-5">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">Session 1. Codex AI 기획 가이드 &amp; Figma 인터페이스</div>
+      <div class="slide-title">핵심 개념: ChatGPT 단순 질의 vs Codex Workspace 설계</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">1일차</span>
+      <span>대구 DIP SW 랜딩</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="table-container" style="margin: 15px 0;">
+      <table class="slide-table">
+        <thead>
+          <tr>
+            <th style="width: 20%;">비교 항목</th>
+            <th style="width: 40%;">일반 생성형 AI (ChatGPT 등)</th>
+            <th style="width: 40%;">Codex Client Workspace</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>작동 방식</strong></td>
+            <td>대화창 중심의 일회성 프롬프트 질의응답</td>
+            <td>로컬 디렉토리 전체를 감시하고 메모리에 캐싱</td>
+          </tr>
+          <tr>
+            <td><strong>컨텍스트 범위</strong></td>
+            <td>사용자가 대화창에 복사해 넣은 단일 텍스트에 한정</td>
+            <td>회의록, 요구사항, 정책 등 프로젝트 내 다중 문서 동시 인지</td>
+          </tr>
+          <tr>
+            <td><strong>작업 실행력</strong></td>
+            <td>화면 텍스트 답변 출력 (파일 직접 제어 불가)</td>
+            <td>로컬 파일 자동 생성/수정, 린트 검증, 외부 도구(Gmail) 직접 호출</td>
+          </tr>
+          <tr>
+            <td><strong>업무 결과물</strong></td>
+            <td>추상적인 답변 및 비정형 줄글 제안</td>
+            <td>개발·디자인에 즉시 투입 가능한 표준 마크다운 및 승인 메일</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="presenter-notes" style="display:none;">우리는 흔히 AI에게 매번 프롬프트를 잘 써서 좋은 답을 얻는 것을 생각합니다. 하지만 프로덕트 빌딩에서는 로컬 폴더(automation/)를 AI의 두뇌 메모리로 연결하여 여러 문서가 모순 없이 동기화되게 만드는 'Workspace 설계'가 핵심입니다.</div>
+    <div class="visual-guide-notes" style="display:none;">단순 챗봇과 파일 제어 에이전트의 차이를 명확한 표 형태로 대조 시각화.</div>
+  </div>
+</section>
+
+<!-- Slide 6: 핵심 개념: Figma 인터페이스 & 핵심 와이어프레임 구조 -->
 <section class="slide-card session-1 session-1" id="slide-6">
   <div class="slide-header">
     <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">도입 질문: 질문과 설계의 차이</div>
+      <div class="slide-category">Session 1. Codex AI 기획 가이드 &amp; Figma 인터페이스</div>
+      <div class="slide-title">Figma 기본 인터페이스 &amp; 핵심 3대 화면 구조</div>
     </div>
     <div class="slide-meta">
       <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
   <div class="slide-body">
-    <div class="split-layout">
-      <div>
-        <ul class="bullet-list">
-          <li><span class="highlight">도입 질문:</span> "ChatGPT에게 매번 좋은 답변을 얻기 위해 프롬프트를 고쳐 쓰는 것과, 하나의 에이전트를 설계하는 것은 무엇이 다를까요?"</li>
-          <li><span class="highlight">비교 분석:</span>
-            <ul>
-              <li><span class="highlight">ChatGPT 질문:</span> 일회성 질의, 답변을 얻기 위한 즉흥적 시도, 개인의 프롬프트 작성 능력에 의존.</li>
-              <li><span class="highlight">Codex Workspace:</span> 다중 파일의 관계 감시 및 콘텍스트 캐싱, 일관된 명세 설계, 자동화 연계 파이프라인 형성.</li>
-            </ul>
-          </li>
-        </ul>
+    <div class="matrix-grid three-col" style="width: 100%; margin-top: 10px;">
+      <div class="code-container" style="margin-bottom:0; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25);">
+        <div class="code-header" style="color: #60a5fa; font-weight: 700;">
+          <span>1. Landing Page (랜딩 화면)</span>
+        </div>
+        <div style="padding: 16px; font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">
+          <p><strong style="color: #ffffff;">역할:</strong> 서비스 가치 전달 및 신규 사용자 유입</p>
+          <ul style="padding-left: 18px; margin-top: 8px;">
+            <li>상단 내비게이션 바 &amp; 로고</li>
+            <li>Hero 섹션 (핵심 헤드라인 + 메인 CTA 버튼)</li>
+            <li>서비스 주요 혜택 및 기능 카드 그리드</li>
+            <li>하단 고객 후기 및 Footer 영역</li>
+          </ul>
+        </div>
       </div>
-      <div class="image-container"
-        style="display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 12px; padding: 10px;">
-        <img alt="질문과 설계의 차이" src="images/slide3_illustration.png"
-          style="max-width: 100%; max-height: 320px; border-radius: 8px; object-fit: contain;" />
+
+      <div class="code-container" style="margin-bottom:0; background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.25);">
+        <div class="code-header" style="color: #22d3ee; font-weight: 700;">
+          <span>2. Dashboard Page (대시보드)</span>
+        </div>
+        <div style="padding: 16px; font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">
+          <p><strong style="color: #ffffff;">역할:</strong> 사용자/전문가 핵심 활동 및 상태 관리</p>
+          <ul style="padding-left: 18px; margin-top: 8px;">
+            <li>좌측 메뉴 사이드바 &amp; 상단 유저 프로필</li>
+            <li>핵심 지표 요약 카드 (예약 현황, 이용 건수)</li>
+            <li>상태별 목록 테이블 (신청 / 확정 / 완료)</li>
+            <li>필터링 검색창 및 빠른 실행 액션 버튼</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="code-container" style="margin-bottom:0; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25);">
+        <div class="code-header" style="color: #c084fc; font-weight: 700;">
+          <span>3. Auth &amp; Booking (인증/예약)</span>
+        </div>
+        <div style="padding: 16px; font-size: 0.9rem; line-height: 1.6; color: var(--text-secondary);">
+          <p><strong style="color: #ffffff;">역할:</strong> 사용자 전환 및 거래 체결 핵심 퍼널</p>
+          <ul style="padding-left: 18px; margin-top: 8px;">
+            <li>로그인/회원가입 모달 또는 전용 페이지</li>
+            <li>날짜/시간 슬롯 선택 인터랙티브 캘린더</li>
+            <li>결제 수단 선택 및 결제 정보 입력 폼</li>
+            <li>예약 완료 피드백 화면 및 안내 모달</li>
+          </ul>
+        </div>
       </div>
     </div>
-    <div class="presenter-notes" style="display:none;">우리는 프롬프트 엔지니어링이라고 하면 매번 다르게 입력해서 좋은 대답을 구하는 '개인 비서와의 대화'를 생각합니다. 하지만 에이전트 설계는 다릅니다. 사용자가 어떤 질문을 던지더라도 정해진 프로세스에 맞춰 판단하고, 도구를 실행해 표준화된 업무 결과물을 뽑아내는 '시스템'을 짓는 일입니다.</div>
-    <div class="visual-guide-notes" style="display:none;">화면을 2분할하여 왼쪽은 '대화형 UI(Chat)'를, 오른쪽은 '기어와 파이프라인(System)' 아이콘을 배치하여 대비 효과 극대화.</div>
+    <div class="presenter-notes" style="display:none;">Figma 실습에서는 서비스의 핵심 흐름을 담아내는 3대 화면(Landing, Dashboard, Auth/Booking)을 와이어프레임으로 구축합니다. 프레임과 오토레이아웃을 활용해 반응형 화면 구조를 설계하고, 이 화면들이 Codex에서 정의하는 기능 요구사항(FR)과 어떻게 1:1로 매칭되는지 확인합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">3개 핵심 화면의 구성 요소와 역할을 카드 형태로 분할 표현.</div>
   </div>
 </section>
 
-<!-- Slide 4: 도입 질문: AI가 비즈니스 요구사항을 처리하려면? -->
+<!-- Slide 7: 핵심 설명: 비즈니스 요구사항 처리 3단계 파이프라인 -->
 <section class="slide-card session-1 session-1" id="slide-7">
   <div class="slide-header">
     <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">도입 질문: AI가 비즈니스 요구사항을 처리하려면?</div>
+      <div class="slide-category">Session 1. Codex AI 기획 가이드 &amp; Figma 인터페이스</div>
+      <div class="slide-title">비즈니스 요구사항 처리 3단계 파이프라인</div>
     </div>
     <div class="slide-meta">
       <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
   <div class="slide-body">
     <div class="flow-diagram">
       <div class="flow-step active">
         <div class="flow-badge">1</div>
-        <div class="flow-title">컨텍스트 일치</div>
-        <div class="flow-desc">프로젝트 내 모든 문서(회의록, 기능 명세)가 하나의 비즈니스 규칙 하에 동기화되는 단계</div>
+        <div class="flow-title">컨텍스트 일치 (Alignment)</div>
+        <div class="flow-desc">로컬 폴더 내 회의록 원본, 기획 메모, 업무 룰이 단일 진실 공급원(SSOT)으로 동기화</div>
       </div>
       <div class="flow-arrow">
         <svg viewBox="0 0 24 24">
@@ -2942,8 +3021,8 @@ header {
       </div>
       <div class="flow-step">
         <div class="flow-badge">2</div>
-        <div class="flow-title">자동화 실행력</div>
-        <div class="flow-desc">문서 작성을 넘어 외부 API 및 모듈(이메일 발송 등)과 실질적인 연동을 수행하는 단계</div>
+        <div class="flow-title">자동화 실행력 (Execution)</div>
+        <div class="flow-desc">지시 프롬프트에 따라 표준 명세서 파일 작성, 문법 검증 및 외부 플러그인(Gmail) 연동 실행</div>
       </div>
       <div class="flow-arrow">
         <svg viewBox="0 0 24 24">
@@ -2952,103 +3031,25 @@ header {
       </div>
       <div class="flow-step">
         <div class="flow-badge">3</div>
-        <div class="flow-title">구조화된 파일 출력</div>
-        <div class="flow-desc">테스팅 및 코드 생성이 용이한 정밀 마크다운(MD) 구조화 문서를 산출하는 단계</div>
+        <div class="flow-title">구조화된 파일 출력 (Output)</div>
+        <div class="flow-desc">Figma 화면과 즉시 1:1 매칭되는 정밀 기능 명세서(MD) 및 이해관계자 승인 메일 산출</div>
       </div>
     </div>
-    <div class="presenter-notes" style="display:none;">만약 고객이 웹사이트에서 전문가를 검색하고 예약을 확정하는 시스템을 기획한다면, AI는 결제가 성공해야만 예약이 생성된다는 비즈니스 룰을 알아야 하고, 정상/예외 흐름을 문서에 직접 써넣어야 하며, 최종 명세 내용을 승인권자에게 메일로 자동 보고할 수 있어야 합니다. 즉, 말 잘하는 인공지능이 아니라 로컬 파일을 직접 통제하는 실행 엔진이 필요합니다.</div>
-    <div class="visual-guide-notes" style="display:none;">'판단 -> 도구 사용 -> 출력'의 유기적인 순서도를 가로형 인포그래픽으로 구현.</div>
+    <div class="presenter-notes" style="display:none;">AI가 실제 비즈니스 기획을 수행하려면 컨텍스트 일치(동일한 룰 인식), 자동화 실행력(도구 직접 사용), 구조화된 출력(정형 마크다운)이라는 3단계를 거쳐야 합니다. 이를 통해 말만 잘하는 AI가 아니라 실제 프로젝트 결과물을 만들어내는 기획 비서로 동작합니다.</div>
+    <div class="visual-guide-notes" style="display:none;">가로형 인포그래픽 순서도로 3단계 파이프라인의 인과 관계 표현.</div>
   </div>
 </section>
 
-<!-- Slide 5: 핵심 설명: Workspace의 개념과 Context -->
+<!-- Slide 8: 실습 준비: Codex Workspace & 플러그인 설정 -->
 <section class="slide-card session-1 session-1" id="slide-8">
   <div class="slide-header">
     <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">핵심 설명: Workspace의 개념과 Context</div>
+      <div class="slide-category">Session 2. 핵심 화면 와이어프레임 &amp; 요구사항(FR) 설계</div>
+      <div class="slide-title">실습 준비: Codex Workspace &amp; Gmail 플러그인 셋업</div>
     </div>
     <div class="slide-meta">
       <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
-    </div>
-  </div>
-  <div class="slide-body">
-    <div class="diagram-nested">
-      <div class="nested-container">
-        <span class="nested-label">Workspace (로컬 폴더)</span>
-        <div class="nested-desc-top">로컬 바탕화면의 automation/ 폴더를 통째로 Codex Client에 감시 연동하는 협업 공간</div>
-        <div class="nested-sub-1">
-          <span class="nested-label">다중 파일 캐싱 &amp; 콘텍스트</span>
-          <div class="nested-desc-top">회의록, 기능 명세서 등 모든 연관 문서 파일의 구조와 비즈니스 사양을 AI가 기억하는 두뇌 메모리</div>
-          <div class="nested-sub-2">
-            <span class="nested-label">동시 수정 및 추론</span>
-            <div class="nested-desc-top">한 명세가 바뀌면 연계된 모든 파일(open-questions 등)을 데이터 충돌 없이 동시 보완하는 다단계 추론</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="presenter-notes" style="display:none;">Workspace는 쉽게 말해 AI에게 주는 '기획 참고 폴더'입니다. AI에게 줄글로 매번 설명할 필요 없이, 우리가 바탕화면에 폴더를 만들고 기획 회의록을 넣어두면 AI가 그 폴더 전체를 감시하고 인지합니다. 이 폴더 자체가 AI가 작업하는 뇌의 기억 저장소(Context)가 되는 것입니다.</div>
-    <div class="visual-guide-notes" style="display:none;">세 개의 원이 서로를 포함하고 있는 벤다이어그램(AI > LLM > Agent)을 입체적인 레이어로 표현.</div>
-  </div>
-</section>
-
-<!-- Slide 6: 핵심 설명: 대화록 전처리(0단계) 및 객체 분류(1단계)의 필요성 -->
-<section class="slide-card session-1 session-1" id="slide-9">
-  <div class="slide-header">
-    <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">핵심 설명: 대화록 전처리 &amp; 객체 분류</div>
-    </div>
-    <div class="slide-meta">
-      <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
-    </div>
-  </div>
-  <div class="slide-body">
-    <div class="table-container" style="margin: 15px 0;">
-      <table class="slide-table">
-        <thead>
-          <tr>
-            <th>구분</th>
-            <th>0단계. 회의록 요약 전처리</th>
-            <th>1단계. 기획 요소 객체 분류</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>주요 목적</strong></td>
-            <td>사담 및 핑퐁 대화 걷어내기 (노이즈 필터링)</td>
-            <td>정제된 정보들을 성격에 따라 카탈로깅</td>
-          </tr>
-          <tr>
-            <td><strong>수행 동작</strong></td>
-            <td>15줄 이내의 평서문 형태 비정형 기획 메모 추출</td>
-            <td>사용자 역할, 기능 후보, 비즈니스 룰, 미결정 사안 분리</td>
-          </tr>
-          <tr>
-            <td><strong>산출 파일</strong></td>
-            <td><code>meeting-notes.md</code> 생성</td>
-            <td>4가지 기획 컴포넌트 객체 정의</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="presenter-notes" style="display:none;">회의를 한 시간 동안 녹음하여 푼 대화록은 개발팀이나 디자이너가 읽고 바로 사양을 뽑기 어렵습니다. 따라서 AI에게 회의록을 먼저 요약(0단계)하게 하고, 그 요약된 내용에서 '사용자 역할은 누구인가?', '기능은 어떤 것들이 있는가?'를 분류(1단계)하는 전처리 가정이 필수적입니다. 그래야 명세서의 신뢰도가 올라갑니다.</div>
-    <div class="visual-guide-notes" style="display:none;">두 방식의 데이터 흐름 차이를 단순 선형 흐름(생성형 AI)과 순환형 루프(에이전트) 다이어그램으로 대조하여 시각화.</div>
-  </div>
-</section>
-
-<!-- Slide 7: 실습 안내: 0단계 및 1단계 실습 준비 -->
-<section class="slide-card session-1 session-1" id="slide-10">
-  <div class="slide-header">
-    <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">실습 안내: 0단계 및 1단계 실습 준비</div>
-    </div>
-    <div class="slide-meta">
-      <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
   <div class="slide-body">
@@ -3065,7 +3066,7 @@ header {
       </div>
       <div class="flow-step">
         <div class="flow-badge">2</div>
-        <div class="flow-title">Workspace 연결</div>
+        <div class="flow-title">Workspace 연동</div>
         <div class="flow-desc">Codex Client 좌측 프로젝트 탐색기에 <code>automation</code> 폴더 등록</div>
       </div>
       <div class="flow-arrow">
@@ -3075,159 +3076,292 @@ header {
       </div>
       <div class="flow-step">
         <div class="flow-badge">3</div>
-        <div class="flow-title">API 및 플러그인 설정</div>
-        <div class="flow-desc">Gemini API Key 환경 설정 및 우측 상단 Gmail 플러그인 연동 인증</div>
+        <div class="flow-title">플러그인 인증</div>
+        <div class="flow-desc">우측 상단 Plugins 메뉴에서 Gmail API 플러그인 활성화 및 Google 계정 연동</div>
+      </div>
+      <div class="flow-arrow">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 11h12.59l-5.3 5.3 1.42 1.42L20 12l-7.29-7.29-1.42 1.42 5.3 5.3H4v2z"></path>
+        </svg>
+      </div>
+      <div class="flow-step">
+        <div class="flow-badge">4</div>
+        <div class="flow-title">회의록 원본 배치</div>
+        <div class="flow-desc">작업 폴더에 <code>meeting-notes-raw.md</code> 파일을 만들고 킥오프 대화록 준비</div>
       </div>
     </div>
-    <div class="presenter-notes" style="display:none;">이제 첫 번째 실습을 시작하겠습니다. 먼저 바탕화면에 실습 전용 폴더인 automation을 만드시고, Codex Client에 이 폴더를 연동해 주세요. 그 다음, API 키 등록 및 Gmail API 플러그인을 연결하도록 가이드하겠습니다.</div>
-    <div class="visual-guide-notes" style="display:none;">IRAO 4개 영역을 각각의 카드 레이아웃으로 구분하고 흐름을 화살표로 연결하여 표현.</div>
+    <div class="presenter-notes" style="display:none;">본격적인 실습에 들어가기 앞서 환경을 구성합니다. 바탕화면에 automation 폴더를 생성해 Codex Client에 연결하고, 오늘 실습의 마지막 단계인 이메일 보고를 위해 Gmail 플러그인을 인증해 둡니다.</div>
+    <div class="visual-guide-notes" style="display:none;">4단계 준비 과정을 순차적으로 직관적인 타임라인 그래픽으로 구현.</div>
   </div>
 </section>
 
-<!-- Slide 8: 실습 진행 0단계: 상세 대화록 핵심 요약 도출 -->
+<!-- Slide 9: 실습 0단계 & 1단계: 대화록 요약 전처리 및 기획 객체 분류 -->
+<section class="slide-card session-1 session-1" id="slide-9">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">Session 2. 핵심 화면 와이어프레임 &amp; 요구사항(FR) 설계</div>
+      <div class="slide-title">[0단계 &amp; 1단계] 대화록 요약 전처리 및 기획 객체 분류</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">1일차</span>
+      <span>대구 DIP SW 랜딩</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="split-layout">
+      <div>
+        <div class="code-container" style="margin-top: 0;">
+          <div class="code-header">
+            <span>0단계 요약 전처리 지시문 (meeting-notes.md 생성)</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="font-size: 13px; line-height: 1.5; white-space: pre-wrap; padding: 12px;">meeting-notes-raw.md의 회의록 원문을 읽고, 화자 간의 불필요한 사담과 감정적 표현을 모두 걷어내고 서비스 사용자, 기능 요건, 시스템 정책, 미결정 유보 사항을 15줄 내외의 컴팩트한 비정형 요약 메모(meeting-notes.md) 형태로 작성해줘. 원문에 없는 가상의 내용은 상상해서 추가하지 말아줘.</pre>
+        </div>
+
+        <div class="code-container" style="margin-top: 10px;">
+          <div class="code-header">
+            <span>1단계 기획 요소 분석 지시문</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="font-size: 13px; line-height: 1.5; white-space: pre-wrap; padding: 12px;">meeting-notes.md를 읽고 다음 4대 기획 컴포넌트를 명확히 분류해줘.
+1. 서비스 사용자 (Customer, Expert, Admin)
+2. 사용자가 수행하는 기능 vs 시스템이 수행하는 기능
+3. 비즈니스 규칙 (결제 성공 시 예약 확정 등)
+4. 아직 결정되지 않은 유보 사항 (알림 채널, 환불 수수료 등)</pre>
+        </div>
+      </div>
+
+      <div>
+        <div class="table-container" style="margin: 0;">
+          <table class="slide-table" style="font-size: 0.88rem;">
+            <thead>
+              <tr>
+                <th>분류 항목</th>
+                <th>주요 내용 및 산출물</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>0단계 핵심 목적</strong></td>
+                <td>사담 및 핑퐁 대화 제거 (노이즈 필터링) → <code>meeting-notes.md</code></td>
+              </tr>
+              <tr>
+                <td><strong>1단계 핵심 목적</strong></td>
+                <td>정제된 정보들을 성격에 따라 카탈로깅 (사용자, 기능, 룰, 미결정)</td>
+              </tr>
+              <tr>
+                <td><strong>검수 포인트</strong></td>
+                <td>원문에 없는 기능(포인트 충전, 회원탈퇴 등) 창작(Hallucination) 방지</td>
+              </tr>
+              <tr>
+                <td><strong>Figma 연결</strong></td>
+                <td>분류된 사용자(Customer, Admin)별 전용 화면 Frame 도출의 기초</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">회의를 1시간 동안 진행하면 온갖 잡담과 추측이 섞여 있습니다. 0단계에서는 이를 15줄 이내로 깔끔히 정제하고, 1단계에서는 사용자 역할, 기능, 정책, 미결정 사항으로 4등분하여 카탈로깅합니다. 이렇게 해야 다음 단계에서 정확한 요구사항 명세가 나옵니다.</div>
+  </div>
+</section>
+
+<!-- Slide 10: 실습 2단계: 기능 요구사항(FR) 표준 문장 작성 -->
+<section class="slide-card session-1 session-1" id="slide-10">
+  <div class="slide-header">
+    <div>
+      <div class="slide-category">Session 2. 핵심 화면 와이어프레임 &amp; 요구사항(FR) 설계</div>
+      <div class="slide-title">[2단계] 기능 요구사항(FR) 테이블 및 표준 명세 작성</div>
+    </div>
+    <div class="slide-meta">
+      <span class="day-badge">1일차</span>
+      <span>대구 DIP SW 랜딩</span>
+    </div>
+  </div>
+  <div class="slide-body">
+    <div class="table-container" style="margin: 10px 0 15px;">
+      <table class="slide-table">
+        <thead>
+          <tr>
+            <th style="width: 15%;">구분</th>
+            <th style="width: 42%;">나쁜 요구사항 (모호함/측정불가)</th>
+            <th style="width: 43%;">개선된 표준 요구사항 (조건·주체·행동·결과)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>예약 생성</strong></td>
+            <td>“시스템은 빠르고 편리하게 예약을 잘 처리해야 한다.”</td>
+            <td><strong>[FR-RES-01]</strong> 시스템은 고객이 가능 시간을 선택하고 결제를 승인하면 즉시 예약 상태를 ‘확정’으로 변경해야 한다.</td>
+          </tr>
+          <tr>
+            <td><strong>알림 발송</strong></td>
+            <td>“예약이 되면 관련자들에게 알아서 알려준다.”</td>
+            <td><strong>[FR-NOTI-01]</strong> 시스템은 예약 상태가 확정되면 고객과 담당 전문가에게 예약 일시 및 접속 링크를 포함한 안내를 전송해야 한다.</td>
+          </tr>
+          <tr>
+            <td><strong>일정 관리</strong></td>
+            <td>“전문가는 일정을 쉽게 볼 수 있다.”</td>
+            <td><strong>[FR-EXP-01]</strong> 전문가는 대시보드에서 확정된 예약 목록을 날짜별로 조회하고 상태(상담대기/완료)를 변경할 수 있어야 한다.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-container" style="margin-top: 10px;">
+      <div class="code-header">
+        <span>2단계 지시 프롬프트 (표준 명세 테이블 작성)</span>
+        <button class="copy-btn">복사</button>
+      </div>
+      <pre class="code-block" style="font-size: 13px; line-height: 1.5; white-space: pre-wrap; padding: 12px;">1단계에서 도출된 기능 후보들을 바탕으로, 요구사항 ID(FR-01 등), 구분, 기능명, 상세 요구조건(조건/주체/행동/결과가 드러나는 표준 문장), 우선순위(MVP/P1/P2)를 포함하는 마크다운 테이블을 작성해줘.</pre>
+    </div>
+
+    <div class="presenter-notes" style="display:none;">2단계에서는 '모호한 표현'을 '측정 가능하고 검증 가능한 정량적 표준 문장'으로 바꾸는 것이 핵심입니다. 주체, 조건, 행동, 결과가 반드시 들어가야 개발자와 디자이너가 오해 없이 화면과 로직을 구현할 수 있습니다.</div>
+  </div>
+</section>
+
+<!-- Slide 11: 실습 3단계 & 4단계: 정상/예외 흐름 및 미결정 질문 목록화 -->
 <section class="slide-card session-1 session-1" id="slide-11">
   <div class="slide-header">
     <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">실습 진행 0단계: 핵심 요약 도출</div>
+      <div class="slide-category">Session 2. 핵심 화면 와이어프레임 &amp; 요구사항(FR) 설계</div>
+      <div class="slide-title">[3단계 &amp; 4단계] 정상/예외 흐름 설계 &amp; 미결정 질문 구축</div>
     </div>
     <div class="slide-meta">
       <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
   <div class="slide-body">
-    <ul class="bullet-list" style="width: 100%; max-width: 900px;">
-      <li><span class="highlight">실습 1단계: meeting-notes-raw.md 파일 생성</span>
-        <div style="font-size: 13px; color: var(--text-secondary); margin: 3px 0;">
-          작업 폴더 내에 <code>meeting-notes-raw.md</code> 파일을 만들고 전문가 상담 Kick-off 대화록을 붙여넣습니다.
+    <div class="split-layout">
+      <div>
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+          <h4 style="color: #34d399; font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">✅ 3단계. 정상 흐름 (Happy Path)</h4>
+          <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+            1. 고객이 전문가 프로필에서 희망 일시 선택<br>
+            2. 예약 정보 확인 후 결제 수단 승인 요청<br>
+            3. 결제 완료 즉시 슬롯 선점 및 확정 알림 전달
+          </p>
         </div>
-      </li>
-      <li><span class="highlight">실습 2단계: AI 창에 전처리 지시 프롬프트 전송</span>
-        <div class="code-container" style="margin-top: 5px; width: 100%;">
-          <div class="code-header" style="background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--panel-border);">
-            <span>0단계 요약 전처리 프롬프트 (복사 가능)</span>
+
+        <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 12px; padding: 16px;">
+          <h4 style="color: #f87171; font-size: 0.95rem; font-weight: 700; margin-bottom: 8px;">⚠️ 3단계. 예외 흐름 (Edge Cases)</h4>
+          <p style="font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5;">
+            • <strong>동일 슬롯 중복 예약:</strong> 결제 중 타인이 먼저 결제 완료 시 슬롯 선점 실패 안내 및 결제 자동 취소<br>
+            • <strong>결제 승인 실패:</strong> 한도 초과 등 실패 시 결제 재시도 모달 표출<br>
+            • <strong>네트워크 타임아웃:</strong> 결제 상태 조회 롱폴링 및 안전 롤백
+          </p>
+        </div>
+      </div>
+
+      <div>
+        <div class="code-container" style="margin-top: 0;">
+          <div class="code-header" style="color: #fef08a;">
+            <span>4단계. 미결정 기획 질문 (open-questions.md)</span>
             <button class="copy-btn">복사</button>
           </div>
-          <pre class="code-block" style="background: rgba(0,0,0,0.15); font-family: monospace; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 10px 15px; border-radius: 0 0 8px 8px; max-height: 120px; overflow-y: auto;">meeting-notes-raw.md의 회의록 원문을 읽고, 화자 간의 불필요한 대화 맥락과 문맥을 걷어내고 서비스 사용자, 기능 요건, 시스템 정책, 미결정 유보 사항을 15줄 내외의 컴팩트한 비정형 요약 메모 형태로 작성해줘. 원문에 없는 가상의 내용은 임의로 상상해서 추가하지 말아줘.</pre>
+          <pre class="code-block" style="font-size: 13px; line-height: 1.5; white-space: pre-wrap; padding: 12px;">meeting-notes.md에서 정책이 불명확하거나 미결정된 안건을 추출하여 open-questions.md를 작성해줘.
+각 질문에는 [질문 ID, 관련 기능, 질문 내용, 검토 옵션(A안/B안), 담당 결정권자]를 포함해줘.
+
+* 도출 예시:
+- [Q-01] 예약 완료 알림 채널: 카카오 알림톡 vs 이메일 (비용/도달률 검토)
+- [Q-02] 취소 위약금 기준: 당일 취소 시 전액 환불 vs 50% 환불 정책</pre>
         </div>
-      </li>
-      <li style="margin-top: 5px;"><span class="highlight">기대 산출물:</span> <code>meeting-notes.md</code> 요약 파일이 로컬 폴더 내에 자동으로 생성 및 저장됨.</li>
-    </ul>
-    
-    <div class="presenter-notes" style="display:none;">회의록 파일이 준비되었으면, AI 프롬프트 입력창에 화면의 지시문을 복사해서 넣어봅시다. 지시문 우측의 [빌드] 버튼을 누르면 AI가 로컬 폴더 안의 meeting-notes-raw.md를 자동으로 찾아내어 군더더기 사담을 모두 제외하고 15줄 이내로 깔끔히 정제된 meeting-notes.md 요약 파일을 생성해 줍니다.</div>
-    <div class="visual-guide-notes" style="display:none;">실습 과정을 1, 2, 3 단계 아이콘과 함께 직관적으로 정리한 타임라인 그래픽 제공. 상단 탭에서 실습 시나리오 변경 가능.</div>
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">진짜 실력 있는 기획자는 성공할 때만 그리지 않고 실패할 때 어떻게 동작해야 하는지 예외 흐름(Edge Case)을 정밀하게 정의합니다. 또한 정해지지 않은 정책을 숨기거나 임의로 상상하지 않고 '미결정 질문'으로 명확히 리스트업하여 경영진/이해관계자에게 확인을 요청합니다.</div>
   </div>
 </section>
 
-<!-- Slide 9: 실습 진행 1단계: 요약 메모에서 기획 요소 분석 -->
+<!-- Slide 12: 실습 5단계: 통합 요구사항 명세서 생성 및 Gmail 보고 -->
 <section class="slide-card session-1 session-1" id="slide-12">
   <div class="slide-header">
     <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">실습 진행 1단계: 기획 요소 분석</div>
+      <div class="slide-category">Session 3. Gmail 플러그인 실제 발송 및 결과물 공유</div>
+      <div class="slide-title">[5단계] 통합 명세서 생성 &amp; Gmail 플러그인 보고 발송</div>
     </div>
     <div class="slide-meta">
       <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
   <div class="slide-body">
-    <div class="matrix-grid three-col" style="width: 100%; max-width: 1200px; margin-top: 5px;">
-      <div class="code-container" style="margin-bottom:0; display: flex; flex-direction: column;">
-        <div class="code-header">
-          <span>객체 분석 요청 프롬프트</span>
-          <button class="copy-btn">복사</button>
+    <div class="split-layout">
+      <div>
+        <div class="code-container" style="margin-top: 0;">
+          <div class="code-header">
+            <span>통합 명세서 빌드 &amp; Gmail 전송 프롬프트</span>
+            <button class="copy-btn">복사</button>
+          </div>
+          <pre class="code-block" style="font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; padding: 12px;">지금까지 작성된 0~4단계 파일들을 통합하여 `requirements-specification.md`를 최종 생성해줘.
+그 후, 이 명세서의 핵심 요약(개요, FR 목록, 핵심 예외 정책, 미결정 안건)을 깔끔한 사내 기획 보고용 이메일 본문으로 서식화하여, Gmail 플러그인을 사용해 수신자 [내 이메일 주소]로 승인 요청 메일을 발송해줘.</pre>
         </div>
-        <pre class="code-block" style="flex-grow:1; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 12px; min-height: 120px;">meeting-notes.md를 읽고 다음 내용을 구분해줘.
-1. 서비스 사용자
-2. 사용자가 수행하는 기능
-3. 시스템이 수행하는 기능
-4. 비즈니스 규칙
-5. 아직 결정되지 않은 사항
 
-회의 메모에 없는 내용은 추가하지 말고 불명확한 내용은 별도로 표시해줘.</pre>
+        <ul class="bullet-list" style="margin-top: 10px;">
+          <li><span class="highlight">최종 통합 문서:</span> <code>requirements-specification.md</code> (기획 명세서 완본)</li>
+          <li><span class="highlight">외부 연동 도구:</span> Codex Google Workspace / Gmail API 플러그인</li>
+        </ul>
       </div>
-      <div class="code-container" style="margin-bottom:0; display: flex; flex-direction: column;">
-        <div class="code-header">
-          <span>기대 분석 결과 (사용자 역할군)</span>
-        </div>
-        <pre class="code-block" style="flex-grow:1; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 12px; min-height: 120px; color: #a5f3fc;">* 서비스 사용자:
-  - Customer (상담 예약 및 결제)
-  - Expert (상담 스케줄 실시간 확인)
-  - Admin (전문가 승인 정책 수행)</pre>
-      </div>
-      <div class="code-container" style="margin-bottom:0; display: flex; flex-direction: column;">
-        <div class="code-header">
-          <span>기대 분석 결과 (정책 및 미결정)</span>
-        </div>
-        <pre class="code-block" style="flex-grow:1; white-space: pre-wrap; font-size: 13px; text-align: left; padding: 12px; min-height: 120px; color: #fef08a;">* 비즈니스 룰: 결제 완료되어야 확정
-* 미결정 유보 사항:
-  - 예약 완료 알림 채널 (SMS/이메일)
-  - 취소 위약금 및 환불 정책</pre>
+
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border); border-radius: 14px; padding: 18px;">
+        <h4 style="color: var(--accent-cyan); font-size: 0.95rem; font-weight: 700; margin-bottom: 10px;">🛡️ Human-in-the-loop (승인 자동화의 원칙)</h4>
+        <ul style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; padding-left: 18px;">
+          <li><strong>외부 전송은 자동화하되, 승인은 사람이 직접:</strong> 메일 발송 전 수신자 주소, 첨부 내용, 개인정보 포함 여부를 눈으로 확인</li>
+          <li><strong>보낸편지함 검증:</strong> 실제 내 메일 계정의 [보낸편지함]에서 보고 메일이 올바르게 전송되었는지 확인</li>
+          <li><strong>결과 공유:</strong> 도출된 명세서와 메일 서식을 팀원들과 상호 크로스체크</li>
+        </ul>
       </div>
     </div>
-    <div class="presenter-notes" style="display:none;">이어서 생성된 meeting-notes.md 파일을 토대로 AI에게 사용자 역할, 기능, 비즈니스 정책, 미결정 사항을 분석하도록 요청해 보겠습니다. AI가 반환한 결과를 보면 일반 회원과 전문가, 관리자의 3가지 역할군이 깔끔하게 정의되고, 미결정된 환불 정책이나 알림 방식도 별도의 영역으로 잘 분리된 것을 볼 수 있습니다.</div>
-    <div class="visual-guide-notes" style="display:none;">3개 프롬프트 상자를 강조 효과와 함께 나열하고, 각 단계마다 늘어나는 구체적 제약 조건을 표시. 탭을 통해 시나리오별 변경 가능.</div>
+    <div class="presenter-notes" style="display:none;">문서가 완성되었으면 AI에게 보고 메일 초안을 만들게 하고, Gmail 플러그인을 실행해 실제 메일을 보냅니다. 중요한 점은 AI가 멋대로 전송하지 못하도록 사람이 수신자와 내용을 최종 확인하는 'Human-in-the-loop' 절차를 지키는 것입니다.</div>
   </div>
 </section>
 
-<!-- Slide 10: 실습 공유 및 피드백 요령 -->
+<!-- Slide 13: 기획 검수 4대 자가진단 및 Day 1 핵심 요약 -->
 <section class="slide-card session-1 session-1" id="slide-13">
   <div class="slide-header">
     <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">실습 공유 및 피드백 요령</div>
+      <div class="slide-category">Session 3. Gmail 플러그인 실제 발송 및 결과물 공유</div>
+      <div class="slide-title">기획 검수 4대 자가진단 &amp; Day 1 핵심 요약</div>
     </div>
     <div class="slide-meta">
       <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
   <div class="slide-body">
-    <ul class="bullet-list">
-      <li><span class="highlight">기획 검수 자가 진단 가이드:</span>
-        <ul>
-          <li>1. **역할 정의**: 사용자가 Customer, Expert, Admin의 3개 주체로 명확히 나뉘어 매칭되었는가?</li>
-          <li>2. **인과 관계**: 결제와 예약 스케줄 승인의 연관 관계가 누락 없이 분류되었는가?</li>
-          <li>3. **미결정 분리**: SMS/이메일 알림 보류 사항과 수수료 정책이 미결정 사항으로 구분되어 분리되었는가?</li>
-          <li>4. **사실성 검증(Anti-Hallucination)**: 대화록 원본에 없는 가상의 기능(포인트 충전, 회원 탈퇴)이 AI 분석에 흘러들지 않았는가?</li>
+    <div class="split-layout">
+      <div>
+        <h4 style="color: var(--accent-cyan); font-size: 1rem; font-weight: 700; margin-bottom: 8px;">📋 기획 검수 4대 자가진단 체크리스트</h4>
+        <ul class="bullet-list" style="font-size: 0.9rem;">
+          <li>1. <strong>원문 충실성 (25점):</strong> 회의록 원본에 없는 가상의 기능/정책을 상상해서 창작하지 않았는가?</li>
+          <li>2. <strong>명확성 (25점):</strong> 모든 요구사항에 조건, 주체, 행동, 결과가 측정 가능하게 기술되었는가?</li>
+          <li>3. <strong>완전성 (25점):</strong> 정상 흐름뿐만 아니라 결제 실패/중복 등의 예외 케이스와 미결정 사항이 분리되었는가?</li>
+          <li>4. <strong>추적성 (25점):</strong> 요구사항 ID(FR-01 등)와 Figma 와이어프레임 화면 컴포넌트가 1:1로 매핑되는가?</li>
         </ul>
-      </li>
-    </ul>
-    <div class="presenter-notes" style="display:none;">생성된 결과를 옆 동료의 화면과 대조해 봅시다. AI가 가상의 '포인트 충전 기능'이나 '회원 탈퇴' 등을 멋대로 창작해서 쓰지는 않았는지 검증해 주세요. 원본 회의록에 있는 팩트(Fact)에 기반하여 사용자 역할과 비즈니스 룰이 깔끔하게 구분되어 있어야 합격입니다.</div>
-    <div class="visual-guide-notes" style="display:none;">토론 분위기를 돋우는 말풍선 그래픽과 대표 질문 3가지를 가독성 높게 배치.</div>
+      </div>
+
+      <div>
+        <h4 style="color: var(--accent-purple); font-size: 1rem; font-weight: 700; margin-bottom: 8px;">🎯 Day 1 핵심 요약 &amp; Next Step</h4>
+        <div style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 12px; padding: 14px; margin-bottom: 10px;">
+          <p style="font-size: 0.88rem; color: #e4e4e7; line-height: 1.55;">
+            • <strong>기획 자동화:</strong> 비정형 회의록 → 0~4단계 Codex 파이프라인 → 통합 명세서 생성 및 Gmail 보고 체계 완비<br>
+            • <strong>Figma 화면 구조:</strong> Landing / Dashboard / Auth 핵심 3대 와이어프레임 구조화
+          </p>
+        </div>
+        <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 12px; padding: 14px;">
+          <p style="font-size: 0.88rem; color: #93c5fd; line-height: 1.55;">
+            🚀 <strong>다음 시간 (Day 2 예고):</strong><br>
+            2일차에는 기획된 화면과 요구사항을 바탕으로 <strong>데이터플로우 다이어그램(DFD)</strong>과 <strong>서비스 아키텍처</strong>를 설계하고, 다중 문서 간 모순과 불일치를 감사하는 기법을 실습합니다.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="presenter-notes" style="display:none;">1일차 실습을 훌륭히 마쳤습니다. 비정형 회의록에서 표준 요구사항 명세서를 만들고, Figma 화면 구조를 잡고, 메일 보고까지 완료했습니다. 4대 체크리스트로 자가진단을 수행하고, 내일 Day 2의 시스템 아키텍처 및 데이터플로우 설계로 넘어가겠습니다.</div>
   </div>
 </section>
 
-<!-- Slide 11: 정리: 1차시 핵심 요약 -->
+<!-- Slide 14: 1일차 강의 평가 (Daily Evaluation) -->
 <section class="slide-card session-1 session-1" id="slide-14">
-  <div class="slide-header">
-    <div>
-      <div class="slide-category">1차시. Codex Client 개요 및 Workspace 이해</div>
-      <div class="slide-title">정리: 1차시 핵심 요약</div>
-    </div>
-    <div class="slide-meta">
-      <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
-    </div>
-  </div>
-  <div class="slide-body">
-    <ul class="bullet-list">
-      <li><span class="highlight">1차시 요약:</span>
-        <ul>
-          <li><span class="highlight">질문보다 Workspace:</span> Codex Client는 로컬 디렉토리 전체를 AI 뇌의 콘텍스트로 매핑하여 다중 파일 연계 사양을 설계한다.</li>
-          <li><span class="highlight">대화 전처리 요약:</span> 비정형 줄글에서 노이즈를 필터링(0단계)하고, 사용자/기능/룰/유보 사항으로 카탈로깅(1단계)했다.</li>
-          <li><span class="highlight">다음 차시 예고:</span> 2차시. 단계형 요구사항 명세화 파이프라인 (기능 요구사항 정의서 표 및 정상/예외 시나리오 설계)</li>
-        </ul>
-      </li>
-    </ul>
-    <div class="presenter-notes" style="display:none;">1차시를 정리하겠습니다. 에이전트 설계는 단순 질문 작성이 아닌 구조화된 업무의 설계도입니다. 다음 2차시에는 에이전트의 '두뇌' 부분에 확실한 일관성을 불어넣어 줄 Persona와 이를 지탱하는 프롬프트 구조화 기법을 알아보겠습니다. 수고하셨습니다.</div>
-    <div class="visual-guide-notes" style="display:none;">깔끔한 체크리스트 형태의 레이아웃. 우측 하단에 'Next Step: 2차시'를 가리키는 밝은 화살표 이펙트 적용.</div>
-  </div>
-</section>
-<!-- Slide: 1일차 강의 평가 (Daily Evaluation) -->
-<section class="slide-card session-1 session-1" id="slide-15">
   <div class="slide-header">
     <div>
       <div class="slide-category">일차별 강의 평가 | Daily Feedback</div>
@@ -3235,7 +3369,7 @@ header {
     </div>
     <div class="slide-meta">
       <span class="day-badge">1일차</span>
-      <span>ACE Startup SW/AI 파일럿</span>
+      <span>대구 DIP SW 랜딩</span>
     </div>
   </div>
 
@@ -3243,10 +3377,10 @@ header {
     <div class="split-layout">
       <div>
         <ul class="bullet-list">
-          <li><span class="highlight">설문 목적:</span> 1일차 교육 내용 만족도, 난이도 체감 및 개선 의견 수렴</li>
+          <li><span class="highlight">설문 목적:</span> 1일차(Codex 요구사항 명세 &amp; Figma 화면 설계) 교육 내용 만족도, 실습 난이도 체감 및 개선 의견 수렴</li>
           <li><span class="highlight">참여 방법:</span> 우측 QR 코드를 스마트폰 카메라로 스캔하거나 아래 링크로 접속해 주세요.</li>
           <li><span class="highlight">설문 링크:</span> <a href="https://docs.google.com/forms/d/e/1FAIpQLSftm8ryWxfPuw5-3Iy4hLLQAgAbvf_lp8D5XeiUm-k2T2tV1g/viewform" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; word-break: break-all;">https://docs.google.com/forms/d/e/1FAIpQLSftm8ryWxfPuw5-3Iy4hLLQAgAbvf_lp8D5XeiUm-k2T2tV1g/viewform</a></li>
-          <li><span class="highlight">유의 사항:</span> 작성해 주신 소중한 피드백은 다음 차시 커리큘럼 보완 및 교육 품질 향상에 즉시 반영됩니다.</li>
+          <li><span class="highlight">유의 사항:</span> 작성해 주신 소중한 피드백은 내일 2일차 교육 진행 및 난이도 조절에 즉시 반영됩니다.</li>
         </ul>
       </div>
 
@@ -3259,7 +3393,7 @@ header {
       </div>
     </div>
 
-    <div class="presenter-notes" style="display:none;">1일차 수업을 마치며 교육 만족도 및 강의 평가를 진행합니다. 수강생분들께서는 QR 코드를 스캔하여 오늘 수업에 대한 피드백을 작성해 주시기 바랍니다.</div>
+    <div class="presenter-notes" style="display:none;">1일차 수업을 마치며 교육 만족도 및 강의 평가를 진행합니다. 수강생분들께서는 QR 코드를 스캔하여 오늘 수업에 대한 소중한 피드백을 남겨주시기 바랍니다. 감사합니다!</div>
   </div>
 </section>
 <!-- End of session1.html -->
@@ -7212,7 +7346,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     slides[index].classList.add('active');
 
     // Update hash router
-    window.location.hash = `slide-${index + 1}`;
+    const activeSlide = slides[index];
+    if (activeSlide && activeSlide.id) {
+      window.location.hash = activeSlide.id;
+    } else {
+      window.location.hash = `slide-${index + 1}`;
+    }
 
     // Update Navigation UI
     const progressPercent = ((index + 1) / slides.length) * 100;
@@ -7227,7 +7366,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     clearCanvas();
 
     // Update Presenter Notes and Visual Guide in tools drawer
-    const activeSlide = slides[index];
     const scriptEl = activeSlide.querySelector('.presenter-notes');
     const visualEl = activeSlide.querySelector('.visual-guide-notes');
 
@@ -7328,16 +7466,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   // --- Hash Route Loading ---
   function parseHash() {
     const hash = window.location.hash;
-    const match = hash.match(/^#slide-(\d+)$/);
-    if (match) {
-      const slideNum = parseInt(match[1], 10) - 1;
-      if (slideNum >= 0 && slideNum < slides.length) {
-        showSlide(slideNum);
-        setViewMode('presentation');
-        return;
+    if (hash) {
+      const target = document.getElementById(hash.replace(/^#/, ''));
+      if (target && target.classList.contains('slide-card')) {
+        const slideIndex = Array.from(slides).indexOf(target);
+        if (slideIndex !== -1) {
+          if (slideIndex !== state.currentSlide) {
+            showSlide(slideIndex);
+          }
+          setViewMode('presentation');
+          return;
+        }
+      }
+      const match = hash.match(/^#slide-(\d+)$/);
+      if (match) {
+        const slideNum = parseInt(match[1], 10) - 1;
+        if (slideNum >= 0 && slideNum < slides.length) {
+          if (slideNum !== state.currentSlide) {
+            showSlide(slideNum);
+          }
+          setViewMode('presentation');
+          return;
+        }
       }
     }
-    showSlide(0);
+    if (state.currentSlide !== 0) {
+      showSlide(0);
+    }
   }
 
   window.addEventListener('hashchange', parseHash);
