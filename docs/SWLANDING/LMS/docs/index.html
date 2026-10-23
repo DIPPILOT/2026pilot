@@ -56,6 +56,8 @@
   <title>대구 DIP SW 랜딩 | 10-Day Learning Contents</title>
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="shared/notice-modal.css" />
   <style>
     :root {
       --primary-color: #3b82f6;
@@ -193,7 +195,7 @@
     }
 
     .hero {
-      margin-top: 70px;
+      margin-top: 96px;
       padding: 120px 0 90px;
       background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1), transparent 60%), #09090b;
       position: relative;
@@ -1029,19 +1031,38 @@
 </head>
 
 <body>
-  <nav class="navbar">
+  <nav class="navbar navbar-tworow">
     <div class="container nav-container">
-      <a href="index.html" class="logo">대구 SW 랜딩</a>
-      <ul class="nav-links">
-        <li><a href="index.html">과정 홈</a></li>
-        <li><a href="homework_week1.html" style="color: #c084fc !important; font-weight: 700 !important; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 12px; border-radius: 8px;">1주차 과제</a></li>
-        <li><a href="homework_week2.html" style="color: #22d3ee !important; font-weight: 700 !important; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.3); padding: 6px 12px; border-radius: 8px;">2주차 과제</a></li>
-        <li><a href="homework_codex_field.html" style="color: #fbbf24 !important; font-weight: 700 !important; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 6px 12px; border-radius: 8px;">코덱스 현업 과제</a></li>
-        <li><a href="#overview">프로그램 소개</a></li>
-        <li><a href="#curriculum">10일 커리큘럼</a></li>
-        <li><a href="#final">최종 결과</a></li>
-        <li><a href="login/login.html" style="color: var(--secondary-color); text-shadow: var(--glow-cyan);">로그인</a></li>
-      </ul>
+      <!-- Row 1: Brand Logo & Core Quick Actions -->
+      <div class="nav-row-top">
+        <div class="logo-group">
+          <a href="index.html" class="logo">대구 SW 랜딩</a>
+          <span class="logo-badge">2026 PILOT</span>
+        </div>
+        <div class="nav-top-right">
+          <a href="index.html" class="nav-home-btn"><i class="fa-solid fa-house"></i> 과정 홈</a>
+          <button type="button" class="nav-notice-btn" id="openNoticeBtn" title="공지사항 보기 (SlideShare 스타일)">
+            <span class="notice-icon-anim">📢</span> 공지사항
+            <span class="notice-badge">3</span>
+          </button>
+          <div id="nav-user-item" class="nav-auth-slot">
+            <a href="login/login.html" class="nav-login-btn">로그인</a>
+          </div>
+        </div>
+      </div>
+      <!-- Row 2: Secondary Menu Links -->
+      <div class="nav-row-sub">
+        <ul class="subnav-links">
+          <li><a href="homework_week1.html" class="subnav-link nav-hw1">📝 1주차 과제</a></li>
+          <li><a href="homework_week2.html" class="subnav-link nav-hw2">⚡ 2주차 과제</a></li>
+          <li><a href="homework_codex_field.html" class="subnav-link nav-codex">💼 코덱스 현업 과제</a></li>
+          <li><a href="attendance_qr.html" class="subnav-link nav-qr">📱 출석 QR</a></li>
+          <li><a href="qr_resources.html" class="subnav-link">🔗 수강생 QR 모음</a></li>
+          <li><a href="#overview" class="subnav-link">💡 프로그램 소개</a></li>
+          <li><a href="#curriculum" class="subnav-link">📚 10일 커리큘럼</a></li>
+          <li><a href="#final" class="subnav-link">🏆 최종 결과</a></li>
+        </ul>
+      </div>
     </div>
   </nav>
 
@@ -3425,7 +3446,7 @@
     if (loggedInUser) {
       try {
         const user = JSON.parse(loggedInUser);
-        const lastNavLink = document.querySelector('.nav-links li:last-child');
+        const lastNavLink = document.getElementById('nav-user-item') || document.querySelector('.nav-auth-slot') || document.querySelector('.nav-links li:last-child');
         if (lastNavLink) {
           lastNavLink.innerHTML = `
             <div class="user-badge-main" style="display:flex; align-items:center; gap:8px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 50px; padding: 6px 14px; font-size: 0.9rem; font-weight: 700; color: var(--secondary-color); cursor: pointer;" onclick="logoutUser()" title="클릭하여 로그아웃">
@@ -3461,6 +3482,7 @@
       </div>
     </div>
   </footer>
+  <script src="shared/notice-modal.js"></script>
 </body>
 
 </html>

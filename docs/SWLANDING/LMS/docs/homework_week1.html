@@ -53,6 +53,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>대구 DIP SW 랜딩 | 1주차 개인 과제</title>
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="shared/notice-modal.css" />
   <style>
     :root {
       --primary-color: #3b82f6;
@@ -174,7 +176,7 @@
 
     /* Hero Section */
     .hero {
-      margin-top: 70px; padding: 70px 0 50px;
+      margin-top: 96px; padding: 70px 0 50px;
       background: radial-gradient(circle at 50% 30%, rgba(168, 85, 247, 0.12), transparent 70%), #09090b;
       position: relative; overflow: hidden; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
@@ -518,16 +520,38 @@
 <body>
 
   <!-- Navbar Header -->
-  <header class="navbar">
+  <header class="navbar navbar-tworow">
     <div class="container nav-container">
-      <a href="index.html" class="logo">대구 SW 랜딩</a>
-      <ul class="nav-links">
-        <li><a href="index.html">과정 홈</a></li>
-        <li><a href="homework_week1.html" class="nav-hw-btn active">📝 1주차 과제</a></li>
-        <li><a href="homework_week2.html" class="nav-hw-btn">2주차 과제</a></li>
-        <li><a href="homework_codex_field.html" class="nav-hw-btn">코덱스 현업 과제</a></li>
-        <li id="nav-user-item"><a href="login/login.html" style="color: var(--secondary-color); text-shadow: var(--glow-cyan);">로그인</a></li>
-      </ul>
+      <!-- Row 1: Brand Logo & Core Quick Actions -->
+      <div class="nav-row-top">
+        <div class="logo-group">
+          <a href="index.html" class="logo">대구 SW 랜딩</a>
+          <span class="logo-badge">2026 PILOT</span>
+        </div>
+        <div class="nav-top-right">
+          <a href="index.html" class="nav-home-btn"><i class="fa-solid fa-house"></i> 과정 홈</a>
+          <button type="button" class="nav-notice-btn" id="openNoticeBtn" title="공지사항 보기 (SlideShare 스타일)">
+            <span class="notice-icon-anim">📢</span> 공지사항
+            <span class="notice-badge">3</span>
+          </button>
+          <div id="nav-user-item" class="nav-auth-slot">
+            <a href="login/login.html" class="nav-login-btn">로그인</a>
+          </div>
+        </div>
+      </div>
+      <!-- Row 2: Secondary Menu Links -->
+      <div class="nav-row-sub">
+        <ul class="subnav-links">
+          <li><a href="homework_week1.html" class="subnav-link nav-hw1 active">📝 1주차 과제</a></li>
+          <li><a href="homework_week2.html" class="subnav-link nav-hw2">⚡ 2주차 과제</a></li>
+          <li><a href="homework_codex_field.html" class="subnav-link nav-codex">💼 코덱스 현업 과제</a></li>
+          <li><a href="attendance_qr.html" class="subnav-link nav-qr">📱 출석 QR</a></li>
+          <li><a href="qr_resources.html" class="subnav-link">🔗 수강생 QR 모음</a></li>
+          <li><a href="index.html#overview" class="subnav-link">💡 프로그램 소개</a></li>
+          <li><a href="index.html#curriculum" class="subnav-link">📚 10일 커리큘럼</a></li>
+          <li><a href="index.html#final" class="subnav-link">🏆 최종 결과</a></li>
+        </ul>
+      </div>
     </div>
   </header>
 
@@ -1798,5 +1822,6 @@ GDPR 삭제권과 세무 보존 의무가 충돌합니다.
     };
   </script>
   <script src="homework-log.js?v=20260930-session-check"></script>
+  <script src="shared/notice-modal.js"></script>
 </body>
 </html>

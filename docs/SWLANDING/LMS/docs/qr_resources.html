@@ -8,6 +8,7 @@
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="shared/notice-modal.css" />
   <style>
     :root {
       --primary: #3b82f6;
@@ -596,18 +597,38 @@
 
 <body>
   <!-- Top Navigation -->
-  <header class="navbar">
-    <a href="index.html" class="brand-logo">
-      <i class="fa-solid fa-qrcode"></i>
-      <span>대구 SW 랜딩</span>
-    </a>
-    <div class="nav-actions">
-      <a href="index.html" class="nav-link-btn">
-        <i class="fa-solid fa-arrow-left"></i> 과정 홈
-      </a>
-      <a href="homework_week1.html" class="nav-link-btn">1주차 과제</a>
-      <a href="homework_week2.html" class="nav-link-btn">2주차 과제</a>
-      <a href="homework_codex_field.html" class="nav-link-btn primary">코덱스 현업 과제</a>
+  <header class="navbar navbar-tworow">
+    <div class="container nav-container">
+      <!-- Row 1: Brand Logo & Core Quick Actions -->
+      <div class="nav-row-top">
+        <div class="logo-group">
+          <a href="index.html" class="logo">대구 SW 랜딩</a>
+          <span class="logo-badge">2026 PILOT</span>
+        </div>
+        <div class="nav-top-right">
+          <a href="index.html" class="nav-home-btn"><i class="fa-solid fa-house"></i> 과정 홈</a>
+          <button type="button" class="nav-notice-btn" id="openNoticeBtn" title="공지사항 보기 (SlideShare 스타일)">
+            <span class="notice-icon-anim">📢</span> 공지사항
+            <span class="notice-badge">3</span>
+          </button>
+          <div id="nav-user-item" class="nav-auth-slot">
+            <a href="login/login.html" class="nav-login-btn">로그인</a>
+          </div>
+        </div>
+      </div>
+      <!-- Row 2: Secondary Menu Links -->
+      <div class="nav-row-sub">
+        <ul class="subnav-links">
+          <li><a href="homework_week1.html" class="subnav-link nav-hw1">📝 1주차 과제</a></li>
+          <li><a href="homework_week2.html" class="subnav-link nav-hw2">⚡ 2주차 과제</a></li>
+          <li><a href="homework_codex_field.html" class="subnav-link nav-codex">💼 코덱스 현업 과제</a></li>
+          <li><a href="attendance_qr.html" class="subnav-link nav-qr">📱 출석 QR</a></li>
+          <li><a href="qr_resources.html" class="subnav-link active">🔗 수강생 QR 모음</a></li>
+          <li><a href="index.html#overview" class="subnav-link">💡 프로그램 소개</a></li>
+          <li><a href="index.html#curriculum" class="subnav-link">📚 10일 커리큘럼</a></li>
+          <li><a href="index.html#final" class="subnav-link">🏆 최종 결과</a></li>
+        </ul>
+      </div>
     </div>
   </header>
 
@@ -954,6 +975,7 @@
       }
     });
   </script>
+  <script src="shared/notice-modal.js"></script>
 </body>
 
 </html>
