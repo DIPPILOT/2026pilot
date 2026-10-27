@@ -57,7 +57,7 @@
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="shared/notice-modal.css" />
+  <link rel="stylesheet" href="shared/notice-modal.css?v=20261027_02" />
   <style>
     :root {
       --primary-color: #3b82f6;
@@ -1027,6 +1027,82 @@
       box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5), 0 0 10px rgba(6, 182, 212, 0.3);
       background: linear-gradient(135deg, #2563eb, #0891b2);
     }
+
+    /* Notice Hero Banner */
+    .notice-hero-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 22px;
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.2), rgba(59, 130, 246, 0.22), rgba(16, 185, 129, 0.18));
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+    }
+    .notice-hero-banner:hover {
+      transform: translateY(-2px);
+      border-color: #38bdf8;
+      box-shadow: 0 8px 30px rgba(56, 189, 248, 0.25);
+      background: linear-gradient(90deg, rgba(239, 68, 68, 0.3), rgba(59, 130, 246, 0.32), rgba(16, 185, 129, 0.25));
+    }
+    .notice-hero-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .notice-hero-pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      animation: heroPulse 1.8s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes heroPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .notice-hero-tag {
+      background: #ef4444;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+    .notice-hero-text {
+      color: #f8fafc;
+      font-size: 0.96rem;
+    }
+    .notice-hero-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #38bdf8;
+      font-size: 0.88rem;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    @media (max-width: 768px) {
+      .notice-hero-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 16px;
+      }
+      .notice-hero-right {
+        align-self: flex-end;
+      }
+    }
   </style>
 </head>
 
@@ -1042,7 +1118,7 @@
           <a href="index.html" class="nav-home-btn"><i class="fa-solid fa-house"></i> 과정 홈</a>
           <button type="button" class="nav-notice-btn" id="openNoticeBtn" title="공지사항 보기 (SlideShare 스타일)">
             <span class="notice-icon-anim">📢</span> 공지사항
-            <span class="notice-badge">3</span>
+            <span class="notice-badge">4</span>
           </button>
           <div id="nav-user-item" class="nav-auth-slot">
             <a href="login/login.html" class="nav-login-btn">로그인</a>
@@ -1066,6 +1142,19 @@
   </nav>
 
   <section class="hero">
+    <div class="container" style="margin-bottom: 28px;">
+      <div class="notice-hero-banner" onclick="openNoticeModal(0)" role="button" tabindex="0" title="10월 27일 온라인 학습 공지사항 보기" onkeydown="if(event.key==='Enter'||event.key===' '){openNoticeModal(0);event.preventDefault();}">
+        <div class="notice-hero-left">
+          <span class="notice-hero-pulse"></span>
+          <span class="notice-hero-tag">중요 공지</span>
+          <span class="notice-hero-text"><strong>📢 10월 27일(화) 온라인 학습 안내</strong> (4시간 학습 + 과제 1개 제출 필수)</span>
+        </div>
+        <div class="notice-hero-right">
+          <span>상세 안내 및 가이드 확인</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+      </div>
+    </div>
     <div class="container hero-grid">
       <div>
         <h1>대구 SW 랜딩 10 Days</h1>
@@ -3481,7 +3570,7 @@
       </div>
     </div>
   </footer>
-  <script src="shared/notice-modal.js"></script>
+  <script src="shared/notice-modal.js?v=20261027_02"></script>
 </body>
 
 </html>

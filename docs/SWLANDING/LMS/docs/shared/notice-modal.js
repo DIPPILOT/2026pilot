@@ -17,14 +17,97 @@
 
   const BASE_PATH = getBasePath();
 
-  // Notices data: Notice 3 is latest (Slide 0), Notice 2 is Slide 1, Notice 1 is Slide 2
+  // Notices data: Notice 4 is latest (Slide 0), Notice 3 is Slide 1, Notice 2 is Slide 2, Notice 1 is Slide 3
   const NOTICES_DATA = [
     {
-      id: 3,
-      tag: '운영 안내 · NEW',
+      id: 4,
+      tag: '온라인 학습 · NEW',
       tagClass: 'tag-urgent',
-      tabLabel: '📢 1. 교육시설/주차 안내',
-      title: '📢 [2026 SW랜딩] 교육시설 이용 및 주차 안내',
+      tabLabel: '📢 1. 10/27 온라인 학습 안내',
+      title: '📢 [SW랜딩] 10월 27일(화) 온라인 학습 안내',
+      contentHtml: `
+        <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
+          이번 온라인 학습은 <span style="color: #38bdf8;">4시간 학습 + 과제 1개 제출</span>로 진행합니다.
+        </p>
+
+        <!-- 1. 학습시간 계산 기준 -->
+        <div class="notice-card-box highlight-amber">
+          <h4 class="notice-box-title">⏰ 학습시간 계산 기준</h4>
+          <ul class="notice-check-list" style="margin-bottom: 10px;">
+            <li><span class="check-icon">▶</span> <span><strong>시작(출입시간):</strong> LMS 접속 시각</span></li>
+            <li><span class="check-icon">▶</span> <span><strong>종료(마감시간):</strong> 구글 클래스룸 과제 제출 시각</span></li>
+          </ul>
+          <p class="notice-text-p" style="color: #fde68a; font-weight: 600; margin: 0;">
+            💡 LMS 접속부터 과제 제출까지 <strong>4시간</strong>을 채우고, 학습과 제출을 모두 <strong>10월 27일(화) 안에 완료</strong>해 주세요.
+          </p>
+        </div>
+
+        <!-- 2. 총 4개 과제 중 1개 선택 -->
+        <div class="notice-card-box highlight-blue">
+          <h4 class="notice-box-title">📝 총 4개 과제 중 ✅ 1개만 선택해 주세요!</h4>
+          <p class="notice-text-p">
+            아래 두 메뉴에 있는 과제 4개 중 원하는 과제 1개를 선택해 수행하고 제출하면 됩니다.
+          </p>
+          <ul class="notice-check-list">
+            <li>
+              <span class="check-icon">1️⃣</span>
+              <span><strong>「1~5day 과제」</strong> → <strong>「Day 1 (2개)」</strong> 중 택 1</span>
+            </li>
+            <li>
+              <span class="check-icon">2️⃣</span>
+              <span><strong>「코덱스 현업 과제」</strong> → <strong>「입문」</strong> 중 택 1</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 3. 제출 전 꼭 확인하세요 -->
+        <div class="notice-card-box highlight-green">
+          <h4 class="notice-box-title">📌 제출 전 꼭 확인하세요!</h4>
+          <p class="notice-text-p">
+            <strong>「과제 제출 및 평가 규칙」</strong>을 읽고, 구글 클래스룸의 <strong>「1주 과제 제출 해주세요」</strong>에 본인 이름으로 제출해 주세요.
+          </p>
+          <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="${BASE_PATH}index.html" class="notice-action-link" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; text-decoration: none; font-weight: 700; font-size: 0.9rem;">
+              🔗 LMS 접속하기
+            </a>
+            <a href="https://classroom.google.com/c/ODczMDM4OTY3MjY4?cjc=qxrgrpxz" target="_blank" rel="noopener noreferrer" class="notice-action-link" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; text-decoration: none; font-weight: 700; font-size: 0.9rem;">
+              🔗 구글 클래스룸 바로가기 ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- 4. 첨부 이미지 3장 안내 -->
+        <div class="notice-attachment-wrap" style="text-align: left; margin-top: 20px;">
+          <div class="attachment-label">
+            <span>👇 <strong>자세한 진행 방법 (첨부 이미지 3장)</strong></span>
+            <span style="font-size: 0.78rem; color: #38bdf8;">클릭 시 원본 크기로 확대</span>
+          </div>
+          <p class="notice-text-p" style="font-size: 0.88rem; color: #94a3b8; margin-bottom: 12px;">
+            순서대로 확인하며 온라인 학습을 진행해 주세요. 이미지를 클릭하면 크게 볼 수 있습니다.
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">01. 학습 시작 및 메뉴 안내</div>
+              <img src="${BASE_PATH}img/notice_online_learning_guide_01.png" alt="01 온라인 학습 시작 안내" class="notice-zoomable-img" style="width: 100%; border-radius: 8px; cursor: zoom-in; transition: transform 0.2s;" data-zoom-src="${BASE_PATH}img/notice_online_learning_guide_01.png" />
+            </div>
+            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">02. 과제 4개 중 1개 선택</div>
+              <img src="${BASE_PATH}img/notice_online_learning_guide_02.png" alt="02 과제 선택 안내" class="notice-zoomable-img" style="width: 100%; border-radius: 8px; cursor: zoom-in; transition: transform 0.2s;" data-zoom-src="${BASE_PATH}img/notice_online_learning_guide_02.png" />
+            </div>
+            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">03. 구글 클래스룸 제출 안내</div>
+              <img src="${BASE_PATH}img/notice_online_learning_guide_03.png" alt="03 과제 제출 안내" class="notice-zoomable-img" style="width: 100%; border-radius: 8px; cursor: zoom-in; transition: transform 0.2s;" data-zoom-src="${BASE_PATH}img/notice_online_learning_guide_03.png" />
+            </div>
+          </div>
+        </div>
+      `
+    },
+    {
+      id: 3,
+      tag: '운영 안내',
+      tagClass: 'tag-urgent',
+      tabLabel: '🚗 2. 교육시설/주차 안내',
+      title: '📢 [SW랜딩] 교육시설 이용 및 주차 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.02rem; font-weight: 600; color: #f8fafc;">
           안녕하세요, SW랜딩 운영팀입니다! 😊<br>
@@ -73,7 +156,7 @@
       id: 2,
       tag: '교수진 공지 · 팀 편성',
       tagClass: 'tag-faculty',
-      tabLabel: '👥 2. 팀 구성 안내',
+      tabLabel: '👥 3. 팀 구성 안내',
       title: '[공지] 학습 모듈별 팀 구성 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -124,8 +207,8 @@
       id: 1,
       tag: '학습 안내 · 모듈 1',
       tagClass: 'tag-learning',
-      tabLabel: '🚀 3. 모듈 1 학습 안내',
-      title: '🚀 [2026 SW랜딩] 모듈 1 첫 번째 학습 안내',
+      tabLabel: '🚀 4. 모듈 1 학습 안내',
+      title: '🚀 [SW랜딩] 모듈 1 첫 번째 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
           안녕하세요! 🤗 @everyone
@@ -231,7 +314,7 @@
         <div class="notice-modal-header">
           <div class="notice-header-left">
             <h2 class="notice-main-title" id="noticeMainTitle">
-              <span style="color:#ef4444;">📢</span> [2026 SW랜딩] 전체 공지사항
+              <span style="color:#ef4444;">📢</span> [SW랜딩] 전체 공지사항
             </h2>
             <span class="notice-counter-pill" id="noticeCounterPill">1 / ${NOTICES_DATA.length} (최신순)</span>
           </div>
@@ -256,6 +339,12 @@
 
         <!-- Footer / Pagination -->
         <div class="notice-modal-footer">
+          <div class="notice-footer-left">
+            <label style="display: inline-flex; align-items: center; gap: 6px; color: #94a3b8; font-size: 0.82rem; cursor: pointer; user-select: none;">
+              <input type="checkbox" id="noticeDontShowToday" style="cursor: pointer; accent-color: #38bdf8;" />
+              오늘 하루 보지 않기
+            </label>
+          </div>
           <div class="notice-pagination-dots" id="noticePaginationDots">
             ${dotsHtml}
           </div>
@@ -345,6 +434,8 @@
     if (arrowNext) arrowNext.disabled = isLast;
   }
 
+  const DONT_SHOW_STORAGE_KEY = 'swlanding_notice_hide_20261027';
+
   function openNotice(slideIndex = 0) {
     createModalDOM();
     goToSlide(slideIndex);
@@ -354,6 +445,13 @@
 
   function closeNotice() {
     if (!modalBackdrop) return;
+    const dontShow = document.getElementById('noticeDontShowToday');
+    if (dontShow && dontShow.checked) {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      try {
+        localStorage.setItem(DONT_SHOW_STORAGE_KEY, todayStr);
+      } catch (e) {}
+    }
     modalBackdrop.classList.remove('is-open');
     document.body.style.overflow = '';
   }
@@ -420,15 +518,22 @@
       }, { passive: true });
     }
 
-    // Lightbox for team table image
-    const teamImg = document.getElementById('noticeTeamTableImg');
+    // Dynamic Lightbox for zoomable images (team table and 3 online guide images)
     const lightbox = document.getElementById('noticeLightboxOverlay');
-    if (teamImg && lightbox) {
-      teamImg.addEventListener('click', () => {
-        lightbox.classList.add('is-active');
-      });
-      lightbox.addEventListener('click', () => {
-        lightbox.classList.remove('is-active');
+    const lightboxImg = lightbox ? lightbox.querySelector('.notice-lightbox-img') : null;
+
+    if (lightbox && lightboxImg) {
+      document.addEventListener('click', (e) => {
+        const zoomTarget = e.target.closest('.notice-zoomable-img, #noticeTeamTableImg, [data-zoom-src]');
+        if (zoomTarget) {
+          const src = zoomTarget.getAttribute('data-zoom-src') || zoomTarget.getAttribute('src');
+          if (src) {
+            lightboxImg.src = src;
+            lightbox.classList.add('is-active');
+          }
+        } else if (lightbox.classList.contains('is-active') && (e.target === lightbox || e.target === lightboxImg)) {
+          lightbox.classList.remove('is-active');
+        }
       });
     }
   }
@@ -451,15 +556,33 @@
     });
   }
 
+  // Auto-open notice popup on page load unless "don't show today" was checked
+  function checkAutoOpen() {
+    if (window.location.pathname.includes('login')) return;
+    try {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const saved = localStorage.getItem(DONT_SHOW_STORAGE_KEY);
+      if (saved === todayStr) {
+        return;
+      }
+    } catch (e) {}
+
+    setTimeout(() => {
+      openNotice(0);
+    }, 400);
+  }
+
   // Initialize on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       createModalDOM();
       bindTriggers();
+      checkAutoOpen();
     });
   } else {
     createModalDOM();
     bindTriggers();
+    checkAutoOpen();
   }
 
   // Periodic check in case triggers are dynamically rendered
