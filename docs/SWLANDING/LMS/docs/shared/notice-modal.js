@@ -17,13 +17,104 @@
 
   const BASE_PATH = getBasePath();
 
-  // Notices data: Notice 4 is latest (Slide 0), Notice 3 is Slide 1, Notice 2 is Slide 2, Notice 1 is Slide 3
+  // Notices data: Notice 5 is latest (Slide 0), Notice 4 is Slide 1, Notice 3 is Slide 2, Notice 2 is Slide 3, Notice 1 is Slide 4
   const NOTICES_DATA = [
     {
-      id: 4,
-      tag: '온라인 학습 · NEW',
+      id: 5,
+      tag: '팀 편성 · 최신 공지',
       tagClass: 'tag-urgent',
-      tabLabel: '📢 1. 10/27 온라인 학습 안내',
+      tabLabel: '👥 1. 팀 재배정 안내',
+      title: '📢 [2026 SW 랜딩] 팀 재배정 안내',
+      contentHtml: `
+        <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; line-height: 1.7;">
+          안녕하세요, SW랜딩 운영팀입니다! 🙌<br>
+          <span style="color: #38bdf8;">추가된 학습성향조사 데이터를 반영하여 팀을 다시 배정하게 되었습니다.</span>
+        </p>
+
+        <p class="notice-text-p" style="font-size: 0.98rem; color: #cbd5e1; line-height: 1.7;">
+          개인별 학습성향을 분석하여 동료학습 시너지를 낼 수 있도록 팀을 구성하였으니, 아래 명단 및 첨부된 이미지에서 본인 팀을 확인해 주세요. 🙌
+        </p>
+
+        <!-- 팀 배정 요약 카드 (텍스트 명단) -->
+        <div class="notice-card-box highlight-blue" style="margin: 18px 0;">
+          <h4 class="notice-box-title" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <span>📋 재배정 팀 명단 (총 4개 팀)</span>
+            <span style="font-size: 0.78rem; color: #94a3b8; font-weight: 500;">학습성향조사 반영</span>
+          </h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;">
+            <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 10px; padding: 12px 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <strong style="color: #60a5fa; font-size: 1.02rem;">1팀</strong>
+                <span style="font-size: 0.76rem; background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 2px 7px; border-radius: 999px;">4명</span>
+              </div>
+              <div style="font-size: 0.95rem; color: #f1f5f9; font-weight: 600; line-height: 1.6;">
+                석지윤 · 김예찬 · 허동후 · 손영준
+              </div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 12px 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <strong style="color: #34d399; font-size: 1.02rem;">2팀</strong>
+                <span style="font-size: 0.76rem; background: rgba(16, 185, 129, 0.2); color: #a7f3d0; padding: 2px 7px; border-radius: 999px;">4명</span>
+              </div>
+              <div style="font-size: 0.95rem; color: #f1f5f9; font-weight: 600; line-height: 1.6;">
+                강모세 · 김나연 · 서상호 · 김지훈
+              </div>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; padding: 12px 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <strong style="color: #fbbf24; font-size: 1.02rem;">3팀</strong>
+                <span style="font-size: 0.76rem; background: rgba(245, 158, 11, 0.2); color: #fde68a; padding: 2px 7px; border-radius: 999px;">4명</span>
+              </div>
+              <div style="font-size: 0.95rem; color: #f1f5f9; font-weight: 600; line-height: 1.6;">
+                권태주 · 유승혁 · 하정무 · 은대영
+              </div>
+            </div>
+            <div style="background: rgba(244, 63, 94, 0.08); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 10px; padding: 12px 14px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <strong style="color: #fb7185; font-size: 1.02rem;">4팀</strong>
+                <span style="font-size: 0.76rem; background: rgba(244, 63, 94, 0.2); color: #fecdd3; padding: 2px 7px; border-radius: 999px;">4명</span>
+              </div>
+              <div style="font-size: 0.95rem; color: #f1f5f9; font-weight: 600; line-height: 1.6;">
+                이진녕 · 김예원 · 류승지 · 이지민
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 소통과 협력 안내 -->
+        <div class="notice-card-box highlight-amber" style="margin-bottom: 18px;">
+          <h4 class="notice-box-title">🤝 팀 소통 및 협력 안내</h4>
+          <p class="notice-text-p" style="margin: 0; color: #fde68a; line-height: 1.7;">
+            이전에 안내드린 팀 구성과 달라진 점 양해 부탁드리며, 앞으로 팀원들과 활발히 소통하고 협력하며 좋은 결과 만들어가시길 바랍니다!
+          </p>
+        </div>
+
+        <!-- 첨부 이미지 -->
+        <div class="notice-attachment-wrap" style="text-align: center; margin-top: 18px;">
+          <div class="attachment-label">
+            <span>📎 첨부파일: <strong>[2026 SW 랜딩] 팀 재배정 안내표</strong></span>
+            <span style="font-size: 0.78rem; color: #38bdf8;">클릭 시 원본 크기로 확대</span>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; display: inline-block; max-width: 100%;">
+            <img src="${BASE_PATH}img/notice_team_reassignment.png" alt="[2026 SW 랜딩] 팀 재배정 안내표" class="notice-team-img notice-zoomable-img" style="max-height: 520px; width: auto; max-width: 100%; border-radius: 10px; cursor: zoom-in; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" data-zoom-src="${BASE_PATH}img/notice_team_reassignment.png" title="클릭하여 원본 크기로 보기" />
+          </div>
+        </div>
+
+        <div class="notice-author-sign">
+          <p class="notice-text-p" style="margin-bottom: 4px;">
+            문의사항은 언제든 편하게 DM 주세요. 😊
+          </p>
+          <p class="notice-text-p" style="font-weight: 700; color: #38bdf8;">
+            2026 SW 랜딩 운영팀 드림
+          </p>
+        </div>
+      `
+    },
+    {
+      id: 4,
+      tag: '온라인 학습',
+      tagClass: 'tag-urgent',
+      tabLabel: '📢 2. 10/27 온라인 학습 안내',
       title: '📢 [SW랜딩] 10월 27일(화) 온라인 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -106,7 +197,7 @@
       id: 3,
       tag: '운영 안내',
       tagClass: 'tag-urgent',
-      tabLabel: '🚗 2. 교육시설/주차 안내',
+      tabLabel: '🚗 3. 교육시설/주차 안내',
       title: '📢 [SW랜딩] 교육시설 이용 및 주차 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.02rem; font-weight: 600; color: #f8fafc;">
@@ -156,7 +247,7 @@
       id: 2,
       tag: '교수진 공지 · 팀 편성',
       tagClass: 'tag-faculty',
-      tabLabel: '👥 3. 팀 구성 안내',
+      tabLabel: '👥 4. 초기 팀 구성 안내',
       title: '[공지] 학습 모듈별 팀 구성 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -191,7 +282,7 @@
         <!-- Attachment: Team Organization Table Image -->
         <div class="notice-attachment-wrap">
           <div class="attachment-label">
-            <span>📎 첨부파일: <strong>2026 SW랜딩 팀 구성 표</strong></span>
+            <span>📎 첨부파일: <strong>2026 SW랜딩 초기 팀 구성 표</strong></span>
             <span style="font-size: 0.78rem; color: #38bdf8;">클릭 시 원본 크기로 확대</span>
           </div>
           <img src="${BASE_PATH}img/notice_team_table.png" alt="2026 SW랜딩 팀 구성 안내표" class="notice-team-img" id="noticeTeamTableImg" title="클릭하여 원본 크기로 보기" />
@@ -207,7 +298,7 @@
       id: 1,
       tag: '학습 안내 · 모듈 1',
       tagClass: 'tag-learning',
-      tabLabel: '🚀 4. 모듈 1 학습 안내',
+      tabLabel: '🚀 5. 모듈 1 학습 안내',
       title: '🚀 [SW랜딩] 모듈 1 첫 번째 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -359,13 +450,18 @@
         </div>
       </div>
 
-      <!-- Image Lightbox for zooming team organization table -->
+      <!-- Image Lightbox for zooming notice images -->
       <div class="notice-lightbox-overlay" id="noticeLightboxOverlay">
-        <img src="${BASE_PATH}img/notice_team_table.png" alt="팀 구성 표 원본" class="notice-lightbox-img" />
+        <img src="${BASE_PATH}img/notice_team_reassignment.png" alt="공지 이미지 확대" class="notice-lightbox-img" />
       </div>
     `;
 
     document.body.appendChild(backdrop);
+
+    // Update notice badges across page
+    document.querySelectorAll('.notice-badge').forEach((badge) => {
+      badge.textContent = NOTICES_DATA.length;
+    });
 
     // Cache elements
     modalBackdrop = backdrop;
@@ -434,7 +530,7 @@
     if (arrowNext) arrowNext.disabled = isLast;
   }
 
-  const DONT_SHOW_STORAGE_KEY = 'swlanding_notice_hide_20261027';
+  const DONT_SHOW_STORAGE_KEY = 'swlanding_notice_hide_20261030';
 
   function openNotice(slideIndex = 0) {
     createModalDOM();
@@ -544,6 +640,9 @@
 
   // Auto-bind to any element with id="openNoticeBtn" or class="nav-notice-btn"
   function bindTriggers() {
+    document.querySelectorAll('.notice-badge').forEach((badge) => {
+      badge.textContent = NOTICES_DATA.length;
+    });
     const triggers = document.querySelectorAll('#openNoticeBtn, .nav-notice-btn, [data-open-notice]');
     triggers.forEach((trigger) => {
       if (!trigger.dataset.noticeBound) {
