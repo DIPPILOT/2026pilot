@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>샌드위치·음료 주문 키오스크 서비스 | 통합 런처 & 실시간 연동 뷰</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --primary: #10b981;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #334155;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+    }
+    .launcher-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+    .brand-badge {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .mode-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn[aria-pressed="true"],
+    .btn.primary {
+      background: var(--primary);
+      color: #064e3b;
+      border-color: var(--primary);
+      font-weight: 800;
+    }
+    .workspace {
+      flex: 1;
+      display: flex;
+      gap: 14px;
+      padding: 14px;
+      min-height: 0;
+    }
+    .pane {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .pane-customer {
+      width: 420px;
+      flex-shrink: 0;
+    }
+    .pane-admin {
+      flex: 1;
+      min-width: 0;
+    }
+    .pane-header {
+      padding: 8px 14px;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .pane-header a {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+    iframe {
+      width: 100%;
+      flex: 1;
+      border: none;
+      background: #fff;
+    }
+    @media (max-width: 1100px) {
+      .workspace {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      .pane-customer {
+        width: 100%;
+        height: 760px;
+      }
+      .pane-admin {
+        width: 100%;
+        height: 860px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="launcher-header">
+    <div class="brand">
+      <span style="font-size:1.4rem;" aria-hidden="true">🥪</span>
+      <h1>샌드위치·음료 주문 키오스크 서비스</h1>
+      <span class="brand-badge">실시간 양방향 동기화 활성</span>
+    </div>
+    <nav class="mode-actions" aria-label="화면 보기 모드 전환">
+      <button type="button" class="btn" id="mode-split-btn" aria-pressed="true">
+        ⚡ 고객 모바일 + PC 관리자 동시 보기
+      </button>
+      <button type="button" class="btn" id="mode-customer-btn" aria-pressed="false">
+        📱 고객 모바일 화면만 보기
+      </button>
+      <button type="button" class="btn" id="mode-admin-btn" aria-pressed="false">
+        🖥️ PC 관리자 화면만 보기
+      </button>
+      <a href="customer/index.html" target="_blank" rel="noopener" class="btn">
+        ↗ 고객 화면 새 창
+      </a>
+      <a href="admin/index.html" target="_blank" rel="noopener" class="btn">
+        ↗ 관리자 화면 새 창
+      </a>
+    </nav>
+  </header>
+
+  <main class="workspace" id="workspace">
+    <section class="pane pane-customer" id="customer-pane" aria-label="고객 모바일 주문 화면 프리뷰">
+      <div class="pane-header">
+        <span>📱 고객 모바일 주문 서비스 (360px+ 세로 화면 기준)</span>
+        <a href="customer/index.html" target="_blank" rel="noopener">단독 창 열기 ↗</a>
+      </div>
+      <iframe src="customer/index.html" title="고객 모바일 주문 서비스"></iframe>
+    </section>
+
+    <section class="pane pane-admin" id="admin-pane" aria-label="PC 관리자 화면 프리뷰">
+      <div class="pane-header">
+        <span>🖥️ PC 매장 관리자 센터 (주문·메뉴·품절·매출·설정·권한)</span>
+        <a href="admin/index.html" target="_blank" rel="noopener">단독 창 열기 ↗</a>
+      </div>
+      <iframe src="admin/index.html" title="PC 관리자 화면"></iframe>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const splitBtn = document.getElementById('mode-split-btn');
+      const custBtn = document.getElementById('mode-customer-btn');
+      const adminBtn = document.getElementById('mode-admin-btn');
+      const custPane = document.getElementById('customer-pane');
+      const adminPane = document.getElementById('admin-pane');
+
+      function setMode(mode) {
+        splitBtn.setAttribute('aria-pressed', String(mode === 'SPLIT'));
+        custBtn.setAttribute('aria-pressed', String(mode === 'CUSTOMER'));
+        adminBtn.setAttribute('aria-pressed', String(mode === 'ADMIN'));
+
+        if (mode === 'SPLIT') {
+          custPane.style.display = 'flex';
+          custPane.style.width = '420px';
+          custPane.style.margin = '0';
+          adminPane.style.display = 'flex';
+        } else if (mode === 'CUSTOMER') {
+          custPane.style.display = 'flex';
+          custPane.style.width = '460px';
+          custPane.style.margin = '0 auto';
+          adminPane.style.display = 'none';
+        } else if (mode === 'ADMIN') {
+          custPane.style.display = 'none';
+          adminPane.style.display = 'flex';
+        }
+      }
+
+      splitBtn.addEventListener('click', () => setMode('SPLIT'));
+      custBtn.addEventListener('click', () => setMode('CUSTOMER'));
+      adminBtn.addEventListener('click', () => setMode('ADMIN'));
+    })();
+  </script>
+</body>
+</html>
+

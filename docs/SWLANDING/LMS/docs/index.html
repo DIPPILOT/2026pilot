@@ -1118,7 +1118,7 @@
           <a href="index.html" class="nav-home-btn"><i class="fa-solid fa-house"></i> 과정 홈</a>
           <button type="button" class="nav-notice-btn" id="openNoticeBtn" title="공지사항 보기 (SlideShare 스타일)">
             <span class="notice-icon-anim">📢</span> 공지사항
-            <span class="notice-badge">5</span>
+            <span class="notice-badge">7</span>
           </button>
           <div id="nav-user-item" class="nav-auth-slot">
             <a href="login/login.html" class="nav-login-btn">로그인</a>
@@ -1142,15 +1142,26 @@
   </nav>
 
   <section class="hero">
-    <div class="container" style="margin-bottom: 28px;">
-      <div class="notice-hero-banner" onclick="openNoticeModal(0)" role="button" tabindex="0" title="[2026 SW 랜딩] 팀 재배정 안내 보기" onkeydown="if(event.key==='Enter'||event.key===' '){openNoticeModal(0);event.preventDefault();}">
+    <div class="container" style="margin-bottom: 28px; display: flex; flex-direction: column; gap: 10px;">
+      <div class="notice-hero-banner" onclick="openNoticeModal(0)" role="button" tabindex="0" title="[필독] LMS 교육 콘텐츠 무단 복사 및 Git 배포 관련 안내 보기" onkeydown="if(event.key==='Enter'||event.key===' '){openNoticeModal(0);event.preventDefault();}" style="border-color: rgba(239, 68, 68, 0.55); background: linear-gradient(90deg, rgba(239, 68, 68, 0.18), rgba(15, 23, 42, 0.92));">
+        <div class="notice-hero-left">
+          <span class="notice-hero-pulse" style="background: #ef4444; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);"></span>
+          <span class="notice-hero-tag" style="background: #ef4444; color: #fff;">🚨 필독 공지</span>
+          <span class="notice-hero-text"><strong style="color: #fecaca;">[공지] LMS 교육 콘텐츠 무단 복사 및 Git 배포 관련 안내</strong> (저작권 보호 및 외부 공개·배포 유의사항)</span>
+        </div>
+        <div class="notice-hero-right" style="color: #fca5a5;">
+          <span>필수 유의사항 확인</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </div>
+      </div>
+      <div class="notice-hero-banner" onclick="openNoticeModal(1)" role="button" tabindex="0" title="11월 3일 온라인 학습 공지사항 보기" onkeydown="if(event.key==='Enter'||event.key===' '){openNoticeModal(1);event.preventDefault();}">
         <div class="notice-hero-left">
           <span class="notice-hero-pulse"></span>
-          <span class="notice-hero-tag">팀 재배정</span>
-          <span class="notice-hero-text"><strong>📢 [2026 SW 랜딩] 팀 재배정 안내</strong> (학습성향조사 데이터 반영 팀 구성 확인)</span>
+          <span class="notice-hero-tag">중요 공지</span>
+          <span class="notice-hero-text"><strong>📢 11월 3일(화) 온라인 학습 안내</strong> (4시간 학습 + 과제 1개 제출 필수)</span>
         </div>
         <div class="notice-hero-right">
-          <span>재배정 팀 명단 및 이미지 확인</span>
+          <span>상세 안내 및 가이드 확인</span>
           <i class="fa-solid fa-arrow-right"></i>
         </div>
       </div>
@@ -1537,6 +1548,64 @@
             </div>
           </div>
         </article>
+
+        <!-- Real Project 2: Document-driven PBL -->
+        <a class="course-card is-clickable" href="real-doc-driven-pbl/index.html"
+          aria-label="Codex와 Antigravity 문서 주도 서비스 개발 PBL 열기"
+          style="text-decoration: none; color: inherit;">
+          <div class="course-thumb"
+            style="background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(6, 182, 212, 0.4)), url('img/real_project2_cover.png'); background-size: cover; background-position: center; color: #fff;">
+            REAL PROJECT 2</div>
+          <div class="course-content">
+            <span class="day-label" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff;">Real Project 2</span>
+            <h3 class="course-title">Codex × Antigravity: 문서 주도 서비스 개발 PBL</h3>
+            <p class="course-subtitle">대화를 Markdown 명세로 전환하고, 모바일 주문·PC 관리자 서비스를 구현·검증하는 실전 PBL</p>
+            <p class="course-desc">
+              샌드위치와 음료를 주문하는 모바일 고객 화면과 PC 관리자 화면을 주제로 진행합니다.
+              Codex로 대화의 사실·가정·질문·결정을 구조화하고, 승인된 MD를 기준으로 Antigravity IDE에서 구현한 뒤
+              설계 검증과 서비스 검증을 증거 중심으로 수행합니다.
+            </p>
+
+            <blockquote style="margin: 12px 0; padding: 10px 14px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.88rem; color: #a7f3d0; line-height: 1.6;">
+              <strong>💡 핵심 질문:</strong> "AI와 나눈 대화를 사람이 검증할 수 있는 문서 계약으로 만들고, 그 계약대로 구현·검증할 수 있는가?"
+            </blockquote>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>프로젝트 대상</strong>모바일 고객 주문(Fresh Route) + PC 매장 관리자 센터</div>
+              <div class="meta-item"><strong>도구 &amp; 기간</strong>Codex(명세·감사) × Antigravity(구현) / 16~24시간 (4개 미션)</div>
+              <div class="meta-item"><strong>최종 산출물</strong>기획·분석 MD 패키지, 작동 서비스(2 Views), 설계·서비스 검증 보고서</div>
+              <div class="meta-item"><strong>구현 &amp; 발표</strong>모바일·PC 실시간 연동 흐름 / 데모 7분, 근거·회고 5분</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>미션 1</strong> 대화 기록을 요구사항·결정·질문으로 재구성 (PROJECT_BRIEF · DECISION_LOG)</div>
+              <div class="time-row"><strong>미션 2</strong> 화면·데이터·API·분석·테스트 MD 명세 패키지 작성 (REQ→UI→DATA→API→TEST)</div>
+              <div class="time-row"><strong>미션 3</strong> Antigravity IDE에서 모바일 고객·PC 관리자 대표 흐름 및 예외 복구 구현</div>
+              <div class="time-row"><strong>미션 4</strong> 설계 검증(문서 정합성)과 서비스 검증(실행 증거), 결함 재검증 및 회고</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">PBL Lab</span>
+              <span class="tag">Codex 명세화</span>
+              <span class="tag">Antigravity IDE</span>
+              <span class="tag">Markdown 계약</span>
+              <span class="tag">모바일 주문</span>
+              <span class="tag">PC 관리자</span>
+              <span class="tag">설계·서비스 검증</span>
+            </div>
+
+            <div class="meta-item" style="margin-top: 10px;">
+              <strong>4대 핵심 워크스페이스</strong>
+              service-planning (기획·명세), service-analysis (지표·API), service-implementation (구현), service-validation (검증)
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <span class="ai-class-btn" style="background: linear-gradient(135deg, #10b981, #0891b2); border: none; cursor: pointer;">
+                🚀 프로젝트 워크스페이스 시작
+              </span>
+            </div>
+          </div>
+        </a>
 
         <!-- Day 6 -->
         <article class="course-card is-clickable" id="openDay6Modal" tabindex="0" role="button"
@@ -3766,7 +3835,7 @@
       </div>
     </div>
   </footer>
-  <script src="shared/notice-modal.js?v=20261030_01"></script>
+  <script src="shared/notice-modal.js?v=20261103_03"></script>
 </body>
 
 </html>

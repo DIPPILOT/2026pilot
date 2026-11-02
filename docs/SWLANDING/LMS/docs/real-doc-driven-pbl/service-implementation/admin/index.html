@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>프레시샌드 매장 관리자 (POS & 백오피스) | 키오스크 주문 서비스</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a href="#admin-main" class="skip-link">본문 작업 영역으로 바로가기</a>
+
+  <!-- 1. 관리자 로그인 화면 오버레이 -->
+  <div id="login-view" class="login-backdrop" hidden>
+    <main class="login-card" aria-labelledby="login-heading">
+      <div class="login-brand">
+        <span class="login-logo" aria-hidden="true">🥪</span>
+        <div>
+          <span class="login-sub">프레시샌드 매장 통합 관리 시스템</span>
+          <h1 id="login-heading" class="login-title">관리자 로그인</h1>
+        </div>
+      </div>
+
+      <div id="login-alert" class="alert-box alert-danger" role="alert" hidden></div>
+
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="login-username" class="form-label">관리자 아이디</label>
+          <input type="text" id="login-username" class="form-input" placeholder="admin / manager / staff" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="login-password" class="form-label">비밀번호</label>
+          <input type="password" id="login-password" class="form-input" placeholder="비밀번호 입력 (기본: password123)" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">로그인</button>
+      </form>
+
+      <div class="login-helper-row">
+        <button type="button" id="open-pw-reset-btn" class="btn-link">비밀번호 재설정 안내</button>
+        <button type="button" id="unlock-accounts-btn" class="btn-link">계정 보호 잠금 해제 (데모)</button>
+      </div>
+
+      <div class="demo-accounts-box">
+        <span class="demo-accounts-title">⚡ 역할별 빠른 데모 로그인 (권한 테스트용)</span>
+        <div class="demo-btn-row">
+          <button type="button" class="btn btn-outline btn-sm quick-login-btn" data-user="admin">
+            👑 점장 (전체 권한)
+          </button>
+          <button type="button" class="btn btn-outline btn-sm quick-login-btn" data-user="manager">
+            🛠️ 매니저 (주문·메뉴·품절)
+          </button>
+          <button type="button" class="btn btn-outline btn-sm quick-login-btn" data-user="staff">
+            🧑‍🍳 직원 (주문 조회·상태변경)
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- PC 관리자 공통 레이아웃 (좌측 메뉴 + 상단 상태 영역 + 본문 작업 영역) -->
+  <div id="admin-shell" class="admin-shell" hidden>
+    <!-- 좌측 메뉴 -->
+    <aside class="admin-sidebar" aria-label="관리자 주 메뉴">
+      <div class="sidebar-brand">
+        <span class="brand-icon" aria-hidden="true">🥪</span>
+        <div class="brand-text">
+          <strong>FreshSand POS</strong>
+          <span>PC 관리자 센터</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="관리 메뉴">
+        <ul class="nav-list" role="list">
+          <li>
+            <button type="button" class="nav-item" data-view="DASHBOARD" aria-current="page">
+              <span aria-hidden="true">📊</span>
+              <span>대시보드</span>
+              <span id="nav-badge-new" class="nav-badge" hidden>0</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item" data-view="ORDERS">
+              <span aria-hidden="true">📋</span>
+              <span>주문 관리</span>
+              <span id="nav-badge-orders" class="nav-badge" hidden>0</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item" data-view="MENUS">
+              <span aria-hidden="true">🥪</span>
+              <span>메뉴 관리</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item" data-view="SOLDOUT">
+              <span aria-hidden="true">🚫</span>
+              <span>품절 관리</span>
+              <span id="nav-badge-soldout" class="nav-badge nav-badge-warn" hidden>0</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item" data-view="SALES">
+              <span aria-hidden="true">📈</span>
+              <span>매출 조회</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item" data-view="SETTINGS">
+              <span aria-hidden="true">⚙️</span>
+              <span>매장 설정</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-item" data-view="USERS">
+              <span aria-hidden="true">👥</span>
+              <span>사용자 및 권한</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" id="reset-demo-data-btn" class="btn btn-outline btn-sm btn-block">
+          🔄 데모 데이터 초기화
+        </button>
+      </div>
+    </aside>
+
+    <!-- 우측 메인 래퍼 -->
+    <div class="admin-content-wrap">
+      <!-- 상단 상태 영역 -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <div class="store-pill">
+            <span aria-hidden="true">🏪</span>
+            <strong id="topbar-store-name">프레시샌드 강남역점</strong>
+          </div>
+
+          <div id="topbar-order-status-pill" class="reception-pill is-receiving">
+            <span id="topbar-reception-icon" aria-hidden="true">🟢</span>
+            <span id="topbar-reception-text">모바일 주문 접수 중</span>
+            <button type="button" id="topbar-toggle-pause-btn" class="btn-xs">
+              일시 중지
+            </button>
+          </div>
+
+          <div id="topbar-new-order-alert" class="new-order-pill" role="status" aria-live="polite">
+            <span aria-hidden="true">🔔</span>
+            <span id="topbar-new-order-text">신규 미접수 1건</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <label class="net-sim-toggle" title="연결 끊김 예외 처리 테스트">
+            <input type="checkbox" id="admin-offline-toggle" />
+            <span>📡 연결 끊김 시뮬레이션</span>
+          </label>
+
+          <div class="clock-box">
+            <div>현재 시각: <strong id="topbar-current-time">--:--:--</strong></div>
+            <div class="sync-sub">마지막 갱신: <span id="topbar-last-sync">--:--:--</span></div>
+          </div>
+
+          <div class="account-box">
+            <span id="topbar-user-badge" class="role-badge">점장</span>
+            <strong id="topbar-user-name">김민준</strong>
+            <button type="button" id="topbar-logout-btn" class="btn btn-outline btn-sm">로그아웃</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- 네트워크 오프라인 경고 배너 -->
+      <div id="admin-offline-banner" class="offline-alert-bar" role="alert" hidden>
+        <div>
+          <strong>🚫 서버와의 네트워크 연결이 끊어졌습니다.</strong>
+          <span>데이터 불일치를 방지하기 위해 주문 상태 변경 및 설정 저장 버튼이 일시 잠금되었습니다. 네트워크를 확인한 후 재연결해 주세요.</span>
+        </div>
+        <button type="button" id="admin-reconnect-btn" class="btn btn-primary btn-sm">지금 재연결</button>
+      </div>
+
+      <!-- 실시간 알림 토스트 -->
+      <div id="admin-toast" class="admin-toast" role="status" aria-live="polite" hidden></div>
+
+      <!-- 본문 작업 영역 -->
+      <main id="admin-main" class="admin-main" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <!-- 공통 모달 (주문 취소, 영수증 출력, 비밀번호 재설정, 마감 확인 등) -->
+  <div id="admin-modal-backdrop" class="modal-backdrop" hidden>
+    <div id="admin-modal" class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h2 id="modal-title" class="modal-title">알림</h2>
+        <button type="button" id="modal-close-btn" class="modal-close" aria-label="창 닫기">✕</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-footer" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <script src="../shared/menu-data.js"></script>
+  <script src="../shared/store.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

@@ -577,6 +577,12 @@ body.has-tworow-nav {
   background: linear-gradient(90deg, rgba(16, 185, 129, 0.08), rgba(20, 25, 38, 0.85));
 }
 
+.notice-card-box.highlight-red {
+  border: 1px solid rgba(239, 68, 68, 0.38);
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.14), rgba(20, 25, 38, 0.92));
+}
+
 .notice-box-title {
   font-size: 1.05rem;
   font-weight: 700;

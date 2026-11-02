@@ -17,13 +17,169 @@
 
   const BASE_PATH = getBasePath();
 
-  // Notices data: Notice 5 is latest (Slide 0), Notice 4 is Slide 1, Notice 3 is Slide 2, Notice 2 is Slide 3, Notice 1 is Slide 4
+  // Notices data: Notice 7 is latest (Slide 0), Notice 6 is Slide 1, Notice 5 is Slide 2, Notice 4 is Slide 3, Notice 3 is Slide 4, Notice 2 is Slide 5, Notice 1 is Slide 6
   const NOTICES_DATA = [
     {
-      id: 5,
-      tag: '팀 편성 · 최신 공지',
+      id: 7,
+      isMustRead: true,
+      tag: '🚨 필독 공지 · 저작권 및 배포 주의',
       tagClass: 'tag-urgent',
-      tabLabel: '👥 1. 팀 재배정 안내',
+      tabLabel: '🚨 1. [필독] 저작권/Git 배포 안내',
+      title: '[공지] LMS 교육 콘텐츠 무단 복사 및 Git 배포 관련 안내',
+      contentHtml: `
+        <div style="margin-bottom: 18px; padding: 14px 18px; border-radius: 12px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(185, 28, 28, 0.14)); border: 1.5px solid rgba(239, 68, 68, 0.55); display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.45rem; line-height: 1;">⚠️</span>
+          <div style="color: #fecaca; font-size: 0.96rem; font-weight: 700; line-height: 1.55;">
+            <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; background: #ef4444; color: #fff; font-size: 0.78rem; font-weight: 800; margin-right: 6px; vertical-align: middle;">필수 숙지</span>
+            모든 수강생 여러분께서는 저작권 보호 및 외부 배포와 관련하여 아래 안내 사항을 반드시 숙지해 주시기 바랍니다.
+          </div>
+        </div>
+
+        <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; line-height: 1.7;">
+          안녕하세요.<br>
+          랜딩 교육과정을 운영하고 있는 이호준 교수입니다.
+        </p>
+
+        <p class="notice-text-p" style="font-size: 0.98rem; color: #e2e8f0; line-height: 1.78;">
+          현재 여러분이 학습하고 있는 LMS 내 교육 콘텐츠는 <strong style="color: #fff;">에듀니티랩에서 개발하고 제공하는 교육 자산</strong>으로, <strong style="color: #fca5a5;">저작권 보호를 받는 자료</strong>입니다.
+        </p>
+
+        <p class="notice-text-p" style="font-size: 0.98rem; color: #e2e8f0; line-height: 1.78;">
+          따라서 교육과정에서 제공되는 콘텐츠를 사전 허가 없이 복사하거나 <strong style="color: #fde68a;">GitHub, 개인 블로그, 외부 웹사이트 등</strong>에 게시 또는 배포하는 행위는 <strong style="color: #fca5a5; text-decoration: underline; text-underline-offset: 4px;">저작권 침해 등 법적 문제가 발생할 수 있습니다.</strong>
+        </p>
+
+        <!-- 엄격 금지 사항 (강조 박스) -->
+        <div class="notice-card-box highlight-red" style="border: 1px solid rgba(239, 68, 68, 0.45); border-left: 4px solid #ef4444; background: linear-gradient(90deg, rgba(239, 68, 68, 0.14), rgba(20, 25, 38, 0.92)); margin: 18px 0;">
+          <h4 class="notice-box-title" style="color: #fca5a5; font-size: 1.06rem; margin-bottom: 12px;">
+            ⛔ 특히 다음 사항에 유의해 주시기 바랍니다 (무단 공개·배포 금지)
+          </h4>
+          <ul class="notice-check-list" style="gap: 10px;">
+            <li style="padding: 10px 14px; border-radius: 10px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25);">
+              <span class="check-icon" style="color: #f87171;">🚫</span>
+              <span style="color: #fef2f2; font-weight: 600;">LMS의 <strong>교육자료, 실습 가이드, 교육카드 등</strong>을 무단으로 복사하여 외부에 공개하는 행위</span>
+            </li>
+            <li style="padding: 10px 14px; border-radius: 10px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25);">
+              <span class="check-icon" style="color: #f87171;">🚫</span>
+              <span style="color: #fef2f2; font-weight: 600;">교육 콘텐츠를 <strong>GitHub 등의 공개 저장소(Public Repository)에 그대로 업로드</strong>하는 행위</span>
+            </li>
+            <li style="padding: 10px 14px; border-radius: 10px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25);">
+              <span class="check-icon" style="color: #f87171;">🚫</span>
+              <span style="color: #fef2f2; font-weight: 600;">교육자료를 <strong>개인 블로그나 외부 사이트에 무단으로 게시하거나 재배포</strong>하는 행위</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 허용 범위 및 주의사항 -->
+        <div class="notice-card-box highlight-green" style="margin-bottom: 18px;">
+          <h4 class="notice-box-title" style="color: #6ee7b7;">
+            ✅ 직접 작성한 소스코드 · 개인 프로젝트 공유 안내
+          </h4>
+          <p class="notice-text-p" style="color: #ecfdf5; margin-bottom: 8px; line-height: 1.72;">
+            다만, 교육과정에서 <strong>직접 작성한 소스코드나 개인 프로젝트 결과물을 GitHub에 업로드하고 공유하는 것은 가능</strong>합니다.
+          </p>
+          <p class="notice-text-p" style="color: #fde68a; font-weight: 700; margin: 0; line-height: 1.7;">
+            💡 이 경우에도 <strong>에듀니티랩의 교육 콘텐츠(강의 교안, 가이드 문서, 원본 템플릿 등)가 함께 포함되지 않도록</strong> 각별히 주의해 주시기 바랍니다.
+          </p>
+        </div>
+
+        <p class="notice-text-p" style="font-size: 0.98rem; color: #e2e8f0; line-height: 1.75;">
+          본 교육과정은 여러분의 AI·SW 개발 역량 향상을 위해 제공되는 만큼, 교육 콘텐츠의 저작권을 존중하고 올바르게 활용해 주시기를 부탁드립니다.
+        </p>
+
+        <div class="notice-author-sign" style="margin-top: 18px;">
+          <p class="notice-text-p" style="margin-bottom: 4px;">감사합니다.</p>
+          <p class="notice-text-p" style="font-weight: 800; color: #f8fafc; font-size: 1.02rem;">이호준 교수 드림</p>
+        </div>
+      `
+    },
+    {
+      id: 6,
+      tag: '온라인 학습 · 최신 공지',
+      tagClass: 'tag-urgent',
+      tabLabel: '📢 2. 11/3 온라인 학습 안내',
+      title: '📢 [SW랜딩] 11월 3일(화) 온라인 학습 안내',
+      contentHtml: `
+        <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
+          이번 온라인 학습은 <span style="color: #38bdf8;">4시간 학습 + 과제 1개 제출</span>로 진행합니다.
+        </p>
+
+        <!-- 1. 학습시간 계산 기준 -->
+        <div class="notice-card-box highlight-amber">
+          <h4 class="notice-box-title">⏰ 학습시간 계산 기준</h4>
+          <ul class="notice-check-list" style="margin-bottom: 10px;">
+            <li><span class="check-icon">▶</span> <span><strong>시작(출입시간):</strong> LMS 접속 시각</span></li>
+            <li><span class="check-icon">▶</span> <span><strong>종료(마감시간):</strong> 구글 클래스룸 과제 제출 시각</span></li>
+          </ul>
+          <p class="notice-text-p" style="color: #fde68a; font-weight: 600; margin: 0;">
+            💡 LMS 접속부터 과제 제출까지 <strong>4시간</strong>을 채우고, 학습과 제출을 모두 <strong>11월 3일(화) 안에 완료</strong>해 주세요.
+          </p>
+        </div>
+
+        <!-- 2. 총 4개 과제 중 1개 선택 -->
+        <div class="notice-card-box highlight-blue">
+          <h4 class="notice-box-title">📝 총 4개 과제 중 ✅ 1개만 선택해 주세요!</h4>
+          <p class="notice-text-p">
+            아래 두 메뉴에 있는 과제 4개 중 원하는 과제 1개를 선택해 수행하고 제출하면 됩니다.
+          </p>
+          <ul class="notice-check-list">
+            <li>
+              <span class="check-icon">1️⃣</span>
+              <span><strong>「1~5day 과제」</strong> → <strong>「Day 5 (2개)」</strong> 중 택 1</span>
+            </li>
+            <li>
+              <span class="check-icon">2️⃣</span>
+              <span><strong>「코덱스 현업 과제」</strong> → <strong>「협업」</strong> 중 택 1</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 3. 제출 전 꼭 확인하세요 -->
+        <div class="notice-card-box highlight-green">
+          <h4 class="notice-box-title">📌 제출 전 꼭 확인하세요!</h4>
+          <p class="notice-text-p">
+            <strong>「과제 제출 및 평가 규칙」</strong>을 읽고, 구글 클래스룸의 <strong>「1주 과제 제출 해주세요」</strong>에 본인 이름으로 제출해 주세요.
+          </p>
+          <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="${BASE_PATH}index.html" class="notice-action-link" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); color: #60a5fa; text-decoration: none; font-weight: 700; font-size: 0.9rem;">
+              🔗 LMS 접속하기
+            </a>
+            <a href="https://classroom.google.com/c/ODczMDM4OTY3MjY4?cjc=qxrgrpxz" target="_blank" rel="noopener noreferrer" class="notice-action-link" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; text-decoration: none; font-weight: 700; font-size: 0.9rem;">
+              🔗 구글 클래스룸 바로가기 ↗
+            </a>
+          </div>
+        </div>
+
+        <!-- 4. 첨부 이미지 3장 안내 -->
+        <div class="notice-attachment-wrap" style="text-align: left; margin-top: 20px;">
+          <div class="attachment-label">
+            <span>👇 <strong>자세한 진행 방법 (첨부 이미지 3장)</strong></span>
+            <span style="font-size: 0.78rem; color: #38bdf8;">클릭 시 원본 크기로 확대</span>
+          </div>
+          <p class="notice-text-p" style="font-size: 0.88rem; color: #94a3b8; margin-bottom: 12px;">
+            순서대로 확인하며 온라인 학습을 진행해 주세요. 이미지를 클릭하면 크게 볼 수 있습니다.
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px;">
+            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">01. 학습 시작 및 메뉴 안내</div>
+              <img src="${BASE_PATH}img/notice_online_learning_guide_01.png" alt="01 온라인 학습 시작 안내" class="notice-zoomable-img" style="width: 100%; border-radius: 8px; cursor: zoom-in; transition: transform 0.2s;" data-zoom-src="${BASE_PATH}img/notice_online_learning_guide_01.png" />
+            </div>
+            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">02. 과제 4개 중 1개 선택</div>
+              <img src="${BASE_PATH}img/notice_online_learning_guide_1103_02.png?v=20261103_02" alt="02 과제 선택 안내 (Day 5 및 협업)" class="notice-zoomable-img" style="width: 100%; border-radius: 8px; cursor: zoom-in; transition: transform 0.2s;" data-zoom-src="${BASE_PATH}img/notice_online_learning_guide_1103_02.png?v=20261103_02" />
+            </div>
+            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; text-align: center;">
+              <div style="font-size: 0.82rem; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">03. 구글 클래스룸 제출 안내</div>
+              <img src="${BASE_PATH}img/notice_online_learning_guide_03.png" alt="03 과제 제출 안내" class="notice-zoomable-img" style="width: 100%; border-radius: 8px; cursor: zoom-in; transition: transform 0.2s;" data-zoom-src="${BASE_PATH}img/notice_online_learning_guide_03.png" />
+            </div>
+          </div>
+        </div>
+      `
+    },
+    {
+      id: 5,
+      tag: '팀 편성',
+      tagClass: 'tag-urgent',
+      tabLabel: '👥 3. 팀 재배정 안내',
       title: '📢 [2026 SW 랜딩] 팀 재배정 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; line-height: 1.7;">
@@ -114,7 +270,7 @@
       id: 4,
       tag: '온라인 학습',
       tagClass: 'tag-urgent',
-      tabLabel: '📢 2. 10/27 온라인 학습 안내',
+      tabLabel: '📢 4. 10/27 온라인 학습 안내',
       title: '📢 [SW랜딩] 10월 27일(화) 온라인 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -197,7 +353,7 @@
       id: 3,
       tag: '운영 안내',
       tagClass: 'tag-urgent',
-      tabLabel: '🚗 3. 교육시설/주차 안내',
+      tabLabel: '🚗 5. 교육시설/주차 안내',
       title: '📢 [SW랜딩] 교육시설 이용 및 주차 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.02rem; font-weight: 600; color: #f8fafc;">
@@ -247,7 +403,7 @@
       id: 2,
       tag: '교수진 공지 · 팀 편성',
       tagClass: 'tag-faculty',
-      tabLabel: '👥 4. 초기 팀 구성 안내',
+      tabLabel: '👥 6. 초기 팀 구성 안내',
       title: '[공지] 학습 모듈별 팀 구성 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -298,7 +454,7 @@
       id: 1,
       tag: '학습 안내 · 모듈 1',
       tagClass: 'tag-learning',
-      tabLabel: '🚀 5. 모듈 1 학습 안내',
+      tabLabel: '🚀 7. 모듈 1 학습 안내',
       title: '🚀 [SW랜딩] 모듈 1 첫 번째 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -388,8 +544,8 @@
 
     // Tabs HTML
     const tabsHtml = NOTICES_DATA.map((notice, idx) => `
-      <button type="button" class="notice-tab-btn ${idx === 0 ? 'is-active' : ''}" data-slide-index="${idx}">
-        ${idx === 0 ? '<span class="notice-tab-badge-new">NEW</span>' : ''}
+      <button type="button" class="notice-tab-btn ${idx === 0 ? 'is-active' : ''}" data-slide-index="${idx}" style="${notice.isMustRead ? 'border-color: rgba(239, 68, 68, 0.55);' : ''}">
+        ${notice.isMustRead ? '<span class="notice-tab-badge-new" style="background: #ef4444; color: #fff;">필독</span>' : (idx === 1 ? '<span class="notice-tab-badge-new">NEW</span>' : '')}
         ${notice.tabLabel}
       </button>
     `).join('');
@@ -452,7 +608,7 @@
 
       <!-- Image Lightbox for zooming notice images -->
       <div class="notice-lightbox-overlay" id="noticeLightboxOverlay">
-        <img src="${BASE_PATH}img/notice_team_reassignment.png" alt="공지 이미지 확대" class="notice-lightbox-img" />
+        <img src="${BASE_PATH}img/notice_online_learning_guide_01.png" alt="공지 이미지 확대" class="notice-lightbox-img" />
       </div>
     `;
 
@@ -530,7 +686,7 @@
     if (arrowNext) arrowNext.disabled = isLast;
   }
 
-  const DONT_SHOW_STORAGE_KEY = 'swlanding_notice_hide_20261030';
+  const DONT_SHOW_STORAGE_KEY = 'swlanding_notice_hide_20261103_mustread';
 
   function openNotice(slideIndex = 0) {
     createModalDOM();
