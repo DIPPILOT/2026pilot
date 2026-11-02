@@ -526,6 +526,310 @@
       text-shadow: var(--glow-cyan);
     }
 
+    /* Curriculum Category Filter Bar & Domain Zones */
+    .curriculum-filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 auto 40px;
+      padding: 10px 14px;
+      max-width: 1040px;
+      background: rgba(17, 24, 39, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      position: sticky;
+      top: 78px;
+      z-index: 40;
+    }
+
+    .curriculum-filter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: #cbd5e1;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      white-space: nowrap;
+    }
+
+    .curriculum-filter-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border-color: rgba(56, 189, 248, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .curriculum-filter-btn.active {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(6, 182, 212, 0.85));
+      color: #ffffff;
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.28);
+    }
+
+    .curriculum-filter-btn .filter-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(9, 9, 11, 0.45);
+      color: #e2e8f0;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .curriculum-filter-btn.active .filter-count {
+      background: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+    }
+
+    .curriculum-zones-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 56px;
+    }
+
+    .curriculum-zone {
+      background: rgba(17, 20, 28, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 26px;
+      padding: 32px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .curriculum-zone.zone-pbl {
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.07) 0%, rgba(17, 20, 28, 0.65) 100%);
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+
+    .curriculum-zone.zone-module1 {
+      background: linear-gradient(180deg, rgba(59, 130, 246, 0.07) 0%, rgba(17, 20, 28, 0.65) 100%);
+      border-color: rgba(59, 130, 246, 0.22);
+    }
+
+    .curriculum-zone.zone-module2 {
+      background: linear-gradient(180deg, rgba(139, 92, 246, 0.07) 0%, rgba(17, 20, 28, 0.65) 100%);
+      border-color: rgba(139, 92, 246, 0.22);
+    }
+
+    .curriculum-zone.zone-support {
+      background: linear-gradient(180deg, rgba(6, 182, 212, 0.06) 0%, rgba(17, 20, 28, 0.65) 100%);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+
+    .curriculum-zone.is-hidden {
+      display: none;
+    }
+
+    .zone-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 26px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .zone-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .zone-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .zone-pbl .zone-badge {
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .zone-module1 .zone-badge {
+      background: rgba(59, 130, 246, 0.16);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+    }
+
+    .zone-module2 .zone-badge {
+      background: rgba(168, 85, 247, 0.16);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+
+    .zone-support .zone-badge {
+      background: rgba(6, 182, 212, 0.16);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.35);
+    }
+
+    .zone-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .zone-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .zone-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .zone-shortcut-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: #f8fafc;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transition: all 0.2s ease;
+    }
+
+    .zone-shortcut-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(59, 130, 246, 0.2);
+      border-color: rgba(56, 189, 248, 0.5);
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Full-width Featured Banner Card in Zone 1 (Project Day) */
+    .course-card.pbl-wide-card {
+      grid-column: 1 / -1;
+      min-height: auto;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+    }
+
+    .course-card.pbl-wide-card .course-thumb {
+      height: 100%;
+      min-height: 220px;
+      border-bottom: none;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* Module Homework Hub Card (6th slot in 2x3 Module grids) */
+    .course-card.module-hub-card {
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.92), rgba(30, 41, 59, 0.78));
+      border: 1px dashed rgba(56, 189, 248, 0.35);
+      justify-content: space-between;
+    }
+
+    .course-card.module-hub-card:hover {
+      border-style: solid;
+      border-color: rgba(56, 189, 248, 0.65);
+    }
+
+    .hub-links-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .hub-action-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+      transition: all 0.2s ease;
+    }
+
+    .hub-action-link:hover {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: rgba(56, 189, 248, 0.5);
+      transform: translateX(4px);
+    }
+
+    /* Compact 4-Column Support & Utility Grid (Zone 4) */
+    .curriculum-grid.support-compact-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .support-compact-grid .course-card {
+      min-height: 340px;
+    }
+
+    .support-compact-grid .course-thumb {
+      height: 135px;
+      font-size: 1.02rem;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .support-compact-grid .course-content {
+      padding: 18px;
+      gap: 10px;
+    }
+
+    .support-compact-grid .course-title {
+      font-size: 1.06rem;
+      line-height: 1.35;
+    }
+
+    .support-compact-grid .course-subtitle {
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
+
+    .support-compact-grid .tag-list {
+      display: none;
+    }
+
+    .support-compact-grid .ai-class-btn {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.86rem;
+    }
+
     .qr-resource-card {
       grid-column: 1 / -1;
       padding: 32px;
@@ -950,8 +1254,19 @@
         grid-template-columns: 1fr 1fr;
       }
 
-      .qr-resource-grid {
+      .qr-resource-grid,
+      .curriculum-grid.support-compact-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .course-card.pbl-wide-card {
+        grid-template-columns: 1fr;
+      }
+
+      .course-card.pbl-wide-card .course-thumb {
+        height: 220px;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       }
     }
 
@@ -962,8 +1277,27 @@
 
       .hero-grid,
       .overview-grid,
-      .modal-grid {
+      .modal-grid,
+      .curriculum-grid,
+      .curriculum-grid.support-compact-grid {
         grid-template-columns: 1fr;
+      }
+
+      .curriculum-zone {
+        padding: 22px 16px;
+        border-radius: 20px;
+      }
+
+      .curriculum-filter-bar {
+        position: static;
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding: 10px 12px;
+      }
+
+      .zone-title {
+        font-size: 1.25rem;
       }
 
       .hero h1 {
@@ -1223,12 +1557,229 @@
 
   <section id="curriculum" class="bg-gray">
     <div class="container">
-      <h2 class="section-title">10-Day Learning Contents</h2>
+      <h2 class="section-title">Learning &amp; Project Workspace</h2>
       <p class="section-desc">
-        각 카드를 클릭하면 10일간 진행되는 일차별 상세 커리큘럼(세션 구성, 학습 목표, 기대 산출물 등)을 확인하실 수 있습니다.
+        실전 종합 PBL 프로젝트부터 Day 1~10 단계별 커리큘럼, 과제 미션, 출석·커리어 지원까지 성격별로 빠르게 탐색하실 수 있습니다.
       </p>
 
-      <div class="curriculum-grid">
+      <!-- Category Filter Tabs -->
+      <div class="curriculum-filter-bar" role="tablist" aria-label="커리큘럼 및 태스크 카테고리 필터">
+        <button type="button" class="curriculum-filter-btn active" data-filter="all" role="tab" aria-selected="true">
+          <span>전체 보기</span>
+          <span class="filter-count">17</span>
+        </button>
+        <button type="button" class="curriculum-filter-btn" data-filter="pbl" role="tab" aria-selected="false">
+          <span>🔥 실전 PBL 프로젝트</span>
+          <span class="filter-count">3</span>
+        </button>
+        <button type="button" class="curriculum-filter-btn" data-filter="module1" role="tab" aria-selected="false">
+          <span>📐 Day 1~5 기획·설계</span>
+          <span class="filter-count">5</span>
+        </button>
+        <button type="button" class="curriculum-filter-btn" data-filter="module2" role="tab" aria-selected="false">
+          <span>💻 Day 6~10 구현·런칭</span>
+          <span class="filter-count">5</span>
+        </button>
+        <button type="button" class="curriculum-filter-btn" data-filter="support" role="tab" aria-selected="false">
+          <span>🧭 커리어·출석·설문·QR</span>
+          <span class="filter-count">4</span>
+        </button>
+      </div>
+
+      <div class="curriculum-zones-wrapper">
+
+        <!-- ZONE 1: Real PBL Projects -->
+        <div class="curriculum-zone zone-pbl" data-zone="pbl">
+          <div class="zone-header">
+            <div class="zone-title-group">
+              <span class="zone-badge">🔥 Track 01 · Real-World PBL Studio</span>
+              <h3 class="zone-title">실전 종합 PBL 프로젝트 (Real Project 1 · 2 &amp; Project Day)</h3>
+              <p class="zone-subtitle">실제 서비스 성장 역설계와 문서 주도(Spec-First) 개발·검증을 완주하는 핵심 프로젝트 트랙입니다.</p>
+            </div>
+            <div class="zone-actions">
+              <a href="real-benchmarking/index.html" class="zone-shortcut-btn" style="border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">🚀 Real Project 1 바로가기</a>
+              <a href="real-doc-driven-pbl/index.html" class="zone-shortcut-btn" style="border-color: rgba(6, 182, 212, 0.4); color: #67e8f9;">🚀 Real Project 2 바로가기</a>
+            </div>
+          </div>
+
+          <div class="curriculum-grid pbl-featured-grid">
+        <!-- Real Project 1 -->
+        <a class="course-card is-clickable" href="real-benchmarking/index.html"
+          aria-label="리얼 벤치마킹 PBL 프로젝트 워크스페이스 열기" style="text-decoration: none; color: inherit;">
+          <div class="course-thumb"
+            style="background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(6, 182, 212, 0.4)), url('img/gstack_sprint_cover.png'); background-size: cover; background-position: center; color: #fff;">
+            REAL PROJECT 1</div>
+          <div class="course-content">
+            <span class="day-label" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff;">Real Project 1</span>
+            <h3 class="course-title">리얼 벤치마킹 PBL: Growth Reverse Engineering Lab</h3>
+            <p class="course-subtitle">무신사·유튜브·당근의 성장 메커니즘을 역설계하고 AI와 함께 작동하는 웹사이트로 구현</p>
+            <p class="course-desc">
+              무신사, 유튜브, 당근 중 하나를 선택해 실제 서비스의 성장 구조(AARRR)를 관찰하고, 이를 제품·비즈니스·개발 3종 문서로 역설계한 뒤 AI와 함께 새로운 웹사이트로 구현합니다. 성장을 만드는 사용자 행동과 제품 구조를 근거로 설명하고 원리를 적용하는 실전 역량을 훈련합니다.
+            </p>
+
+            <blockquote style="margin: 12px 0; padding: 10px 14px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.88rem; color: #a7f3d0; line-height: 1.6;">
+              <strong>💡 핵심 질문:</strong> "성공한 서비스의 성장 메커니즘을 관찰 가능한 증거로 설명하고, 이를 문서와 작동하는 제품으로 다시 만들 수 있는가?"
+            </blockquote>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>프로젝트 대상</strong>무신사, 유튜브, 당근 중 1개 서비스 선택</div>
+              <div class="meta-item"><strong>팀 구성 &amp; 기간</strong>3~5명 / 4개 미션 (총 4주 권장)</div>
+              <div class="meta-item"><strong>최종 산출물</strong>근거 자료, 3종 핵심 문서, 작동 웹사이트, 비교 분석 보고서</div>
+              <div class="meta-item"><strong>구현 &amp; 발표</strong>1개 대표 사용자 흐름 / 데모 7분, 근거·회고 5분, 질의응답 5분</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>미션 1</strong> 실제 서비스 관찰과 성장 가설 (AARRR 성장 루프 분석)</div>
+              <div class="time-row"><strong>미션 2</strong> 3종 문서로 역설계 (제품 기회 · 비즈니스 모델 · 개발 기본설계)</div>
+              <div class="time-row"><strong>미션 3</strong> 문서를 기준으로 AI 구현 (대표 사용자 흐름 웹사이트 구현)</div>
+              <div class="time-row"><strong>미션 4</strong> 원본과 구현 결과 비교·회고 (정성·정량 비교 및 다음 실험 제안)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">PBL Lab</span>
+              <span class="tag">성장 역설계</span>
+              <span class="tag">3종 기획문서</span>
+              <span class="tag">AI 웹구현</span>
+              <span class="tag">AARRR 루프</span>
+              <span class="tag">비교분석 회고</span>
+            </div>
+
+            <div class="meta-item" style="margin-top: 10px;">
+              <strong>5대 추천 역할</strong>
+              Growth Researcher, Product Owner, Business Designer, Tech Lead, Evidence Keeper
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <span class="ai-class-btn" style="background: linear-gradient(135deg, #10b981, #0891b2); border: none; cursor: pointer;">
+                🚀 프로젝트 워크스페이스 시작
+              </span>
+            </div>
+
+          </div>
+        </a>
+
+        <!-- Real Project 2: Document-driven PBL -->
+        <a class="course-card is-clickable" href="real-doc-driven-pbl/index.html"
+          aria-label="Codex와 Antigravity 문서 주도 서비스 개발 PBL 열기"
+          style="text-decoration: none; color: inherit;">
+          <div class="course-thumb"
+            style="background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(6, 182, 212, 0.4)), url('img/real_project2_cover.png'); background-size: cover; background-position: center; color: #fff;">
+            REAL PROJECT 2</div>
+          <div class="course-content">
+            <span class="day-label" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff;">Real Project 2</span>
+            <h3 class="course-title">Codex × Antigravity: 문서 주도 서비스 개발 PBL</h3>
+            <p class="course-subtitle">대화를 Markdown 명세로 전환하고, 모바일 주문·PC 관리자 서비스를 구현·검증하는 실전 PBL</p>
+            <p class="course-desc">
+              샌드위치와 음료를 주문하는 모바일 고객 화면과 PC 관리자 화면을 주제로 진행합니다.
+              Codex로 대화의 사실·가정·질문·결정을 구조화하고, 승인된 MD를 기준으로 Antigravity IDE에서 구현한 뒤
+              설계 검증과 서비스 검증을 증거 중심으로 수행합니다.
+            </p>
+
+            <blockquote style="margin: 12px 0; padding: 10px 14px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.88rem; color: #a7f3d0; line-height: 1.6;">
+              <strong>💡 핵심 질문:</strong> "AI와 나눈 대화를 사람이 검증할 수 있는 문서 계약으로 만들고, 그 계약대로 구현·검증할 수 있는가?"
+            </blockquote>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>프로젝트 대상</strong>모바일 고객 주문(Fresh Route) + PC 매장 관리자 센터</div>
+              <div class="meta-item"><strong>도구 &amp; 기간</strong>Codex(명세·감사) × Antigravity(구현) / 16~24시간 (4개 미션)</div>
+              <div class="meta-item"><strong>최종 산출물</strong>기획·분석 MD 패키지, 작동 서비스(2 Views), 설계·서비스 검증 보고서</div>
+              <div class="meta-item"><strong>구현 &amp; 발표</strong>모바일·PC 실시간 연동 흐름 / 데모 7분, 근거·회고 5분</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>미션 1</strong> 대화 기록을 요구사항·결정·질문으로 재구성 (PROJECT_BRIEF · DECISION_LOG)</div>
+              <div class="time-row"><strong>미션 2</strong> 화면·데이터·API·분석·테스트 MD 명세 패키지 작성 (REQ→UI→DATA→API→TEST)</div>
+              <div class="time-row"><strong>미션 3</strong> Antigravity IDE에서 모바일 고객·PC 관리자 대표 흐름 및 예외 복구 구현</div>
+              <div class="time-row"><strong>미션 4</strong> 설계 검증(문서 정합성)과 서비스 검증(실행 증거), 결함 재검증 및 회고</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">PBL Lab</span>
+              <span class="tag">Codex 명세화</span>
+              <span class="tag">Antigravity IDE</span>
+              <span class="tag">Markdown 계약</span>
+              <span class="tag">모바일 주문</span>
+              <span class="tag">PC 관리자</span>
+              <span class="tag">설계·서비스 검증</span>
+            </div>
+
+            <div class="meta-item" style="margin-top: 10px;">
+              <strong>4대 핵심 워크스페이스</strong>
+              service-planning (기획·명세), service-analysis (지표·API), service-implementation (구현), service-validation (검증)
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <span class="ai-class-btn" style="background: linear-gradient(135deg, #10b981, #0891b2); border: none; cursor: pointer;">
+                🚀 프로젝트 워크스페이스 시작
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Project Day -->
+        <article class="course-card is-clickable pbl-wide-card" id="openProjectDayModal" tabindex="0" role="button"
+          aria-label="Project Day 상세 커리큘럼 열기">
+          <div class="course-thumb"
+            style="background-image: url('img/project_day_cover.png'); background-size: cover; background-position: center;">
+            PROJECT DAY</div>
+          <div class="course-content">
+            <span class="day-label" style="background: linear-gradient(135deg, #3b82f6, #06b6d4); color: #fff;">Project Day · Spec-First Sprint</span>
+            <h3 class="course-title">Markdown 기획서 기반 웹사이트 구축 (Project Day)</h3>
+            <p class="course-subtitle">코덱스(Codex)와 대화하며 아이디어를 Markdown 기획서로 작성하고 실제 웹사이트로 구현하는 6단계 정석 프로젝트 실습</p>
+            <p class="course-desc">
+              아이디어 구체화(Phase 1), 5대 Markdown 기획서 작성(Phase 2), 코덱스 웹사이트 코드 생성(Phase 3), 학생/선생님 시나리오 테스트(Phase 4), 피드백 반영 문서·코드 개선(Phase 5), 대화 이력 기록 및 5분 발표(Phase 6)를 경험합니다.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 주제</strong>Idea Definition, Markdown Specifications, Codex Implementation, Scenario Testing, Iterative Spec-First Refinement, History Logging</div>
+              <div class="meta-item"><strong>학습 목표</strong>대화와 표준 기획 명세를 바탕으로 코덱스 AI와 완벽히 협업하여 실행 가능한 웹 앱을 완성하는 프로세스 마스터</div>
+              <div class="meta-item"><strong>실습 방향</strong>아이디어 정의 ➔ 기획 문서화 ➔ 코덱스 구현 ➔ 시나리오 검증 ➔ 문서 연쇄 개선 ➔ 이력 기록 &amp; 발표</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>30분</strong> 아이디어 구체화 &amp; 5대 Markdown 기획서 작성 (Phase 1 &amp; 2)</div>
+              <div class="time-row"><strong>45분</strong> 코덱스 웹사이트 생성 &amp; 역할별 시나리오 테스트 (Phase 3 &amp; 4)</div>
+              <div class="time-row"><strong>45분</strong> 문서·코드 개선 &amp; 대화 이력 작성 및 결과 발표 (Phase 5 &amp; 6)</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">Project Day</span>
+              <span class="tag">Codex Website</span>
+              <span class="tag">Markdown Specs</span>
+              <span class="tag">Scenario Test</span>
+              <span class="tag">Spec-First</span>
+              <span class="tag">CONVERSATION.md</span>
+            </div>
+
+            <div class="meta-item">
+              <strong>예상 산출물</strong>
+              사이트 명세서(SITE_SPEC.md), 이용 동선(USER_FLOWS.md), 데이터 모델(DATA_MODEL.md), 구현 계획서(IMPLEMENTATION_PLAN.md), 대화 기록지(CONVERSATION.md), 완성 웹사이트(website/)
+            </div>
+            <div style="margin-top: 14px;">
+              <a href="project_day/project_day-ai-classroom.html" class="ai-class-btn">
+                AI 강의실 입장
+              </a>
+            </div>
+          </div>
+        </article>
+          </div>
+        </div>
+
+        <!-- ZONE 2: Module 1 (Day 1 ~ Day 5) -->
+        <div class="curriculum-zone zone-module1" data-zone="module1">
+          <div class="zone-header">
+            <div class="zone-title-group">
+              <span class="zone-badge">📐 Track 02 · Module 1 (Day 1 ~ Day 5)</span>
+              <h3 class="zone-title">AI 서비스 기획 · 데이터 모델링 · API 아키텍처 · UX 설계</h3>
+              <p class="zone-subtitle">아이디어 발굴부터 요구사항 명세(PRD), ERD 설계, API 명세서, UI/UX 프로토타이핑 및 사용성 검증까지 설계 전반을 다룹니다.</p>
+            </div>
+            <div class="zone-actions">
+              <a href="homework_week1.html" class="zone-shortcut-btn" style="border-color: rgba(139, 92, 246, 0.45); color: #c4b5fd;">📝 1~5day 과제 바로가기</a>
+              <a href="homework_codex_field.html" class="zone-shortcut-btn" style="border-color: rgba(245, 158, 11, 0.45); color: #fde68a;">💼 코덱스 현업 과제</a>
+            </div>
+          </div>
+
+          <div class="curriculum-grid">
         <!-- Day 1 -->
         <article class="course-card is-clickable" id="openDay1Modal" tabindex="0" role="button"
           aria-label="Day 1 상세 커리큘럼 열기">
@@ -1326,61 +1877,6 @@
 
           </div>
         </article>
-
-        <!-- Real Project 1 -->
-        <a class="course-card is-clickable" href="real-benchmarking/index.html"
-          aria-label="리얼 벤치마킹 PBL 프로젝트 워크스페이스 열기" style="text-decoration: none; color: inherit;">
-          <div class="course-thumb"
-            style="background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(6, 182, 212, 0.4)), url('img/gstack_sprint_cover.png'); background-size: cover; background-position: center; color: #fff;">
-            REAL PROJECT 1</div>
-          <div class="course-content">
-            <span class="day-label" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff;">Real Project 1</span>
-            <h3 class="course-title">리얼 벤치마킹 PBL: Growth Reverse Engineering Lab</h3>
-            <p class="course-subtitle">무신사·유튜브·당근의 성장 메커니즘을 역설계하고 AI와 함께 작동하는 웹사이트로 구현</p>
-            <p class="course-desc">
-              무신사, 유튜브, 당근 중 하나를 선택해 실제 서비스의 성장 구조(AARRR)를 관찰하고, 이를 제품·비즈니스·개발 3종 문서로 역설계한 뒤 AI와 함께 새로운 웹사이트로 구현합니다. 성장을 만드는 사용자 행동과 제품 구조를 근거로 설명하고 원리를 적용하는 실전 역량을 훈련합니다.
-            </p>
-
-            <blockquote style="margin: 12px 0; padding: 10px 14px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.88rem; color: #a7f3d0; line-height: 1.6;">
-              <strong>💡 핵심 질문:</strong> "성공한 서비스의 성장 메커니즘을 관찰 가능한 증거로 설명하고, 이를 문서와 작동하는 제품으로 다시 만들 수 있는가?"
-            </blockquote>
-
-            <div class="meta-grid">
-              <div class="meta-item"><strong>프로젝트 대상</strong>무신사, 유튜브, 당근 중 1개 서비스 선택</div>
-              <div class="meta-item"><strong>팀 구성 &amp; 기간</strong>3~5명 / 4개 미션 (총 4주 권장)</div>
-              <div class="meta-item"><strong>최종 산출물</strong>근거 자료, 3종 핵심 문서, 작동 웹사이트, 비교 분석 보고서</div>
-              <div class="meta-item"><strong>구현 &amp; 발표</strong>1개 대표 사용자 흐름 / 데모 7분, 근거·회고 5분, 질의응답 5분</div>
-            </div>
-
-            <div class="time-list">
-              <div class="time-row"><strong>미션 1</strong> 실제 서비스 관찰과 성장 가설 (AARRR 성장 루프 분석)</div>
-              <div class="time-row"><strong>미션 2</strong> 3종 문서로 역설계 (제품 기회 · 비즈니스 모델 · 개발 기본설계)</div>
-              <div class="time-row"><strong>미션 3</strong> 문서를 기준으로 AI 구현 (대표 사용자 흐름 웹사이트 구현)</div>
-              <div class="time-row"><strong>미션 4</strong> 원본과 구현 결과 비교·회고 (정성·정량 비교 및 다음 실험 제안)</div>
-            </div>
-
-            <div class="tag-list">
-              <span class="tag" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">PBL Lab</span>
-              <span class="tag">성장 역설계</span>
-              <span class="tag">3종 기획문서</span>
-              <span class="tag">AI 웹구현</span>
-              <span class="tag">AARRR 루프</span>
-              <span class="tag">비교분석 회고</span>
-            </div>
-
-            <div class="meta-item" style="margin-top: 10px;">
-              <strong>5대 추천 역할</strong>
-              Growth Researcher, Product Owner, Business Designer, Tech Lead, Evidence Keeper
-            </div>
-
-            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
-              <span class="ai-class-btn" style="background: linear-gradient(135deg, #10b981, #0891b2); border: none; cursor: pointer;">
-                🚀 프로젝트 워크스페이스 시작
-              </span>
-            </div>
-
-          </div>
-        </a>
 
         <!-- Day 3 -->
         <article class="course-card is-clickable" id="openDay3Modal" tabindex="0" role="button"
@@ -1549,64 +2045,47 @@
           </div>
         </article>
 
-        <!-- Real Project 2: Document-driven PBL -->
-        <a class="course-card is-clickable" href="real-doc-driven-pbl/index.html"
-          aria-label="Codex와 Antigravity 문서 주도 서비스 개발 PBL 열기"
-          style="text-decoration: none; color: inherit;">
+        <!-- Module 1 Homework & Codex Action Hub (6th slot in 2x3 grid) -->
+        <article class="course-card module-hub-card" aria-label="Module 1 실습 과제 및 코덱스 미션 허브">
           <div class="course-thumb"
-            style="background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.4), rgba(6, 182, 212, 0.4)), url('img/real_project2_cover.png'); background-size: cover; background-position: center; color: #fff;">
-            REAL PROJECT 2</div>
+            style="background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.65)), url('img/homework_module1_cover.png'); background-size: cover; background-position: center; border-bottom: 1px solid rgba(59, 130, 246, 0.2); flex-direction: column; gap: 6px; color: #fff;">
+            <span style="font-size: 0.82rem; color: #93c5fd; letter-spacing: 0.12em; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);">MODULE 1 ACTION HUB</span>
+            <span style="text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);">DAY 1 ~ 5 과제 · 미션</span>
+          </div>
           <div class="course-content">
-            <span class="day-label" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff;">Real Project 2</span>
-            <h3 class="course-title">Codex × Antigravity: 문서 주도 서비스 개발 PBL</h3>
-            <p class="course-subtitle">대화를 Markdown 명세로 전환하고, 모바일 주문·PC 관리자 서비스를 구현·검증하는 실전 PBL</p>
-            <p class="course-desc">
-              샌드위치와 음료를 주문하는 모바일 고객 화면과 PC 관리자 화면을 주제로 진행합니다.
-              Codex로 대화의 사실·가정·질문·결정을 구조화하고, 승인된 MD를 기준으로 Antigravity IDE에서 구현한 뒤
-              설계 검증과 서비스 검증을 증거 중심으로 수행합니다.
-            </p>
-
-            <blockquote style="margin: 12px 0; padding: 10px 14px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.88rem; color: #a7f3d0; line-height: 1.6;">
-              <strong>💡 핵심 질문:</strong> "AI와 나눈 대화를 사람이 검증할 수 있는 문서 계약으로 만들고, 그 계약대로 구현·검증할 수 있는가?"
-            </blockquote>
-
-            <div class="meta-grid">
-              <div class="meta-item"><strong>프로젝트 대상</strong>모바일 고객 주문(Fresh Route) + PC 매장 관리자 센터</div>
-              <div class="meta-item"><strong>도구 &amp; 기간</strong>Codex(명세·감사) × Antigravity(구현) / 16~24시간 (4개 미션)</div>
-              <div class="meta-item"><strong>최종 산출물</strong>기획·분석 MD 패키지, 작동 서비스(2 Views), 설계·서비스 검증 보고서</div>
-              <div class="meta-item"><strong>구현 &amp; 발표</strong>모바일·PC 실시간 연동 흐름 / 데모 7분, 근거·회고 5분</div>
-            </div>
-
-            <div class="time-list">
-              <div class="time-row"><strong>미션 1</strong> 대화 기록을 요구사항·결정·질문으로 재구성 (PROJECT_BRIEF · DECISION_LOG)</div>
-              <div class="time-row"><strong>미션 2</strong> 화면·데이터·API·분석·테스트 MD 명세 패키지 작성 (REQ→UI→DATA→API→TEST)</div>
-              <div class="time-row"><strong>미션 3</strong> Antigravity IDE에서 모바일 고객·PC 관리자 대표 흐름 및 예외 복구 구현</div>
-              <div class="time-row"><strong>미션 4</strong> 설계 검증(문서 정합성)과 서비스 검증(실행 증거), 결함 재검증 및 회고</div>
-            </div>
-
-            <div class="tag-list">
-              <span class="tag" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">PBL Lab</span>
-              <span class="tag">Codex 명세화</span>
-              <span class="tag">Antigravity IDE</span>
-              <span class="tag">Markdown 계약</span>
-              <span class="tag">모바일 주문</span>
-              <span class="tag">PC 관리자</span>
-              <span class="tag">설계·서비스 검증</span>
-            </div>
-
-            <div class="meta-item" style="margin-top: 10px;">
-              <strong>4대 핵심 워크스페이스</strong>
-              service-planning (기획·명세), service-analysis (지표·API), service-implementation (구현), service-validation (검증)
-            </div>
-
-            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
-              <span class="ai-class-btn" style="background: linear-gradient(135deg, #10b981, #0891b2); border: none; cursor: pointer;">
-                🚀 프로젝트 워크스페이스 시작
-              </span>
+            <span class="day-label" style="background: rgba(139, 92, 246, 0.18); color: #c4b5fd; border-color: rgba(139, 92, 246, 0.35);">Module 1 · 실습 과제 &amp; 자동화 미션</span>
+            <h3 class="course-title">Day 1~5 기획·설계 실습 과제 및 현업 자동화 미션</h3>
+            <p class="course-subtitle">1~5일차에 학습한 PRD·ERD·API·UI/UX 설계 역량을 온라인 과제와 코덱스 현업 미션으로 점검합니다.</p>
+            <div class="hub-links-stack">
+              <a href="homework_week1.html" class="hub-action-link">
+                <span>📝 1~5Day 일차별 실습 과제 (HW-D01 ~ D05)</span>
+                <span style="color: #60a5fa;">열기 →</span>
+              </a>
+              <a href="homework_codex_field.html" class="hub-action-link">
+                <span>💼 코덱스 현업 자동화 미션 (입문·협업·개발)</span>
+                <span style="color: #fbbf24;">열기 →</span>
+              </a>
             </div>
           </div>
-        </a>
+        </article>
+          </div>
+        </div>
 
+        <!-- ZONE 3: Module 2 (Day 6 ~ Day 10) -->
+        <div class="curriculum-zone zone-module2" data-zone="module2">
+          <div class="zone-header">
+            <div class="zone-title-group">
+              <span class="zone-badge">💻 Track 03 · Module 2 (Day 6 ~ Day 10)</span>
+              <h3 class="zone-title">프론트/백엔드 기능 구현 · 회원 보안 · 결제 신뢰성 · 서비스 런칭</h3>
+              <p class="zone-subtitle">설계 명세를 실제 동작하는 코드로 구현하고, 디버깅·예외 방어·인증·결제 UX·최종 런칭 패키지까지 완성합니다.</p>
+            </div>
+            <div class="zone-actions">
+              <a href="homework_week2.html" class="zone-shortcut-btn" style="border-color: rgba(6, 182, 212, 0.45); color: #67e8f9;">⚡ 5~10day 과제 바로가기</a>
+              <a href="homework_codex_field.html" class="zone-shortcut-btn" style="border-color: rgba(245, 158, 11, 0.45); color: #fde68a;">💼 코덱스 현업 과제</a>
+            </div>
+          </div>
+
+          <div class="curriculum-grid">
         <!-- Day 6 -->
         <article class="course-card is-clickable" id="openDay6Modal" tabindex="0" role="button"
           aria-label="Day 6 상세 커리큘럼 열기">
@@ -1849,53 +2328,48 @@
           </div>
         </article>
 
-        <!-- Project Day -->
-        <article class="course-card is-clickable" id="openProjectDayModal" tabindex="0" role="button"
-          aria-label="Project Day 상세 커리큘럼 열기">
+        <!-- Module 2 Homework & Codex Action Hub (6th slot in 2x3 grid) -->
+        <article class="course-card module-hub-card" aria-label="Module 2 실습 과제 및 코덱스 미션 허브">
           <div class="course-thumb"
-            style="background-image: url('img/project_day_cover.png'); background-size: cover; background-position: center;">
-            PROJECT DAY</div>
+            style="background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.65)), url('img/homework_module2_cover.png'); background-size: cover; background-position: center; border-bottom: 1px solid rgba(139, 92, 246, 0.2); flex-direction: column; gap: 6px; color: #fff;">
+            <span style="font-size: 0.82rem; color: #c4b5fd; letter-spacing: 0.12em; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);">MODULE 2 ACTION HUB</span>
+            <span style="text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);">DAY 6 ~ 10 과제 · 미션</span>
+          </div>
           <div class="course-content">
-            <span class="day-label" style="background: linear-gradient(135deg, #3b82f6, #06b6d4); color: #fff;">Project Day</span>
-            <h3 class="course-title">Markdown 기획서 기반 웹사이트 구축 (Project Day)</h3>
-            <p class="course-subtitle">코덱스(Codex)와 대화하며 아이디어를 Markdown 기획서로 작성하고 실제 웹사이트로 구현하는 6단계 정석 프로젝트 실습</p>
-            <p class="course-desc">
-              아이디어 구체화(Phase 1), 5대 Markdown 기획서 작성(Phase 2), 코덱스 웹사이트 코드 생성(Phase 3), 학생/선생님 시나리오 테스트(Phase 4), 피드백 반영 문서·코드 개선(Phase 5), 대화 이력 기록 및 5분 발표(Phase 6)를 경험합니다.
-            </p>
-
-            <div class="meta-grid">
-              <div class="meta-item"><strong>핵심 주제</strong>Idea Definition, Markdown Specifications, Codex Implementation, Scenario Testing, Iterative Spec-First Refinement, History Logging</div>
-              <div class="meta-item"><strong>학습 목표</strong>대화와 표준 기획 명세를 바탕으로 코덱스 AI와 완벽히 협업하여 실행 가능한 웹 앱을 완성하는 프로세스 마스터</div>
-              <div class="meta-item"><strong>실습 방향</strong>아이디어 정의 ➔ 기획 문서화 ➔ 코덱스 구현 ➔ 시나리오 검증 ➔ 문서 연쇄 개선 ➔ 이력 기록 &amp; 발표</div>
-            </div>
-
-            <div class="time-list">
-              <div class="time-row"><strong>30분</strong> 아이디어 구체화 &amp; 5대 Markdown 기획서 작성 (Phase 1 &amp; 2)</div>
-              <div class="time-row"><strong>45분</strong> 코덱스 웹사이트 생성 &amp; 역할별 시나리오 테스트 (Phase 3 &amp; 4)</div>
-              <div class="time-row"><strong>45분</strong> 문서·코드 개선 &amp; 대화 이력 작성 및 결과 발표 (Phase 5 &amp; 6)</div>
-            </div>
-
-            <div class="tag-list">
-              <span class="tag">Project Day</span>
-              <span class="tag">Codex Website</span>
-              <span class="tag">Markdown Specs</span>
-              <span class="tag">Scenario Test</span>
-              <span class="tag">Spec-First</span>
-              <span class="tag">CONVERSATION.md</span>
-            </div>
-
-            <div class="meta-item">
-              <strong>예상 산출물</strong>
-              사이트 명세서(SITE_SPEC.md), 이용 동선(USER_FLOWS.md), 데이터 모델(DATA_MODEL.md), 구현 계획서(IMPLEMENTATION_PLAN.md), 대화 기록지(CONVERSATION.md), 완성 웹사이트(website/)
-            </div>
-            <div style="margin-top: 14px;">
-              <a href="project_day/project_day-ai-classroom.html" class="ai-class-btn">
-                AI 강의실 입장
+            <span class="day-label" style="background: rgba(6, 182, 212, 0.18); color: #67e8f9; border-color: rgba(6, 182, 212, 0.35);">Module 2 · 심화 구현 &amp; 런칭 미션</span>
+            <h3 class="course-title">Day 6~10 기능 구현·보안·결제·런칭 과제 및 미션</h3>
+            <p class="course-subtitle">6~10일차에 구현한 서비스 통합·보안·결제·QA·런칭 역량을 심화 과제와 현업 자동화 미션으로 완성합니다.</p>
+            <div class="hub-links-stack">
+              <a href="homework_week2.html" class="hub-action-link">
+                <span>⚡ 5~10Day 심화 구현·런칭 과제 (HW-D06 ~ D10)</span>
+                <span style="color: #22d3ee;">열기 →</span>
+              </a>
+              <a href="homework_codex_field.html" class="hub-action-link">
+                <span>💼 코덱스 현업 자동화 미션 (입문·협업·개발)</span>
+                <span style="color: #fbbf24;">열기 →</span>
               </a>
             </div>
           </div>
         </article>
+          </div>
+        </div>
 
+        <!-- ZONE 4: Career, Attendance, QR Resources & Survey (Compact 4-Column Grid) -->
+        <div class="curriculum-zone zone-support" data-zone="support">
+          <div class="zone-header">
+            <div class="zone-title-group">
+              <span class="zone-badge">🧭 Track 04 · Career &amp; Student Support</span>
+              <h3 class="zone-title">취업면접 가이드 · 출석 체크인 · QR 리소스 · 수료 설문</h3>
+              <p class="zone-subtitle">AI SW 취업면접 준비부터 주차별 출결 체크, 역량 진단·커뮤니티 QR 모음, 최종 수료 설문까지 한눈에 이용하세요.</p>
+            </div>
+            <div class="zone-actions">
+              <a href="attendance_qr.html" class="zone-shortcut-btn" style="border-color: rgba(16, 185, 129, 0.45); color: #6ee7b7;">📅 출석 QR 체크인</a>
+              <a href="qr_resources.html" class="zone-shortcut-btn" style="border-color: rgba(6, 182, 212, 0.45); color: #67e8f9;">📱 전체 QR 모음</a>
+              <a href="career_interview.html" class="zone-shortcut-btn" style="border-color: rgba(168, 85, 247, 0.45); color: #d8b4fe;">🎯 취업면접 가이드</a>
+            </div>
+          </div>
+
+          <div class="curriculum-grid support-compact-grid">
         <!-- AI SW Career Interview Card -->
         <article class="course-card" aria-label="AI SW 취업면접 가이드">
           <div class="course-thumb" style="background-image: linear-gradient(rgba(9, 9, 11, 0.28), rgba(9, 9, 11, 0.72)), url('img/ai_sw_career_interview_cover.png'); background-size: cover; background-position: center; color: #fff;">
@@ -1924,40 +2398,7 @@
 
             <div style="margin-top: 14px;">
               <a href="career_interview.html" class="ai-class-btn" style="background: linear-gradient(135deg, #0891b2, #7c3aed);">
-                🎯 AI SW 취업면접 가이드 보기
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Final Survey & Graduation Card (KR) -->
-        <article class="course-card" id="openSurveyModal" tabindex="0" role="region" aria-label="최종 설문조사 및 수료 안내">
-          <div class="course-thumb" style="background-image: url('img/survey_card_cover.png'); background-size: cover; background-position: center; color: #fff;">
-            SURVEY & GRADUATION</div>
-          <div class="course-content">
-            <span class="day-label" style="background: linear-gradient(135deg, #f59e0b, #ec4899); color: #fff;">최종 설문조사 · 수료 안내</span>
-            <h3 class="course-title">AI SW 랜딩의 모든 수업이 종료되었습니다. 감사합니다.</h3>
-            <p class="course-subtitle">AI SW 랜딩의 모든 수업이 종료되었습니다. 감사합니다. 마지막 설문을 부탁 드립니다.</p>
-            <p class="course-desc">
-              수강생 여러분의 앞날에 축복과 행복이 가득하기를 기원합니다. 아래 버튼을 클릭하여 수료 축하 메시지와 2가지 설문조사(사후 설문조사 및 AI 트랙 사전 학습 진단) QR 코드 안내 페이지로 이동하세요.
-            </p>
-
-            <div class="meta-grid">
-              <div class="meta-item"><strong>핵심 안내</strong>사후 설문조사 &amp; AI 트랙 사전 학습 진단 QR 코드 안내</div>
-              <div class="meta-item"><strong>참여 목적</strong>수업 만족도 개선 및 학습 성과 역량 평가</div>
-            </div>
-
-            <div class="tag-list">
-              <span class="tag">최종 설문조사</span>
-              <span class="tag">수료 안내</span>
-              <span class="tag">QR 코드</span>
-              <span class="tag">사후 설문</span>
-              <span class="tag">사전 학습 진단</span>
-            </div>
-
-            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
-              <a href="survey.html" class="ai-class-btn" style="background: linear-gradient(135deg, #f59e0b, #ec4899);">
-                📋 설문조사 QR 코드 페이지 열기
+                🎯 취업면접 가이드 보기
               </a>
             </div>
           </div>
@@ -1991,11 +2432,12 @@
 
             <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
               <a href="attendance_qr.html" class="ai-class-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
-                📅 오프라인출석 QR 코드 페이지 열기
+                📅 출석 QR 페이지 열기
               </a>
             </div>
           </div>
         </article>
+
         <!-- Student QR Resources Card -->
         <article class="course-card is-clickable" id="openQrResourcesCard" tabindex="0" role="link" aria-label="설문·클래스룸·커뮤니티 QR 코드" onclick="location.href='qr_resources.html'" onkeydown="if(event.key==='Enter'||event.key===' '){location.href='qr_resources.html';event.preventDefault();}">
           <div class="course-thumb" style="background-image: linear-gradient(rgba(9, 9, 11, 0.2), rgba(9, 9, 11, 0.65)), url('img/qr_resource_cover.png'); background-size: cover; background-position: center; color: #fff;">
@@ -2025,11 +2467,46 @@
 
             <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
               <a href="qr_resources.html" class="ai-class-btn" style="background: linear-gradient(135deg, #06b6d4, #2563eb);">
-                📱 QR 코드 모음 페이지 열기
+                📱 QR 코드 모음 열기
               </a>
             </div>
           </div>
         </article>
+
+        <!-- Final Survey & Graduation Card (KR) -->
+        <article class="course-card" id="openSurveyModal" tabindex="0" role="region" aria-label="최종 설문조사 및 수료 안내">
+          <div class="course-thumb" style="background-image: url('img/survey_card_cover.png'); background-size: cover; background-position: center; color: #fff;">
+            SURVEY &amp; GRADUATION</div>
+          <div class="course-content">
+            <span class="day-label" style="background: linear-gradient(135deg, #f59e0b, #ec4899); color: #fff;">최종 설문조사 · 수료 안내</span>
+            <h3 class="course-title">AI SW 랜딩 최종 설문조사 및 수료 안내</h3>
+            <p class="course-subtitle">사후 설문조사 및 AI 트랙 사전 학습 진단 QR 코드 안내</p>
+            <p class="course-desc">
+              수강생 여러분의 앞날에 축복과 행복이 가득하기를 기원합니다. 아래 버튼을 클릭하여 수료 축하 메시지와 2가지 설문조사(사후 설문조사 및 AI 트랙 사전 학습 진단) QR 코드 안내 페이지로 이동하세요.
+            </p>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>핵심 안내</strong>사후 설문조사 &amp; AI 트랙 사전 학습 진단 QR 코드 안내</div>
+              <div class="meta-item"><strong>참여 목적</strong>수업 만족도 개선 및 학습 성과 역량 평가</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag">최종 설문조사</span>
+              <span class="tag">수료 안내</span>
+              <span class="tag">QR 코드</span>
+              <span class="tag">사후 설문</span>
+              <span class="tag">사전 학습 진단</span>
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <a href="survey.html" class="ai-class-btn" style="background: linear-gradient(135deg, #f59e0b, #ec4899);">
+                📋 설문조사 QR 열기
+              </a>
+            </div>
+          </div>
+        </article>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -3758,6 +4235,44 @@
     setupModal('openDay8Modal', 'day8Modal', 'closeDay8Modal');
     setupModal('openDay9Modal', 'day9Modal', 'closeDay9Modal');
     setupModal('openDay10Modal', 'day10Modal', 'closeDay10Modal');
+
+    // Project Day card click fallback
+    const projectDayCard = document.getElementById('openProjectDayModal');
+    if (projectDayCard) {
+      projectDayCard.addEventListener('click', function (e) {
+        if (!e.target.closest('a')) {
+          window.location.href = 'project_day/project_day-ai-classroom.html';
+        }
+      });
+    }
+
+    // Curriculum Category Filter Tabs
+    (function initCurriculumFilter() {
+      const filterButtons = document.querySelectorAll('.curriculum-filter-btn');
+      const zones = document.querySelectorAll('.curriculum-zone');
+      if (!filterButtons.length || !zones.length) return;
+
+      filterButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const targetFilter = btn.getAttribute('data-filter');
+
+          filterButtons.forEach(function (b) {
+            const isActive = b === btn;
+            b.classList.toggle('active', isActive);
+            b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+          });
+
+          zones.forEach(function (zone) {
+            const zoneType = zone.getAttribute('data-zone');
+            if (targetFilter === 'all' || zoneType === targetFilter) {
+              zone.classList.remove('is-hidden');
+            } else {
+              zone.classList.add('is-hidden');
+            }
+          });
+        });
+      });
+    })();
 
     // Helper to get cookie
     function getCookie(name) {
