@@ -9,7 +9,7 @@
   // Determine base path for assets (subfolders like day1/ need '../')
   function getBasePath() {
     const p = window.location.pathname;
-    if (p.includes('/day') || p.includes('/announcement/') || p.includes('/project_day/') || p.includes('/login/')) {
+    if (p.includes('/day') || p.includes('/announcement/') || p.includes('/project_day/') || p.includes('/login/') || p.includes('/real-')) {
       return '../';
     }
     return '';
@@ -17,7 +17,7 @@
 
   const BASE_PATH = getBasePath();
 
-  // Notices data: Notice 7 is latest (Slide 0), Notice 6 is Slide 1, Notice 5 is Slide 2, Notice 4 is Slide 3, Notice 3 is Slide 4, Notice 2 is Slide 5, Notice 1 is Slide 6
+  // Notices data: Notice 7 is Must-Read (Slide 0), Notice 8 is latest 3rd-week gstack guide (Slide 1), Notice 6 is Slide 2, Notice 5 is Slide 3, Notice 4 is Slide 4, Notice 3 is Slide 5, Notice 2 is Slide 6, Notice 1 is Slide 7
   const NOTICES_DATA = [
     {
       id: 7,
@@ -93,10 +93,98 @@
       `
     },
     {
+      id: 8,
+      tag: '3주차 교육 안내 · gstack 실습',
+      tagClass: 'tag-faculty',
+      tabLabel: '⚡ 2. [3주차] gstack 프로젝트 실습 안내',
+      title: '📢 [3주차 교육 안내] gstack을 활용한 프로젝트 설계·진행 강의 및 실습',
+      contentHtml: `
+        <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; line-height: 1.7;">
+          안녕하세요. 랜딩 과정을 운영하고 있는 이호준 교수입니다.
+        </p>
+
+        <p class="notice-text-p" style="font-size: 0.98rem; color: #e2e8f0; line-height: 1.78;">
+          이번 교육에서는 <strong style="color: #38bdf8;">gstack을 활용한 AI 기반 프로젝트 설계 및 개발 프로세스</strong>를 학습하고, 직접 실습하는 시간을 갖습니다.
+        </p>
+
+        <p class="notice-text-p" style="font-size: 0.98rem; color: #e2e8f0; line-height: 1.78;">
+          AI Agent를 활용한 개발은 단순히 AI에게 코드를 작성하도록 요청하는 것이 아닙니다. <strong style="color: #fff;">프로젝트를 기획하고, 요구사항을 분석하며, 설계부터 구현·검증까지 전체 개발 과정을 체계적으로 관리하는 역량</strong>이 중요합니다.
+        </p>
+
+        <p class="notice-text-p" style="font-size: 0.98rem; color: #e2e8f0; line-height: 1.78;">
+          이번 시간에는 gstack을 활용하여 실제 개발 현장에서 이루어지는 프로젝트 진행 과정을 경험해 보겠습니다.
+        </p>
+
+        <!-- 주요 교육 내용 -->
+        <div class="notice-card-box highlight-blue" style="margin: 18px 0;">
+          <h4 class="notice-box-title">■ 주요 교육 내용</h4>
+          <ul class="notice-check-list" style="gap: 10px;">
+            <li>
+              <span class="check-icon">01</span>
+              <span><strong>gstack의 개념과 AI 기반 개발 워크플로 이해</strong></span>
+            </li>
+            <li>
+              <span class="check-icon">02</span>
+              <span><strong>프로젝트 아이디어 구체화 및 요구사항 분석</strong></span>
+            </li>
+            <li>
+              <span class="check-icon">03</span>
+              <span><strong>AI Agent를 활용한 프로젝트 구조 설계</strong></span>
+            </li>
+            <li>
+              <span class="check-icon">04</span>
+              <span><strong>역할별 검토와 피드백을 통한 개발 과정 개선</strong></span>
+            </li>
+            <li>
+              <span class="check-icon">05</span>
+              <span><strong>실제 프로젝트에 적용하는 실습 및 결과 공유</strong></span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 교육 목표 -->
+        <div class="notice-card-box highlight-green" style="margin-bottom: 18px;">
+          <h4 class="notice-box-title">■ 교육 목표</h4>
+          <p class="notice-text-p" style="color: #ecfdf5; font-weight: 600; margin-bottom: 10px; line-height: 1.75;">
+            AI가 코드를 만들어 주는 수준을 넘어, <strong style="color: #6ee7b7;">AI를 활용해 프로젝트 전체를 설계하고, 개발 과정을 주도하며, 결과물을 스스로 검증할 수 있는 역량</strong>을 기르는 것입니다.
+          </p>
+          <p class="notice-text-p" style="color: #fde68a; font-weight: 600; margin: 0; line-height: 1.7;">
+            💡 이번 교육도 이론보다는 <strong>실습 중심(Hands-on)</strong>으로 진행됩니다.
+          </p>
+          <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="${BASE_PATH}real-project-gstack/index.html" class="notice-action-link" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 8px; background: rgba(6, 182, 212, 0.22); border: 1px solid rgba(34, 211, 238, 0.45); color: #67e8f9; text-decoration: none; font-weight: 700; font-size: 0.9rem;">
+              ⚡ Real Project gstack 강의실 바로가기 →
+            </a>
+          </div>
+        </div>
+
+        <p class="notice-text-p" style="font-size: 0.98rem; color: #e2e8f0; line-height: 1.75;">
+          여러분이 AI 시대의 개발자로 성장하기 위해 필요한 실무 역량을 직접 경험하는 시간이 되기를 바랍니다.<br>
+          적극적인 참여 부탁드립니다.
+        </p>
+
+        <!-- 첨부 인포그래픽 이미지 -->
+        <div class="notice-attachment-wrap" style="text-align: center; margin-top: 18px;">
+          <div class="attachment-label">
+            <span>📎 첨부파일: <strong>3주차 교육 안내 — GStack을 활용한 프로젝트 설계·진행 강의 및 실습</strong></span>
+            <span style="font-size: 0.78rem; color: #38bdf8;">클릭 시 원본 크기로 확대</span>
+          </div>
+          <div style="background: rgba(0,0,0,0.32); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; display: inline-block; max-width: 100%;">
+            <img src="${BASE_PATH}img/notice_gstack_week3_guide.png" alt="3주차 교육 안내 - GStack을 활용한 프로젝트 설계·진행 강의 및 실습" class="notice-team-img notice-zoomable-img" style="max-height: 580px; width: auto; max-width: 100%; border-radius: 10px; cursor: zoom-in; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" data-zoom-src="${BASE_PATH}img/notice_gstack_week3_guide.png" title="클릭하여 원본 크기로 보기" />
+          </div>
+        </div>
+
+        <div class="notice-author-sign" style="margin-top: 18px;">
+          <p class="notice-text-p" style="margin-bottom: 4px;">감사합니다.</p>
+          <p class="notice-text-p" style="font-weight: 800; color: #f8fafc; font-size: 1.02rem;">이호준 교수 드림</p>
+        </div>
+      `
+    },
+    {
       id: 6,
       tag: '온라인 학습 · 최신 공지',
       tagClass: 'tag-urgent',
-      tabLabel: '📢 2. 11/3 온라인 학습 안내',
+      tabLabel: '📢 3. 11/3 온라인 학습 안내',
       title: '📢 [SW랜딩] 11월 3일(화) 온라인 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -179,7 +267,7 @@
       id: 5,
       tag: '팀 편성',
       tagClass: 'tag-urgent',
-      tabLabel: '👥 3. 팀 재배정 안내',
+      tabLabel: '👥 4. 팀 재배정 안내',
       title: '📢 [2026 SW 랜딩] 팀 재배정 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; line-height: 1.7;">
@@ -270,7 +358,7 @@
       id: 4,
       tag: '온라인 학습',
       tagClass: 'tag-urgent',
-      tabLabel: '📢 4. 10/27 온라인 학습 안내',
+      tabLabel: '📢 5. 10/27 온라인 학습 안내',
       title: '📢 [SW랜딩] 10월 27일(화) 온라인 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -353,7 +441,7 @@
       id: 3,
       tag: '운영 안내',
       tagClass: 'tag-urgent',
-      tabLabel: '🚗 5. 교육시설/주차 안내',
+      tabLabel: '🚗 6. 교육시설/주차 안내',
       title: '📢 [SW랜딩] 교육시설 이용 및 주차 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.02rem; font-weight: 600; color: #f8fafc;">
@@ -403,7 +491,7 @@
       id: 2,
       tag: '교수진 공지 · 팀 편성',
       tagClass: 'tag-faculty',
-      tabLabel: '👥 6. 초기 팀 구성 안내',
+      tabLabel: '👥 7. 초기 팀 구성 안내',
       title: '[공지] 학습 모듈별 팀 구성 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -454,7 +542,7 @@
       id: 1,
       tag: '학습 안내 · 모듈 1',
       tagClass: 'tag-learning',
-      tabLabel: '🚀 7. 모듈 1 학습 안내',
+      tabLabel: '🚀 8. 모듈 1 학습 안내',
       title: '🚀 [SW랜딩] 모듈 1 첫 번째 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
