@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function () {
+      function getCookie(name) {
+        var prefix = name + '=';
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          if (cookie.indexOf(prefix) === 0) return decodeURIComponent(cookie.substring(prefix.length));
+        }
+        return null;
+      }
+      var loggedInUser = getCookie('currentUser');
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) loggedInUser = session.value;
+            else localStorage.removeItem('currentUserSession');
+          } catch (e) { console.error(e); }
+        }
+      }
+      if (!loggedInUser) window.location.href = '../login/login.html';
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Codex와 Claude Code로 gstack을 설치하고 기획부터 개발, 리뷰, QA, 출시까지 실습하는 Real Project 강의" />
+  <title>Real Project gstack 강의 | 대구 SW 랜딩</title>
+  <link rel="icon" href="course/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #111827;
+      --surface-2: #171c27;
+      --line: rgba(255, 255, 255, 0.09);
+      --text: #ffffff;
+      --muted: #a1a1aa;
+      --blue: #3b82f6;
+      --cyan: #22d3ee;
+      --cyan-soft: #a5f3fc;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --radius: 20px;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 86px; }
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+      background:
+        radial-gradient(circle at 12% 4%, rgba(34, 211, 238, 0.11), transparent 28%),
+        radial-gradient(circle at 88% 28%, rgba(59, 130, 246, 0.12), transparent 30%),
+        var(--bg);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; }
+    .container { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--line);
+      background: rgba(9, 9, 11, 0.82);
+      backdrop-filter: blur(18px);
+    }
+
+    .nav-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 850;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: #08111d;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      font-weight: 950;
+      letter-spacing: -0.08em;
+    }
+
+    .nav-links { display: flex; align-items: center; gap: 9px; list-style: none; }
+    .nav-links a, .nav-links button {
+      padding: 8px 12px;
+      color: #d4d4d8;
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 750;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .nav-links a:hover, .nav-links button:hover { color: var(--cyan); }
+    .nav-links .nav-cta {
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      border-radius: 9px;
+      color: var(--cyan-soft);
+      background: rgba(6, 182, 212, 0.12);
+      transition: all 0.2s ease;
+    }
+    .nav-links .nav-cta:hover {
+      background: rgba(6, 182, 212, 0.24);
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
+    .hero { position: relative; overflow: hidden; padding: 88px 0 72px; border-bottom: 1px solid var(--line); }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.42;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.055) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, #000, transparent 90%);
+    }
+
+    .hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr); gap: 62px; align-items: center; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--cyan); font-size: 0.8rem; font-weight: 900; letter-spacing: 0.13em; }
+    .eyebrow::before { content: ''; width: 28px; height: 2px; background: var(--cyan); box-shadow: 0 0 14px var(--cyan); }
+    h1 { margin: 18px 0 20px; font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.04; letter-spacing: -0.055em; }
+    h1 span { display: block; background: linear-gradient(110deg, #ffffff 10%, var(--cyan-soft) 52%, #60a5fa); -webkit-background-clip: text; color: transparent; }
+    .hero-copy { max-width: 760px; color: #cbd5e1; font-size: 1.08rem; word-break: keep-all; }
+    .hero-copy strong { color: #ffffff; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 12px 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .button:hover { transform: translateY(-2px); border-color: rgba(34, 211, 238, 0.46); }
+    .button.primary { color: #07111f; border-color: transparent; background: linear-gradient(135deg, #67e8f9, var(--blue)); box-shadow: 0 14px 34px rgba(6, 182, 212, 0.22); }
+    .button.secondary { background: rgba(255, 255, 255, 0.045); }
+
+    .terminal {
+      overflow: hidden;
+      border: 1px solid rgba(34, 211, 238, 0.24);
+      border-radius: 22px;
+      background: rgba(7, 12, 21, 0.92);
+      box-shadow: var(--shadow), 0 0 60px rgba(6, 182, 212, 0.11);
+      transform: rotate(1.5deg);
+      cursor: pointer;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+    .terminal:hover {
+      transform: rotate(0deg) translateY(-4px);
+      border-color: rgba(34, 211, 238, 0.55);
+    }
+    .terminal-bar { display: flex; align-items: center; gap: 7px; padding: 14px 16px; border-bottom: 1px solid var(--line); background: rgba(255, 255, 255, 0.025); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #fb7185; }
+    .dot:nth-child(2) { background: #fbbf24; }
+    .dot:nth-child(3) { background: var(--green); }
+    .terminal-title { margin-left: auto; color: #64748b; font: 0.73rem var(--mono); }
+    .terminal-body { padding: 24px; font: 0.86rem/1.75 var(--mono); }
+    .terminal-body .prompt { color: var(--cyan); }
+    .terminal-body .command { color: #e2e8f0; }
+    .terminal-body .ok { color: #6ee7b7; }
+    .terminal-body .dim { color: #64748b; }
+
+    .stats { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 48px; }
+    .stat { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: rgba(17, 24, 39, 0.7); }
+    .stat strong { display: block; color: var(--cyan); font-size: 1.16rem; }
+    .stat span { color: var(--muted); font-size: 0.8rem; }
+
+    section.content-section { padding: 78px 0; }
+    section.alt { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(17, 24, 39, 0.42); }
+    .section-kicker { color: var(--cyan); font-size: 0.76rem; font-weight: 900; letter-spacing: 0.12em; }
+    .section-title { margin: 8px 0 12px; font-size: clamp(1.8rem, 4vw, 2.7rem); line-height: 1.18; letter-spacing: -0.035em; }
+    .section-copy { max-width: 760px; color: var(--muted); word-break: keep-all; }
+
+    .outcome-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 32px; }
+    .outcome-card { padding: 24px; border: 1px solid var(--line); border-radius: 17px; background: linear-gradient(145deg, rgba(25, 31, 43, 0.94), rgba(13, 17, 24, 0.94)); }
+    .outcome-icon { width: 42px; height: 42px; display: grid; place-items: center; margin-bottom: 17px; border-radius: 12px; color: #07111f; background: linear-gradient(135deg, var(--cyan), var(--blue)); font-weight: 950; }
+    .outcome-card h3 { margin-bottom: 8px; font-size: 1.05rem; }
+    .outcome-card p { color: var(--muted); font-size: 0.87rem; }
+
+    .roadmap { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 34px; }
+    .phase {
+      position: relative;
+      padding: 24px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: rgba(11, 17, 28, 0.82);
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .phase:hover {
+      transform: translateY(-4px);
+      border-color: rgba(34, 211, 238, 0.45);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+    }
+    .phase::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: linear-gradient(var(--cyan), var(--blue)); }
+    .phase-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .phase-no { color: var(--cyan); font-size: 0.76rem; font-weight: 900; letter-spacing: 0.1em; }
+    .phase-slide-pill {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.1);
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      color: var(--cyan-soft);
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+    .phase h3 { margin: 8px 0 9px; font-size: 1.14rem; }
+    .phase p { color: var(--muted); font-size: 0.88rem; }
+    .phase code { display: inline-block; margin-top: 14px; color: var(--cyan-soft); font: 0.77rem var(--mono); }
+
+    .practice-flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 32px; }
+    .practice-step { padding: 26px; border-top: 2px solid var(--cyan); border-radius: 0 0 16px 16px; background: rgba(255, 255, 255, 0.035); }
+    .practice-step strong { display: block; margin-bottom: 8px; color: var(--cyan); font-size: 0.78rem; letter-spacing: 0.1em; }
+    .practice-step h3 { margin-bottom: 8px; font-size: 1.1rem; }
+    .practice-step p { color: var(--muted); font-size: 0.88rem; }
+
+    .resource-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 18px; margin-top: 32px; }
+    .resource-card { display: flex; flex-direction: column; padding: 27px; border: 1px solid var(--line); border-radius: 18px; background: rgba(18, 24, 34, 0.88); }
+    .resource-card.featured { border-color: rgba(34, 211, 238, 0.34); background: radial-gradient(circle at 90% 10%, rgba(34, 211, 238, 0.11), transparent 35%), rgba(18, 24, 34, 0.94); }
+    .resource-card h3 { margin: 8px 0; font-size: 1.2rem; }
+    .resource-card p { color: var(--muted); font-size: 0.88rem; }
+    .resource-card .button { width: fit-content; margin-top: 20px; }
+    .download-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; margin-top: 18px; }
+    .download-list a { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; color: #cbd5e1; text-decoration: none; font-size: 0.78rem; font-weight: 750; background: rgba(255, 255, 255, 0.025); }
+    .download-list a:hover { color: var(--cyan); border-color: rgba(34, 211, 238, 0.34); }
+
+    .cta { padding: 72px 0; text-align: center; }
+    .cta-box { padding: 48px 28px; border: 1px solid rgba(34, 211, 238, 0.3); border-radius: 24px; background: radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.16), transparent 42%), #0c1220; box-shadow: var(--shadow); }
+    .cta h2 { margin-bottom: 10px; font-size: clamp(1.8rem, 4vw, 2.8rem); }
+    .cta p { color: var(--muted); }
+    .cta .actions { justify-content: center; }
+    footer { padding: 30px 20px; text-align: center; color: #71717a; border-top: 1px solid var(--line); font-size: 0.8rem; }
+
+    /* ==========================================================================
+       SLIDESHARE LAYER POPUP MODAL (#gstackSlideModal)
+       ========================================================================== */
+    .slideshare-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(4, 7, 13, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .slideshare-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .slideshare-player {
+      width: min(1420px, 100%);
+      height: min(92vh, 940px);
+      display: flex;
+      flex-direction: column;
+      background: #0b101b;
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      border-radius: 22px;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.75), 0 0 40px rgba(6, 182, 212, 0.12);
+      overflow: hidden;
+      transform: translateY(14px) scale(0.985);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .slideshare-backdrop.active .slideshare-player {
+      transform: translateY(0) scale(1);
+    }
+
+    .slideshare-player:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      border: none;
+    }
+
+    /* Top Bar */
+    .ss-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      flex-shrink: 0;
+    }
+
+    .ss-brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .ss-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(59, 130, 246, 0.2));
+      border: 1px solid rgba(34, 211, 238, 0.38);
+      color: var(--cyan-soft);
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .ss-deck-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #f8fafc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ss-top-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ss-select {
+      padding: 7px 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: #111827;
+      color: #e2e8f0;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      max-width: 260px;
+    }
+
+    .ss-tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: #cbd5e1;
+      font-size: 0.8rem;
+      font-weight: 750;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .ss-tool-btn:hover,
+    .ss-tool-btn.active {
+      background: rgba(34, 211, 238, 0.15);
+      border-color: rgba(34, 211, 238, 0.45);
+      color: #ffffff;
+    }
+
+    .ss-tool-btn.close-btn {
+      background: rgba(244, 63, 94, 0.14);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+
+    .ss-tool-btn.close-btn:hover {
+      background: rgba(244, 63, 94, 0.28);
+      color: #ffffff;
+    }
+
+    /* Middle Stage (Drawer + Slide Canvas) */
+    .ss-body {
+      position: relative;
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(34, 211, 238, 0.07), transparent 35%),
+        radial-gradient(circle at 85% 80%, rgba(59, 130, 246, 0.08), transparent 35%),
+        #070b12;
+    }
+
+    /* Left TOC Drawer */
+    .ss-toc-drawer {
+      width: 280px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(11, 16, 27, 0.96);
+      overflow-y: auto;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+      transition: margin-left 0.25s ease, opacity 0.25s ease;
+    }
+
+    .ss-toc-drawer.collapsed {
+      margin-left: -280px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .ss-toc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 11px;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.02);
+      color: #94a3b8;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .ss-toc-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #e2e8f0;
+    }
+
+    .ss-toc-item.active {
+      background: rgba(34, 211, 238, 0.13);
+      border-color: rgba(34, 211, 238, 0.42);
+      color: #ffffff;
+    }
+
+    .ss-toc-num {
+      display: inline-grid;
+      place-items: center;
+      min-width: 26px;
+      height: 24px;
+      padding: 0 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--cyan);
+      font: 800 0.72rem var(--mono);
+      flex-shrink: 0;
+    }
+
+    .ss-toc-item.active .ss-toc-num {
+      background: var(--cyan);
+      color: #06121e;
+    }
+
+    .ss-toc-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .ss-toc-text strong {
+      font-size: 0.82rem;
+      font-weight: 750;
+      line-height: 1.3;
+      color: inherit;
+    }
+
+    .ss-toc-text span {
+      font-size: 0.71rem;
+      color: #64748b;
+    }
+
+    /* Slide Stage Area */
+    .ss-stage {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px 64px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .ss-nav-paddle {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 44px;
+      height: 68px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 23, 42, 0.82);
+      color: #e2e8f0;
+      font-size: 1.5rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .ss-nav-paddle:hover:not(:disabled) {
+      background: rgba(34, 211, 238, 0.22);
+      border-color: var(--cyan);
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
+    }
+
+    .ss-nav-paddle:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+    }
+
+    .ss-nav-paddle.prev { left: 12px; }
+    .ss-nav-paddle.next { right: 12px; }
+
+    /* Slide Card Frame */
+    .ss-slide-viewport {
+      width: 100%;
+      height: 100%;
+      max-width: 1180px;
+      background: linear-gradient(165deg, #111827 0%, #0b111e 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .ss-slide {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+      padding: 34px 42px;
+      animation: ssFadeIn 0.22s ease;
+    }
+
+    .ss-slide.active {
+      display: flex;
+    }
+
+    @keyframes ssFadeIn {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Slide Internal Typography & Components */
+    .slide-meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 14px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .slide-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--cyan);
+      font: 900 0.76rem var(--mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .slide-kicker span {
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(34, 211, 238, 0.14);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      color: var(--cyan-soft);
+    }
+
+    .slide-page-tag {
+      color: #64748b;
+      font: 700 0.78rem var(--mono);
+    }
+
+    .slide-headline {
+      font-size: clamp(1.55rem, 2.6vw, 2.25rem);
+      font-weight: 850;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    .slide-headline em {
+      font-style: normal;
+      background: linear-gradient(110deg, var(--cyan-soft), #38bdf8, #34d399);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .slide-subcopy {
+      color: #94a3b8;
+      font-size: 0.96rem;
+      max-width: 880px;
+      margin-bottom: 22px;
+    }
+
+    .slide-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .slide-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .slide-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .slide-card {
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .slide-card.accent {
+      background: linear-gradient(145deg, rgba(6, 182, 212, 0.12), rgba(59, 130, 246, 0.06));
+      border-color: rgba(34, 211, 238, 0.3);
+    }
+
+    .slide-card.warn {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .slide-card.danger {
+      background: rgba(244, 63, 94, 0.09);
+      border-color: rgba(244, 63, 94, 0.32);
+    }
+
+    .slide-card h3, .slide-card h4 {
+      font-size: 1.04rem;
+      color: #f8fafc;
+      margin-bottom: 8px;
+    }
+
+    .slide-card p {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .slide-num-badge {
+      display: inline-grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #06121e;
+      font: 900 0.78rem var(--mono);
+      margin-bottom: 10px;
+    }
+
+    .ss-code-block {
+      position: relative;
+      margin: 10px 0;
+      padding: 13px 68px 13px 16px;
+      border-radius: 12px;
+      background: #060a12;
+      border: 1px solid rgba(34, 211, 238, 0.2);
+      overflow-x: auto;
+    }
+
+    .ss-code-block code {
+      font: 0.82rem/1.65 var(--mono);
+      color: #a5f3fc;
+      white-space: pre;
+      display: block;
+    }
+
+    .ss-copy-btn {
+      position: absolute;
+      top: 9px;
+      right: 9px;
+      padding: 5px 10px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      font-size: 0.72rem;
+      font-weight: 750;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .ss-copy-btn:hover {
+      border-color: var(--cyan);
+      color: #ffffff;
+    }
+
+    .ss-copy-btn.copied {
+      background: var(--green);
+      border-color: var(--green);
+      color: #051b11;
+    }
+
+    .ss-expected {
+      margin-top: 8px;
+      padding: 9px 12px;
+      border-left: 3px solid var(--green);
+      background: rgba(52, 211, 153, 0.08);
+      border-radius: 4px 8px 8px 4px;
+      color: #a7f3d0;
+      font-size: 0.8rem;
+    }
+
+    .ss-result-box {
+      margin-top: 12px;
+      border: 1px solid rgba(52, 211, 153, 0.32);
+      border-radius: 14px;
+      background: rgba(6, 78, 59, 0.16);
+      overflow: hidden;
+    }
+
+    .ss-result-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      background: rgba(16, 185, 129, 0.18);
+      border-bottom: 1px solid rgba(52, 211, 153, 0.24);
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #ecfdf5;
+    }
+
+    .ss-result-head span {
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: var(--green);
+      color: #052e16;
+      font: 900 0.68rem var(--mono);
+    }
+
+    .ss-result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      color: #d1fae5;
+    }
+
+    .ss-result-grid div b {
+      display: block;
+      color: #34d399;
+      margin-bottom: 2px;
+    }
+
+    .ss-result-check {
+      padding: 8px 14px;
+      background: rgba(6, 95, 70, 0.28);
+      border-top: 1px solid rgba(52, 211, 153, 0.2);
+      color: #a7f3d0;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .ss-stage-gate {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(59, 130, 246, 0.09);
+      border-left: 3px solid var(--cyan);
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+
+    .ss-stage-gate b {
+      color: var(--cyan-soft);
+    }
+
+    .ss-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.8rem;
+    }
+
+    .ss-table th, .ss-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .ss-table th {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--cyan-soft);
+      font-weight: 800;
+    }
+
+    .ss-pass { color: var(--green); font-weight: 900; }
+    .ss-fail { color: var(--rose); font-weight: 900; }
+
+    /* Bottom Player Bar */
+    .ss-bottombar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px 22px 14px;
+      background: rgba(15, 23, 42, 0.96);
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+      flex-shrink: 0;
+    }
+
+    .ss-scrubber {
+      display: grid;
+      grid-template-columns: repeat(16, 1fr);
+      gap: 5px;
+      width: 100%;
+    }
+
+    .ss-scrub-dot {
+      height: 6px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(255, 255, 255, 0.14);
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .ss-scrub-dot:hover {
+      background: rgba(34, 211, 238, 0.55);
+      transform: scaleY(1.4);
+    }
+
+    .ss-scrub-dot.passed {
+      background: rgba(34, 211, 238, 0.42);
+    }
+
+    .ss-scrub-dot.active {
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      box-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+      transform: scaleY(1.5);
+    }
+
+    .ss-controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .ss-nav-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ss-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.05);
+      color: #f8fafc;
+      font-size: 0.84rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .ss-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.25), rgba(59, 130, 246, 0.25));
+      border-color: var(--cyan);
+    }
+
+    .ss-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .ss-counter {
+      min-width: 82px;
+      text-align: center;
+      font: 800 0.86rem var(--mono);
+      color: var(--cyan-soft);
+    }
+
+    .ss-shortcut-hint {
+      color: #64748b;
+      font-size: 0.76rem;
+    }
+
+    .ss-shortcut-hint kbd {
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      font: 700 0.7rem var(--mono);
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid, .resource-grid, .slide-grid-2, .slide-grid-3, .slide-grid-4, .ss-result-grid { grid-template-columns: 1fr; }
+      .terminal { transform: none; }
+      .outcome-grid, .roadmap, .practice-flow { grid-template-columns: repeat(2, 1fr); }
+      .ss-toc-drawer { position: absolute; left: 0; top: 0; bottom: 0; z-index: 20; box-shadow: 16px 0 40px rgba(0, 0, 0, 0.6); }
+      .ss-stage { padding: 14px 48px; }
+      .ss-slide { padding: 24px 22px; }
+      .ss-shortcut-hint { display: none; }
+    }
+
+    @media (max-width: 680px) {
+      .container { width: min(100% - 28px, 1180px); }
+      .nav-inner { min-height: 64px; }
+      .nav-links li:not(:last-child) { display: none; }
+      .hero { padding: 62px 0 52px; }
+      .hero-grid { gap: 38px; }
+      .stats, .outcome-grid, .roadmap, .practice-flow, .download-list { grid-template-columns: 1fr; }
+      section.content-section { padding: 58px 0; }
+      .slideshare-backdrop { padding: 0; }
+      .slideshare-player { height: 100vh; border-radius: 0; }
+      .ss-stage { padding: 10px; }
+      .ss-nav-paddle { display: none; }
+      .ss-select { max-width: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="../index.html" class="brand"><span class="brand-mark">g/</span>대구 SW 랜딩</a>
+      <ul class="nav-links">
+        <li><a href="#roadmap">학습 로드맵</a></li>
+        <li><a href="#resources">실습 자료</a></li>
+        <li><a href="../index.html">과정 홈</a></li>
+        <li><button type="button" class="nav-cta" data-open-slides="0">📑 강의 슬라이드 열기</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">REAL PROJECT · GSTACK</div>
+            <h1>기획부터 QA까지,<span>AI 개발팀을 설계하다</span></h1>
+            <p class="hero-copy">
+              <strong>Codex와 Claude Code</strong>에서 gstack을 설치하는 방법부터 시작해 문제 정의, 기획, 구현, 코드 리뷰, 디버깅, QA, 출시까지 실제 프로젝트의 전체 흐름을 따라갑니다. 모든 단계에 명령어, 프롬프트, 실행 결과 예시와 다운로드 실습 파일이 포함됩니다.
+            </p>
+            <div class="actions">
+              <button type="button" class="button primary" data-open-slides="0">전체 강의 슬라이드 시작 <span aria-hidden="true">→</span></button>
+              <a class="button secondary" href="course/downloads/gstack-3hour-lecture-notes.pdf" download>PDF 강의록 다운로드</a>
+            </div>
+          </div>
+          <div class="terminal" data-open-slides="0" role="button" tabindex="0" aria-label="클릭하여 gstack 강의 슬라이드 열기" title="클릭하여 슬라이드 쉐어 강의 열기">
+            <div class="terminal-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="terminal-title">real-project — gstack (클릭하여 슬라이드 열기)</span></div>
+            <div class="terminal-body">
+              <div><span class="prompt">$</span> <span class="command">/office-hours</span></div>
+              <div class="dim">문제와 사용자를 구체화합니다...</div>
+              <br />
+              <div><span class="prompt">$</span> <span class="command">/plan-ceo-review</span></div>
+              <div class="ok">✓ 제품 관점 검토 완료</div>
+              <div><span class="prompt">$</span> <span class="command">/plan-eng-review</span></div>
+              <div class="ok">✓ 구현 계획과 위험 요소 정리</div>
+              <br />
+              <div><span class="prompt">$</span> <span class="command">/review → /qa</span></div>
+              <div class="ok">✓ 구현 검토 · 브라우저 QA 완료</div>
+              <div><span class="prompt">$</span> <span class="command">/ship</span></div>
+              <div class="ok">✓ 출시 준비 완료</div>
+            </div>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>16 Slides</strong><span>인터랙티브 슬라이드 쉐어 강의</span></div>
+          <div class="stat"><strong>10단계</strong><span>프로젝트 생명주기 실습</span></div>
+          <div class="stat"><strong>33페이지</strong><span>초급자용 PDF 강의록</span></div>
+          <div class="stat"><strong>2개 환경</strong><span>Codex · Claude Code</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="container">
+        <div class="section-kicker">LEARNING OUTCOMES</div>
+        <h2 class="section-title">이 강의에서 완성할 수 있는 것</h2>
+        <p class="section-copy">명령어를 외우는 수업이 아니라, 각 역할에 맞는 AI 에이전트를 호출하고 결과를 검증하는 프로젝트 운영 방식을 익힙니다.</p>
+        <div class="outcome-grid">
+          <article class="outcome-card"><div class="outcome-icon">01</div><h3>환경 구축</h3><p>Windows WSL, macOS, Codex, Claude Code에서 초급자도 따라 할 수 있도록 설치하고 점검합니다.</p></article>
+          <article class="outcome-card"><div class="outcome-icon">02</div><h3>기획과 명세</h3><p>아이디어를 사용자 문제, 요구사항, 실행 가능한 스펙과 개발 계획으로 구체화합니다.</p></article>
+          <article class="outcome-card"><div class="outcome-icon">03</div><h3>개발과 검토</h3><p>구현 후 코드 리뷰, 원인 중심 디버깅, 보안과 성능 점검을 역할별로 수행합니다.</p></article>
+          <article class="outcome-card"><div class="outcome-icon">04</div><h3>QA와 출시</h3><p>브라우저에서 실제 사용 흐름을 테스트하고, 문서화와 출시·회고까지 연결합니다.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section alt" id="roadmap">
+      <div class="container">
+        <div class="section-kicker">END-TO-END ROADMAP</div>
+        <h2 class="section-title">기획 → 개발 → QA 전체 과정</h2>
+        <p class="section-copy">각 단계를 클릭하면 해당 주제의 슬라이드 화면이 레이어팝업으로 즉시 열립니다.</p>
+        <div class="roadmap">
+          <article class="phase" data-open-slides="3" role="button" tabindex="0">
+            <div class="phase-top"><span class="phase-no">PHASE 01</span><span class="phase-slide-pill">Slide 04 열기 ↗</span></div>
+            <h3>Setup · 환경 준비</h3>
+            <p>운영체제별 설치, Codex 프롬프팅 설치, Claude Code 등록, 설치 확인과 오류 해결</p>
+            <code>check → install → verify</code>
+          </article>
+          <article class="phase" data-open-slides="9" role="button" tabindex="0">
+            <div class="phase-top"><span class="phase-no">PHASE 02</span><span class="phase-slide-pill">Slide 10 열기 ↗</span></div>
+            <h3>Discover · 문제 정의</h3>
+            <p>사용자, 현재 문제, 성공 기준을 질문으로 좁혀 프로젝트의 출발점을 정리</p>
+            <code>/office-hours</code>
+          </article>
+          <article class="phase" data-open-slides="10" role="button" tabindex="0">
+            <div class="phase-top"><span class="phase-no">PHASE 03</span><span class="phase-slide-pill">Slide 11 열기 ↗</span></div>
+            <h3>Spec · 요구사항 명세</h3>
+            <p>모호한 아이디어를 범위, 예외, 수용 기준이 있는 실행 가능한 명세로 전환</p>
+            <code>/spec</code>
+          </article>
+          <article class="phase" data-open-slides="10" role="button" tabindex="0">
+            <div class="phase-top"><span class="phase-no">PHASE 04</span><span class="phase-slide-pill">Slide 11 열기 ↗</span></div>
+            <h3>Plan · 다각도 검토</h3>
+            <p>제품·디자인·엔지니어링 관점으로 계획을 검토하고 구현 순서와 위험을 확정</p>
+            <code>/plan-ceo-review · /plan-eng-review</code>
+          </article>
+          <article class="phase" data-open-slides="11" role="button" tabindex="0">
+            <div class="phase-top"><span class="phase-no">PHASE 05</span><span class="phase-slide-pill">Slide 12 열기 ↗</span></div>
+            <h3>Build · 구현</h3>
+            <p>작은 단위로 개발하고, 변경 이유와 검증 방법을 남기며 프로젝트를 완성</p>
+            <code>implement → test → commit</code>
+          </article>
+          <article class="phase" data-open-slides="12" role="button" tabindex="0">
+            <div class="phase-top"><span class="phase-no">PHASE 06</span><span class="phase-slide-pill">Slide 13 열기 ↗</span></div>
+            <h3>Review · QA · Ship</h3>
+            <p>코드 리뷰, 디버깅, 실제 브라우저 QA, 보안·성능·문서화, 출시와 회고 수행</p>
+            <code>/review → /qa → /ship → /retro</code>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="container">
+        <div class="section-kicker">PRACTICE METHOD</div>
+        <h2 class="section-title">초급자가 따라가는 실습 방식</h2>
+        <div class="practice-flow">
+          <article class="practice-step"><strong>STEP 01 · WATCH</strong><h3>예시를 먼저 이해하기</h3><p>슬라이드 강의 화면의 프롬프트와 예상 실행 결과를 비교해 무엇을 요청하고 어떤 결과가 나오는지 확인합니다.</p></article>
+          <article class="practice-step"><strong>STEP 02 · FOLLOW</strong><h3>ZIP으로 그대로 따라 하기</h3><p>Git 저장소 없이 단계별 ZIP 파일을 내려받아 압축을 풀고, 안내된 명령과 프롬프트를 그대로 실행합니다.</p></article>
+          <article class="practice-step"><strong>STEP 03 · APPLY</strong><h3>내 프로젝트에 적용하기</h3><p>예제의 입력값과 성공 기준을 자신의 주제로 바꿔 산출물을 만들고, 체크리스트로 결과를 검증합니다.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section alt" id="resources">
+      <div class="container">
+        <div class="section-kicker">DOWNLOAD CENTER</div>
+        <h2 class="section-title">강의와 실습 자료</h2>
+        <p class="section-copy">인터랙티브 슬라이드 쉐어 강의 화면, PDF 강의록, 완성 실습팩과 10개 단계별 ZIP을 모두 제공합니다.</p>
+        <div class="resource-grid">
+          <article class="resource-card featured">
+            <span class="section-kicker">FULL COURSE · SLIDESHARE VIEW</span>
+            <h3>인터랙티브 전체 강의 (슬라이드 쉐어)</h3>
+            <p>Windows 설치와 WSL 설명, Codex 프롬프팅 설치, Claude Code 사용법, 전체 프로젝트 생명주기, 명령별 입력·출력 예시를 레이어팝업 슬라이드 형태로 한 장씩 넘기며 학습합니다.</p>
+            <button type="button" class="button primary" id="openCourseSlideBtn" data-open-slides="0">강의 화면 열기 →</button>
+          </article>
+          <article class="resource-card">
+            <span class="section-kicker">LECTURE NOTES</span>
+            <h3>PDF 강의록 · 33페이지</h3>
+            <p>인쇄하거나 오프라인에서 참고할 수 있는 초급자용 강의록입니다.</p>
+            <a class="button secondary" href="course/downloads/gstack-3hour-lecture-notes.pdf" download>PDF 다운로드</a>
+          </article>
+          <article class="resource-card featured">
+            <span class="section-kicker">COMPLETE PACK</span>
+            <h3>전체 실습 자료 한 번에 받기</h3>
+            <p>환경 점검부터 출시와 회고까지 모든 단계의 실습 파일을 하나의 ZIP으로 내려받습니다.</p>
+            <a class="button primary" href="course/downloads/gstack-complete-practice-pack.zip" download>전체 실습팩 다운로드</a>
+          </article>
+          <article class="resource-card">
+            <span class="section-kicker">STEP BY STEP</span>
+            <h3>단계별 실습 ZIP</h3>
+            <div class="download-list">
+              <a href="course/downloads/01-environment-check.zip" download>01 환경 점검</a>
+              <a href="course/downloads/02-first-gstack-skill.zip" download>02 첫 gstack 스킬</a>
+              <a href="course/downloads/03-plan-review.zip" download>03 계획 리뷰</a>
+              <a href="course/downloads/04-review-and-qa.zip" download>04 리뷰와 QA</a>
+              <a href="course/downloads/05-discovery-and-spec.zip" download>05 문제 정의와 명세</a>
+              <a href="course/downloads/06-product-design-engineering-plan.zip" download>06 다각도 계획</a>
+              <a href="course/downloads/07-implementation-and-git.zip" download>07 구현과 Git</a>
+              <a href="course/downloads/08-review-debug-qa.zip" download>08 리뷰·디버깅·QA</a>
+              <a href="course/downloads/09-security-performance-docs.zip" download>09 보안·성능·문서</a>
+              <a href="course/downloads/10-ship-and-retro.zip" download>10 출시와 회고</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="container">
+        <div class="cta-box">
+          <div class="section-kicker">READY TO BUILD?</div>
+          <h2>첫 명령보다 먼저, 좋은 프로젝트 흐름을 만드세요.</h2>
+          <p>설치부터 시작해 실제 프로젝트의 기획·개발·QA 과정을 슬라이드 쉐어 강의로 순서대로 진행합니다.</p>
+          <div class="actions">
+            <button type="button" class="button primary" id="openRealProjectBottomBtn" data-open-slides="0">Real Project 시작하기 →</button>
+            <a class="button secondary" href="../index.html">LMS 과정 홈으로</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Copyright ⓒ Eduniety Lab. All Rights Reserved. · Real Project gstack Course</footer>
+
+  <!-- ==========================================================================
+       SLIDESHARE LAYER POPUP MODAL (16 SLIDES)
+       ========================================================================== -->
+  <div class="slideshare-backdrop" id="gstackSlideModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="ssDeckTitle">
+    <div class="slideshare-player" id="ssPlayerContainer">
+      <!-- Top Bar -->
+      <header class="ss-topbar">
+        <div class="ss-brand-group">
+          <span class="ss-badge">SLIDESHARE DECK</span>
+          <strong class="ss-deck-title" id="ssDeckTitle">gstack 실습형 강의실 — 기획부터 QA까지 AI 개발팀 설계</strong>
+        </div>
+        <div class="ss-top-controls">
+          <button type="button" class="ss-tool-btn active" id="ssToggleTocBtn" aria-expanded="true">📑 슬라이드 목차</button>
+          <select class="ss-select" id="ssSlideSelect" aria-label="슬라이드 바로 이동"></select>
+          <a class="ss-tool-btn" href="course/downloads/gstack-3hour-lecture-notes.pdf" download>📥 PDF 강의록</a>
+          <a class="ss-tool-btn" href="course/index.html" target="_blank" rel="noopener">↗ 스크롤 뷰 열기</a>
+          <button type="button" class="ss-tool-btn" id="ssFullscreenBtn">⛶ 전체화면</button>
+          <button type="button" class="ss-tool-btn close-btn" id="ssCloseModalBtn">✕ 닫기</button>
+        </div>
+      </header>
+
+      <!-- Middle Body -->
+      <div class="ss-body">
+        <!-- Left TOC Sidebar -->
+        <aside class="ss-toc-drawer" id="ssTocDrawer" aria-label="슬라이드 목차"></aside>
+
+        <!-- Main Slide Stage -->
+        <div class="ss-stage">
+          <button type="button" class="ss-nav-paddle prev" id="ssPaddlePrev" aria-label="이전 슬라이드">‹</button>
+
+          <div class="ss-slide-viewport" id="ssSlideViewport">
+
+            <!-- SLIDE 01: COVER -->
+            <section class="ss-slide active" data-slide-title="강의 표지 · 개발팀을 설계한다" data-slide-sub="3 Hours Hands-on">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 01</span> 3 HOURS HANDS-ON LECTURE</div>
+                <div class="slide-page-tag">01 / 16</div>
+              </div>
+              <div class="slide-grid-2" style="align-items: center; flex: 1;">
+                <div>
+                  <h2 class="slide-headline" style="font-size: clamp(2rem, 3.6vw, 3.1rem);">코드를 시키기 전에,<br><em>개발팀을 설계한다.</em></h2>
+                  <p class="slide-subcopy" style="font-size: 1.05rem;">
+                    Codex와 Claude Code에 <strong>gstack</strong>을 설치하고, 같은 프로젝트를 계획·리뷰·QA하며 AI 개발 워크플로를 직접 비교하는 입문 및 실전 강의입니다.
+                  </p>
+                  <div class="slide-card accent" style="margin-bottom: 16px;">
+                    <p style="font-size: 0.94rem; color: #e2e8f0;">
+                      💡 <strong>핵심 정의:</strong> gstack은 코딩 모델이 아니라 <strong>AI에게 역할·순서·품질 기준을 부여하는 개발 워크플로</strong>입니다.
+                    </p>
+                  </div>
+                  <div class="slide-grid-3">
+                    <div class="slide-card"><h4>대상</h4><p>Git 기초 학습자 · 초급 개발자</p></div>
+                    <div class="slide-card"><h4>도구</h4><p>OpenAI Codex · Claude Code</p></div>
+                    <div class="slide-card"><h4>결과</h4><p>10단계 실습 산출물 완성</p></div>
+                  </div>
+                </div>
+                <div class="slide-card accent" style="padding: 28px; text-align: center;">
+                  <div class="slide-kicker" style="justify-content: center; margin-bottom: 12px;"><span>GSTACK WORKFLOW</span></div>
+                  <h3 style="font-size: 1.55rem; margin-bottom: 16px; color: #fff;">Think → Plan → Review → Test</h3>
+                  <div class="slide-grid-2" style="text-align: left; gap: 12px;">
+                    <div class="slide-card"><strong style="color: var(--cyan);">CEO Role</strong><p>사용자 문제와 제품 가치·범위 검증 (<code>/office-hours</code>, <code>/plan-ceo-review</code>)</p></div>
+                    <div class="slide-card"><strong style="color: var(--blue);">ENG Role</strong><p>아키텍처·데이터 흐름·실패 경로 설계 (<code>/spec</code>, <code>/plan-eng-review</code>)</p></div>
+                    <div class="slide-card"><strong style="color: var(--amber);">REVIEW Role</strong><p>Diff 기반 결함·보안·원인 추적 (<code>/review</code>, <code>/investigate</code>)</p></div>
+                    <div class="slide-card"><strong style="color: var(--green);">QA &amp; SHIP Role</strong><p>실제 행동 검증·문서 동기화·출시 (<code>/qa-only</code>, <code>/qa</code>, <code>/ship</code>)</p></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SLIDE 02: ORIENTATION -->
+            <section class="ss-slide" data-slide-title="01 / 오리엔테이션 · 3대 원칙" data-slide-sub="Orientation">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 02</span> 01 / ORIENTATION</div>
+                <div class="slide-page-tag">02 / 16</div>
+              </div>
+              <h2 class="slide-headline">오늘 배우는 것은 명령어보다 <em>작업 방식</em>입니다.</h2>
+              <p class="slide-subcopy">AI에게 바로 “만들어 줘”라고 지시하면 그럴듯하지만 검증되지 않은 코드가 쌓입니다. gstack은 3가지 원칙으로 프로젝트를 통제합니다.</p>
+              <div class="slide-grid-3" style="margin-top: 8px; flex: 1; align-items: stretch;">
+                <article class="slide-card accent">
+                  <div class="slide-num-badge">01</div>
+                  <h3>바로 만들지 않기</h3>
+                  <p>코드를 작성하기 전에 사용자 문제와 프로젝트 범위를 먼저 확인하고, 구현 전에 숨겨진 가정을 수면 위로 드러냅니다.</p>
+                  <div class="ss-expected" style="margin-top: 16px;">핵심 질문: “누구의 어떤 불편을 해결하는가?”</div>
+                </article>
+                <article class="slide-card accent">
+                  <div class="slide-num-badge">02</div>
+                  <h3>역할을 분리하기</h3>
+                  <p>제품(CEO), 디자인(Design), 기술(ENG), 코드 리뷰(Review), 품질 검증(QA) 관점을 한 번에 섞지 않고 각각 다른 스킬로 분리 실행합니다.</p>
+                  <div class="ss-expected" style="margin-top: 16px;">기획 단계에서는 코드 수정을 엄격히 금지합니다.</div>
+                </article>
+                <article class="slide-card accent">
+                  <div class="slide-num-badge">03</div>
+                  <h3>결과를 검증하기</h3>
+                  <p>AI의 출력은 정답지가 아닙니다. 실제 생성된 파일, <code>git status</code>, <code>git diff</code>, 그리고 브라우저 실행 결과로 사람이 직접 확인합니다.</p>
+                  <div class="ss-expected" style="margin-top: 16px;">근거(파일·재현 절차) 없는 통과는 인정하지 않습니다.</div>
+                </article>
+              </div>
+            </section>
+
+            <!-- SLIDE 03: 180-MINUTE ROADMAP -->
+            <section class="ss-slide" data-slide-title="02 / 180분 타임라인 로드맵" data-slide-sub="180-Min Roadmap">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 03</span> 02 / 180-MINUTE ROADMAP</div>
+                <div class="slide-page-tag">03 / 16</div>
+              </div>
+              <h2 class="slide-headline">설치에서 QA까지, <em>한 번의 완성된 루프</em></h2>
+              <p class="slide-subcopy">3시간 입문 강의에서 환경 구축부터 첫 프로젝트 리뷰·QA·회고까지 완주하는 표준 시간표입니다.</p>
+              <div class="slide-grid-4">
+                <article class="slide-card"><span class="slide-kicker">00–15 MIN</span><h3 style="margin-top:8px;">1. 방향 잡기</h3><p>gstack 워크플로 개념과 Codex · Claude Code 두 실행 환경의 차이를 이해합니다.</p></article>
+                <article class="slide-card"><span class="slide-kicker">15–30 MIN</span><h3 style="margin-top:8px;">2. 환경 점검</h3><p>Git, Node.js, Bun, 계정, 터미널(PowerShell/WSL/macOS) 환경을 확인합니다.</p></article>
+                <article class="slide-card"><span class="slide-kicker">30–80 MIN</span><h3 style="margin-top:8px;">3. Codex · Claude 설치</h3><p>각 도구를 설치·로그인하고 실습 프로젝트에서 첫 읽기 작업을 수행합니다.</p></article>
+                <article class="slide-card accent"><span class="slide-kicker">80–90 MIN</span><h3 style="margin-top:8px;">4. gstack 등록</h3><p>선택한 host(<code>codex</code> / <code>claude</code>)에 gstack 스킬을 등록하고 상태를 확인합니다.</p></article>
+                <article class="slide-card warn"><span class="slide-kicker">90–100 MIN</span><h3 style="margin-top:8px;">5. 휴식 &amp; 설치 보완</h3><p>설치나 경로 문제가 있는 학습자는 이 시간에 트러블슈팅을 완료합니다.</p></article>
+                <article class="slide-card accent"><span class="slide-kicker">100–145 MIN</span><h3 style="margin-top:8px;">6. 문제와 계획</h3><p><code>office-hours</code>와 <code>plan-eng-review</code>를 실행해 문제와 구현 계획을 세웁니다.</p></article>
+                <article class="slide-card accent"><span class="slide-kicker">145–165 MIN</span><h3 style="margin-top:8px;">7. 리뷰와 QA</h3><p><code>review</code>(코드 관점)와 <code>qa-only</code>(사용자 행동 관점)의 차이를 체험합니다.</p></article>
+                <article class="slide-card"><span class="slide-kicker">165–180 MIN</span><h3 style="margin-top:8px;">8. 비교와 회고</h3><p>두 도구의 결과를 비교하고 자신의 PBL 프로젝트 적용 계획을 정리합니다.</p></article>
+              </div>
+            </section>
+
+            <!-- SLIDE 04: WINDOWS NATIVE SETUP PART 1 -->
+            <section class="ss-slide" data-slide-title="03 / Windows 초급자 설치 ① (기본 도구)" data-slide-sub="Windows Setup Pt.1">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 04</span> 03 / WINDOWS · START FROM ZERO (PART 1)</div>
+                <div class="slide-page-tag">04 / 16</div>
+              </div>
+              <h2 class="slide-headline">처음 설치하는 학습자를 위한 <em>Windows 네이티브 과정 ①</em></h2>
+              <p class="slide-subcopy">Windows 학습자는 먼저 추가 운영체제 없이 PowerShell에서 바로 설치하는 <strong>PATH A (Windows 네이티브)</strong>를 따라 합니다.</p>
+              <div class="slide-grid-4" style="margin-bottom: 14px;">
+                <div class="slide-card"><h4>터미널</h4><p>컴퓨터에 글자로 명령을 전달하는 창입니다.</p></div>
+                <div class="slide-card"><h4>PowerShell</h4><p>Windows에 기본 포함된 터미널입니다.</p></div>
+                <div class="slide-card"><h4>명령어</h4><p>복사 후 붙여넣고 Enter를 누릅니다.</p></div>
+                <div class="slide-card"><h4>WSL</h4><p>Windows 안의 Ubuntu Linux 선택 기능입니다.</p></div>
+              </div>
+              <div class="slide-grid-2">
+                <div class="slide-card">
+                  <h4>Step 1~3. PowerShell · Git · Node.js · Bun 설치</h4>
+                  <p>Windows 키 → <b>PowerShell</b> 실행 후 아래 명령을 순서대로 실행합니다.</p>
+                  <div class="ss-code-block"><code>winget install --id Git.Git -e
+winget install OpenJS.NodeJS.LTS</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-code-block"><code>powershell -c "irm bun.sh/install.ps1|iex"</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-expected">설치 후 PowerShell을 닫고 새로 연 뒤 <code>bun --version</code> 숫자를 확인합니다.</div>
+                </div>
+                <div class="slide-card">
+                  <h4>Step 4~6. Codex · Claude Code 설치 및 버전 확인</h4>
+                  <div class="ss-code-block"><code>powershell -ExecutionPolicy ByPass -c "irm https://chatgpt.com/codex/install.ps1 | iex"
+winget install Anthropic.ClaudeCode</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-code-block"><code>git --version
+node --version
+bun --version
+codex --version
+claude --version</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-expected">각 줄에 버전 번호가 표시되면 기본 도구 준비 완료입니다.</div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SLIDE 05: WINDOWS SETUP PART 2 & WSL2 & TROUBLESHOOTING -->
+            <section class="ss-slide" data-slide-title="03 / Windows 설치 ② · WSL2 · 오류 해결" data-slide-sub="Windows Pt.2 & WSL">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 05</span> 03 / WINDOWS · GSTACK LINK &amp; WSL2 / TROUBLESHOOTING</div>
+                <div class="slide-page-tag">05 / 16</div>
+              </div>
+              <h2 class="slide-headline">Windows gstack 등록 및 <em>WSL2 선택 과정 · 오류 해결</em></h2>
+              <div class="slide-grid-2" style="margin-bottom: 14px;">
+                <div class="slide-card accent">
+                  <h4>PATH A (Step 7~10). Windows 네이티브 gstack 등록 &amp; 실습 시작</h4>
+                  <div class="ss-code-block"><code>git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git "$HOME\gstack"
+cd "$HOME\gstack"
+.\setup.ps1 --host codex
+.\setup.ps1 --host claude
+.\setup.ps1 --status</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <p style="margin-top:8px;">압축을 푼 실습 <code>project</code> 폴더에서 로컬 Git 기준점을 만든 뒤 시작합니다:</p>
+                  <div class="ss-code-block"><code>git init
+git add .
+git commit -m "실습 시작 상태"
+codex   # 또는 claude</code><button class="ss-copy-btn" type="button">복사</button></div>
+                </div>
+                <div class="slide-card">
+                  <h4>PATH B (선택). WSL2 Ubuntu 설치 요약</h4>
+                  <p>Linux 환경 통일이 필요할 때만 사용합니다. <strong>Codex·Claude·gstack을 모두 같은 환경(WSL 안)에 설치</strong>해야 합니다.</p>
+                  <div class="ss-code-block"><code># 관리자 PowerShell에서 WSL 설치 후 재부팅
+wsl --install</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-code-block"><code># Ubuntu 터미널 내부에서 실행
+sudo apt update && sudo apt install -y git curl unzip
+curl -fsSL https://bun.com/install | bash && source ~/.bashrc
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+curl -fsSL https://claude.ai/install.sh | bash
+git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/gstack
+cd ~/gstack && ./setup --host codex && ./setup --host claude && ./setup --status</code><button class="ss-copy-btn" type="button">복사</button></div>
+                </div>
+              </div>
+              <div class="slide-grid-3">
+                <div class="slide-card warn"><h4>setup.ps1 실행 차단 시</h4><p><code>powershell -ExecutionPolicy Bypass -File .\setup.ps1 --host codex</code> 실행</p></div>
+                <div class="slide-card warn"><h4>Git 커밋 이름 오류 시</h4><p><code>git config user.name "student"</code> 및 이메일 설정 후 재시도</p></div>
+                <div class="slide-card warn"><h4>스킬이 안 보일 때</h4><p>Codex/Claude 종료 후 새 터미널 세션을 열고 <code>--status</code> 재확인</p></div>
+              </div>
+            </section>
+
+            <!-- SLIDE 06: TRACK A & B + COMMON GSTACK INSTALL -->
+            <section class="ss-slide" data-slide-title="03 / Track A(Codex) · Track B(Claude) 설치" data-slide-sub="Track A & B Setup">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 06</span> 03 / SETUP · TRACK A &amp; TRACK B</div>
+                <div class="slide-page-tag">06 / 16</div>
+              </div>
+              <h2 class="slide-headline">같은 gstack, <em>다른 호출 방식 (Codex vs Claude Code)</em></h2>
+              <p class="slide-subcopy">학습자는 하나의 트랙을 선택해 따라 하고, 강사는 두 환경을 나란히 비교 시연합니다.</p>
+              <div class="slide-grid-2" style="margin-bottom: 16px;">
+                <article class="slide-card" style="border-top: 4px solid var(--blue);">
+                  <span class="slide-kicker">TRACK A · EXPERIMENTAL HOST</span>
+                  <h3 style="font-size: 1.3rem; margin: 6px 0;">OpenAI Codex</h3>
+                  <p>터미널에서 프로젝트를 읽고 수정하며, gstack 스킬은 <strong>스킬 이름을 자연어로 지정</strong>해 호출합니다.</p>
+                  <div class="ss-code-block"><code># macOS · Linux · WSL
+curl -fsSL https://chatgpt.com/codex/install.sh | sh
+# npm 대안
+npm install -g @openai/codex</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-code-block"><code>codex --version
+codex</code><button class="ss-copy-btn" type="button">복사</button></div>
+                </article>
+                <article class="slide-card" style="border-top: 4px solid #f97316;">
+                  <span class="slide-kicker" style="color: #fb923c;">TRACK B · FULL HOST</span>
+                  <h3 style="font-size: 1.3rem; margin: 6px 0;">Claude Code</h3>
+                  <p>gstack의 정식 지원 환경이며, 주요 스킬을 <strong>슬래시 명령(<code>/office-hours</code> 등)</strong>으로 즉시 호출합니다.</p>
+                  <div class="ss-code-block"><code># Homebrew (macOS)
+brew install --cask claude-code
+# npm 대안
+npm install -g @anthropic-ai/claude-code</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-code-block"><code>claude --version
+claude doctor
+claude</code><button class="ss-copy-btn" type="button">복사</button></div>
+                </article>
+              </div>
+              <div class="slide-card accent">
+                <h4>COMMON STEP · 공식 gstack 저장소 받기 및 Host 등록 (macOS · Linux · WSL)</h4>
+                <div class="ss-code-block"><code>git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/gstack
+cd ~/gstack
+./setup --host codex
+./setup --host claude
+./setup --status</code><button class="ss-copy-btn" type="button">복사</button></div>
+              </div>
+            </section>
+
+            <!-- SLIDE 07: CODEX PROMPT-DRIVEN SETUP -->
+            <section class="ss-slide" data-slide-title="03 / Codex 프롬프트 기반 설치 (Method B)" data-slide-sub="Prompt-Driven Setup">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 07</span> METHOD B · PROMPT-DRIVEN SETUP</div>
+                <div class="slide-page-tag">07 / 16</div>
+              </div>
+              <h2 class="slide-headline">명령을 직접 치는 대신 <em>Codex에게 설치를 요청하기</em></h2>
+              <p class="slide-subcopy">Codex CLI 설치와 로그인을 마친 뒤, <strong>1차 환경 점검 프롬프트(읽기 전용) → 2차 설치 프롬프트(승인 기반)</strong> 2단계로 안전하게 설치합니다.</p>
+              <div class="slide-grid-3">
+                <div class="slide-card">
+                  <span class="slide-kicker">PROMPT 01 · 읽기 전용 점검</span>
+                  <h4>1차: 설치하지 말고 환경만 점검</h4>
+                  <div class="ss-code-block"><code>gstack 설치를 준비하고 있어.
+먼저 현재 운영체제와 셸을 확인하고,
+Git, Bun, Codex 버전과 기존 gstack 설치 여부를 점검해 줘.
+
+아직 설치하거나 파일을 수정하지 말고,
+확인한 사실, 부족한 항목, 사용할 설치 경로와
+실행할 명령 계획만 보여 줘.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-expected">운영체제, 부족한 도구, 설치 경로 계획을 먼저 눈으로 확인합니다.</div>
+                </div>
+                <div class="slide-card accent">
+                  <span class="slide-kicker">PROMPT 02 · 승인하며 설치</span>
+                  <h4>2차: 조건부 안전 설치 실행</h4>
+                  <div class="ss-code-block"><code>방금 점검한 결과를 기준으로 gstack을 Codex host에 설치해 줘.
+
+조건:
+1. https://github.com/garrytan/gstack 공식 저장소만 사용해.
+2. Windows 네이티브면 $HOME\gstack과 setup.ps1을 사용하고,
+   macOS·Linux·WSL이면 ~/gstack과 ./setup을 사용해.
+3. 기존 gstack 폴더가 있으면 덮어쓰거나 삭제하지 말고 멈춰서 알려 줘.
+4. 파괴적인 명령은 실행하지 마.
+5. 네트워크 접근이나 홈 폴더 쓰기가 필요하면 먼저 승인을 요청해.
+6. 설치 후 --host codex 등록과 --status 확인까지 실행해.
+7. 마지막에 실행한 명령, 설치 경로, 상태 결과를 요약해.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                </div>
+                <div class="slide-card">
+                  <span class="slide-kicker">PROMPT 03 · 새 세션 첫 실행</span>
+                  <h4>3차: 스킬 인식 확인 &amp; 첫 분석</h4>
+                  <div class="ss-code-block"><code>먼저 gstack-office-hours 스킬을 사용할 수 있는지 확인해 줘.
+사용 가능하면 이 프로젝트를 읽고 다음을 정리해 줘.
+
+1. 대상 사용자
+2. 사용자가 겪는 문제
+3. 가장 작은 핵심 기능
+4. 검증되지 않은 가정
+
+아직 파일을 수정하지 마.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-expected">승인 창 체크: ① git clone/setup인가? ② garrytan/gstack인가? ③ 내 홈 폴더인가? ④ 삭제 명령이 없는가?</div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SLIDE 08: DOWNLOAD & PRACTICE (ZIP 01~04) -->
+            <section class="ss-slide" data-slide-title="04 / 실습 방법 및 단계별 ZIP 01~04" data-slide-sub="Download & Practice">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 08</span> 04 / DOWNLOAD &amp; PRACTICE</div>
+                <div class="slide-page-tag">08 / 16</div>
+              </div>
+              <h2 class="slide-headline">한 단계씩 ZIP을 받고, <em>로컬 Git 기준점으로 결과를 남깁니다.</em></h2>
+              <div class="slide-grid-2" style="margin-bottom: 14px; align-items: center;">
+                <div class="slide-card">
+                  <h4>로컬 실습 4단계 워크플로 (ZIP → DIR → GIT → AI)</h4>
+                  <p>GitHub 원격 저장소 없이 ZIP을 내려받아 압축을 풀고 로컬 Git 저장소를 만들어 변경 전후(<code>git diff</code>)를 비교합니다.</p>
+                </div>
+                <div class="ss-code-block" style="margin: 0;"><code>cd 다운로드한-실습폴더/project
+git init
+git add .
+git commit -m "실습 시작 상태"
+git status</code><button class="ss-copy-btn" type="button">복사</button></div>
+              </div>
+              <div class="slide-grid-4">
+                <article class="slide-card">
+                  <span class="slide-kicker">STEP 01 · 15 MIN</span>
+                  <h3>환경 점검</h3>
+                  <p>Git, Bun, Codex, Claude 버전 확인 스크립트와 수강생 체크리스트</p>
+                  <a class="button secondary" style="width:100%; margin-top:12px; min-height:40px; font-size:0.82rem;" href="course/downloads/01-environment-check.zip" download>01 ZIP 다운로드 ↓</a>
+                </article>
+                <article class="slide-card accent">
+                  <span class="slide-kicker">STEP 02 · 20 MIN</span>
+                  <h3>첫 gstack 스킬</h3>
+                  <p>의도적 문제가 포함된 Focus List 앱에서 <code>office-hours</code> 실행</p>
+                  <a class="button primary" style="width:100%; margin-top:12px; min-height:40px; font-size:0.82rem;" href="course/downloads/02-first-gstack-skill.zip" download>02 ZIP 다운로드 ↓</a>
+                </article>
+                <article class="slide-card">
+                  <span class="slide-kicker">STEP 03 · 25 MIN</span>
+                  <h3>기술 계획 검토</h3>
+                  <p><code>plan-eng-review</code>로 구성요소, 데이터 흐름, 예외와 테스트 검토</p>
+                  <a class="button secondary" style="width:100%; margin-top:12px; min-height:40px; font-size:0.82rem;" href="course/downloads/03-plan-review.zip" download>03 ZIP 다운로드 ↓</a>
+                </article>
+                <article class="slide-card">
+                  <span class="slide-kicker">STEP 04 · 20 MIN</span>
+                  <h3>코드 리뷰와 QA</h3>
+                  <p><code>review</code>와 <code>qa-only</code>의 관점 차이를 확인하고 재현 보고서 작성</p>
+                  <a class="button secondary" style="width:100%; margin-top:12px; min-height:40px; font-size:0.82rem;" href="course/downloads/04-review-and-qa.zip" download>04 ZIP 다운로드 ↓</a>
+                </article>
+              </div>
+            </section>
+
+            <!-- SLIDE 09: PROMPT LAB -->
+            <section class="ss-slide" data-slide-title="05 / 프롬프트 랩 · Codex vs Claude 비교" data-slide-sub="Prompt Lab">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 09</span> 05 / PROMPT LAB</div>
+                <div class="slide-page-tag">09 / 16</div>
+              </div>
+              <h2 class="slide-headline">도구는 달라도 <em>검토 기준은 같습니다.</em></h2>
+              <p class="slide-subcopy">Codex는 자연어 스킬명으로, Claude Code는 슬래시 명령으로 호출하지만 요구하는 핵심 질문과 “아직 수정하지 마” 규칙은 동일합니다.</p>
+              <div class="slide-grid-2">
+                <div class="slide-card accent">
+                  <span class="slide-kicker">OPENAI CODEX PROMPT</span>
+                  <h3 style="margin-top:6px;">Codex에서 office-hours 호출</h3>
+                  <div class="ss-code-block"><code>gstack-office-hours 스킬을 사용해 이 프로젝트를 검토해 줘.
+
+1. 대상 사용자
+2. 해결하려는 문제
+3. 핵심 가치
+4. 가장 작은 핵심 기능
+5. 검증되지 않은 가정
+
+아직 코드를 수정하지 마.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                </div>
+                <div class="slide-card accent">
+                  <span class="slide-kicker">CLAUDE CODE PROMPT</span>
+                  <h3 style="margin-top:6px;">Claude Code에서 /office-hours 호출</h3>
+                  <div class="ss-code-block"><code>/office-hours
+
+이 프로젝트의 대상 사용자, 해결하려는 문제,
+핵심 가치, 가장 작은 핵심 기능과 검증되지 않은 가정을
+정리해 줘. 아직 코드를 수정하지 마.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                </div>
+              </div>
+              <div class="slide-card warn" style="margin-top: 16px;">
+                <h4>📌 실습 공통 황금 규칙 (Golden Rule)</h4>
+                <p>AI 작업 전후에 반드시 <code>git status</code>와 <code>git diff</code>를 확인하고, AI가 말한 설명은 실제 파일 코드와 브라우저 실행 결과로 검증합니다.</p>
+              </div>
+            </section>
+
+            <!-- SLIDE 10: LIFECYCLE OVERVIEW & STEP 01 DISCOVER -->
+            <section class="ss-slide" data-slide-title="06 / 생명주기 · Step 01 문제 탐색 (Discover)" data-slide-sub="Step 01 Discover">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 10</span> 06 / FULL LIFECYCLE LAB · STEP 01 DISCOVER</div>
+                <div class="slide-page-tag">10 / 16</div>
+              </div>
+              <h2 class="slide-headline">Step 01. 문제 탐색 (DISCOVER · <em>코드 수정 금지</em>)</h2>
+              <p class="slide-subcopy">실습 주제: <strong>Focus List 앱</strong>에 빈 입력 방지, 중복 방지, 긴 제목 처리 기능을 추가합니다. 무엇을 만들지보다 왜 필요한지 먼저 확인합니다.</p>
+              <div class="slide-grid-2">
+                <div class="slide-card">
+                  <h4>Codex &amp; Claude Code 실행 프롬프트</h4>
+                  <div class="ss-code-block"><code># Codex
+gstack-office-hours 스킬을 사용해 Focus List의
+대상 사용자, 현재 대안, 핵심 문제, 최소 검증 기능을
+정리해 줘. 아직 파일을 수정하지 마.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-code-block"><code># Claude Code
+/office-hours
+
+Focus List의 사용자 문제와 최소 검증 기능을
+정리해 줘. 아직 파일을 수정하지 마.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-stage-gate">
+                    <span><b>산출물:</b> 문제 정의 1문장 · 사용자 1명 · 가정 3개</span>
+                    <span><b>통과 조건:</b> 기능이 아니라 사용자의 불편으로 설명할 수 있다.</span>
+                  </div>
+                </div>
+                <div>
+                  <div class="ss-result-box" style="margin-top: 0;">
+                    <div class="ss-result-head"><span>EXAMPLE OUTPUT 01</span> office-hours 실행 결과 예시</div>
+                    <div class="ss-result-grid">
+                      <div><b>대상 사용자</b>수업·과제를 동시에 관리하는 교육생</div>
+                      <div><b>핵심 문제</b>해야 할 일을 적어도 지금 처리할 한 가지를 빠르게 구분하기 어렵다.</div>
+                      <div><b>최소 검증 기능</b>3초 안에 할 일을 추가하고 완료 상태를 바꾼다.</div>
+                      <div><b>검증할 가정</b>사용자는 분류 기능보다 빠른 입력을 먼저 원한다.</div>
+                    </div>
+                    <div class="ss-result-check">✓ 사람의 확인 → “학생용 할 일 앱”처럼 기능명만 적지 않고 실제 불편과 검증할 가정이 드러났는가?</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SLIDE 11: STEP 02 SPEC & STEP 03 PLAN -->
+            <section class="ss-slide" data-slide-title="06 / 생명주기 · Step 02 명세 & Step 03 계획" data-slide-sub="Step 02 Spec & 03 Plan">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 11</span> 06 / FULL LIFECYCLE LAB · STEP 02 SPEC &amp; STEP 03 PLAN</div>
+                <div class="slide-page-tag">11 / 16</div>
+              </div>
+              <h2 class="slide-headline">Step 02 명세 작성(SPEC) &amp; Step 03 <em>다각도 계획 검토(PLAN)</em></h2>
+              <div class="slide-grid-2">
+                <div class="slide-card">
+                  <span class="slide-kicker">STEP 02 · SPEC (수정 금지)</span>
+                  <h4>테스트 가능한 요구사항(Given/When/Then)으로 변환</h4>
+                  <div class="ss-code-block"><code># Codex: gstack-spec 스킬 / Claude: /spec
+gstack-spec 스킬로 빈 입력·중복 항목·긴 제목 처리의
+정상/예외 시나리오와 인수 조건을 작성해 줘.
+아직 구현하지 마.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-result-box">
+                    <div class="ss-result-head"><span>EXAMPLE OUTPUT 02</span> spec 실행 결과 예시</div>
+                    <div class="ss-result-grid">
+                      <div><b>Given / When</b>공백만 입력된 상태에서 “추가” 버튼을 누르면</div>
+                      <div><b>Then (인수 조건)</b>항목 수는 증가하지 않으며 “내용을 입력하세요” 표시</div>
+                      <div><b>제외 범위</b>로그인, 서버 저장, 카테고리는 이번 실습에서 제외</div>
+                      <div><b>판별 기준</b>제3자가 화면에서 성공/실패를 동일하게 판정 가능</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="slide-card accent">
+                  <span class="slide-kicker">STEP 03 · PLAN (수정 금지)</span>
+                  <h4>제품(CEO) · 디자인(Design) · 기술(ENG) 관점 잠금</h4>
+                  <div class="ss-code-block"><code># Codex: gstack-plan-eng-review / Claude: /plan-eng-review (또는 /autoplan)
+gstack-plan-eng-review 스킬로 현재 명세를 검토해 줘.
+변경 파일, 데이터 흐름, 실패 경로, 테스트, 구현 순서를
+포함하고 아직 구현하지 마.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-result-box">
+                    <div class="ss-result-head"><span>EXAMPLE OUTPUT 03</span> 계획 검토 결과 예시</div>
+                    <div class="ss-result-grid">
+                      <div><b>변경 파일</b><code>app.js</code> 입력·중복 검증, <code>styles.css</code> 오류·긴 제목 상태</div>
+                      <div><b>데이터 흐름</b>입력 → trim → 빈 값 검사 → 중복 검사 → 배열 추가 → 렌더링</div>
+                      <div><b>실패 경로</b>공백, 대소문자 중복, 100자 이상 제목, 빠른 연속 클릭</div>
+                      <div><b>구현 순서</b>입력 검증 → 중복 규칙 → 화면 상태 → 회귀 테스트</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SLIDE 12: STEP 04 BUILD & STEP 05 REVIEW/DEBUG -->
+            <section class="ss-slide" data-slide-title="06 / 생명주기 · Step 04 개발 & Step 05 리뷰·디버깅" data-slide-sub="Step 04 Build & 05 Review">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 12</span> 06 / FULL LIFECYCLE LAB · STEP 04 BUILD &amp; STEP 05 REVIEW</div>
+                <div class="slide-page-tag">12 / 16</div>
+              </div>
+              <h2 class="slide-headline">Step 04 작은 단위 개발(BUILD) &amp; Step 05 <em>리뷰·원인 조사</em></h2>
+              <div class="slide-grid-2">
+                <div class="slide-card">
+                  <span class="slide-kicker" style="color: var(--green);">STEP 04 · BUILD (여기서부터 수정 허용)</span>
+                  <h4>한 기능씩 구현하고 Git 체크포인트 남기기</h4>
+                  <div class="ss-code-block"><code>승인한 명세와 기술 계획을 기준으로
+먼저 빈 입력 방지만 구현해 줘.
+검증을 수행하고 다른 기능은 건드리지 마.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-code-block"><code>git status && git diff
+git add . && git commit -m "feat: prevent blank tasks"</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-result-box">
+                    <div class="ss-result-head"><span>EXAMPLE OUTPUT 04</span> Git · 브라우저 확인</div>
+                    <div class="ss-result-grid">
+                      <div><b>git diff --stat</b><code>app.js | 12 ++++++++++--</code> (계획 외 파일 변경 없음)</div>
+                      <div><b>브라우저 재현</b>✓ 공백 입력 차단 · ✓ 정상 입력 1개 추가 · ✓ 완료 버튼 정상</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="slide-card accent">
+                  <span class="slide-kicker">STEP 05 · REVIEW &amp; INVESTIGATE</span>
+                  <h4>변경 위험(review)과 근본 원인(investigate) 분리</h4>
+                  <div class="ss-code-block"><code># 리뷰 (Claude: /review)
+gstack-review 스킬로 현재 diff를 검토해 줘.
+심각도, 파일 근거, 재현 방법만 보고하고 수정하지 마.
+
+# 원인 조사 (Claude: /investigate)
+gstack-investigate 스킬로 중복 항목 원인을 조사해 줘.
+재현과 근거를 먼저 제시하고 승인 전에는 수정하지 마.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <div class="ss-result-box">
+                    <div class="ss-result-head"><span>EXAMPLE OUTPUT 05</span> review · investigate 결과</div>
+                    <div class="ss-result-grid">
+                      <div><b>P1 보안 결함 발견</b><code>app.js</code>에서 제목을 <code>innerHTML</code>로 삽입 → <code>textContent</code> 교체 필요</div>
+                      <div><b>근본 원인 규명</b>중복 검사를 렌더링 후 수행해 빠른 연속 클릭 시 동일 배열 상태를 읽음</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SLIDE 13: STEP 06 QA & STEP 07 HARDEN -->
+            <section class="ss-slide" data-slide-title="06 / 생명주기 · Step 06 QA & Step 07 출시 준비" data-slide-sub="Step 06 QA & 07 Harden">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 13</span> 06 / FULL LIFECYCLE LAB · STEP 06 QA &amp; STEP 07 HARDEN</div>
+                <div class="slide-page-tag">13 / 16</div>
+              </div>
+              <h2 class="slide-headline">Step 06 사용자 행동 검증(QA) &amp; Step 07 <em>보안·성능·문서 동기화</em></h2>
+              <div class="slide-grid-2">
+                <div class="slide-card">
+                  <span class="slide-kicker">STEP 06 · QA (보고 전용 vs 승인 후 수정)</span>
+                  <h4><code>qa-only</code>로 먼저 판정표를 받고 승인 후 <code>qa</code>로 수정</h4>
+                  <div class="ss-code-block"><code># 1차 보고 전용 (Claude: /qa-only)
+gstack-qa-only 스킬로 정상/빈/중복/긴 입력,
+연속 클릭, 새로고침, 모바일을 테스트해 줘.
+수정하지 말고 기대/실제 결과를 작성해 줘.</code><button class="ss-copy-btn" type="button">복사</button></div>
+                  <table class="ss-table">
+                    <thead><tr><th>테스트 항목</th><th>기대 결과</th><th>실제 결과</th><th>판정</th></tr></thead>
+                    <tbody>
+                      <tr><td>공백 입력</td><td>추가 안 됨</td><td>빈 항목 추가</td><td class="ss-fail">FAIL</td></tr>
+                      <tr><td>중복 입력</td><td>안내 후 차단</td><td>2개 추가</td><td class="ss-fail">FAIL</td></tr>
+                      <tr><td>긴 제목·모바일(375px)</td><td>줄바꿈 유지</td><td>완료 버튼 밀림</td><td class="ss-fail">FAIL</td></tr>
+                      <tr><td>정상 입력</td><td>1개 추가</td><td>1개 추가</td><td class="ss-pass">PASS</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="slide-card accent">
+                  <span class="slide-kicker">STEP 07 · HARDEN &amp; DOCUMENT</span>
+                  <h4>보안(<code>cso</code>) · 성능(<code>benchmark</code>) · 문서(<code>document-release</code>)</h4>
+                  <div class="slide-grid-3" style="margin: 10px 0;">
+                    <div class="slide-card"><strong>보안 점검</strong><p><code>gstack-cso</code><br><small>Claude: /cso</small></p></div>
+                    <div class="slide-card"><strong>성능 측정</strong><p><code>gstack-benchmark</code><br><small>Claude: /benchmark</small></p></div>
+                    <div class="slide-card"><strong>문서 동기화</strong><p><code>gstack-document-release</code></p></div>
+                  </div>
+                  <div class="ss-result-box">
+                    <div class="ss-result-head"><span>EXAMPLE OUTPUT 07</span> 출시 준비 점검 결과</div>
+                    <div class="ss-result-grid">
+                      <div><b>보안 (CSO)</b>사용자 입력 렌더링 P1 1건 → <code>textContent</code> 수정 후 재검증 PASS</div>
+                      <div><b>성능 (Benchmark)</b>항목 100개 렌더링 18ms → 20ms (기준 50ms 이내 PASS)</div>
+                      <div><b>문서 동기화</b>README에 실행법, 중복 규칙, 새로고침 시 초기화 제한사항 명시</div>
+                      <div><b>최종 판정</b>중대한 미해결 위험 없음 → 출시 후보(Release Candidate) 승인</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SLIDE 14: STEP 08 SHIP & HUMAN CHECKPOINTS -->
+            <section class="ss-slide" data-slide-title="06 / 생명주기 · Step 08 출시·회고 & 4대 결정 지점" data-slide-sub="Step 08 Ship & Checkpoints">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 14</span> 06 / FULL LIFECYCLE LAB · STEP 08 SHIP &amp; HUMAN CHECKPOINTS</div>
+                <div class="slide-page-tag">14 / 16</div>
+              </div>
+              <h2 class="slide-headline">Step 08 출시·회고(SHIP &amp; RETRO)와 <em>사람의 4대 승인 체크포인트</em></h2>
+              <div class="slide-grid-2" style="margin-bottom: 16px;">
+                <div class="slide-card">
+                  <span class="slide-kicker">STEP 08 · SHIP &amp; LEARN</span>
+                  <h4>검증된 변경만 전달하고 다음 프로젝트에 학습 남기기</h4>
+                  <div class="slide-grid-3" style="margin: 10px 0;">
+                    <div class="slide-card"><strong>PR 준비</strong><p><code>gstack-ship</code><br><small>/ship</small></p></div>
+                    <div class="slide-card"><strong>배포 검증</strong><p><code>gstack-land-and-deploy</code></p></div>
+                    <div class="slide-card"><strong>회고·학습</strong><p><code>gstack-retro</code><br><small>/retro · /learn</small></p></div>
+                  </div>
+                  <div class="ss-stage-gate">
+                    <span><b>산출물:</b> PR 체크리스트 · 배포 확인 · 회고</span>
+                    <span><b>통과 조건:</b> 무엇을 왜 바꿨고 어떻게 검증했는지 타인이 이해한다.</span>
+                  </div>
+                </div>
+                <div class="ss-result-box" style="margin-top: 0;">
+                  <div class="ss-result-head"><span>EXAMPLE OUTPUT 08</span> ship · retro 결과 예시</div>
+                  <div class="ss-result-grid">
+                    <div><b>변경 요약</b>빈 입력·중복을 차단하고 긴 제목의 모바일 레이아웃 보완</div>
+                    <div><b>검증 증거</b>인수 조건 4개, QA 시나리오 8개 PASS, 보안 P1 재검증 완료</div>
+                    <div><b>남은 제한</b>데이터는 브라우저 메모리에만 있어 새로고침 후 초기화됨</div>
+                    <div><b>팀 회고 (Retro)</b>구현 전에 중복의 정의(대소문자/공백)를 확정했다면 재작업 1회 단축</div>
+                  </div>
+                </div>
+              </div>
+              <div class="slide-card accent">
+                <span class="slide-kicker">HUMAN CHECKPOINTS · AI가 멈추고 사람이 결정해야 하는 네 지점</span>
+                <div class="slide-grid-4" style="margin-top: 10px;">
+                  <div class="slide-card"><h4>① 문제 승인</h4><p>누구의 어떤 문제인지 최종 확정</p></div>
+                  <div class="slide-card"><h4>② 범위 승인</h4><p>이번 릴리즈에서 무엇을 제외할지 결정</p></div>
+                  <div class="slide-card"><h4>③ 결함 승인</h4><p>리뷰·QA 지적 중 무엇을 지금 고칠지 결정</p></div>
+                  <div class="slide-card"><h4>④ 출시 승인</h4><p>남은 제한사항과 위험을 수용할지 결정</p></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SLIDE 15: EXTENSION DOWNLOADS (05~10) -->
+            <section class="ss-slide" data-slide-title="07 / 확장 실습 ZIP 다운로드 (05~10단계)" data-slide-sub="Extension ZIPs 05-10">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 15</span> 07 / EXTENSION DOWNLOADS (STEP 05 ~ 10)</div>
+                <div class="slide-page-tag">15 / 16</div>
+              </div>
+              <h2 class="slide-headline">전체 생명주기 과정도 <em>단계별 ZIP으로 실습합니다.</em></h2>
+              <p class="slide-subcopy">각 ZIP에는 동일한 Focus List 프로젝트, 단계별 README, 작성용 워크시트가 들어 있습니다. 앞 단계의 결과를 다음 단계로 이어가며 완주하세요.</p>
+              <div class="slide-grid-3">
+                <article class="slide-card accent">
+                  <div class="slide-num-badge">05</div>
+                  <h3>문제 탐색과 명세</h3>
+                  <p><code>office-hours</code> · <code>spec</code> 실습 프로젝트 및 워크시트</p>
+                  <a class="button primary" style="width:100%; margin-top:14px; min-height:40px; font-size:0.82rem;" href="course/downloads/05-discovery-and-spec.zip" download>05 ZIP 다운로드 ↓</a>
+                </article>
+                <article class="slide-card accent">
+                  <div class="slide-num-badge">06</div>
+                  <h3>제품·디자인·기술 계획</h3>
+                  <p><code>plan-ceo</code> · <code>plan-design</code> · <code>plan-eng</code> 다각도 검토</p>
+                  <a class="button primary" style="width:100%; margin-top:14px; min-height:40px; font-size:0.82rem;" href="course/downloads/06-product-design-engineering-plan.zip" download>06 ZIP 다운로드 ↓</a>
+                </article>
+                <article class="slide-card accent">
+                  <div class="slide-num-badge">07</div>
+                  <h3>구현과 Git 체크포인트</h3>
+                  <p>작은 단위 구현 · <code>git diff</code> 검증 · 기능별 커밋 실습</p>
+                  <a class="button primary" style="width:100%; margin-top:14px; min-height:40px; font-size:0.82rem;" href="course/downloads/07-implementation-and-git.zip" download>07 ZIP 다운로드 ↓</a>
+                </article>
+                <article class="slide-card">
+                  <div class="slide-num-badge">08</div>
+                  <h3>리뷰·디버깅·QA</h3>
+                  <p><code>review</code> · <code>investigate</code> · <code>qa-only</code> · <code>qa</code></p>
+                  <a class="button secondary" style="width:100%; margin-top:14px; min-height:40px; font-size:0.82rem;" href="course/downloads/08-review-debug-qa.zip" download>08 ZIP 다운로드 ↓</a>
+                </article>
+                <article class="slide-card">
+                  <div class="slide-num-badge">09</div>
+                  <h3>보안·성능·문서</h3>
+                  <p><code>cso</code> · <code>benchmark</code> · <code>document-release</code> 동기화</p>
+                  <a class="button secondary" style="width:100%; margin-top:14px; min-height:40px; font-size:0.82rem;" href="course/downloads/09-security-performance-docs.zip" download>09 ZIP 다운로드 ↓</a>
+                </article>
+                <article class="slide-card">
+                  <div class="slide-num-badge">10</div>
+                  <h3>출시와 회고</h3>
+                  <p><code>ship</code> · <code>land-and-deploy</code> · <code>retro</code> · <code>learn</code></p>
+                  <a class="button secondary" style="width:100%; margin-top:14px; min-height:40px; font-size:0.82rem;" href="course/downloads/10-ship-and-retro.zip" download>10 ZIP 다운로드 ↓</a>
+                </article>
+              </div>
+            </section>
+
+            <!-- SLIDE 16: COMPLETION RUBRIC & CLOSING -->
+            <section class="ss-slide" data-slide-title="08 / 완료 평가 루브릭 & 전체 실습팩" data-slide-sub="Rubric & Next PBL">
+              <div class="slide-meta-bar">
+                <div class="slide-kicker"><span>SLIDE 16</span> 08 / COMPLETION RUBRIC &amp; NEXT PBL</div>
+                <div class="slide-page-tag">16 / 16</div>
+              </div>
+              <h2 class="slide-headline">완료 기준은 “실행했다”가 아니라 <em>근거와 사람의 판단</em>입니다.</h2>
+              <p class="slide-subcopy">각 결과가 파일·실행 증거를 갖고 있는지, 사람이 중요한 의사결정을 직접 수행했는지를 100점 만점 루브릭으로 점검합니다.</p>
+              <div class="slide-grid-4" style="grid-template-columns: repeat(5, minmax(0, 1fr)); margin-bottom: 20px;">
+                <article class="slide-card"><strong style="font: 900 1.8rem var(--mono); color: var(--cyan);">20점</strong><h3 style="margin-top:8px;">환경 구성</h3><p>필수 도구와 gstack 등록 상태를 확인했다.</p></article>
+                <article class="slide-card"><strong style="font: 900 1.8rem var(--mono); color: var(--cyan);">20점</strong><h3 style="margin-top:8px;">스킬 선택</h3><p>단계별 목적에 맞는 역할 스킬을 호출했다.</p></article>
+                <article class="slide-card"><strong style="font: 900 1.8rem var(--mono); color: var(--cyan);">20점</strong><h3 style="margin-top:8px;">근거 확인</h3><p>파일·Git diff·실제 동작으로 AI 출력을 검증했다.</p></article>
+                <article class="slide-card"><strong style="font: 900 1.8rem var(--mono); color: var(--cyan);">20점</strong><h3 style="margin-top:8px;">품질 보고</h3><p>재현 가능한 리뷰·QA 결과를 남겼다.</p></article>
+                <article class="slide-card"><strong style="font: 900 1.8rem var(--mono); color: var(--cyan);">20점</strong><h3 style="margin-top:8px;">사람의 판단</h3><p>AI의 가정과 사람의 최종 결정을 구분했다.</p></article>
+              </div>
+              <div class="slide-card accent" style="padding: 26px; text-align: center;">
+                <span class="slide-kicker" style="justify-content: center;"><span>NEXT · PBL PROJECT</span></span>
+                <h3 style="font-size: 1.45rem; margin: 8px 0;">이제 실제 프로젝트에 하나의 루프를 적용할 차례입니다.</h3>
+                <p style="margin-bottom: 16px;">문제 정의 → 요구 명세 → 다각도 기술 계획 → 작은 구현 → 리뷰·QA → 출시·회고</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 12px;">
+                  <a class="button primary" href="course/downloads/gstack-complete-practice-pack.zip" download>📦 전체 실습팩 한 번에 다운로드</a>
+                  <a class="button secondary" href="course/downloads/gstack-3hour-lecture-notes.pdf" download>📘 33페이지 PDF 강의록 다운로드</a>
+                </div>
+              </div>
+            </section>
+
+          </div>
+
+          <button type="button" class="ss-nav-paddle next" id="ssPaddleNext" aria-label="다음 슬라이드">›</button>
+        </div>
+      </div>
+
+      <!-- Bottom SlideShare Control Bar -->
+      <footer class="ss-bottombar">
+        <div class="ss-scrubber" id="ssScrubber" role="tablist" aria-label="슬라이드 진행 바"></div>
+        <div class="ss-controls-row">
+          <div class="ss-nav-group">
+            <button type="button" class="ss-btn" id="ssPrevBtn">← 이전 슬라이드</button>
+            <span class="ss-counter" id="ssSlideCounter">01 / 16</span>
+            <button type="button" class="ss-btn" id="ssNextBtn">다음 슬라이드 →</button>
+          </div>
+          <div class="ss-shortcut-hint">
+            단축키: <kbd>←</kbd> <kbd>→</kbd> 슬라이드 이동 · <kbd>M</kbd> 목차 토글 · <kbd>F</kbd> 전체화면 · <kbd>ESC</kbd> 닫기
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var modal = document.getElementById('gstackSlideModal');
+      var playerContainer = document.getElementById('ssPlayerContainer');
+      var slides = Array.prototype.slice.call(document.querySelectorAll('#ssSlideViewport .ss-slide'));
+      var tocDrawer = document.getElementById('ssTocDrawer');
+      var slideSelect = document.getElementById('ssSlideSelect');
+      var scrubber = document.getElementById('ssScrubber');
+      var counterEl = document.getElementById('ssSlideCounter');
+      var prevBtn = document.getElementById('ssPrevBtn');
+      var nextBtn = document.getElementById('ssNextBtn');
+      var paddlePrev = document.getElementById('ssPaddlePrev');
+      var paddleNext = document.getElementById('ssPaddleNext');
+      var toggleTocBtn = document.getElementById('ssToggleTocBtn');
+      var fullscreenBtn = document.getElementById('ssFullscreenBtn');
+      var closeModalBtn = document.getElementById('ssCloseModalBtn');
+
+      var currentIndex = 0;
+      var totalSlides = slides.length;
+
+      function pad2(n) {
+        return n < 10 ? '0' + n : String(n);
+      }
+
+      // Build TOC, Select options, and Scrubber dots
+      slides.forEach(function (slide, idx) {
+        var title = slide.getAttribute('data-slide-title') || ('Slide ' + (idx + 1));
+        var sub = slide.getAttribute('data-slide-sub') || '';
+
+        // TOC button
+        var tocBtn = document.createElement('button');
+        tocBtn.type = 'button';
+        tocBtn.className = 'ss-toc-item' + (idx === 0 ? ' active' : '');
+        tocBtn.innerHTML =
+          '<span class="ss-toc-num">' + pad2(idx + 1) + '</span>' +
+          '<span class="ss-toc-text"><strong>' + title + '</strong><span>' + sub + '</span></span>';
+        tocBtn.addEventListener('click', function () {
+          goToSlide(idx);
+        });
+        tocDrawer.appendChild(tocBtn);
+
+        // Select option
+        var opt = document.createElement('option');
+        opt.value = String(idx);
+        opt.textContent = pad2(idx + 1) + '. ' + title;
+        slideSelect.appendChild(opt);
+
+        // Scrubber dot
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'ss-scrub-dot' + (idx === 0 ? ' active' : '');
+        dot.title = pad2(idx + 1) + '. ' + title;
+        dot.setAttribute('aria-label', pad2(idx + 1) + '번 슬라이드로 이동');
+        dot.addEventListener('click', function () {
+          goToSlide(idx);
+        });
+        scrubber.appendChild(dot);
+      });
+
+      var tocItems = Array.prototype.slice.call(tocDrawer.querySelectorAll('.ss-toc-item'));
+      var scrubDots = Array.prototype.slice.call(scrubber.querySelectorAll('.ss-scrub-dot'));
+
+      function goToSlide(index) {
+        if (index < 0 || index >= totalSlides) return;
+        currentIndex = index;
+
+        slides.forEach(function (s, i) {
+          var active = i === currentIndex;
+          s.classList.toggle('active', active);
+          if (active) s.scrollTop = 0;
+        });
+
+        tocItems.forEach(function (item, i) {
+          var active = i === currentIndex;
+          item.classList.toggle('active', active);
+          if (active) {
+            item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          }
+        });
+
+        scrubDots.forEach(function (dot, i) {
+          dot.classList.toggle('active', i === currentIndex);
+          dot.classList.toggle('passed', i < currentIndex);
+        });
+
+        slideSelect.value = String(currentIndex);
+        counterEl.textContent = pad2(currentIndex + 1) + ' / ' + pad2(totalSlides);
+
+        var atStart = currentIndex === 0;
+        var atEnd = currentIndex === totalSlides - 1;
+        prevBtn.disabled = atStart;
+        paddlePrev.disabled = atStart;
+        nextBtn.disabled = atEnd;
+        paddleNext.disabled = atEnd;
+      }
+
+      function openSlideModal(startIndex) {
+        var idx = typeof startIndex === 'number' && !isNaN(startIndex) ? startIndex : 0;
+        goToSlide(idx);
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeSlideModal() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(function () {});
+        }
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+
+      function toggleToc() {
+        var collapsed = tocDrawer.classList.toggle('collapsed');
+        toggleTocBtn.classList.toggle('active', !collapsed);
+        toggleTocBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      }
+
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          playerContainer.requestFullscreen().catch(function () {});
+        } else {
+          document.exitFullscreen().catch(function () {});
+        }
+      }
+
+      // Wire all triggers with [data-open-slides]
+      document.querySelectorAll('[data-open-slides]').forEach(function (trigger) {
+        trigger.addEventListener('click', function (e) {
+          e.preventDefault();
+          var targetSlide = parseInt(trigger.getAttribute('data-open-slides') || '0', 10);
+          openSlideModal(targetSlide);
+        });
+        trigger.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            var targetSlide = parseInt(trigger.getAttribute('data-open-slides') || '0', 10);
+            openSlideModal(targetSlide);
+          }
+        });
+      });
+
+      prevBtn.addEventListener('click', function () { goToSlide(currentIndex - 1); });
+      nextBtn.addEventListener('click', function () { goToSlide(currentIndex + 1); });
+      paddlePrev.addEventListener('click', function () { goToSlide(currentIndex - 1); });
+      paddleNext.addEventListener('click', function () { goToSlide(currentIndex + 1); });
+
+      slideSelect.addEventListener('change', function () {
+        goToSlide(parseInt(slideSelect.value, 10));
+      });
+
+      toggleTocBtn.addEventListener('click', toggleToc);
+      fullscreenBtn.addEventListener('click', toggleFullscreen);
+      closeModalBtn.addEventListener('click', closeSlideModal);
+
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeSlideModal();
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (!modal.classList.contains('active')) return;
+        if (e.target && (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeSlideModal();
+        } else if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+          e.preventDefault();
+          goToSlide(currentIndex + 1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          e.preventDefault();
+          goToSlide(currentIndex - 1);
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          goToSlide(0);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          goToSlide(totalSlides - 1);
+        } else if (e.key === 'm' || e.key === 'M') {
+          e.preventDefault();
+          toggleToc();
+        } else if (e.key === 'f' || e.key === 'F') {
+          e.preventDefault();
+          toggleFullscreen();
+        }
+      });
+
+      // Copy buttons inside slides
+      document.querySelectorAll('.ss-copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var codeEl = btn.parentElement.querySelector('code');
+          if (!codeEl) return;
+          navigator.clipboard.writeText(codeEl.textContent).then(function () {
+            var orig = btn.textContent;
+            btn.textContent = '복사됨 ✓';
+            btn.classList.add('copied');
+            setTimeout(function () {
+              btn.textContent = orig;
+              btn.classList.remove('copied');
+            }, 1300);
+          });
+        });
+      });
+
+      // Auto-open if URL has ?slides=1 or #slides
+      if (window.location.hash === '#slides' || window.location.search.indexOf('slides=1') !== -1) {
+        openSlideModal(0);
+      }
+    })();
+  </script>
+</body>
+</html>
