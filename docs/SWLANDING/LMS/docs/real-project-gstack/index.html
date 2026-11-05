@@ -959,10 +959,463 @@
       font: 700 0.7rem var(--mono);
     }
 
+    /* ==========================================================================
+       GSTACK COMMAND REFERENCE SECTION & FLOATING BUTTON & LAYER POPUP MODAL
+       ========================================================================== */
+    .nav-links .nav-cmd-btn {
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      border-radius: 9px;
+      color: #a7f3d0;
+      background: rgba(16, 185, 129, 0.13);
+      transition: all 0.2s ease;
+    }
+    .nav-links .nav-cmd-btn:hover {
+      background: rgba(16, 185, 129, 0.26);
+      border-color: var(--green);
+      color: #ffffff;
+    }
+
+    .button.cmd-trigger {
+      border-color: rgba(52, 211, 153, 0.42);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(6, 182, 212, 0.16));
+      color: #d1fae5;
+    }
+    .button.cmd-trigger:hover {
+      border-color: var(--green);
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.22);
+      color: #ffffff;
+    }
+
+    /* Floating Quick Button (Always Accessible) */
+    .cmd-fab {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 950;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(34, 211, 238, 0.48);
+      background: linear-gradient(135deg, rgba(11, 17, 30, 0.95), rgba(15, 23, 42, 0.95));
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 850;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.55), 0 0 24px rgba(34, 211, 238, 0.22);
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .cmd-fab:hover {
+      transform: translateY(-3px);
+      border-color: var(--cyan);
+      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.65), 0 0 32px rgba(34, 211, 238, 0.38);
+    }
+    .cmd-fab-badge {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #06121e;
+      font: 900 0.74rem var(--mono);
+    }
+
+    /* On-Page Command Overview Card & Flow */
+    .cmd-overview-banner {
+      margin-top: 28px;
+      padding: 28px;
+      border-radius: 20px;
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      background:
+        radial-gradient(circle at 90% 10%, rgba(34, 211, 238, 0.12), transparent 40%),
+        linear-gradient(155deg, rgba(17, 24, 39, 0.94), rgba(9, 13, 22, 0.96));
+      box-shadow: var(--shadow);
+    }
+    .cmd-flow-track {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      background: rgba(6, 10, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .cmd-flow-step {
+      padding: 7px 13px;
+      border-radius: 9px;
+      background: rgba(34, 211, 238, 0.12);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      color: var(--cyan-soft);
+      font: 800 0.82rem var(--mono);
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+    .cmd-flow-step:hover {
+      background: rgba(34, 211, 238, 0.24);
+      border-color: var(--cyan);
+      color: #ffffff;
+    }
+    .cmd-flow-step.text-step {
+      background: rgba(52, 211, 153, 0.12);
+      border-color: rgba(52, 211, 153, 0.32);
+      color: #a7f3d0;
+      font-family: inherit;
+    }
+    .cmd-flow-arrow {
+      color: #64748b;
+      font-weight: 900;
+      font-size: 0.9rem;
+    }
+    .cmd-cat-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .cmd-cat-card {
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.025);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.18s ease;
+    }
+    .cmd-cat-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(34, 211, 238, 0.45);
+      background: rgba(34, 211, 238, 0.08);
+    }
+    .cmd-cat-card strong {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 0.92rem;
+      color: #f8fafc;
+      margin-bottom: 6px;
+    }
+    .cmd-cat-card strong span {
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.14);
+      color: var(--cyan);
+      font: 800 0.7rem var(--mono);
+    }
+    .cmd-cat-card p {
+      font-size: 0.77rem;
+      color: #94a3b8;
+      line-height: 1.45;
+      font-family: var(--mono);
+    }
+
+    /* Command Layer Popup Modal (#gstackCmdModal) */
+    .cmd-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 10050;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(4, 7, 13, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.24s ease, visibility 0.24s ease;
+    }
+    .cmd-modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .cmd-modal-dialog {
+      width: min(1240px, 100%);
+      height: min(91vh, 920px);
+      display: flex;
+      flex-direction: column;
+      background: #0b101b;
+      border: 1px solid rgba(34, 211, 238, 0.32);
+      border-radius: 22px;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.8), 0 0 42px rgba(6, 182, 212, 0.15);
+      overflow: hidden;
+      transform: translateY(14px) scale(0.985);
+      transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .cmd-modal-backdrop.active .cmd-modal-dialog {
+      transform: translateY(0) scale(1);
+    }
+    .cmd-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 24px;
+      background: rgba(15, 23, 42, 0.96);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      flex-shrink: 0;
+    }
+    .cmd-modal-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .cmd-modal-title {
+      font-size: 1.08rem;
+      font-weight: 850;
+      color: #f8fafc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cmd-modal-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 24px;
+      background: rgba(11, 16, 27, 0.96);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+    .cmd-filter-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .cmd-filter-tab {
+      padding: 6px 11px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      color: #94a3b8;
+      font-size: 0.78rem;
+      font-weight: 750;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+    .cmd-filter-tab:hover {
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.07);
+    }
+    .cmd-filter-tab.active {
+      background: rgba(34, 211, 238, 0.16);
+      border-color: rgba(34, 211, 238, 0.48);
+      color: #ffffff;
+    }
+    .cmd-search-box {
+      position: relative;
+      min-width: 240px;
+      flex: 0 1 290px;
+    }
+    .cmd-search-input {
+      width: 100%;
+      padding: 8px 14px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: #070b12;
+      color: #f8fafc;
+      font-family: inherit;
+      font-size: 0.83rem;
+      outline: none;
+      transition: border-color 0.18s ease;
+    }
+    .cmd-search-input:focus {
+      border-color: var(--cyan);
+    }
+    .cmd-modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(34, 211, 238, 0.06), transparent 35%),
+        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.07), transparent 35%),
+        #070b12;
+    }
+    .cmd-intro-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+    }
+    .cmd-intro-box {
+      padding: 18px 20px;
+      border-radius: 16px;
+      background: rgba(17, 24, 39, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+    .cmd-intro-box.highlight {
+      border-color: rgba(34, 211, 238, 0.3);
+      background: linear-gradient(145deg, rgba(6, 182, 212, 0.11), rgba(17, 24, 39, 0.9));
+    }
+    .cmd-intro-box h3 {
+      font-size: 0.96rem;
+      color: var(--cyan-soft);
+      margin-bottom: 8px;
+    }
+    .cmd-intro-box p {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+    .cmd-example-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .cmd-example-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 9px;
+      background: #05080f;
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      color: #a5f3fc;
+      font: 700 0.8rem var(--mono);
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+    .cmd-example-chip:hover {
+      border-color: var(--cyan);
+      background: rgba(34, 211, 238, 0.14);
+      color: #ffffff;
+    }
+    .cmd-sections-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    .cmd-category-block {
+      border-radius: 16px;
+      background: rgba(17, 24, 39, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      overflow: hidden;
+    }
+    .cmd-category-block.hidden {
+      display: none;
+    }
+    .cmd-category-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 13px 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .cmd-category-head h4 {
+      font-size: 0.96rem;
+      font-weight: 850;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cmd-category-count {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.14);
+      color: var(--cyan-soft);
+      font: 800 0.72rem var(--mono);
+    }
+    .cmd-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .cmd-table th,
+    .cmd-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: left;
+      vertical-align: middle;
+      font-size: 0.84rem;
+    }
+    .cmd-table tr:last-child td {
+      border-bottom: none;
+    }
+    .cmd-table th {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: rgba(0, 0, 0, 0.22);
+    }
+    .cmd-table tbody tr:hover {
+      background: rgba(34, 211, 238, 0.05);
+    }
+    .cmd-table tbody tr.hidden-row {
+      display: none;
+    }
+    .cmd-code-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 7px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      color: var(--cyan-soft);
+      font: 800 0.8rem var(--mono);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .cmd-code-pill:hover {
+      background: rgba(34, 211, 238, 0.25);
+      border-color: var(--cyan);
+      color: #ffffff;
+    }
+    .cmd-code-pill.copied {
+      background: var(--green);
+      border-color: var(--green);
+      color: #052e16;
+    }
+    .cmd-desc-cell {
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+    .cmd-note-callout {
+      padding: 12px 16px;
+      background: rgba(245, 158, 11, 0.09);
+      border-top: 1px solid rgba(245, 158, 11, 0.28);
+      color: #fde68a;
+      font-size: 0.8rem;
+      line-height: 1.55;
+    }
+    .cmd-note-callout code {
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-family: var(--mono);
+    }
+    .cmd-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 24px;
+      background: rgba(15, 23, 42, 0.96);
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+      font-size: 0.8rem;
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+
     @media (max-width: 980px) {
-      .hero-grid, .resource-grid, .slide-grid-2, .slide-grid-3, .slide-grid-4, .ss-result-grid { grid-template-columns: 1fr; }
+      .hero-grid, .resource-grid, .slide-grid-2, .slide-grid-3, .slide-grid-4, .ss-result-grid, .cmd-intro-grid, .cmd-sections-grid { grid-template-columns: 1fr; }
       .terminal { transform: none; }
-      .outcome-grid, .roadmap, .practice-flow { grid-template-columns: repeat(2, 1fr); }
+      .outcome-grid, .roadmap, .practice-flow, .cmd-cat-preview-grid { grid-template-columns: repeat(2, 1fr); }
       .ss-toc-drawer { position: absolute; left: 0; top: 0; bottom: 0; z-index: 20; box-shadow: 16px 0 40px rgba(0, 0, 0, 0.6); }
       .ss-stage { padding: 14px 48px; }
       .ss-slide { padding: 24px 22px; }
@@ -972,16 +1425,17 @@
     @media (max-width: 680px) {
       .container { width: min(100% - 28px, 1180px); }
       .nav-inner { min-height: 64px; }
-      .nav-links li:not(:last-child) { display: none; }
+      .nav-links li:not(:nth-last-child(-n+2)) { display: none; }
       .hero { padding: 62px 0 52px; }
       .hero-grid { gap: 38px; }
-      .stats, .outcome-grid, .roadmap, .practice-flow, .download-list { grid-template-columns: 1fr; }
+      .stats, .outcome-grid, .roadmap, .practice-flow, .download-list, .cmd-cat-preview-grid { grid-template-columns: 1fr; }
       section.content-section { padding: 58px 0; }
-      .slideshare-backdrop { padding: 0; }
-      .slideshare-player { height: 100vh; border-radius: 0; }
+      .slideshare-backdrop, .cmd-modal-backdrop { padding: 0; }
+      .slideshare-player, .cmd-modal-dialog { height: 100vh; border-radius: 0; }
       .ss-stage { padding: 10px; }
       .ss-nav-paddle { display: none; }
       .ss-select { max-width: 150px; }
+      .cmd-fab { right: 14px; bottom: 14px; padding: 11px 16px; font-size: 0.82rem; }
     }
   </style>
 </head>
@@ -991,8 +1445,10 @@
       <a href="../index.html" class="brand"><span class="brand-mark">g/</span>대구 SW 랜딩</a>
       <ul class="nav-links">
         <li><a href="#roadmap">학습 로드맵</a></li>
+        <li><a href="#commands">명령어 사전</a></li>
         <li><a href="#resources">실습 자료</a></li>
         <li><a href="../index.html">과정 홈</a></li>
+        <li><button type="button" class="nav-cmd-btn" data-open-cmd-modal="all">⌨️ 명령어 보기 (53)</button></li>
         <li><button type="button" class="nav-cta" data-open-slides="0">📑 강의 슬라이드 열기</button></li>
       </ul>
     </div>
@@ -1010,6 +1466,7 @@
             </p>
             <div class="actions">
               <button type="button" class="button primary" data-open-slides="0">전체 강의 슬라이드 시작 <span aria-hidden="true">→</span></button>
+              <button type="button" class="button cmd-trigger" data-open-cmd-modal="all">⌨️ gstack 53개 명령어 보기</button>
               <a class="button secondary" href="course/downloads/gstack-3hour-lecture-notes.pdf" download>PDF 강의록 다운로드</a>
             </div>
           </div>
@@ -1100,7 +1557,88 @@
       </div>
     </section>
 
-    <section class="content-section">
+    <section class="content-section" id="commands">
+      <div class="container">
+        <div class="section-kicker">CODEX GSTACK SKILL REFERENCE · 53 SKILLS</div>
+        <h2 class="section-title">설치된 gstack 스킬 53개 &amp; 명령어 사전</h2>
+        <p class="section-copy">
+          현재 이 Codex 환경에는 <strong>gstack 스킬 53개</strong>가 설치되어 있습니다. 독립적인 <code>gstack</code> CLI가 아니라, Codex 대화에서 스킬 이름을 지정해 실행하는 방식입니다. (예: <code>review 스킬로 현재 변경사항을 검토해줘</code> 또는 <code>/review 실행해줘</code>)
+        </p>
+
+        <div class="cmd-overview-banner">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+            <div>
+              <span class="section-kicker" style="color: var(--green);">STANDARD END-TO-END WORKFLOW</span>
+              <h3 style="font-size: 1.25rem; margin-top: 4px;">가장 일반적인 전체 흐름</h3>
+            </div>
+            <button type="button" class="button primary" data-open-cmd-modal="all">⌨️ 전체 명령어 레이어팝업 열기 →</button>
+          </div>
+
+          <div class="cmd-flow-track" aria-label="가장 일반적인 gstack 전체 흐름">
+            <span class="cmd-flow-step" data-open-cmd-modal="plan" title="아이디어와 제품 방향을 YC 방식으로 구체화">/office-hours</span>
+            <span class="cmd-flow-arrow">→</span>
+            <span class="cmd-flow-step" data-open-cmd-modal="plan" title="CEO → 디자인 → 엔지니어링 → DX 검토를 한 번에 실행">/autoplan</span>
+            <span class="cmd-flow-arrow">→</span>
+            <span class="cmd-flow-step text-step" data-open-cmd-modal="design">기능 구현</span>
+            <span class="cmd-flow-arrow">→</span>
+            <span class="cmd-flow-step" data-open-cmd-modal="quality" title="현재 브랜치 또는 PR의 코드 리뷰">/review</span>
+            <span class="cmd-flow-arrow">→</span>
+            <span class="cmd-flow-step" data-open-cmd-modal="qa" title="웹 앱을 테스트하고 발견한 버그까지 수정">/qa</span>
+            <span class="cmd-flow-arrow">→</span>
+            <span class="cmd-flow-step" data-open-cmd-modal="ship" title="테스트, 리뷰, 버전 변경, 푸시, PR 생성">/ship</span>
+            <span class="cmd-flow-arrow">→</span>
+            <span class="cmd-flow-step" data-open-cmd-modal="ship" title="PR 병합부터 배포 및 운영 검증까지 실행">/land-and-deploy</span>
+            <span class="cmd-flow-arrow">→</span>
+            <span class="cmd-flow-step" data-open-cmd-modal="qa" title="배포 후 오류와 성능 저하를 지속 감시">/canary</span>
+          </div>
+
+          <div class="cmd-cat-preview-grid">
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="plan">
+              <strong>기획 및 설계 <span>8</span></strong>
+              <p>/office-hours · /autoplan · /spec · /plan-ceo-review ...</p>
+            </button>
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="design">
+              <strong>디자인 및 구현 <span>3</span></strong>
+              <p>/design-consultation · /design-shotgun · /design-html</p>
+            </button>
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="quality">
+              <strong>코드 품질 및 검토 <span>8</span></strong>
+              <p>/review · /investigate · /cso · /health · /claude ...</p>
+            </button>
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="qa">
+              <strong>웹 브라우저 및 QA <span>10</span></strong>
+              <p>/browse · /qa · /qa-only · /benchmark · /canary ...</p>
+            </button>
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="ship">
+              <strong>배포 및 문서화 <span>6</span></strong>
+              <p>/ship · /land-and-deploy · /document-release ...</p>
+            </button>
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="visual">
+              <strong>문서 및 시각 자료 <span>2</span></strong>
+              <p>/diagram · /make-pdf</p>
+            </button>
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="safety">
+              <strong>안전장치 <span>4</span></strong>
+              <p>/careful · /freeze · /guard · /unfreeze</p>
+            </button>
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="memory">
+              <strong>기억 및 작업 상태 <span>5</span></strong>
+              <p>/context-save · /context-restore · /learn · /setup-gbrain ...</p>
+            </button>
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="ios">
+              <strong>iOS <span>5</span></strong>
+              <p>/ios-qa · /ios-fix · /ios-design-review · /ios-sync ...</p>
+            </button>
+            <button type="button" class="cmd-cat-card" data-open-cmd-modal="ops">
+              <strong>프로젝트 운영 <span>2</span></strong>
+              <p>/retro · /gstack-upgrade</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section alt">
       <div class="container">
         <div class="section-kicker">PRACTICE METHOD</div>
         <h2 class="section-title">초급자가 따라가는 실습 방식</h2>
@@ -1112,7 +1650,7 @@
       </div>
     </section>
 
-    <section class="content-section alt" id="resources">
+    <section class="content-section" id="resources">
       <div class="container">
         <div class="section-kicker">DOWNLOAD CENTER</div>
         <h2 class="section-title">강의와 실습 자료</h2>
@@ -1164,6 +1702,7 @@
           <p>설치부터 시작해 실제 프로젝트의 기획·개발·QA 과정을 슬라이드 쉐어 강의로 순서대로 진행합니다.</p>
           <div class="actions">
             <button type="button" class="button primary" id="openRealProjectBottomBtn" data-open-slides="0">Real Project 시작하기 →</button>
+            <button type="button" class="button cmd-trigger" data-open-cmd-modal="all">⌨️ gstack 53개 명령어 보기</button>
             <a class="button secondary" href="../index.html">LMS 과정 홈으로</a>
           </div>
         </div>
@@ -1172,6 +1711,12 @@
   </main>
 
   <footer>Copyright ⓒ Eduniety Lab. All Rights Reserved. · Real Project gstack Course</footer>
+
+  <!-- Always-Accessible Floating Quick Button -->
+  <button type="button" class="cmd-fab" data-open-cmd-modal="all" aria-label="gstack 명령어 보기 레이어팝업 열기">
+    <span>⌨️ gstack 명령어 보기</span>
+    <span class="cmd-fab-badge">53 Skills</span>
+  </button>
 
   <!-- ==========================================================================
        SLIDESHARE LAYER POPUP MODAL (16 SLIDES)
@@ -1187,6 +1732,7 @@
         <div class="ss-top-controls">
           <button type="button" class="ss-tool-btn active" id="ssToggleTocBtn" aria-expanded="true">📑 슬라이드 목차</button>
           <select class="ss-select" id="ssSlideSelect" aria-label="슬라이드 바로 이동"></select>
+          <button type="button" class="ss-tool-btn" data-open-cmd-modal="all" style="border-color: rgba(52, 211, 153, 0.45); color: #a7f3d0;">⌨️ 명령어 보기 (53)</button>
           <a class="ss-tool-btn" href="course/downloads/gstack-3hour-lecture-notes.pdf" download>📥 PDF 강의록</a>
           <a class="ss-tool-btn" href="course/index.html" target="_blank" rel="noopener">↗ 스크롤 뷰 열기</a>
           <button type="button" class="ss-tool-btn" id="ssFullscreenBtn">⛶ 전체화면</button>
@@ -1865,9 +2411,377 @@ gstack-qa-only 스킬로 정상/빈/중복/긴 입력,
     </div>
   </div>
 
+  <!-- ==========================================================================
+       GSTACK 53 COMMANDS LAYER POPUP MODAL (#gstackCmdModal)
+       ========================================================================== -->
+  <div class="cmd-modal-backdrop" id="gstackCmdModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="cmdModalTitle">
+    <div class="cmd-modal-dialog">
+      <header class="cmd-modal-header">
+        <div class="cmd-modal-title-wrap">
+          <span class="ss-badge">CODEX · GSTACK 53 SKILLS</span>
+          <strong class="cmd-modal-title" id="cmdModalTitle">gstack 스킬 53개 전체 명령어 사전 &amp; 워크플로 가이드</strong>
+        </div>
+        <div class="ss-top-controls">
+          <button type="button" class="ss-tool-btn close-btn" id="cmdCloseModalBtn">✕ 닫기</button>
+        </div>
+      </header>
+
+      <div class="cmd-modal-toolbar">
+        <div class="cmd-filter-tabs" id="cmdFilterTabs" role="tablist" aria-label="명령어 카테고리 필터">
+          <button type="button" class="cmd-filter-tab active" data-cmd-filter="all">전체 (53)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="plan">기획 및 설계 (8)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="design">디자인 및 구현 (3)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="quality">코드 품질 및 검토 (8)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="qa">웹 브라우저 및 QA (10)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="ship">배포 및 문서화 (6)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="visual">문서 및 시각 자료 (2)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="safety">안전장치 (4)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="memory">기억 및 작업 상태 (5)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="ios">iOS (5)</button>
+          <button type="button" class="cmd-filter-tab" data-cmd-filter="ops">프로젝트 운영 (2)</button>
+        </div>
+        <div class="cmd-search-box">
+          <input type="search" class="cmd-search-input" id="cmdSearchInput" placeholder="🔎 명령어 또는 용도 검색 (예: /review, QA, 배포...)" aria-label="명령어 검색" />
+        </div>
+      </div>
+
+      <div class="cmd-modal-body" id="cmdModalBody">
+        <!-- Top Intro & Standard Workflow -->
+        <div class="cmd-intro-grid">
+          <div class="cmd-intro-box highlight">
+            <h3>💡 Codex 환경에서의 gstack 실행 방식</h3>
+            <p>
+              현재 이 Codex 환경에는 <strong>gstack 스킬 53개</strong>가 설치되어 있습니다. 독립적인 <code>gstack</code> CLI가 아니라, <strong>Codex 대화에서 스킬 이름을 지정해 실행하는 방식</strong>입니다. (아래 예시나 표의 명령어를 클릭하면 클립보드에 즉시 복사됩니다.)
+            </p>
+            <div class="cmd-example-chips">
+              <button type="button" class="cmd-example-chip" data-copy-text="review 스킬로 현재 변경사항을 검토해줘" title="클릭하여 복사">
+                <span>예 1: review 스킬로 현재 변경사항을 검토해줘</span>
+                <span style="color: var(--cyan); font-size: 0.72rem;">복사</span>
+              </button>
+              <button type="button" class="cmd-example-chip" data-copy-text="/review 실행해줘" title="클릭하여 복사">
+                <span>예 2: /review 실행해줘</span>
+                <span style="color: var(--cyan); font-size: 0.72rem;">복사</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="cmd-intro-box">
+            <h3>🚀 가장 일반적인 전체 흐름</h3>
+            <p style="margin-bottom: 10px;">아이디어 구체화부터 자동 계획, 구현, 리뷰, QA, 배포 및 카나리 감시까지 이어지는 표준 파이프라인입니다.</p>
+            <div class="ss-code-block" style="margin: 0; padding: 10px 64px 10px 14px;">
+              <code>/office-hours
+→ /autoplan
+→ 기능 구현
+→ /review
+→ /qa
+→ /ship
+→ /land-and-deploy
+→ /canary</code>
+              <button class="ss-copy-btn" type="button">복사</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10 Category Tables -->
+        <div class="cmd-sections-grid" id="cmdSectionsGrid">
+          <!-- 1. 기획 및 설계 -->
+          <section class="cmd-category-block" data-cmd-category="plan">
+            <div class="cmd-category-head">
+              <h4>📐 기획 및 설계</h4>
+              <span class="cmd-category-count">8개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/office-hours">/office-hours</button></td><td class="cmd-desc-cell">아이디어와 제품 방향을 YC 방식으로 구체화</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/autoplan">/autoplan</button></td><td class="cmd-desc-cell">CEO → 디자인 → 엔지니어링 → DX 검토를 한 번에 실행</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/spec">/spec</button></td><td class="cmd-desc-cell">모호한 요구사항을 실행 가능한 상세 명세로 변환</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/plan-ceo-review">/plan-ceo-review</button></td><td class="cmd-desc-cell">제품 가치, 범위, 우선순위를 CEO 관점에서 검토</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/plan-eng-review">/plan-eng-review</button></td><td class="cmd-desc-cell">아키텍처, 데이터 흐름, 예외 상황, 테스트 계획 검토</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/plan-design-review">/plan-design-review</button></td><td class="cmd-desc-cell">UI/UX 계획을 디자이너 관점에서 검토</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/plan-devex-review">/plan-devex-review</button></td><td class="cmd-desc-cell">API·CLI·SDK·문서의 개발자 경험 계획 검토</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/plan-tune">/plan-tune</button></td><td class="cmd-desc-cell">gstack이 어떤 질문을 할지 선호도 조정</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 2. 디자인 및 구현 -->
+          <section class="cmd-category-block" data-cmd-category="design">
+            <div class="cmd-category-head">
+              <h4>🎨 디자인 및 구현</h4>
+              <span class="cmd-category-count">3개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/design-consultation">/design-consultation</button></td><td class="cmd-desc-cell">제품 디자인 시스템과 시각 방향 제안</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/design-shotgun">/design-shotgun</button></td><td class="cmd-desc-cell">여러 디자인 시안을 생성하고 비교</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/design-html">/design-html</button></td><td class="cmd-desc-cell">승인된 디자인을 실제 HTML/CSS로 구현</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 3. 코드 품질 및 검토 -->
+          <section class="cmd-category-block" data-cmd-category="quality">
+            <div class="cmd-category-head">
+              <h4>🔍 코드 품질 및 검토</h4>
+              <span class="cmd-category-count">8개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/review">/review</button></td><td class="cmd-desc-cell">현재 브랜치 또는 PR의 코드 리뷰</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/investigate">/investigate</button></td><td class="cmd-desc-cell">버그의 근본 원인을 조사한 후 수정</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/cso">/cso</button></td><td class="cmd-desc-cell">보안 감사, OWASP 및 STRIDE 분석</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/health">/health</button></td><td class="cmd-desc-cell">린트·타입·테스트·데드코드 등을 종합 점검</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/design-review">/design-review</button></td><td class="cmd-desc-cell">실행 중인 UI를 시각적으로 검토하고 수정</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/devex-review">/devex-review</button></td><td class="cmd-desc-cell">실제 온보딩과 개발자 경험을 테스트</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/claude">/claude</button></td><td class="cmd-desc-cell">Claude CLI를 이용한 독립적인 2차 검토</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/benchmark-models">/benchmark-models</button></td><td class="cmd-desc-cell">Claude·GPT·Gemini 결과와 성능 비교</td></tr>
+              </tbody>
+            </table>
+            <div class="cmd-note-callout">
+              📌 참고로 Claude Code용 gstack에는 <code>/codex</code>가 있지만, 현재는 <strong>Codex 환경이므로 반대편 모델을 호출하는 <code>/claude</code></strong>가 설치되어 있습니다.
+            </div>
+          </section>
+
+          <!-- 4. 웹 브라우저 및 QA -->
+          <section class="cmd-category-block" data-cmd-category="qa">
+            <div class="cmd-category-head">
+              <h4>🌐 웹 브라우저 및 QA</h4>
+              <span class="cmd-category-count">10개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/browse">/browse</button></td><td class="cmd-desc-cell">브라우저를 조작해 웹페이지 확인</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/open-gstack-browser">/open-gstack-browser</button></td><td class="cmd-desc-cell">화면에 보이는 GStack Browser 실행</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/qa">/qa</button></td><td class="cmd-desc-cell">웹 앱을 테스트하고 발견한 버그까지 수정</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/qa-only">/qa-only</button></td><td class="cmd-desc-cell">수정 없이 QA 보고서만 작성</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/benchmark">/benchmark</button></td><td class="cmd-desc-cell">로딩 속도, Core Web Vitals, 리소스 크기 측정</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/canary">/canary</button></td><td class="cmd-desc-cell">배포 후 오류와 성능 저하를 지속 감시</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/scrape">/scrape</button></td><td class="cmd-desc-cell">웹페이지에서 구조화된 데이터 추출</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/skillify">/skillify</button></td><td class="cmd-desc-cell">성공한 스크래핑 작업을 재사용 가능한 스킬로 저장</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/setup-browser-cookies">/setup-browser-cookies</button></td><td class="cmd-desc-cell">실제 브라우저 쿠키를 테스트 세션에 가져오기</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/pair-agent">/pair-agent</button></td><td class="cmd-desc-cell">다른 AI 에이전트와 브라우저 세션 공유</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 5. 배포 및 문서화 -->
+          <section class="cmd-category-block" data-cmd-category="ship">
+            <div class="cmd-category-head">
+              <h4>🚢 배포 및 문서화</h4>
+              <span class="cmd-category-count">6개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/ship">/ship</button></td><td class="cmd-desc-cell">테스트, 리뷰, 버전 변경, 푸시, PR 생성</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/land-and-deploy">/land-and-deploy</button></td><td class="cmd-desc-cell">PR 병합부터 배포 및 운영 검증까지 실행</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/landing-report">/landing-report</button></td><td class="cmd-desc-cell">PR과 릴리스 버전 슬롯 현황을 읽기 전용으로 확인</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/setup-deploy">/setup-deploy</button></td><td class="cmd-desc-cell">배포 플랫폼과 운영 URL 설정</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/document-release">/document-release</button></td><td class="cmd-desc-cell">변경된 코드에 맞춰 기존 문서 업데이트</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/document-generate">/document-generate</button></td><td class="cmd-desc-cell">누락된 문서를 Diataxis 방식으로 새로 작성</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 6. 문서 및 시각 자료 -->
+          <section class="cmd-category-block" data-cmd-category="visual">
+            <div class="cmd-category-head">
+              <h4>📊 문서 및 시각 자료</h4>
+              <span class="cmd-category-count">2개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/diagram">/diagram</button></td><td class="cmd-desc-cell">설명을 Mermaid, Excalidraw, SVG, PNG 다이어그램으로 생성</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/make-pdf">/make-pdf</button></td><td class="cmd-desc-cell">Markdown을 PDF·HTML·DOCX로 변환</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 7. 안전장치 -->
+          <section class="cmd-category-block" data-cmd-category="safety">
+            <div class="cmd-category-head">
+              <h4>🛡️ 안전장치</h4>
+              <span class="cmd-category-count">4개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/careful">/careful</button></td><td class="cmd-desc-cell">삭제·강제 푸시 등 위험한 명령 전에 경고</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/freeze">/freeze</button></td><td class="cmd-desc-cell">지정한 디렉터리 밖의 파일 편집을 차단</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/guard">/guard</button></td><td class="cmd-desc-cell"><code>/careful</code>과 <code>/freeze</code>를 동시에 적용</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/unfreeze">/unfreeze</button></td><td class="cmd-desc-cell">파일 편집 범위 제한 해제</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 8. 기억 및 작업 상태 -->
+          <section class="cmd-category-block" data-cmd-category="memory">
+            <div class="cmd-category-head">
+              <h4>🧠 기억 및 작업 상태</h4>
+              <span class="cmd-category-count">5개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/context-save">/context-save</button></td><td class="cmd-desc-cell">현재 작업 진행 상태 저장</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/context-restore">/context-restore</button></td><td class="cmd-desc-cell">이전에 저장한 작업 상태 복원</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/learn">/learn</button></td><td class="cmd-desc-cell">프로젝트에서 축적된 학습 내용 조회·정리</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/setup-gbrain">/setup-gbrain</button></td><td class="cmd-desc-cell">지속적인 프로젝트 지식 저장소인 GBrain 설치</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/sync-gbrain">/sync-gbrain</button></td><td class="cmd-desc-cell">현재 저장소 코드를 GBrain에 다시 색인</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 9. iOS -->
+          <section class="cmd-category-block" data-cmd-category="ios">
+            <div class="cmd-category-head">
+              <h4>📱 iOS</h4>
+              <span class="cmd-category-count">5개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/ios-qa">/ios-qa</button></td><td class="cmd-desc-cell">실제 iPhone에서 SwiftUI 앱 QA</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/ios-fix">/ios-fix</button></td><td class="cmd-desc-cell">발견된 iOS 버그 수정 후 기기에서 재검증</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/ios-design-review">/ios-design-review</button></td><td class="cmd-desc-cell">Apple HIG 기준으로 iOS 화면 검토</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/ios-sync">/ios-sync</button></td><td class="cmd-desc-cell">iOS 디버그 브리지와 접근자 재생성</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/ios-clean">/ios-clean</button></td><td class="cmd-desc-cell">앱에서 gstack iOS 디버그 코드 제거</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- 10. 프로젝트 운영 -->
+          <section class="cmd-category-block" data-cmd-category="ops">
+            <div class="cmd-category-head">
+              <h4>⚙️ 프로젝트 운영</h4>
+              <span class="cmd-category-count">2개 명령</span>
+            </div>
+            <table class="cmd-table">
+              <thead><tr><th style="width: 38%;">명령 (클릭 복사)</th><th>용도</th></tr></thead>
+              <tbody>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/retro">/retro</button></td><td class="cmd-desc-cell">커밋과 코드 품질을 분석해 주간 회고 작성</td></tr>
+                <tr><td><button type="button" class="cmd-code-pill" data-copy-text="/gstack-upgrade">/gstack-upgrade</button></td><td class="cmd-desc-cell">설치된 gstack을 최신 버전으로 업데이트</td></tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+      </div>
+
+      <footer class="cmd-modal-footer">
+        <span>💡 팁: 명령어 배지를 클릭하면 즉시 복사되어 Codex 또는 Claude Code 대화창에 붙여넣을 수 있습니다.</span>
+        <span class="ss-shortcut-hint">단축키: <kbd>ESC</kbd> 닫기</span>
+      </footer>
+    </div>
+  </div>
+
   <script>
     (function () {
       var modal = document.getElementById('gstackSlideModal');
+      var cmdModal = document.getElementById('gstackCmdModal');
+      var cmdCloseBtn = document.getElementById('cmdCloseModalBtn');
+      var cmdFilterTabs = Array.prototype.slice.call(document.querySelectorAll('#cmdFilterTabs .cmd-filter-tab'));
+      var cmdCategoryBlocks = Array.prototype.slice.call(document.querySelectorAll('#cmdSectionsGrid .cmd-category-block'));
+      var cmdSearchInput = document.getElementById('cmdSearchInput');
+      var cmdModalBody = document.getElementById('cmdModalBody');
+      var activeCmdCategory = 'all';
+
+      function applyCmdFilterAndSearch() {
+        var query = (cmdSearchInput ? cmdSearchInput.value : '').trim().toLowerCase();
+
+        cmdCategoryBlocks.forEach(function (block) {
+          var cat = block.getAttribute('data-cmd-category');
+          var categoryMatches = (activeCmdCategory === 'all' || activeCmdCategory === cat);
+          if (!categoryMatches) {
+            block.classList.add('hidden');
+            return;
+          }
+
+          var rows = Array.prototype.slice.call(block.querySelectorAll('tbody tr'));
+          var visibleRows = 0;
+          rows.forEach(function (row) {
+            var text = row.textContent.toLowerCase();
+            var match = !query || text.indexOf(query) !== -1;
+            row.classList.toggle('hidden-row', !match);
+            if (match) visibleRows++;
+          });
+
+          block.classList.toggle('hidden', visibleRows === 0);
+        });
+      }
+
+      function setCmdCategory(category) {
+        activeCmdCategory = category || 'all';
+        cmdFilterTabs.forEach(function (tab) {
+          tab.classList.toggle('active', tab.getAttribute('data-cmd-filter') === activeCmdCategory);
+        });
+        applyCmdFilterAndSearch();
+      }
+
+      function openCmdModal(category) {
+        setCmdCategory(category || 'all');
+        cmdModal.classList.add('active');
+        cmdModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        if (cmdModalBody) cmdModalBody.scrollTop = 0;
+      }
+
+      function closeCmdModal() {
+        cmdModal.classList.remove('active');
+        cmdModal.setAttribute('aria-hidden', 'true');
+        if (!modal.classList.contains('active')) {
+          document.body.style.overflow = '';
+        }
+      }
+
+      document.querySelectorAll('[data-open-cmd-modal]').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          var cat = btn.getAttribute('data-open-cmd-modal') || 'all';
+          openCmdModal(cat);
+        });
+      });
+
+      cmdFilterTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          setCmdCategory(tab.getAttribute('data-cmd-filter') || 'all');
+        });
+      });
+
+      if (cmdSearchInput) {
+        cmdSearchInput.addEventListener('input', applyCmdFilterAndSearch);
+      }
+
+      if (cmdCloseBtn) {
+        cmdCloseBtn.addEventListener('click', closeCmdModal);
+      }
+
+      if (cmdModal) {
+        cmdModal.addEventListener('click', function (e) {
+          if (e.target === cmdModal) closeCmdModal();
+        });
+      }
+
+      // Click-to-copy for [data-copy-text] pills and example chips
+      document.querySelectorAll('[data-copy-text]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var text = el.getAttribute('data-copy-text');
+          if (!text) return;
+          navigator.clipboard.writeText(text).then(function () {
+            var origHtml = el.innerHTML;
+            el.classList.add('copied');
+            el.textContent = text + ' 복사됨 ✓';
+            setTimeout(function () {
+              el.classList.remove('copied');
+              el.innerHTML = origHtml;
+            }, 1200);
+          });
+        });
+      });
       var playerContainer = document.getElementById('ssPlayerContainer');
       var slides = Array.prototype.slice.call(document.querySelectorAll('#ssSlideViewport .ss-slide'));
       var tocDrawer = document.getElementById('ssTocDrawer');
@@ -2026,6 +2940,14 @@ gstack-qa-only 스킬로 정상/빈/중복/긴 입력,
       });
 
       document.addEventListener('keydown', function (e) {
+        if (cmdModal && cmdModal.classList.contains('active')) {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            closeCmdModal();
+          }
+          return;
+        }
+
         if (!modal.classList.contains('active')) return;
         if (e.target && (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
 
