@@ -8,6 +8,8 @@
   'use strict';
 
   const SESSION_KEY = 'SANDWICH_CUSTOMER_SESSION_V1';
+  const ORDER_API_URL =
+    'https://script.google.com/macros/s/AKfycbwnBPBoFAOMYkNAATlV2jKi1dMhVTbpuevMiWkamOZGJvqZt5_PqCNPyNdn5ZYWtdVbmw/exec';
 
   const SCREEN_TITLES = {
     START: '주문 시작',
@@ -151,6 +153,7 @@
 
   let session = loadSession();
   let storeState = window.KioskStore.loadState();
+  let isFinalizingOrder = false;
 
   function saveSession() {
     try {
@@ -707,15 +710,72 @@
     }, 900);
   }
 
-  function finalizeOrderCreation() {
+  async function saveOrderToSheet(orderSequence) {
+    const response = await fetch(ORDER_API_URL, {
+      method: 'POST',
+      headers: {
+        // text/plain을 사용하면 Apps Script 호출 시 CORS 사전 요청을 피할 수 있습니다.
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        order_number: orderSequence,
+        bill_state: '결제완료',
+        order_type: session.orderType === 'DINE_IN' ? '매장' : '포장',
+        // 현재 화면에서 제공하는 결제 수단은 카드 및 카드 기반 간편결제입니다.
+        bill_type: '카드'
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`주문 API 응답 오류 (${response.status})`);
+    }
+
+    const result = await response.json();
+    if (!result || !result.ok) {
+      throw new Error((result && result.message) || '주문 저장에 실패했습니다.');
+    }
+
+    return result.data;
+  }
+
+  async function finalizeOrderCreation() {
+    if (isFinalizingOrder) return;
+    isFinalizingOrder = true;
+
     const cartInfo = getCartTotalInfo();
     let createdOrder = null;
+    let orderSequence = null;
+    let savedSheetOrder = null;
+
+    session.paymentState = 'PROCESSING';
+    session.paymentFailReason = '';
+    saveSession();
+    render();
+
+    try {
+      // 여러 탭에서 동시에 주문하더라도 고객 주문번호가 겹치지 않도록 먼저 번호를 예약합니다.
+      storeState = window.KioskStore.saveState(function (state) {
+        orderSequence = state.nextOrderSequence || 104;
+        state.nextOrderSequence = orderSequence + 1;
+        return state;
+      });
+
+      savedSheetOrder = await saveOrderToSheet(orderSequence);
+    } catch (error) {
+      session.paymentState = 'FAILED';
+      session.paymentFailReason =
+        '주문 데이터 저장에 실패했습니다. 네트워크 연결을 확인한 뒤 다시 시도해 주세요. (' +
+        (error && error.message ? error.message : '알 수 없는 오류') +
+        ')';
+      saveSession();
+      render();
+      isFinalizingOrder = false;
+      return;
+    }
 
     storeState = window.KioskStore.saveState(
       function (state) {
-        const seq = state.nextOrderSequence || 104;
-        const orderNumber = 'A-' + seq;
-        state.nextOrderSequence = seq + 1;
+        const orderNumber = 'A-' + orderSequence;
 
         const now = new Date().toISOString();
         const pmMeta = window.KioskStore.PAYMENT_METHODS[session.selectedPaymentMethod] || { name: '간편결제' };
@@ -729,6 +789,8 @@
           status: 'PAID',
           paymentStatus: 'PAID',
           paymentMethod: session.selectedPaymentMethod,
+          sheetOrderIdx: savedSheetOrder && savedSheetOrder.idx,
+          sheetSavedAt: savedSheetOrder && savedSheetOrder.order_date,
           customerRequest: (session.customerRequest || '').trim(),
           totalAmount: cartInfo.totalAmount,
           discountAmount: cartInfo.discountAmount,
@@ -784,6 +846,8 @@
       saveSession();
       navigateTo('ORDER_COMPLETE', false);
     }
+
+    isFinalizingOrder = false;
   }
 
   /* ============================================================================
