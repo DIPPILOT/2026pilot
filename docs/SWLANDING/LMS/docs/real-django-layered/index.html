@@ -1,0 +1,2432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function () {
+      function getCookie(name) {
+        var prefix = name + '=';
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          if (cookie.indexOf(prefix) === 0) return decodeURIComponent(cookie.substring(prefix.length));
+        }
+        return null;
+      }
+      var loggedInUser = getCookie('currentUser');
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) loggedInUser = session.value;
+            else localStorage.removeItem('currentUserSession');
+          } catch (e) { console.error(e); }
+        }
+      }
+      if (!loggedInUser) window.location.href = '../login/login.html';
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Real Project 3: Django의 기본 구조를 확장하여 API·Business·Infrastructure 분리, 외부 결제 Adapter, AI 에이전트 개발 규격을 수립하는 레이어드 아키텍처 설계 강의" />
+  <title>Real Project 3 · Django 레이어드 아키텍처 설계 | 대구 SW 랜딩</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #111827;
+      --surface-2: #171c27;
+      --line: rgba(255, 255, 255, 0.09);
+      --text: #ffffff;
+      --muted: #a1a1aa;
+      --emerald: #10b981;
+      --emerald-soft: #a7f3d0;
+      --cyan: #22d3ee;
+      --cyan-soft: #a5f3fc;
+      --blue: #3b82f6;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --purple: #a855f7;
+      --radius: 20px;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 86px; }
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+      background:
+        radial-gradient(circle at 12% 4%, rgba(16, 185, 129, 0.12), transparent 28%),
+        radial-gradient(circle at 88% 28%, rgba(34, 211, 238, 0.11), transparent 30%),
+        var(--bg);
+    }
+
+    a { color: inherit; }
+    button { font-family: inherit; }
+    .container { width: min(1200px, calc(100% - 40px)); margin: 0 auto; }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--line);
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(18px);
+    }
+    .nav-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1.02rem;
+      font-weight: 850;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: #052e16;
+      background: linear-gradient(135deg, #34d399, var(--cyan));
+      font-weight: 950;
+      font-size: 0.9rem;
+      letter-spacing: -0.04em;
+    }
+    .nav-links { display: flex; align-items: center; gap: 6px; list-style: none; flex-wrap: wrap; }
+    .nav-links a, .nav-links button {
+      padding: 8px 12px;
+      color: #d4d4d8;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 750;
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.18s ease;
+    }
+    .nav-links a:hover, .nav-links button:hover { color: var(--emerald-soft); background: rgba(255, 255, 255, 0.04); }
+    .nav-links .nav-cta {
+      border: 1px solid rgba(16, 185, 129, 0.42);
+      border-radius: 9px;
+      color: var(--emerald-soft);
+      background: rgba(16, 185, 129, 0.14);
+    }
+    .nav-links .nav-cta:hover {
+      background: rgba(16, 185, 129, 0.28);
+      border-color: var(--emerald);
+      color: #fff;
+    }
+
+    /* Hero */
+    .hero { position: relative; overflow: hidden; padding: 82px 0 68px; border-bottom: 1px solid var(--line); }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.4;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(16, 185, 129, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.055) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, #000, transparent 92%);
+    }
+    .hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr); gap: 52px; align-items: center; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: #34d399; font-size: 0.8rem; font-weight: 900; letter-spacing: 0.13em; }
+    .eyebrow::before { content: ''; width: 28px; height: 2px; background: #34d399; box-shadow: 0 0 14px #34d399; }
+    h1 { margin: 16px 0 18px; font-size: clamp(2rem, 3.6vw, 3.15rem); line-height: 1.16; letter-spacing: -0.04em; word-break: keep-all; }
+    h1 span { display: block; background: linear-gradient(110deg, #ffffff 10%, #a7f3d0 50%, #38bdf8); -webkit-background-clip: text; color: transparent; }
+    .hero-copy { max-width: 740px; color: #cbd5e1; font-size: 1.05rem; word-break: keep-all; }
+    .hero-copy strong { color: #ffffff; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 11px 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.93rem;
+      font-weight: 850;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .button:hover { transform: translateY(-2px); border-color: rgba(52, 211, 153, 0.5); }
+    .button.primary { color: #042f1e; border-color: transparent; background: linear-gradient(135deg, #6ee7b7, #22d3ee); box-shadow: 0 14px 34px rgba(16, 185, 129, 0.24); }
+    .button.secondary { background: rgba(255, 255, 255, 0.045); }
+
+    /* Hero Architecture Stack Preview */
+    .arch-terminal {
+      overflow: hidden;
+      border: 1px solid rgba(52, 211, 153, 0.28);
+      border-radius: 22px;
+      background: rgba(7, 12, 21, 0.94);
+      box-shadow: var(--shadow), 0 0 60px rgba(16, 185, 129, 0.12);
+      cursor: pointer;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+    .arch-terminal:hover {
+      transform: translateY(-4px);
+      border-color: rgba(52, 211, 153, 0.6);
+    }
+    .terminal-bar { display: flex; align-items: center; gap: 7px; padding: 13px 16px; border-bottom: 1px solid var(--line); background: rgba(255, 255, 255, 0.03); }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #fb7185; }
+    .dot:nth-child(2) { background: #fbbf24; }
+    .dot:nth-child(3) { background: #34d399; }
+    .terminal-title { margin-left: auto; color: #94a3b8; font: 0.73rem var(--mono); }
+    .arch-stack-body { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .arch-layer-pill {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(17, 24, 39, 0.85);
+      font-size: 0.84rem;
+    }
+    .arch-layer-pill strong { font-family: var(--mono); color: #fff; font-size: 0.83rem; }
+    .arch-layer-pill span { color: #94a3b8; font-size: 0.76rem; }
+    .arch-layer-pill.l-api { border-left: 3px solid #38bdf8; }
+    .arch-layer-pill.l-wf { border-left: 3px solid #34d399; }
+    .arch-layer-pill.l-biz { border-left: 3px solid #10b981; background: rgba(16, 185, 129, 0.11); border-color: rgba(16, 185, 129, 0.35); }
+    .arch-layer-pill.l-port { border-left: 3px solid #fbbf24; }
+    .arch-layer-pill.l-infra { border-left: 3px solid #a855f7; }
+    .arch-arrow-down { text-align: center; color: #34d399; font: 800 0.75rem var(--mono); line-height: 1; }
+
+    .stats { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 44px; }
+    .stat { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: rgba(17, 24, 39, 0.72); }
+    .stat strong { display: block; color: #34d399; font-size: 1.18rem; }
+    .stat span { color: var(--muted); font-size: 0.8rem; }
+
+    /* Sections */
+    section.content-section { padding: 74px 0; }
+    section.alt { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(17, 24, 39, 0.42); }
+    .section-header-row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+    .section-kicker { color: #34d399; font-size: 0.76rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; }
+    .section-title { margin: 6px 0 10px; font-size: clamp(1.75rem, 3.6vw, 2.5rem); line-height: 1.18; letter-spacing: -0.035em; }
+    .section-copy { max-width: 780px; color: var(--muted); word-break: keep-all; }
+    .slide-jump-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: var(--emerald-soft);
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .slide-jump-pill:hover {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: var(--emerald);
+      color: #fff;
+    }
+
+    /* Cards & Grids */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+
+    .card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(22, 29, 42, 0.92), rgba(12, 16, 24, 0.94));
+    }
+    .card.emerald { border-color: rgba(16, 185, 129, 0.34); background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), rgba(12, 16, 24, 0.95)); }
+    .card.cyan { border-color: rgba(34, 211, 238, 0.34); background: linear-gradient(145deg, rgba(6, 182, 212, 0.1), rgba(12, 16, 24, 0.95)); }
+    .card.amber { border-color: rgba(245, 158, 11, 0.34); background: linear-gradient(145deg, rgba(245, 158, 11, 0.09), rgba(12, 16, 24, 0.95)); }
+    .card.danger { border-color: rgba(244, 63, 94, 0.36); background: linear-gradient(145deg, rgba(244, 63, 94, 0.1), rgba(12, 16, 24, 0.95)); }
+
+    .card h3 { font-size: 1.12rem; margin-bottom: 10px; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+    .card p { color: #cbd5e1; font-size: 0.9rem; }
+    .badge-num {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #34d399, var(--cyan));
+      color: #042f1e;
+      font: 900 0.76rem var(--mono);
+      flex-shrink: 0;
+    }
+
+    .check-list { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-top: 12px; }
+    .check-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      line-height: 1.55;
+    }
+    .check-list li::before {
+      content: '✓';
+      color: #34d399;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .check-list.danger-list li::before {
+      content: '✕';
+      color: var(--rose);
+    }
+
+    /* Code Block with Copy */
+    .code-box {
+      position: relative;
+      margin: 12px 0;
+      padding: 16px 70px 16px 18px;
+      border-radius: 13px;
+      background: #060a12;
+      border: 1px solid rgba(52, 211, 153, 0.22);
+      overflow-x: auto;
+    }
+    .code-box.danger-code { border-color: rgba(244, 63, 94, 0.35); }
+    .code-box code {
+      font: 0.82rem/1.68 var(--mono);
+      color: #d1fae5;
+      white-space: pre;
+      display: block;
+    }
+    .code-box.danger-code code { color: #fecdd3; }
+    .copy-code-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      font-size: 0.72rem;
+      font-weight: 750;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+    .copy-code-btn:hover { border-color: #34d399; color: #fff; }
+    .copy-code-btn.copied { background: #34d399; border-color: #34d399; color: #042f1e; }
+
+    /* Tables */
+    .arch-table-wrap {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(11, 16, 27, 0.85);
+    }
+    .arch-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .arch-table th, .arch-table td {
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      font-size: 0.88rem;
+    }
+    .arch-table th {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--emerald-soft);
+      font-size: 0.78rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .arch-table tr:last-child td { border-bottom: none; }
+    .arch-table code {
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #a7f3d0;
+      font: 700 0.8rem var(--mono);
+    }
+
+    /* Interactive 20-Chapter Roadmap Grid */
+    .chapter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .chapter-card {
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.78);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: left;
+    }
+    .chapter-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(52, 211, 153, 0.5);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    .chapter-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .chapter-no {
+      font: 900 0.74rem var(--mono);
+      color: #34d399;
+    }
+    .chapter-open-tag {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .chapter-card h4 {
+      font-size: 0.94rem;
+      color: #f8fafc;
+      margin-bottom: 4px;
+    }
+    .chapter-card p {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      line-height: 1.45;
+    }
+
+    /* CTA & Footer */
+    .cta { padding: 72px 0; text-align: center; }
+    .cta-box {
+      padding: 48px 28px;
+      border: 1px solid rgba(52, 211, 153, 0.32);
+      border-radius: 24px;
+      background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.16), transparent 45%), #0b121e;
+      box-shadow: var(--shadow);
+    }
+    .cta h2 { margin-bottom: 10px; font-size: clamp(1.8rem, 4vw, 2.7rem); }
+    .cta p { color: var(--muted); max-width: 680px; margin: 0 auto; }
+    .cta .actions { justify-content: center; }
+    footer { padding: 30px 20px; text-align: center; color: #71717a; border-top: 1px solid var(--line); font-size: 0.8rem; }
+
+    /* ==========================================================================
+       SLIDESHARE LAYER POPUP MODAL (#djangoSlideModal)
+       ========================================================================== */
+    .slideshare-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(4, 7, 13, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .slideshare-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .slideshare-player {
+      width: min(1420px, 100%);
+      height: min(92vh, 940px);
+      display: flex;
+      flex-direction: column;
+      background: #0b101b;
+      border: 1px solid rgba(52, 211, 153, 0.32);
+      border-radius: 22px;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.78), 0 0 40px rgba(16, 185, 129, 0.14);
+      overflow: hidden;
+      transform: translateY(14px) scale(0.985);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .slideshare-backdrop.active .slideshare-player {
+      transform: translateY(0) scale(1);
+    }
+    .slideshare-player:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      border: none;
+    }
+    .ss-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.96);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      flex-shrink: 0;
+    }
+    .ss-brand-group { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .ss-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      color: var(--emerald-soft);
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .ss-deck-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: #f8fafc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ss-top-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ss-select {
+      padding: 7px 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: #111827;
+      color: #e2e8f0;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      max-width: 270px;
+    }
+    .ss-tool-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: #cbd5e1;
+      font-size: 0.8rem;
+      font-weight: 750;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+    .ss-tool-btn:hover, .ss-tool-btn.active {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: rgba(52, 211, 153, 0.45);
+      color: #ffffff;
+    }
+    .ss-tool-btn.close-btn {
+      background: rgba(244, 63, 94, 0.14);
+      border-color: rgba(244, 63, 94, 0.35);
+      color: #fda4af;
+    }
+    .ss-tool-btn.close-btn:hover { background: rgba(244, 63, 94, 0.28); color: #ffffff; }
+
+    .ss-body {
+      position: relative;
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.07), transparent 35%),
+        radial-gradient(circle at 85% 80%, rgba(34, 211, 238, 0.07), transparent 35%),
+        #070b12;
+    }
+    .ss-toc-drawer {
+      width: 280px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(11, 16, 27, 0.96);
+      overflow-y: auto;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+      transition: margin-left 0.25s ease, opacity 0.25s ease;
+    }
+    .ss-toc-drawer.collapsed {
+      margin-left: -280px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .ss-toc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.02);
+      color: #94a3b8;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+    .ss-toc-item:hover { background: rgba(255, 255, 255, 0.06); color: #e2e8f0; }
+    .ss-toc-item.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(52, 211, 153, 0.42);
+      color: #ffffff;
+    }
+    .ss-toc-num {
+      display: inline-grid;
+      place-items: center;
+      min-width: 26px;
+      height: 24px;
+      padding: 0 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.07);
+      color: #34d399;
+      font: 800 0.72rem var(--mono);
+      flex-shrink: 0;
+    }
+    .ss-toc-item.active .ss-toc-num { background: #34d399; color: #042f1e; }
+    .ss-toc-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .ss-toc-text strong { font-size: 0.81rem; font-weight: 750; line-height: 1.3; color: inherit; }
+    .ss-toc-text span { font-size: 0.7rem; color: #64748b; }
+
+    .ss-stage {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px 64px;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .ss-nav-paddle {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 44px;
+      height: 68px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 23, 42, 0.82);
+      color: #e2e8f0;
+      font-size: 1.5rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s ease;
+    }
+    .ss-nav-paddle:hover:not(:disabled) {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: #34d399;
+      color: #ffffff;
+    }
+    .ss-nav-paddle:disabled { opacity: 0.25; cursor: not-allowed; }
+    .ss-nav-paddle.prev { left: 12px; }
+    .ss-nav-paddle.next { right: 12px; }
+
+    .ss-slide-viewport {
+      width: 100%;
+      height: 100%;
+      max-width: 1180px;
+      background: linear-gradient(165deg, #111827 0%, #0b111e 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .ss-slide {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+      padding: 32px 40px;
+      animation: ssFadeIn 0.22s ease;
+    }
+    .ss-slide.active { display: flex; }
+    @keyframes ssFadeIn {
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .slide-meta-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+    .slide-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #34d399;
+      font: 900 0.76rem var(--mono);
+      letter-spacing: 0.1em;
+    }
+    .slide-kicker span {
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(52, 211, 153, 0.32);
+      color: var(--emerald-soft);
+    }
+    .slide-page-tag { color: #64748b; font: 700 0.78rem var(--mono); }
+    .slide-headline {
+      font-size: clamp(1.5rem, 2.5vw, 2.15rem);
+      font-weight: 850;
+      line-height: 1.22;
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+    .slide-subcopy {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      max-width: 900px;
+      margin-bottom: 20px;
+    }
+
+    /* Bottom Progress Bar */
+    .ss-bottombar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.96);
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+      flex-shrink: 0;
+    }
+    .ss-progress-wrap { flex: 1; display: flex; align-items: center; gap: 12px; max-width: 540px; }
+    .ss-progress-track {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    .ss-progress-fill {
+      height: 100%;
+      width: 5%;
+      background: linear-gradient(90deg, #34d399, var(--cyan));
+      transition: width 0.22s ease;
+    }
+    .ss-counter { font: 800 0.8rem var(--mono); color: #cbd5e1; min-width: 68px; }
+    .ss-bottom-actions { display: flex; align-items: center; gap: 8px; }
+
+    @media (max-width: 980px) {
+      .hero-grid, .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .chapter-grid, .stats { grid-template-columns: repeat(2, 1fr); }
+      .ss-toc-drawer { position: absolute; left: 0; top: 0; bottom: 0; z-index: 20; box-shadow: 16px 0 40px rgba(0, 0, 0, 0.6); }
+      .ss-stage { padding: 14px 48px; }
+      .ss-slide { padding: 24px 22px; }
+    }
+    @media (max-width: 680px) {
+      .chapter-grid, .stats { grid-template-columns: 1fr; }
+      .slideshare-backdrop { padding: 0; }
+      .slideshare-player { height: 100vh; border-radius: 0; }
+      .ss-stage { padding: 10px; }
+      .ss-nav-paddle { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="../index.html" class="brand"><span class="brand-mark">DJ</span>대구 SW 랜딩 · Real Project 3</a>
+      <ul class="nav-links">
+        <li><a href="#overview">1. 개요·문제점</a></li>
+        <li><a href="#architecture">2. 목표 아키텍처</a></li>
+        <li><a href="#business-layer">3. Business 계층</a></li>
+        <li><a href="#cafe-example">4. 카페 주문 API</a></li>
+        <li><a href="#billing-module">5. 빌링·결제 확장</a></li>
+        <li><a href="#ai-spec">6. 테스트·AI 규격</a></li>
+        <li><a href="../index.html">← 과정 홈</a></li>
+        <li><button type="button" class="nav-cta" data-open-slides="0">📑 20강 슬라이드 열기</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">REAL PROJECT 03 · DJANGO LAYERED ARCHITECTURE</div>
+            <h1>백엔드 프레임워크 기본 구조를 넘어,<span>레이어드 아키텍처를 설계하다 ( Django 예시 )</span></h1>
+            <p class="hero-copy">
+              <strong>API·비즈니스 로직·데이터베이스·외부 결제 API</strong>를 책임별 계층으로 분리하고,
+              여러 개발자와 <strong>AI 개발 에이전트</strong>가 충돌 없이 일관된 위치에 코드를 작성할 수 있는
+              실무형 백엔드 아키텍처와 개발 규격을 완성합니다.
+            </p>
+            <div class="actions">
+              <button type="button" class="button primary" data-open-slides="0">📑 전체 20강 슬라이드 쉐어 시작 →</button>
+              <a href="#cafe-example" class="button secondary">☕ 카페 주문 API 사례 보기</a>
+              <a href="#billing-module" class="button secondary">💳 빌링·결제 Adapter 설계</a>
+              <a href="#ai-spec" class="button secondary">🤖 AI 개발 규격 &amp; 배치표</a>
+            </div>
+          </div>
+
+          <div class="arch-terminal" data-open-slides="4" role="button" tabindex="0" title="클릭하여 의존성 방향 슬라이드 열기">
+            <div class="terminal-bar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="terminal-title">dependency-flow.py (클릭하여 슬라이드 열기)</span>
+            </div>
+            <div class="arch-stack-body">
+              <div class="arch-layer-pill l-api">
+                <strong>apps / API (View · Serializer)</strong>
+                <span>HTTP 요청 검증 · Workflow 호출</span>
+              </div>
+              <div class="arch-arrow-down">↓ calls</div>
+              <div class="arch-layer-pill l-wf">
+                <strong>business / Workflow</strong>
+                <span>유스케이스 전체 처리 순서 조율</span>
+              </div>
+              <div class="arch-arrow-down">↓ orchestrates</div>
+              <div class="arch-layer-pill l-biz">
+                <strong>business / Rule · Policy · Calculator</strong>
+                <span>순수 업무 규칙 · 정책 결정 · 금액 계산 (Django 비의존)</span>
+              </div>
+              <div class="arch-arrow-down">↓ depends on interface ↑ implements</div>
+              <div class="arch-layer-pill l-port">
+                <strong>business / Port (Protocol)</strong>
+                <span>OrderRepository · PaymentGateway 인터페이스</span>
+              </div>
+              <div class="arch-arrow-down">↑ implements</div>
+              <div class="arch-layer-pill l-infra">
+                <strong>infrastructure / Repository · Adapter</strong>
+                <span>Django ORM · Toss 결제 API · Outbox 구현체</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><strong>20 Chapters</strong><span>이론부터 결제·AI 규격까지 완주</span></div>
+          <div class="stat"><strong>5대 핵심 계층</strong><span>config · apps · business · infra · tests</span></div>
+          <div class="stat"><strong>2대 실전 도메인</strong><span>카페 주문 API + 빌링·결제 모듈</span></div>
+          <div class="stat"><strong>12-Step AI 규격</strong><span>AI 에이전트 일관성 보장 표준</span></div>
+        </div>
+
+        <!-- 20-Chapter Quick Slide Launcher -->
+        <div style="margin-top: 36px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <span class="section-kicker">INTERACTIVE 20-SLIDE DECK · CLICK TO OPEN</span>
+            <span style="font-size: 0.8rem; color: #94a3b8;">카드를 클릭하면 해당 챕터 슬라이드가 즉시 열립니다</span>
+          </div>
+          <div class="chapter-grid" id="chapterQuickGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1~3: 강의 개요 & 왜 필요한가 & Django 기본 구조 -->
+    <section class="content-section" id="overview">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <div class="section-kicker">CHAPTER 01 – 03 · OVERVIEW &amp; PROBLEM STATEMENT</div>
+            <h2 class="section-title">1. 강의 개요 및 왜 레이어드 아키텍처가 필요한가?</h2>
+            <p class="section-copy">Django의 빠른 생산성을 유지하면서 서비스 규모 확장에 따른 Fat View·중복 규칙·테스트 불가·AI 코드 파편화 문제를 해결합니다.</p>
+          </div>
+          <button type="button" class="slide-jump-pill" data-open-slides="0">📑 Ch 01~03 슬라이드 보기 ↗</button>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 24px;">
+          <div class="card emerald">
+            <h3><span class="badge-num">01</span> 강의 주제: 6대 핵심 설계 요구사항</h3>
+            <p>Django의 기본 구조를 확장하여 다음 요구사항을 만족하는 레이어드 아키텍처를 설계합니다.</p>
+            <ul class="check-list">
+              <li><strong>API와 비즈니스 로직 분리</strong> — View가 모든 일을 처리하지 않도록 분리</li>
+              <li><strong>데이터베이스 접근 로직 분리</strong> — ORM 쿼리를 Repository 뒤에 캡슐화</li>
+              <li><strong>자주 변경되는 업무 규칙의 라이브러리화</strong> — Rule·Policy·Calculator 모듈화</li>
+              <li><strong>여러 개발자가 동시에 작업하기 쉬운 구조</strong> — 파일 단위 책임 분리로 Git 충돌 최소화</li>
+              <li><strong>외부 결제 API와 서드파티 연동 구조화</strong> — Port &amp; Adapter 기반 느슨한 결합</li>
+              <li><strong>AI 개발 에이전트가 일관되게 코드를 작성할 수 있는 개발 규격 수립</strong></li>
+            </ul>
+          </div>
+
+          <div class="card cyan">
+            <h3><span class="badge-num">02</span> 7대 학습 목표</h3>
+            <p>수강생은 강의가 끝난 후 다음 내용을 설명하고 직접 구현할 수 있어야 합니다.</p>
+            <ul class="check-list">
+              <li><strong>1.</strong> Django 기본 구조(<code>models.py</code>, <code>views.py</code> 비대화)의 한계를 이해한다.</li>
+              <li><strong>2.</strong> Model, API, Business, Infrastructure 계층을 구분한다.</li>
+              <li><strong>3.</strong> <code>Rule</code>, <code>Policy</code>, <code>Calculator</code>, <code>Workflow</code>의 역할을 구분한다.</li>
+              <li><strong>4.</strong> <code>Repository</code>와 <code>Port</code>를 이용해 DB와 외부 시스템 의존성을 분리한다.</li>
+              <li><strong>5.</strong> 카페 주문 API를 레이어드 아키텍처로 구현한다.</li>
+              <li><strong>6.</strong> 외부 결제사를 <code>Adapter</code> 형태로 추가한다.</li>
+              <li><strong>7.</strong> AI가 따라야 할 프로젝트 개발 규격을 작성한다.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card danger">
+            <h3>⚠️ 안티패턴: 하나의 View가 너무 많은 일을 처리하는 코드 (Ch 02)</h3>
+            <p>HTTP 요청 처리, DB 조회, 판매 가능 판단, 금액 계산, 주문 저장, 외부 결제 호출이 한 View에 뒤섞인 구조입니다.</p>
+            <div class="code-box danger-code">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>class OrderCreateView(APIView):
+    def post(self, request):
+        menu = Menu.objects.get(id=request.data["menu_id"])
+
+        if not menu.is_available:
+            raise ValidationError("판매 중인 메뉴가 아닙니다.")
+
+        total_price = menu.price * request.data["quantity"]
+
+        order = Order.objects.create(
+            user=request.user,
+            total_price=total_price,
+        )
+
+        PaymentAPI.confirm(...)
+
+        return Response({"order_id": order.id})</code>
+            </div>
+            <ul class="check-list danger-list">
+              <li>같은 업무 규칙이 여러 API에 중복된다.</li>
+              <li>비즈니스 로직을 DB 없이 단위 테스트하기 어렵다.</li>
+              <li>여러 개발자가 같은 파일을 동시에 수정하며 충돌한다.</li>
+              <li>외부 API 변경이 전체 서비스에 영향을 준다.</li>
+              <li>AI가 코드를 작성할 위치를 일관되게 판단하기 어렵다.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>📁 Django 기본 구조와 파일 비대화 문제 (Ch 03)</h3>
+            <p>작은 프로젝트에서는 충분하지만 기능이 커지면 <code>models.py</code>, <code>views.py</code>, <code>serializers.py</code>, <code>tests.py</code>가 수천 줄로 비대해집니다.</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>backend/
+├── manage.py
+├── config/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+└── cafe/
+    ├── migrations/
+    ├── admin.py
+    ├── apps.py
+    ├── models.py        # ⚠️ 수천 줄로 비대화
+    ├── serializers.py   # ⚠️ 검증 + 비즈니스 혼재
+    ├── tests.py         # ⚠️ 느린 DB 의존 테스트
+    └── views.py         # ⚠️ HTTP + 쿼리 + 결제 혼재</code>
+            </div>
+            <p style="margin-top: 10px; color: var(--emerald-soft); font-weight: 700;">
+              💡 해결책: Django 앱 내부 파일을 책임에 따라 나누고, 순수 <code>business</code> 계층과 <code>infrastructure</code> 계층을 추가합니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4~5: 목표 아키텍처 & 의존성 방향 -->
+    <section class="content-section alt" id="architecture">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <div class="section-kicker">CHAPTER 04 – 05 · TARGET ARCHITECTURE &amp; DEPENDENCY RULE</div>
+            <h2 class="section-title">2. 목표 아키텍처와 단방향 의존성 원칙</h2>
+            <p class="section-copy">5대 최상위 디렉터리로 책임을 분리하고, Business 계층이 Django ORM이나 외부 API에 직접 의존하지 않도록 Port 인터페이스를 경계로 세웁니다.</p>
+          </div>
+          <button type="button" class="slide-jump-pill" data-open-slides="3">📑 Ch 04~05 슬라이드 보기 ↗</button>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 22px;">
+          <div class="card">
+            <h3>🏗️ 4.1 목표 아키텍처 전체 디렉터리 구조</h3>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>backend/
+├── manage.py
+├── pyproject.toml
+├── config/                       # Django 전역 설정
+├── apps/                         # Django와 HTTP 계층
+│   ├── cafe/
+│   └── billing/
+├── business/                     # 순수 비즈니스 로직 (Django import 금지)
+│   ├── core/
+│   ├── cafe/
+│   └── billing/
+├── infrastructure/               # DB 및 외부 시스템 구현 (Port 구현체)
+│   ├── repositories/
+│   ├── transactions/
+│   ├── payment_gateways/
+│   ├── notifications/
+│   └── outbox/
+└── tests/                        # 3단계 테스트 스위트
+    ├── unit/
+    ├── integration/
+    └── contract/</code>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>📋 4.2 계층별 핵심 책임</h3>
+            <div class="arch-table-wrap" style="margin-top: 10px;">
+              <table class="arch-table">
+                <thead>
+                  <tr><th>계층</th><th>책임</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>config</code></td><td>Django 프로젝트 전체 설정 (settings, urls, wsgi/asgi)</td></tr>
+                  <tr><td><code>apps</code></td><td>HTTP 요청/응답(DRF API), Django Model 정의, 관리자(Admin) 및 <code>container.py</code></td></tr>
+                  <tr><td><code>business</code></td><td>순수 업무 규칙(Rule), 정책(Policy), 계산(Calculator), 처리 절차(Workflow), 인터페이스(Port)</td></tr>
+                  <tr><td><code>infrastructure</code></td><td>Django ORM Repository, 트랜잭션(UoW), 외부 결제 API Adapter, 메시지/이메일, Outbox</td></tr>
+                  <tr><td><code>tests</code></td><td>단위(Unit, DB 무관) · 통합(Integration, DB/ORM) · 계약(Contract, 외부 Adapter) 테스트</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top: 16px; padding: 14px 16px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
+              <strong style="color: var(--emerald-soft); font-size: 0.88rem;">🧭 5. 핵심 의존성 원칙</strong>
+              <p style="font-size: 0.84rem; color: #e2e8f0; margin-top: 4px;">
+                API → Workflow → Rule·Policy·Calculator → <strong>Port</strong> ← Infrastructure Adapter → DB / External API.<br>
+                <strong>Business 계층은 Django와 DRF를 절대 import하지 않습니다.</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card danger">
+            <h3>🚫 금지되는 의존성 (Business에서 ORM 직접 호출)</h3>
+            <div class="code-box danger-code">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code># ❌ business 계층에서 절대 금지!
+from django.db import transaction
+from apps.cafe.models import Order
+
+Order.objects.create(...)</code>
+            </div>
+          </div>
+          <div class="card emerald">
+            <h3>✅ 허용되는 의존성 (Port 인터페이스 주입)</h3>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code># ✅ Workflow는 어떤 DB를 사용하는지 알지 못한다
+class CreateOrderWorkflow:
+    def __init__(self, order_repository: OrderRepository):
+        self.order_repository = order_repository</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: Business 계층의 세부 구조 -->
+    <section class="content-section" id="business-layer">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <div class="section-kicker">CHAPTER 06 · PURE BUSINESS LAYER COMPONENTS</div>
+            <h2 class="section-title">3. Business 계층의 6대 구성요소</h2>
+            <p class="section-copy"><code>business/cafe/</code> 내부는 <code>dto</code>, <code>rules</code>, <code>policies</code>, <code>calculators</code>, <code>workflows</code>, <code>ports</code>로 세분화되어 각자의 단일 책임을 수행합니다.</p>
+          </div>
+          <button type="button" class="slide-jump-pill" data-open-slides="5">📑 Ch 06 슬라이드 보기 ↗</button>
+        </div>
+
+        <div class="grid-2">
+          <!-- 6.1 DTO -->
+          <div class="card">
+            <h3><span class="badge-num">6.1</span> DTO (Data Transfer Object)</h3>
+            <p>계층 사이에서 데이터를 전달하는 불변 객체입니다. <strong>DTO에는 Django Model을 사용하지 않습니다.</strong></p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class OrderItemCommand:
+    menu_id: int
+    quantity: int
+
+@dataclass(frozen=True)
+class CreateOrderCommand:
+    customer_id: int
+    items: tuple[OrderItemCommand, ...]</code>
+            </div>
+          </div>
+
+          <!-- 6.2 Rule -->
+          <div class="card">
+            <h3><span class="badge-num">6.2</span> Rule (단일 조건 판단)</h3>
+            <p>하나의 업무 조건만 판단합니다 (예: 주문 수량, 판매 중 여부, 주문 가능 시간, 할인 대상 여부).</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>class OrderQuantityRule:
+    def evaluate(self, quantity: int) -> RuleResult:
+        if quantity < 1:
+            return RuleResult.reject(
+                code="INVALID_QUANTITY",
+                message="주문 수량은 1개 이상이어야 합니다.",
+            )
+
+        return RuleResult.accept()</code>
+            </div>
+          </div>
+
+          <!-- 6.3 Policy -->
+          <div class="card">
+            <h3><span class="badge-num">6.3</span> Policy (복합 규칙 결정)</h3>
+            <p>여러 Rule을 조합해 최종 결정을 내립니다 (예: 주문 접수 정책, 취소 정책, 할인 정책, 환불 정책).</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>class OrderAcceptancePolicy:
+    def __init__(self, rules):
+        self.rules = rules
+
+    def evaluate(self, context):
+        for rule in self.rules:
+            result = rule.evaluate(context)
+            if not result.passed:
+                return result
+
+        return RuleResult.accept()</code>
+            </div>
+          </div>
+
+          <!-- 6.4 Calculator -->
+          <div class="card">
+            <h3><span class="badge-num">6.4</span> Calculator (순수 계산기)</h3>
+            <p>같은 입력에 항상 같은 결과를 반환하며, DB/외부 API를 호출하지 않고 금액 계산에 <code>float</code>를 쓰지 않습니다.</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>class OrderPriceCalculator:
+    def calculate(self, items):
+        return sum(
+            item.unit_price * item.quantity
+            for item in items
+        )</code>
+            </div>
+          </div>
+
+          <!-- 6.5 Workflow -->
+          <div class="card emerald">
+            <h3><span class="badge-num">6.5</span> Workflow (유스케이스 절차 조율)</h3>
+            <p>하나의 유스케이스에 필요한 전체 처리 순서를 관리하며, 직접 계산·판단하기보다 Rule, Policy, Calculator를 조합합니다.</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>class CreateOrderWorkflow:
+    def __init__(
+        self,
+        menu_repository,
+        order_repository,
+        acceptance_policy,
+        price_calculator,
+        unit_of_work,
+    ):
+        self.menu_repository = menu_repository
+        self.order_repository = order_repository
+        self.acceptance_policy = acceptance_policy
+        self.price_calculator = price_calculator
+        self.unit_of_work = unit_of_work
+
+    def execute(self, command):
+        menus = self.menu_repository.get_available_menus(
+            menu_ids=[item.menu_id for item in command.items]
+        )
+        self.acceptance_policy.validate(menus=menus, items=command.items)
+        total_price = self.price_calculator.calculate(items=command.items, menus=menus)
+
+        with self.unit_of_work:
+            return self.order_repository.create_order(
+                customer_id=command.customer_id,
+                items=command.items,
+                total_price=total_price,
+            )</code>
+            </div>
+          </div>
+
+          <!-- 6.6 Port -->
+          <div class="card cyan">
+            <h3><span class="badge-num">6.6</span> Port (외부 기능 인터페이스)</h3>
+            <p>Business 계층이 외부 계층에 요구하는 기능의 <code>Protocol</code> 인터페이스입니다. 실제 구현은 <code>infrastructure</code>에 둡니다.</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>from typing import Protocol
+
+
+class OrderRepository(Protocol):
+    def create_order(self, order_data):
+        ...
+
+    def get_order(self, order_id: int):
+        ...</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 7~8: 카페 주문 API 적용 사례 & 의존성 조립 -->
+    <section class="content-section alt" id="cafe-example">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <div class="section-kicker">CHAPTER 07 – 08 · CAFE ORDER API &amp; DEPENDENCY INJECTION</div>
+            <h2 class="section-title">4. 실전 적용 사례 1: 카페 주문 API &amp; 의존성 조립</h2>
+            <p class="section-copy">7단계 주문 요구사항을 폴더 구조와 파이프라인으로 매핑하고, <code>container.py</code>에서 구현체를 주입(DI)합니다.</p>
+          </div>
+          <button type="button" class="slide-jump-pill" data-open-slides="6">📑 Ch 07~08 슬라이드 보기 ↗</button>
+        </div>
+
+        <div class="grid-3" style="margin-bottom: 20px;">
+          <div class="card">
+            <h3>☕ 7.1 요구사항 &amp; 7.3 처리 흐름</h3>
+            <ol style="padding-left: 18px; color: #e2e8f0; font-size: 0.88rem; line-height: 1.8;">
+              <li>요청 데이터 검증 (<code>CreateOrderSerializer</code>)</li>
+              <li><code>CreateOrderCommand</code> DTO 생성</li>
+              <li>메뉴 조회 (<code>MenuRepository</code>)</li>
+              <li>판매 가능 여부 + 수량 검증 (<code>OrderAcceptancePolicy</code>)</li>
+              <li>총금액 계산 (<code>OrderPriceCalculator</code>)</li>
+              <li>주문·항목 트랜잭션 저장 (<code>OrderRepository</code>)</li>
+              <li>주문 결과 반환 (<code>201 Created</code>)</li>
+            </ol>
+            <div class="code-box" style="margin-top: 12px;">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>// POST /api/v1/cafe/orders 요청
+{
+  "items": [
+    { "menu_id": 1, "quantity": 2 },
+    { "menu_id": 3, "quantity": 1 }
+  ]
+}
+
+// 응답
+{
+  "order_id": 1042,
+  "status": "RECEIVED",
+  "total_price": 13500
+}</code>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>📂 7.2 카페 도메인 폴더 구조</h3>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>apps/cafe/
+├── models/ (menu.py, order.py, order_item.py)
+├── api/ (serializers.py, views.py, urls.py)
+└── container.py
+
+business/cafe/
+├── dto/ (order_command.py, order_result.py)
+├── rules/ (menu_available_rule.py, order_quantity_rule.py)
+├── policies/ (order_acceptance_policy.py)
+├── calculators/ (order_price_calculator.py)
+├── workflows/ (create_order_workflow.py)
+└── ports/ (menu_repository.py, order_repository.py, unit_of_work.py)
+
+infrastructure/
+├── repositories/ (django_menu_repository.py, django_order_repository.py)
+└── transactions/ (django_unit_of_work.py)</code>
+            </div>
+          </div>
+
+          <div class="card emerald">
+            <h3>🧩 8. 의존성 조립 (container.py)</h3>
+            <p>Workflow 내부에서 <code>DjangoOrderRepository()</code>를 직접 생성하지 않고 <code>container.py</code>에서 조립합니다.</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code># apps/cafe/container.py
+def create_order_workflow() -> CreateOrderWorkflow:
+    return CreateOrderWorkflow(
+        menu_repository=DjangoMenuRepository(),
+        order_repository=DjangoOrderRepository(),
+        acceptance_policy=OrderAcceptancePolicy(...),
+        price_calculator=OrderPriceCalculator(),
+        unit_of_work=DjangoUnitOfWork(),
+    )</code>
+            </div>
+            <ul class="check-list">
+              <li>단위 테스트에서 <code>FakeRepository</code> 즉시 주입 가능</li>
+              <li>DB 및 외부 API 구현체 교체 용이</li>
+              <li>Workflow가 기술 세부사항에 종속되지 않음</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 9~16: 빌링·결제 모듈 확장 -->
+    <section class="content-section" id="billing-module">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <div class="section-kicker">CHAPTER 09 – 16 · BILLING, PORT &amp; ADAPTER, IDEMPOTENCY, WEBHOOK &amp; OUTBOX</div>
+            <h2 class="section-title">5. 실전 적용 사례 2: 빌링·결제 모듈 아키텍처 확장</h2>
+            <p class="section-copy">외부 결제사 연동, 네트워크 Timeout, 중복 승인 방지(Idempotency), 웹훅 검증, Outbox 이벤트 발행을 Port &amp; Adapter 패턴으로 격리합니다.</p>
+          </div>
+          <button type="button" class="slide-jump-pill" data-open-slides="8">📑 Ch 09~16 슬라이드 보기 ↗</button>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 20px;">
+          <div class="card cyan">
+            <h3>🔌 10. PaymentGateway Port &amp; Toss Adapter</h3>
+            <p>Business 계층은 Toss라는 이름이나 응답 형식을 전혀 알지 못하며 오직 <code>PaymentGateway</code> Protocol만 바라봅니다.</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>class PaymentGateway(Protocol):
+    provider_code: str
+    def confirm(self, command) -> PaymentResult: ...
+    def get_payment(self, provider_payment_id) -> PaymentResult: ...
+    def cancel(self, command) -> RefundResult: ...
+    def verify_webhook(self, raw_body, headers) -> bool: ...
+
+class TossPaymentGateway:
+    provider_code = "TOSS"
+    def __init__(self, client, mapper):
+        self.client = client
+        self.mapper = mapper
+
+    def confirm(self, command):
+        response = self.client.confirm_payment(
+            payment_key=command.payment_key,
+            order_id=command.order_id,
+            amount=command.amount,
+        )
+        return self.mapper.to_payment_result(response)</code>
+            </div>
+            <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 6px;">
+              📌 Adapter 내부 6대 파일: <code>adapter.py</code> · <code>client.py</code> · <code>mapper.py</code> · <code>schemas.py</code> · <code>signature.py</code> · <code>exceptions.py</code>
+            </p>
+          </div>
+
+          <div class="card emerald">
+            <h3>🗂️ 11. 결제사 Registry &amp; 12. 상태 전이 머신</h3>
+            <p><code>if provider == "TOSS":</code> 분기문 대신 <code>PaymentGatewayRegistry</code>로 결제사를 선택하여, 신규 결제사 추가 시 기존 Workflow 수정이 0줄입니다.</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>class PaymentGatewayRegistry:
+    def __init__(self, gateways):
+        self._gateways = {g.provider_code: g for g in gateways}
+
+    def get(self, provider_code):
+        return self._gateways[provider_code]</code>
+            </div>
+            <div style="margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); font-size: 0.83rem;">
+              <strong style="color: #34d399;">✅ 허용 상태 전이:</strong> <code>READY → PENDING → PAID / FAILED</code>, <code>PAID → PARTIAL_REFUND → REFUNDED</code>, <code>PAID → CANCELLED</code><br>
+              <strong style="color: var(--rose);">🚫 금지 상태 전이:</strong> <code>FAILED → REFUNDED</code>, <code>READY → CANCELLED</code>, <code>REFUNDED → PAID</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="card">
+            <h3>⚡ 13. 승인 트랜잭션 분리</h3>
+            <p>외부 API 호출 중에는 DB 트랜잭션을 물고 있지 않습니다.</p>
+            <ul class="check-list">
+              <li>짧은 TX 1: <code>PENDING</code> 변경</li>
+              <li>TX 외부: 결제사 승인 API 호출</li>
+              <li>짧은 TX 2: 결제 결과 + Outbox 저장</li>
+              <li>Timeout 시 즉시 실패 확정 금지 (조회/웹훅 확인)</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>🛡️ 14. 멱등성 (Idempotency)</h3>
+            <p>네트워크 재전송으로 인한 중복 결제를 원천 차단합니다.</p>
+            <ul class="check-list">
+              <li><code>Idempotency-Key</code> 헤더 필수</li>
+              <li>동일 Key + 동일 요청 → 기존 결과 반환</li>
+              <li>동일 Key + 다른 금액 → <code>409 Conflict</code></li>
+              <li><code>provider_payment_id</code> Unique 제약</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>🔔 15. 웹훅(Webhook) 원칙</h3>
+            <p>중복 수신과 이벤트 순서 역전에 안전해야 합니다.</p>
+            <ul class="check-list">
+              <li>Raw Body로 서명(Signature) 검증</li>
+              <li>외부 <code>event_id</code> Unique 제약</li>
+              <li>과거 이벤트가 최신 상태를 덮어쓰지 못하게 방어</li>
+              <li>실패 이벤트 재처리 가능 구조</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>📦 16. Outbox 패턴</h3>
+            <p>후속 작업 장애가 결제 승인을 롤백시키지 않도록 분리합니다.</p>
+            <ul class="check-list">
+              <li><code>Payment</code> 저장과 <code>PAYMENT_COMPLETED</code> Outbox 이벤트를 동일 TX에 저장</li>
+              <li>Commit 후 Outbox Publisher가 주문 상태 변경·영수증·알림 비동기 발행</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 17~20: 테스트 전략, AI 개발 규격, 파일 배치 판단법, 핵심 정리 -->
+    <section class="content-section alt" id="ai-spec">
+      <div class="container">
+        <div class="section-header-row">
+          <div>
+            <div class="section-kicker">CHAPTER 17 – 20 · TEST STRATEGY, AI SPEC &amp; FILE PLACEMENT</div>
+            <h2 class="section-title">6. 3단계 테스트 전략 · AI 개발 규격 · 파일 배치 판단법</h2>
+            <p class="section-copy">AI 에이전트가 어디에 어떤 코드를 작성하고 어떻게 검증해야 하는지 명확한 규칙과 매트릭스로 정의합니다.</p>
+          </div>
+          <button type="button" class="slide-jump-pill" data-open-slides="16">📑 Ch 17~20 슬라이드 보기 ↗</button>
+        </div>
+
+        <div class="grid-3" style="margin-bottom: 22px;">
+          <div class="card">
+            <h3>🧪 17.1 단위 테스트 (Unit)</h3>
+            <p><code>tests/unit/business/</code> — <strong>DB 없이</strong> 순수 Business 계층을 밀리초 단위로 검증합니다.</p>
+            <ul class="check-list">
+              <li>주문 수량·판매 가능 여부·총액 계산</li>
+              <li>결제 상태 전이·부분 환불 한도</li>
+              <li>중복 결제·Timeout·역순 웹훅 처리</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>🔗 17.2 통합 테스트 (Integration)</h3>
+            <p><code>tests/integration/</code> — 실제 Django 모델, 트랜잭션, DB 제약조건을 검증합니다.</p>
+            <ul class="check-list">
+              <li>주문 + 주문 항목 원자적 저장 및 Rollback</li>
+              <li>결제 + 결제 시도 이력 + Outbox 동시 저장</li>
+              <li>웹훅 중복 이벤트 1회 처리 보장</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>📜 17.3 Adapter 계약 테스트 (Contract)</h3>
+            <p><code>tests/contract/payment_gateways/</code> — 모든 결제사 Adapter가 동일한 규격을 지키는지 검증합니다.</p>
+            <ul class="check-list">
+              <li>승인 성공/거절 DTO 변환 일관성</li>
+              <li>Timeout·알 수 없는 응답 예외 분류</li>
+              <li>웹훅 서명 검증 및 상태 매핑</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 22px;">
+          <div class="card emerald">
+            <h3>🤖 18. AI 개발 에이전트 12단계 구현 순서</h3>
+            <ol style="padding-left: 20px; color: #e2e8f0; font-size: 0.89rem; line-height: 1.78;">
+              <li>기존 프로젝트 규격을 읽는다.</li>
+              <li>관련 도메인의 기존 코드를 검색한다.</li>
+              <li><code>DTO</code>와 오류 코드를 정의한다.</li>
+              <li><code>Rule</code>, <code>Policy</code>, <code>Calculator</code>를 구현한다.</li>
+              <li><strong>단위 테스트(Unit Test)</strong>를 작성한다.</li>
+              <li><code>Port</code> 인터페이스를 정의한다.</li>
+              <li><code>Workflow</code>를 구현한다.</li>
+              <li>Django <code>Model</code>과 <code>Migration</code>을 작성한다.</li>
+              <li><code>Repository</code> 또는 <code>Adapter</code>를 구현한다.</li>
+              <li><code>API (Serializer · View · URL)</code>를 구현한다.</li>
+              <li><code>container.py</code>에서 의존성을 조립한다.</li>
+              <li>전체 테스트와 정적 검사를 실행한다.</li>
+            </ol>
+          </div>
+
+          <div class="card danger">
+            <h3>⛔ 18. AI가 절대 하지 않아야 하는 9대 금지 작업</h3>
+            <ul class="check-list danger-list">
+              <li>View에 복잡한 비즈니스 로직 작성</li>
+              <li>Business 계층에서 Django ORM 직접 사용</li>
+              <li>기존 공통 Rule을 확인하지 않고 코드 복제</li>
+              <li>결제사 원본 응답을 API에 그대로 반환</li>
+              <li>실패 테스트 없이 임시 조건문으로 버그 수정</li>
+              <li>기존 Migration 파일 임의 변경</li>
+              <li>결제 Secret Key를 코드에 하드코딩</li>
+              <li>요청받지 않은 대규모 리팩터링 수행</li>
+              <li>실행하지 않은 테스트를 통과했다고 거짓 보고</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Chapter 19 & 20 -->
+        <div class="grid-2">
+          <div class="card">
+            <h3>🧭 19. 파일 배치 판단법 매트릭스</h3>
+            <p style="margin-bottom: 10px; color: var(--emerald-soft); font-weight: 700;">
+              질문: “이 코드는 Django와 DB가 없어도 실행할 수 있는 업무 규칙인가?” → Yes면 무조건 <code>business/</code>!
+            </p>
+            <div class="arch-table-wrap">
+              <table class="arch-table">
+                <thead>
+                  <tr><th>코드 종류</th><th>작성 위치</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>DB 테이블 정의</td><td><code>apps/&lt;domain&gt;/models</code></td></tr>
+                  <tr><td>요청·응답 검증 (HTTP)</td><td><code>apps/&lt;domain&gt;/api</code></td></tr>
+                  <tr><td>단일 업무 조건</td><td><code>business/&lt;domain&gt;/rules</code></td></tr>
+                  <tr><td>여러 조건의 조합</td><td><code>business/&lt;domain&gt;/policies</code></td></tr>
+                  <tr><td>금액·점수·기간 계산</td><td><code>business/&lt;domain&gt;/calculators</code></td></tr>
+                  <tr><td>업무 처리 절차</td><td><code>business/&lt;domain&gt;/workflows</code></td></tr>
+                  <tr><td>외부 기능 인터페이스</td><td><code>business/&lt;domain&gt;/ports</code></td></tr>
+                  <tr><td>Django ORM 구현</td><td><code>infrastructure/repositories</code></td></tr>
+                  <tr><td>특정 결제사 구현</td><td><code>infrastructure/payment_gateways</code></td></tr>
+                  <tr><td>의존성 조립</td><td><code>apps/&lt;domain&gt;/container.py</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card cyan">
+            <h3>🎯 20. 강의 핵심 정리: 변경의 영향을 가두는 구조</h3>
+            <p>레이어드 아키텍처의 목적은 폴더를 많이 만드는 것이 아니라, <strong>변경의 영향을 특정 영역에 제한</strong>하는 것입니다.</p>
+            <div class="code-box">
+              <button type="button" class="copy-code-btn">복사</button>
+              <code>API 스펙 변경        → apps/api만 변경
+업무 규칙 변경        → business/rules 또는 policies만 변경
+금액 계산 공식 변경   → business/calculators만 변경
+DB 접근 방식 변경     → infrastructure/repositories만 변경
+외부 결제사 추가/변경 → infrastructure/payment_gateways adapter만 변경</code>
+            </div>
+            <h4 style="margin: 14px 0 8px; color: #fff; font-size: 0.96rem;">🔥 반드시 기억할 5대 핵심 원칙</h4>
+            <ul class="check-list">
+              <li><strong>1.</strong> View는 요청을 받고 Workflow를 호출한다.</li>
+              <li><strong>2.</strong> Workflow는 업무 처리 순서를 관리한다.</li>
+              <li><strong>3.</strong> Rule, Policy, Calculator는 순수 비즈니스 로직을 담당한다.</li>
+              <li><strong>4.</strong> DB와 외부 시스템은 Port와 Adapter를 통해 연결한다.</li>
+              <li><strong>5.</strong> Business 계층은 Django와 특정 외부 서비스에 의존하지 않는다.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTTOM CTA -->
+    <section class="cta">
+      <div class="container">
+        <div class="cta-box">
+          <div class="section-kicker" style="margin-bottom: 8px;">READY TO ARCHITECT WITH AI</div>
+          <h2>20강 슬라이드 쉐어로 전체 설계 과정을 복습하세요</h2>
+          <p>강의안의 1장부터 20장까지 모든 코드와 아키텍처 다이어그램을 슬라이드 쉐어 레이어팝업에서 한눈에 넘겨보며 실습할 수 있습니다.</p>
+          <div class="actions">
+            <button type="button" class="button primary" data-open-slides="0">📑 Real Project 3 슬라이드 쉐어 열기 →</button>
+            <a href="../index.html" class="button secondary">← LMS 과정 홈으로 돌아가기</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      Copyright ⓒ Eduniety Lab. All Rights Reserved. · 대구 SW 랜딩 Real Project 3 (Django Layered Architecture)
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       SLIDESHARE LAYER POPUP MODAL (20 SLIDES)
+       ========================================================================== -->
+  <div class="slideshare-backdrop" id="djangoSlideModal" role="dialog" aria-modal="true" aria-labelledby="ssModalTitle">
+    <div class="slideshare-player" id="djangoSlidePlayer">
+      <div class="ss-topbar">
+        <div class="ss-brand-group">
+          <span class="ss-badge">REAL PROJECT 3 · SLIDESHARE</span>
+          <span class="ss-deck-title" id="ssModalTitle">Django 레이어드 아키텍처 설계 강의안 (전 20강)</span>
+        </div>
+        <div class="ss-top-controls">
+          <button type="button" class="ss-tool-btn active" id="ssToggleTocBtn">☰ 목차</button>
+          <select class="ss-select" id="ssSlideSelect" aria-label="슬라이드 바로 이동"></select>
+          <button type="button" class="ss-tool-btn" id="ssFullscreenBtn">⛶ 전체화면</button>
+          <button type="button" class="ss-tool-btn close-btn" id="ssCloseBtn">✕ 닫기 (ESC)</button>
+        </div>
+      </div>
+
+      <div class="ss-body">
+        <aside class="ss-toc-drawer" id="ssTocDrawer"></aside>
+        <div class="ss-stage">
+          <button type="button" class="ss-nav-paddle prev" id="ssPaddlePrev" aria-label="이전 슬라이드">‹</button>
+          <div class="ss-slide-viewport" id="ssSlideViewport"></div>
+          <button type="button" class="ss-nav-paddle next" id="ssPaddleNext" aria-label="다음 슬라이드">›</button>
+        </div>
+      </div>
+
+      <div class="ss-bottombar">
+        <div class="ss-progress-wrap">
+          <span class="ss-counter" id="ssCounterText">01 / 20</span>
+          <div class="ss-progress-track">
+            <div class="ss-progress-fill" id="ssProgressFill"></div>
+          </div>
+        </div>
+        <div class="ss-bottom-actions">
+          <button type="button" class="ss-tool-btn" id="ssBottomPrev">‹ 이전</button>
+          <button type="button" class="ss-tool-btn" id="ssBottomNext">다음 ›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const SLIDES = [
+        {
+          no: "01",
+          kicker: "CHAPTER 01 · LECTURE OVERVIEW",
+          title: "강의 개요 및 7대 학습 목표",
+          sub: "Django의 기본 구조를 확장하여 팀 협업과 AI 에이전트 개발에 최적화된 레이어드 아키텍처를 설계합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card emerald">
+                <h3>🎯 6대 핵심 설계 요구사항</h3>
+                <ul class="check-list">
+                  <li>API와 비즈니스 로직 분리</li>
+                  <li>데이터베이스 접근 로직 분리</li>
+                  <li>자주 변경되는 업무 규칙의 라이브러리화</li>
+                  <li>여러 개발자가 동시에 작업하기 쉬운 구조</li>
+                  <li>외부 결제 API와 서드파티 연동 구조화</li>
+                  <li>AI 개발 에이전트가 일관되게 코드를 작성할 수 있는 개발 규격 수립</li>
+                </ul>
+              </div>
+              <div class="card cyan">
+                <h3>🏆 수강 후 달성할 7대 학습 목표</h3>
+                <ul class="check-list">
+                  <li>1. Django 기본 구조의 한계를 이해한다.</li>
+                  <li>2. Model, API, Business, Infrastructure 계층을 구분한다.</li>
+                  <li>3. Rule, Policy, Calculator, Workflow의 역할을 구분한다.</li>
+                  <li>4. Repository와 Port를 이용해 DB와 외부 시스템 의존성을 분리한다.</li>
+                  <li>5. 카페 주문 API를 레이어드 아키텍처로 구현한다.</li>
+                  <li>6. 외부 결제사를 Adapter 형태로 추가한다.</li>
+                  <li>7. AI가 따라야 할 프로젝트 개발 규격을 작성한다.</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "02",
+          kicker: "CHAPTER 02 · WHY LAYERED ARCHITECTURE",
+          title: "왜 레이어드 아키텍처가 필요한가?",
+          sub: "하나의 View에서 너무 많은 일을 처리하면 규칙 변경이나 결제사 교체 시 View 전체를 수정해야 합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card danger">
+                <h3>⚠️ 전형적인 Fat View 문제 코드</h3>
+                <div class="code-box danger-code"><code>class OrderCreateView(APIView):
+    def post(self, request):
+        menu = Menu.objects.get(id=request.data["menu_id"])
+        if not menu.is_available:
+            raise ValidationError("판매 중인 메뉴가 아닙니다.")
+        total_price = menu.price * request.data["quantity"]
+        order = Order.objects.create(
+            user=request.user, total_price=total_price,
+        )
+        PaymentAPI.confirm(...)
+        return Response({"order_id": order.id})</code></div>
+              </div>
+              <div class="card">
+                <h3>💥 발생하는 5대 구조적 문제</h3>
+                <ul class="check-list danger-list">
+                  <li>같은 업무 규칙이 여러 API에 중복된다.</li>
+                  <li>비즈니스 로직을 DB 없이 테스트하기 어렵다.</li>
+                  <li>여러 개발자가 같은 파일을 동시에 수정한다.</li>
+                  <li>외부 API 변경이 전체 서비스에 영향을 준다.</li>
+                  <li>AI가 코드를 작성할 위치를 일관되게 판단하기 어렵다.</li>
+                </ul>
+                <p style="margin-top:12px; color:#34d399; font-weight:700;">→ 해결책: 코드를 책임별 계층(Layered Architecture)으로 분리한다.</p>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "03",
+          kicker: "CHAPTER 03 · DEFAULT DJANGO STRUCTURE",
+          title: "Django 기본 구조의 한계",
+          sub: "작은 프로젝트에서는 충분하지만 기능이 커지면 models.py, views.py, serializers.py, tests.py가 비대해집니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card">
+                <h3>📁 Django 기본 생성 구조</h3>
+                <div class="code-box"><code>backend/
+├── manage.py
+├── config/
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+└── cafe/
+    ├── migrations/
+    ├── admin.py
+    ├── apps.py
+    ├── models.py
+    ├── tests.py
+    └── views.py</code></div>
+              </div>
+              <div class="card amber">
+                <h3>⚠️ 규모 확장 시 비대해지는 4대 파일</h3>
+                <div class="code-box danger-code"><code>models.py
+views.py
+serializers.py
+tests.py</code></div>
+                <p style="margin-top:10px;">따라서 Django 앱 내부 파일을 책임에 따라 나누고, 순수 <strong>비즈니스 계층(business)</strong>과 <strong>인프라 계층(infrastructure)</strong>을 추가합니다.</p>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "04",
+          kicker: "CHAPTER 04 · TARGET ARCHITECTURE",
+          title: "목표 아키텍처 (전체 구조와 계층별 책임)",
+          sub: "config, apps, business, infrastructure, tests의 5대 영역으로 프로젝트 최상위 구조를 재설계합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card">
+                <h3>🏗️ 4.1 전체 구조</h3>
+                <div class="code-box"><code>backend/
+├── manage.py
+├── pyproject.toml
+├── config/                       # Django 전역 설정
+├── apps/                         # Django와 HTTP 계층 (cafe, billing)
+├── business/                     # 순수 비즈니스 로직 (core, cafe, billing)
+├── infrastructure/               # DB 및 외부 시스템 구현
+│   ├── repositories/
+│   ├── transactions/
+│   ├── payment_gateways/
+│   ├── notifications/
+│   └── outbox/
+└── tests/                        # unit / integration / contract</code></div>
+              </div>
+              <div class="card emerald">
+                <h3>📋 4.2 계층별 책임</h3>
+                <ul class="check-list">
+                  <li><code>config</code> : Django 프로젝트 전체 설정</li>
+                  <li><code>apps</code> : HTTP, Django Model, 관리자 기능</li>
+                  <li><code>business</code> : 업무 규칙, 계산, 정책, 처리 절차</li>
+                  <li><code>infrastructure</code> : Django ORM, 외부 API, 메시지, 이메일</li>
+                  <li><code>tests</code> : 단위·통합·계약 테스트</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "05",
+          kicker: "CHAPTER 05 · DEPENDENCY DIRECTION",
+          title: "의존성 방향과 핵심 원칙",
+          sub: "Business 계층은 Port 인터페이스에만 의존하며, Django와 DRF를 절대 import하지 않습니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card cyan">
+                <h3>🧭 단방향 의존성 흐름</h3>
+                <div class="code-box"><code>HTTP Request
+     ↓
+API
+     ↓
+Workflow
+     ↓
+Rule · Policy · Calculator
+     ↓
+Port
+     ↑
+Infrastructure Adapter
+     ↓
+Database · External API</code></div>
+              </div>
+              <div class="card">
+                <h3>🚫 금지 vs ✅ 허용 코드</h3>
+                <div class="code-box danger-code"><code># ❌ business 계층에서 금지
+from django.db import transaction
+from apps.cafe.models import Order
+Order.objects.create(...)</code></div>
+                <div class="code-box"><code># ✅ 허용되는 의존성 (Port 주입)
+class CreateOrderWorkflow:
+    def __init__(self, order_repository: OrderRepository):
+        self.order_repository = order_repository</code></div>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "06",
+          kicker: "CHAPTER 06 · BUSINESS LAYER DETAILS",
+          title: "Business 계층의 세부 구조 (DTO · Rule · Policy · Calculator · Workflow · Port)",
+          sub: "순수 Python 코드로만 작성되어 DB 없이도 즉시 검증 가능한 6대 핵심 컴포넌트입니다.",
+          html: `
+            <div class="grid-3">
+              <div class="card">
+                <h3>6.1 DTO &amp; 6.2 Rule</h3>
+                <div class="code-box"><code>@dataclass(frozen=True)
+class OrderItemCommand:
+    menu_id: int
+    quantity: int
+
+class OrderQuantityRule:
+    def evaluate(self, quantity: int):
+        if quantity < 1:
+            return RuleResult.reject(...)
+        return RuleResult.accept()</code></div>
+              </div>
+              <div class="card">
+                <h3>6.3 Policy &amp; 6.4 Calculator</h3>
+                <div class="code-box"><code>class OrderAcceptancePolicy:
+    def evaluate(self, context):
+        for rule in self.rules:
+            res = rule.evaluate(context)
+            if not res.passed: return res
+        return RuleResult.accept()
+
+class OrderPriceCalculator:
+    def calculate(self, items):
+        return sum(i.unit_price * i.quantity for i in items)</code></div>
+              </div>
+              <div class="card emerald">
+                <h3>6.5 Workflow &amp; 6.6 Port</h3>
+                <div class="code-box"><code>class OrderRepository(Protocol):
+    def create_order(self, order_data): ...
+    def get_order(self, order_id: int): ...
+
+# Workflow는 Rule·Policy·Calculator·Port를
+# 조합하여 전체 유스케이스 절차를 실행</code></div>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "07",
+          kicker: "CHAPTER 07 · CAFE ORDER API CASE STUDY",
+          title: "카페 주문 API 적용 사례 (폴더 구조 & 처리 흐름)",
+          sub: "POST /api/v1/cafe/orders 요청부터 DB 저장까지의 전체 파이프라인을 계층별로 분리합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card">
+                <h3>📂 7.2 폴더 구조 &amp; 7.3 처리 흐름</h3>
+                <div class="code-box"><code>POST /api/v1/cafe/orders
+  ↓ CreateOrderSerializer
+  ↓ CreateOrderCommand (DTO)
+  ↓ CreateOrderWorkflow
+  ↓ OrderAcceptancePolicy (Rules)
+  ↓ OrderPriceCalculator
+  ↓ OrderRepository (Port)
+  ↓ Django ORM → Database</code></div>
+              </div>
+              <div class="card emerald">
+                <h3>📨 7.4 API 요청 &amp; 7.5 응답 명세</h3>
+                <div class="code-box"><code>// Request
+{
+  "items": [
+    { "menu_id": 1, "quantity": 2 },
+    { "menu_id": 3, "quantity": 1 }
+  ]
+}
+
+// Response
+{
+  "order_id": 1042,
+  "status": "RECEIVED",
+  "total_price": 13500
+}</code></div>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "08",
+          kicker: "CHAPTER 08 · DEPENDENCY INJECTION",
+          title: "의존성 조립 (container.py)",
+          sub: "각 클래스가 구체 의존성을 직접 생성하지 않고 container.py에서 조립하여 주입(DI)합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card danger">
+                <h3>🚫 지양하는 코드 (강결합)</h3>
+                <div class="code-box danger-code"><code>class CreateOrderWorkflow:
+    def __init__(self):
+        self.repository = DjangoOrderRepository()</code></div>
+                <p>구체 ORM Repository에 직접 결합되어 Fake 테스트가 불가능합니다.</p>
+              </div>
+              <div class="card emerald">
+                <h3>✅ 권장하는 코드 (container.py 조립)</h3>
+                <div class="code-box"><code>def create_order_workflow() -> CreateOrderWorkflow:
+    return CreateOrderWorkflow(
+        menu_repository=DjangoMenuRepository(),
+        order_repository=DjangoOrderRepository(),
+        acceptance_policy=OrderAcceptancePolicy(...),
+        price_calculator=OrderPriceCalculator(),
+        unit_of_work=DjangoUnitOfWork(),
+    )</code></div>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "09",
+          kicker: "CHAPTER 09 · BILLING MODULE EXPANSION",
+          title: "빌링·결제 모듈 확장 요구사항 및 폴더 구조",
+          sub: "외부 결제사 호출, 승인·취소·부분환불, Timeout, 중복 승인 방지, 웹훅, Outbox를 반영한 폴더 구조입니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card">
+                <h3>💳 결제 모듈 8대 핵심 요구사항</h3>
+                <ul class="check-list">
+                  <li>외부 결제사 API 호출 및 승인·취소·부분 환불</li>
+                  <li>네트워크 Timeout 대응 및 중복 승인 방지</li>
+                  <li>웹훅(Webhook) 검증·처리 및 결제 상태 관리</li>
+                  <li>결제 시도 이력 보존 및 민감정보 보호</li>
+                </ul>
+              </div>
+              <div class="card cyan">
+                <h3>📂 9.1 결제 모듈 폴더 구조</h3>
+                <div class="code-box"><code>apps/billing/ (models, api, container.py)
+business/billing/
+├── workflows/ (prepare, confirm, cancel, refund, handle_webhook)
+└── ports/ (payment_gateway, payment_repository, webhook_repository, event_publisher)
+infrastructure/payment_gateways/
+├── registry.py
+├── common/ (http_client.py, retry_policy.py)
+├── toss/ (adapter, client, mapper, schemas, signature, exceptions)
+└── another_provider/</code></div>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "10",
+          kicker: "CHAPTER 10 · PORT & ADAPTER PATTERN",
+          title: "Port와 Adapter 패턴 (PaymentGateway & TossPaymentGateway)",
+          sub: "Business 계층은 Toss라는 이름이나 응답 형식을 알지 못하며 공통 PaymentGateway 인터페이스만 호출합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card">
+                <h3>10.1 Port &amp; 10.2 Toss Adapter</h3>
+                <div class="code-box"><code>class PaymentGateway(Protocol):
+    provider_code: str
+    def confirm(self, command) -> PaymentResult: ...
+    def get_payment(self, provider_payment_id) -> PaymentResult: ...
+    def cancel(self, command) -> RefundResult: ...
+    def verify_webhook(self, raw_body, headers) -> bool: ...
+
+class TossPaymentGateway:
+    provider_code = "TOSS"
+    def confirm(self, command):
+        res = self.client.confirm_payment(...)
+        return self.mapper.to_payment_result(res)</code></div>
+              </div>
+              <div class="card emerald">
+                <h3>10.3 Adapter 파일별 책임</h3>
+                <ul class="check-list">
+                  <li><code>adapter.py</code> : PaymentGateway Port 구현</li>
+                  <li><code>client.py</code> : 실제 HTTP API 호출</li>
+                  <li><code>mapper.py</code> : 외부 응답과 내부 DTO 변환</li>
+                  <li><code>schemas.py</code> : 외부 요청·응답 구조</li>
+                  <li><code>signature.py</code> : 웹훅 서명 검증</li>
+                  <li><code>exceptions.py</code> : 결제사 오류 분류</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "11",
+          kicker: "CHAPTER 11 · PAYMENT GATEWAY REGISTRY",
+          title: "결제사 Registry (무수정 결제사 추가)",
+          sub: "Workflow에 if/elif 결제사 분기문을 작성하지 않고 Registry에서 provider_code로 조회합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card">
+                <h3>🗂️ PaymentGatewayRegistry 구현</h3>
+                <div class="code-box"><code>class PaymentGatewayRegistry:
+    def __init__(self, gateways):
+        self._gateways = {
+            gateway.provider_code: gateway
+            for gateway in gateways
+        }
+
+    def get(self, provider_code):
+        return self._gateways[provider_code]</code></div>
+              </div>
+              <div class="card emerald">
+                <h3>➕ 신규 결제사 추가 4단계 (Workflow 수정 0줄)</h3>
+                <ul class="check-list">
+                  <li>1. 새 Adapter 폴더 생성</li>
+                  <li>2. <code>PaymentGateway</code> Port 구현</li>
+                  <li>3. Adapter 계약 테스트(Contract Test) 작성</li>
+                  <li>4. <code>PaymentGatewayRegistry</code>에 등록</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "12",
+          kicker: "CHAPTER 12 · PAYMENT STATE MACHINE",
+          title: "결제 상태 관리와 상태 전이 규칙",
+          sub: "외부 결제사의 상태값을 내부에서 그대로 쓰지 않고 내부 표준 상태와 전이 규칙으로 통제합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card emerald">
+                <h3>✅ 내부 표준 상태 &amp; 허용 전이</h3>
+                <div class="code-box"><code># 7대 내부 표준 상태
+READY · PENDING · PAID · FAILED
+CANCELLED · PARTIAL_REFUND · REFUNDED
+
+# 허용 상태 전이
+READY → PENDING → PAID
+READY → PENDING → FAILED
+PAID → PARTIAL_REFUND → REFUNDED
+PAID → CANCELLED</code></div>
+              </div>
+              <div class="card danger">
+                <h3>🚫 금지되는 상태 전이 예시</h3>
+                <div class="code-box danger-code"><code>FAILED → REFUNDED   # ❌ 거절
+READY → CANCELLED   # ❌ 거절
+REFUNDED → PAID     # ❌ 거절</code></div>
+                <p style="margin-top:10px;">상태 전이 규칙은 <strong>Policy</strong> 또는 <strong>Model 메서드</strong> 한 곳에서 집중 관리합니다.</p>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "13",
+          kicker: "CHAPTER 13 · PAYMENT CONFIRMATION FLOW",
+          title: "결제 승인 처리 흐름과 짧은 트랜잭션 원칙",
+          sub: "외부 API 호출 중에는 DB 트랜잭션을 오래 유지하지 않고 짧은 트랜잭션 2개로 분리합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card">
+                <h3>🔄 ConfirmPaymentWorkflow 흐름</h3>
+                <div class="code-box"><code>Client → Confirm Payment API
+  ↓ ConfirmPaymentWorkflow
+    ├─ 주문 및 결제 금액 확인
+    ├─ 결제 상태 확인
+    ├─ 결제사 Adapter 선택
+    ├─ 외부 승인 API 호출 (TX 외부!)
+    ├─ 결제 결과 저장
+    └─ Outbox Event 저장</code></div>
+              </div>
+              <div class="card cyan">
+                <h3>⚡ 권장 트랜잭션 분리 5단계</h3>
+                <ul class="check-list">
+                  <li>1. 짧은 트랜잭션으로 결제를 <code>PENDING</code>으로 변경</li>
+                  <li>2. <strong>트랜잭션 밖에서</strong> 결제사 API 호출</li>
+                  <li>3. 새로운 짧은 트랜잭션으로 결과 저장</li>
+                  <li>4. Timeout이면 즉시 실패(<code>FAILED</code>)로 확정하지 않음</li>
+                  <li>5. 결제 조회 API나 웹훅으로 최종 상태 확인</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "14",
+          kicker: "CHAPTER 14 · IDEMPOTENCY & DUPLICATE PREVENTION",
+          title: "멱등성(Idempotency)과 중복 결제 방지",
+          sub: "응답 전달 중 네트워크 Timeout으로 사용자가 재요청하더라도 같은 주문이 두 번 결제되지 않게 보호합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card danger">
+                <h3>⚠️ 네트워크 Timeout 재전송 시나리오</h3>
+                <div class="code-box danger-code"><code>사용자 요청
+  ↓ 외부 결제 승인 성공
+  ↓ 응답 전달 중 네트워크 Timeout 발생!
+  ↓ 사용자가 다시 결제 요청</code></div>
+              </div>
+              <div class="card emerald">
+                <h3>🛡️ 중복 결제 방지 6대 기준</h3>
+                <ul class="check-list">
+                  <li>결제 승인 API에 <code>Idempotency Key</code> 사용</li>
+                  <li>같은 Key + 같은 요청 → 기존 결과 반환</li>
+                  <li>같은 Key + 다른 금액 → <code>409 Conflict</code> 반환</li>
+                  <li><code>provider_payment_id</code>에 Unique Constraint 설정</li>
+                  <li>외부 결제사의 멱등성 기능도 함께 사용</li>
+                  <li>Timeout 후 승인 API를 무조건 재호출하지 않음</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "15",
+          kicker: "CHAPTER 15 · WEBHOOK PROCESSING",
+          title: "웹훅(Webhook) 처리 원칙",
+          sub: "서명 검증, 중복 이벤트 방어, 이벤트 순서 역전 방어, 실패 이벤트 재처리 구조를 갖춥니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card">
+                <h3>🔔 웹훅 처리 파이프라인</h3>
+                <div class="code-box"><code>외부 결제사
+  ↓ Webhook Endpoint
+  ↓ 서명 검증 (Raw Body)
+  ↓ 중복 이벤트 확인 (Unique Event ID)
+  ↓ 표준 DTO 변환
+  ↓ HandleWebhookWorkflow
+  ↓ 결제 상태 반영</code></div>
+              </div>
+              <div class="card cyan">
+                <h3>📌 웹훅 7대 원칙</h3>
+                <ul class="check-list">
+                  <li>Raw Body를 사용해 서명을 검증한다.</li>
+                  <li>서명 검증 실패 시 업무 로직을 실행하지 않는다.</li>
+                  <li>외부 Event ID에 Unique Constraint를 둔다.</li>
+                  <li>같은 이벤트가 여러 번 올 수 있다고 가정한다.</li>
+                  <li>이벤트 순서가 바뀔 수 있다고 가정한다.</li>
+                  <li>과거 이벤트가 최신 상태를 되돌리지 못하게 한다.</li>
+                  <li>실패 이벤트는 재처리가 가능해야 한다.</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "16",
+          kicker: "CHAPTER 16 · TRANSACTIONAL OUTBOX PATTERN",
+          title: "Outbox 패턴 (결제 후속 작업 분리)",
+          sub: "주문 상태 변경·영수증 발행·알림·포인트 적립 장애가 결제 승인을 실패시키지 않도록 트랜잭션을 분리합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card emerald">
+                <h3>📦 Outbox 패턴 아키텍처</h3>
+                <div class="code-box"><code>[동일 DB 트랜잭션]
+Payment 저장 + PAYMENT_COMPLETED Outbox Event 저장
+        ↓ commit
+Outbox Publisher (비동기 발행)
+        ├─ 주문 상태 변경
+        ├─ 영수증 발행
+        └─ 사용자 알림 전송</code></div>
+              </div>
+              <div class="card">
+                <h3>💡 왜 Outbox 패턴을 쓰는가?</h3>
+                <ul class="check-list">
+                  <li>Workflow에서 후속 작업을 직접 동기 호출하면 알림 서버 장애가 결제 장애로 전파됨</li>
+                  <li>결제 결과와 Outbox 이벤트를 같은 트랜잭션에 저장해 유실 방지(At-least-once)</li>
+                  <li>이벤트 소비자(Consumer)도 멱등하게 구현하여 중복 실행에 안전하도록 설계</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "17",
+          kicker: "CHAPTER 17 · THREE-TIER TEST STRATEGY",
+          title: "3단계 테스트 전략 (단위 · 통합 · Adapter 계약 테스트)",
+          sub: "Business 단위 테스트(DB 무관), Django/DB 통합 테스트, 결제사 Adapter 계약 테스트로 품질을 보증합니다.",
+          html: `
+            <div class="grid-3">
+              <div class="card">
+                <h3>17.1 단위 테스트 (Unit)</h3>
+                <p><code>tests/unit/business/</code> (DB 없이 실행)</p>
+                <ul class="check-list">
+                  <li>주문 수량·판매 여부·총액 계산</li>
+                  <li>결제 상태 전이·부분 환불 한도</li>
+                  <li>중복 결제·Timeout·역순 웹훅</li>
+                </ul>
+              </div>
+              <div class="card">
+                <h3>17.2 통합 테스트 (Integration)</h3>
+                <p>실제 Django 모델과 DB 연결 검증</p>
+                <ul class="check-list">
+                  <li>주문+주문항목 원자적 저장</li>
+                  <li>결제+시도이력 함께 저장</li>
+                  <li>트랜잭션 실패 시 전체 Rollback</li>
+                  <li>웹훅 중복 이벤트 1회 처리</li>
+                </ul>
+              </div>
+              <div class="card emerald">
+                <h3>17.3 계약 테스트 (Contract)</h3>
+                <p><code>tests/contract/payment_gateways/</code></p>
+                <ul class="check-list">
+                  <li>승인 성공/거절 변환 일관성</li>
+                  <li>Timeout 및 알 수 없는 응답 처리</li>
+                  <li>웹훅 서명 검증 및 상태 매핑</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "18",
+          kicker: "CHAPTER 18 · AI AGENT DEVELOPMENT SPECIFICATION",
+          title: "AI 개발 규격 (12단계 구현 순서 & 9대 금지 작업)",
+          sub: "AI 에이전트가 일관된 품질로 기능을 구현하도록 작업 순서와 금지 경계를 명확히 지시합니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card emerald">
+                <h3>🤖 AI 기능 구현 12단계 표준 순서</h3>
+                <div class="code-box"><code>1. 기존 프로젝트 규격을 읽는다.
+2. 관련 도메인의 기존 코드를 검색한다.
+3. DTO와 오류 코드를 정의한다.
+4. Rule, Policy, Calculator를 구현한다.
+5. 단위 테스트를 작성한다.
+6. Port를 정의한다.
+7. Workflow를 구현한다.
+8. Django Model과 Migration을 작성한다.
+9. Repository 또는 Adapter를 구현한다.
+10. API를 구현한다.
+11. Container에서 의존성을 조립한다.
+12. 전체 테스트와 정적 검사를 실행한다.</code></div>
+              </div>
+              <div class="card danger">
+                <h3>⛔ AI가 하지 않아야 하는 9가지 작업</h3>
+                <ul class="check-list danger-list">
+                  <li>View에 복잡한 비즈니스 로직 작성</li>
+                  <li>Business에서 Django ORM 직접 사용</li>
+                  <li>기존 공통 Rule을 확인하지 않고 코드 복제</li>
+                  <li>결제사 응답을 API에 그대로 반환</li>
+                  <li>실패 테스트 없이 임시 조건문으로 버그 수정</li>
+                  <li>기존 Migration 임의 변경</li>
+                  <li>결제 Secret을 코드에 작성</li>
+                  <li>요청받지 않은 대규모 리팩터링</li>
+                  <li>실행하지 않은 테스트를 통과했다고 보고</li>
+                </ul>
+              </div>
+            </div>
+          `
+        },
+        {
+          no: "19",
+          kicker: "CHAPTER 19 · FILE PLACEMENT DECISION MATRIX",
+          title: "파일 배치 판단법",
+          sub: "“이 코드는 Django와 DB가 없어도 실행할 수 있는 업무 규칙인가?”라는 질문으로 파일 위치를 즉시 결정합니다.",
+          html: `
+            <div class="arch-table-wrap">
+              <table class="arch-table">
+                <thead>
+                  <tr><th>코드 종류</th><th>작성 위치</th><th>핵심 판단 기준</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>DB 테이블</td><td><code>apps/&lt;domain&gt;/models</code></td><td>Django ORM 모델 필드·테이블 메타 정의</td></tr>
+                  <tr><td>요청·응답 검증</td><td><code>apps/&lt;domain&gt;/api</code></td><td>HTTP 상태코드, DRF Serializer, View</td></tr>
+                  <tr><td>단일 업무 조건</td><td><code>business/&lt;domain&gt;/rules</code></td><td>Django/DB 없이 실행 가능한 단일 조건 판단</td></tr>
+                  <tr><td>여러 조건의 조합</td><td><code>business/&lt;domain&gt;/policies</code></td><td>복수 Rule을 묶어 승인/거절 결정</td></tr>
+                  <tr><td>금액 계산</td><td><code>business/&lt;domain&gt;/calculators</code></td><td>순수 함수형 금액·수수료·기간 계산 (float 금지)</td></tr>
+                  <tr><td>업무 처리 절차</td><td><code>business/&lt;domain&gt;/workflows</code></td><td>유스케이스 실행 순서 조율</td></tr>
+                  <tr><td>외부 기능 인터페이스</td><td><code>business/&lt;domain&gt;/ports</code></td><td>Protocol 기반 Repository/Gateway 추상화</td></tr>
+                  <tr><td>Django ORM 구현</td><td><code>infrastructure/repositories</code></td><td>실제 QuerySet 조회·저장 구현체</td></tr>
+                  <tr><td>특정 결제사 구현</td><td><code>infrastructure/payment_gateways</code></td><td>Toss 등 외부 결제사 HTTP 호출·매핑</td></tr>
+                  <tr><td>의존성 조립</td><td><code>apps/&lt;domain&gt;/container.py</code></td><td>Workflow에 실제 구현체 주입</td></tr>
+                </tbody>
+              </table>
+            </div>
+          `
+        },
+        {
+          no: "20",
+          kicker: "CHAPTER 20 · KEY TAKEAWAYS",
+          title: "강의 핵심 정리: 변경의 영향을 제한하는 구조",
+          sub: "좋은 아키텍처는 변경이 발생하지 않게 하는 구조가 아니라, 변경이 발생했을 때 수정할 위치를 명확하게 만드는 구조입니다.",
+          html: `
+            <div class="grid-2">
+              <div class="card">
+                <h3>🎯 변경 영향 범위 격리</h3>
+                <div class="code-box"><code>API 변경        → apps/api만 변경
+업무 규칙 변경   → business/rules 또는 policies만 변경
+금액 계산 변경   → calculators만 변경
+DB 접근 방식 변경 → repositories만 변경
+결제사 변경      → payment gateway adapter만 변경</code></div>
+              </div>
+              <div class="card emerald">
+                <h3>🌟 가장 중요한 5대 원칙</h3>
+                <ul class="check-list">
+                  <li><strong>1.</strong> View는 요청을 받고 Workflow를 호출한다.</li>
+                  <li><strong>2.</strong> Workflow는 업무 처리 순서를 관리한다.</li>
+                  <li><strong>3.</strong> Rule, Policy, Calculator는 순수 비즈니스 로직을 담당한다.</li>
+                  <li><strong>4.</strong> DB와 외부 시스템은 Port와 Adapter를 통해 연결한다.</li>
+                  <li><strong>5.</strong> Business 계층은 Django와 특정 외부 서비스에 의존하지 않는다.</li>
+                </ul>
+              </div>
+            </div>
+          `
+        }
+      ];
+
+      // Render 20-chapter quick launcher on main page
+      const quickGrid = document.getElementById('chapterQuickGrid');
+      if (quickGrid) {
+        quickGrid.innerHTML = SLIDES.map((s, idx) => `
+          <button type="button" class="chapter-card" data-open-slides="${idx}">
+            <div class="chapter-card-top">
+              <span class="chapter-no">CH ${s.no}</span>
+              <span class="chapter-open-tag">슬라이드 ↗</span>
+            </div>
+            <h4>${s.title}</h4>
+            <p>${s.sub}</p>
+          </button>
+        `).join('');
+      }
+
+      // Render SlideShare Modal DOM
+      const modal = document.getElementById('djangoSlideModal');
+      const player = document.getElementById('djangoSlidePlayer');
+      const tocDrawer = document.getElementById('ssTocDrawer');
+      const slideSelect = document.getElementById('ssSlideSelect');
+      const viewport = document.getElementById('ssSlideViewport');
+      const counterText = document.getElementById('ssCounterText');
+      const progressFill = document.getElementById('ssProgressFill');
+      const paddlePrev = document.getElementById('ssPaddlePrev');
+      const paddleNext = document.getElementById('ssPaddleNext');
+      const bottomPrev = document.getElementById('ssBottomPrev');
+      const bottomNext = document.getElementById('ssBottomNext');
+      const toggleTocBtn = document.getElementById('ssToggleTocBtn');
+      const fullscreenBtn = document.getElementById('ssFullscreenBtn');
+      const closeBtn = document.getElementById('ssCloseBtn');
+
+      let currentIdx = 0;
+
+      tocDrawer.innerHTML = SLIDES.map((s, idx) => `
+        <button type="button" class="ss-toc-item ${idx === 0 ? 'active' : ''}" data-slide-idx="${idx}">
+          <span class="ss-toc-num">${s.no}</span>
+          <span class="ss-toc-text">
+            <strong>${s.title}</strong>
+            <span>${s.kicker}</span>
+          </span>
+        </button>
+      `).join('');
+
+      slideSelect.innerHTML = SLIDES.map((s, idx) => `
+        <option value="${idx}">${s.no}. ${s.title}</option>
+      `).join('');
+
+      viewport.innerHTML = SLIDES.map((s, idx) => `
+        <article class="ss-slide ${idx === 0 ? 'active' : ''}" data-slide-panel="${idx}">
+          <div class="slide-meta-bar">
+            <div class="slide-kicker"><span>CH ${s.no}</span> ${s.kicker}</div>
+            <div class="slide-page-tag">SLIDE ${s.no} OF 20</div>
+          </div>
+          <h2 class="slide-headline">${s.title}</h2>
+          <p class="slide-subcopy">${s.sub}</p>
+          <div>${s.html}</div>
+        </article>
+      `).join('');
+
+      function bindCopyButtons(root = document) {
+        root.querySelectorAll('.code-box').forEach((box) => {
+          let btn = box.querySelector('.copy-code-btn');
+          if (!btn) {
+            btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'copy-code-btn';
+            btn.textContent = '복사';
+            box.prepend(btn);
+          }
+          if (!btn.dataset.bound) {
+            btn.dataset.bound = 'true';
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const codeEl = box.querySelector('code');
+              if (!codeEl) return;
+              navigator.clipboard.writeText(codeEl.innerText).then(() => {
+                btn.textContent = '✓ 복사됨';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                  btn.textContent = '복사';
+                  btn.classList.remove('copied');
+                }, 1500);
+              });
+            });
+          }
+        });
+      }
+      bindCopyButtons(document);
+
+      function goToSlide(idx) {
+        if (idx < 0) idx = 0;
+        if (idx >= SLIDES.length) idx = SLIDES.length - 1;
+        currentIdx = idx;
+
+        viewport.querySelectorAll('.ss-slide').forEach((el, i) => {
+          el.classList.toggle('active', i === currentIdx);
+          if (i === currentIdx) el.scrollTop = 0;
+        });
+
+        tocDrawer.querySelectorAll('.ss-toc-item').forEach((el, i) => {
+          el.classList.toggle('active', i === currentIdx);
+          if (i === currentIdx) el.scrollIntoView({ block: 'nearest' });
+        });
+
+        slideSelect.value = String(currentIdx);
+        const numStr = String(currentIdx + 1).padStart(2, '0');
+        counterText.textContent = `${numStr} / ${SLIDES.length}`;
+        progressFill.style.width = `${((currentIdx + 1) / SLIDES.length) * 100}%`;
+
+        const isFirst = currentIdx === 0;
+        const isLast = currentIdx === SLIDES.length - 1;
+        paddlePrev.disabled = isFirst;
+        bottomPrev.disabled = isFirst;
+        paddleNext.disabled = isLast;
+        bottomNext.disabled = isLast;
+      }
+
+      function openSlides(idx = 0) {
+        goToSlide(idx);
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeSlides() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+
+      document.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-open-slides]');
+        if (trigger) {
+          e.preventDefault();
+          const idx = parseInt(trigger.getAttribute('data-open-slides'), 10) || 0;
+          openSlides(idx);
+        }
+      });
+
+      tocDrawer.addEventListener('click', (e) => {
+        const item = e.target.closest('[data-slide-idx]');
+        if (item) goToSlide(parseInt(item.getAttribute('data-slide-idx'), 10));
+      });
+
+      slideSelect.addEventListener('change', () => {
+        goToSlide(parseInt(slideSelect.value, 10));
+      });
+
+      paddlePrev.addEventListener('click', () => goToSlide(currentIdx - 1));
+      bottomPrev.addEventListener('click', () => goToSlide(currentIdx - 1));
+      paddleNext.addEventListener('click', () => goToSlide(currentIdx + 1));
+      bottomNext.addEventListener('click', () => goToSlide(currentIdx + 1));
+
+      toggleTocBtn.addEventListener('click', () => {
+        tocDrawer.classList.toggle('collapsed');
+        toggleTocBtn.classList.toggle('active', !tocDrawer.classList.contains('collapsed'));
+      });
+
+      fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          player.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      closeBtn.addEventListener('click', closeSlides);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeSlides();
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('active')) return;
+        if (e.key === 'Escape') closeSlides();
+        if (e.key === 'ArrowLeft') goToSlide(currentIdx - 1);
+        if (e.key === 'ArrowRight') goToSlide(currentIdx + 1);
+      });
+    })();
+  </script>
+</body>
+</html>
+

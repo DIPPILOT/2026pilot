@@ -1566,11 +1566,11 @@
       <div class="curriculum-filter-bar" role="tablist" aria-label="커리큘럼 및 태스크 카테고리 필터">
         <button type="button" class="curriculum-filter-btn active" data-filter="all" role="tab" aria-selected="true">
           <span>전체 보기</span>
-          <span class="filter-count">18</span>
+          <span class="filter-count">19</span>
         </button>
         <button type="button" class="curriculum-filter-btn" data-filter="pbl" role="tab" aria-selected="false">
           <span>🔥 실전 PBL 프로젝트</span>
-          <span class="filter-count">4</span>
+          <span class="filter-count">5</span>
         </button>
         <button type="button" class="curriculum-filter-btn" data-filter="module1" role="tab" aria-selected="false">
           <span>📐 Day 1~5 기획·설계</span>
@@ -1593,12 +1593,13 @@
           <div class="zone-header">
             <div class="zone-title-group">
               <span class="zone-badge">🔥 Track 01 · Real-World PBL Studio</span>
-              <h3 class="zone-title">실전 종합 PBL 프로젝트 (Real Project 1 · 2 · gstack &amp; Project Day)</h3>
-              <p class="zone-subtitle">서비스 성장 역설계, 문서 주도 개발, gstack 기반 기획·개발·QA 자동화까지 완주하는 핵심 프로젝트 트랙입니다.</p>
+              <h3 class="zone-title">실전 종합 PBL 프로젝트 (Real Project 1 · 2 · 3 · gstack &amp; Project Day)</h3>
+              <p class="zone-subtitle">서비스 성장 역설계, 문서 주도 개발, Django 레이어드 아키텍처, gstack 기반 기획·개발·QA 자동화까지 완주하는 핵심 프로젝트 트랙입니다.</p>
             </div>
             <div class="zone-actions">
               <a href="real-benchmarking/index.html" class="zone-shortcut-btn" style="border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">🚀 Real Project 1 바로가기</a>
               <a href="real-doc-driven-pbl/index.html" class="zone-shortcut-btn" style="border-color: rgba(6, 182, 212, 0.4); color: #67e8f9;">🚀 Real Project 2 바로가기</a>
+              <a href="real-django-layered/index.html" class="zone-shortcut-btn" style="border-color: rgba(52, 211, 153, 0.5); color: #a7f3d0;">🏗️ Real Project 3 바로가기</a>
               <a href="real-project-gstack/index.html" class="zone-shortcut-btn" style="border-color: rgba(96, 165, 250, 0.5); color: #bfdbfe;">⚡ gstack 강의 바로가기</a>
             </div>
           </div>
@@ -1712,6 +1713,62 @@
             <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
               <span class="ai-class-btn" style="background: linear-gradient(135deg, #10b981, #0891b2); border: none; cursor: pointer;">
                 🚀 프로젝트 워크스페이스 시작
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Real Project 3: Django Layered Architecture -->
+        <a class="course-card is-clickable" href="real-django-layered/index.html"
+          aria-label="Real Project 3 Django 레이어드 아키텍처 설계 강의 열기"
+          style="text-decoration: none; color: inherit;">
+          <div class="course-thumb"
+            style="background-image: linear-gradient(135deg, rgba(16, 185, 129, 0.36), rgba(6, 182, 212, 0.36)), url('img/real_project3_cover.png'); background-size: cover; background-position: center; color: #fff;">
+            REAL PROJECT 3</div>
+          <div class="course-content">
+            <span class="day-label" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: #fff;">Real Project 3</span>
+            <h3 class="course-title">Django 레이어드 아키텍처 설계 강의</h3>
+            <p class="course-subtitle">API·Business·Infrastructure 분리, 외부 결제 Adapter, AI 에이전트 개발 규격을 수립하는 실전 아키텍처</p>
+            <p class="course-desc">
+              Django 기본 구조의 Fat View 한계를 넘어 Model·API·Business(DTO·Rule·Policy·Calculator·Workflow·Port)·Infrastructure 계층을 분리합니다. 카페 주문 API와 외부 결제 모듈(Port &amp; Adapter, Registry, 상태 전이, 멱등성, 웹훅, Outbox), 3단계 테스트 전략과 AI 에이전트 12단계 개발 규격까지 전 20강으로 완성합니다.
+            </p>
+
+            <blockquote style="margin: 12px 0; padding: 10px 14px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 6px; font-size: 0.88rem; color: #a7f3d0; line-height: 1.6;">
+              <strong>💡 핵심 원칙:</strong> "좋은 아키텍처는 변경이 발생하지 않게 하는 구조가 아니라, 변경이 발생했을 때 수정할 위치를 명확하게 만드는 구조다."
+            </blockquote>
+
+            <div class="meta-grid">
+              <div class="meta-item"><strong>적용 도메인</strong>카페 주문 API + 빌링·외부 결제 게이트웨이 모듈</div>
+              <div class="meta-item"><strong>강의 구성</strong>전 20챕터 아키텍처 가이드 + 인터랙티브 슬라이드 쉐어</div>
+              <div class="meta-item"><strong>핵심 계층</strong>apps · business(Rule/Policy/Calculator/Workflow/Port) · infrastructure</div>
+              <div class="meta-item"><strong>검증 &amp; 규격</strong>단위·통합·계약 테스트 + AI 12단계 구현 순서 &amp; 파일 배치표</div>
+            </div>
+
+            <div class="time-list">
+              <div class="time-row"><strong>Ch 01~06</strong> 레이어드 아키텍처 필요성, 단방향 의존성, Business 6대 구성요소 설계</div>
+              <div class="time-row"><strong>Ch 07~08</strong> 카페 주문 API(POST /api/v1/cafe/orders) 구현 및 container.py 의존성 조립</div>
+              <div class="time-row"><strong>Ch 09~16</strong> 빌링·결제 확장 (PaymentGateway Port·Toss Adapter·Registry·멱등성·웹훅·Outbox)</div>
+              <div class="time-row"><strong>Ch 17~20</strong> 3단계 테스트 전략, AI 개발 규격(12단계/9대 금지), 파일 배치 판단 매트릭스</div>
+            </div>
+
+            <div class="tag-list">
+              <span class="tag" style="border-color: rgba(16, 185, 129, 0.4); color: #34d399;">Layered Arch</span>
+              <span class="tag">Django &amp; DRF</span>
+              <span class="tag">Rule · Policy · Workflow</span>
+              <span class="tag">Port &amp; Adapter</span>
+              <span class="tag">Payment Gateway</span>
+              <span class="tag">Idempotency &amp; Outbox</span>
+              <span class="tag">AI 개발 규격</span>
+            </div>
+
+            <div class="meta-item" style="margin-top: 10px;">
+              <strong>5대 핵심 원칙</strong>
+              View→Workflow 호출, Workflow 순서 관리, 순수 Business 로직 분리, Port/Adapter 외부 연동, Business의 Django 비의존
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+              <span class="ai-class-btn" style="background: linear-gradient(135deg, #10b981, #0891b2); border: none; cursor: pointer;">
+                🏗️ 아키텍처 강의 &amp; 20강 슬라이드 열기
               </span>
             </div>
           </div>
