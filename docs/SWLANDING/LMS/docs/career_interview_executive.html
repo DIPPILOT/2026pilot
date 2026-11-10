@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="ko" data-accent="purple">
+<head>
+  <script id="auth-guard">
+    (function () {
+      if (location.protocol === 'file:' || location.hostname === '127.0.0.1' || location.hostname === 'localhost') return;
+      function getCookie(name) {
+        var prefix = name + '=';
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          if (cookie.indexOf(prefix) === 0) return decodeURIComponent(cookie.substring(prefix.length));
+        }
+        return null;
+      }
+      var loggedInUser = getCookie('currentUser');
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) loggedInUser = session.value;
+            else localStorage.removeItem('currentUserSession');
+          } catch (e) { console.error(e); }
+        }
+      }
+      if (!loggedInUser) window.location.href = 'login/login.html';
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI SW 임원면접 질문지 50문항과 출제 의도, 핵심 평가 기준" />
+  <title>AI SW 임원면접 질문지 | 대구 DIP SW 랜딩</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="shared/notice-modal.css" />
+  <style>
+    :root {
+      --bg:#09090b; --panel:#121722; --panel-2:#191f2c; --line:rgba(255,255,255,.1);
+      --text:#fff; --muted:#cbd5e1; --quiet:#94a3b8; --cyan:#22d3ee; --blue:#60a5fa;
+      --purple:#c084fc; --pink:#f472b6; --amber:#fbbf24; --green:#34d399;
+      --accent:var(--purple); --accent-2:var(--pink);
+      --accent-rgb:192,132,252; --radius:15px;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; scroll-padding-top:152px; }
+    body { min-width:320px; font-family:'Pretendard',sans-serif; color:var(--text); background:radial-gradient(circle at 10% 4%,rgba(var(--accent-rgb),.13),transparent 25%),radial-gradient(circle at 90% 20%,rgba(124,58,237,.1),transparent 28%),var(--bg); line-height:1.68; }
+    a { color:inherit; }
+    button,input,select { font:inherit; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    button,a,summary,select { -webkit-tap-highlight-color:transparent; }
+    :focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+    .container { width:min(1180px,calc(100% - 36px)); margin:0 auto; }
+    .navbar { position:sticky; top:0; z-index:50; background:rgba(9,9,11,.88); border-bottom:1px solid var(--line); backdrop-filter:blur(16px); }
+    .nav-in { min-height:70px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .logo { color:#fff; text-decoration:none; font-weight:850; display:flex; align-items:center; gap:9px; }
+    .logo::before { content:''; width:8px; height:21px; border-radius:99px; background:linear-gradient(var(--accent),var(--accent-2)); }
+    .nav-links { display:flex; gap:9px; flex-wrap:wrap; list-style:none; }
+    .nav-links a { min-height:38px; display:inline-flex; align-items:center; text-decoration:none; color:#e4e4e7; background:rgba(255,255,255,.05); border:1px solid var(--line); padding:7px 11px; border-radius:8px; font-size:.84rem; font-weight:750; }
+    .nav-links a.active { color:#07111f; background:var(--accent); border-color:transparent; }
+    [data-accent="purple"] .nav-links a.active { color:#fff; }
+    .hero { padding:70px 0 48px; border-bottom:1px solid var(--line); }
+    .eyebrow { color:var(--accent); font-size:.78rem; font-weight:900; letter-spacing:.13em; margin-bottom:12px; }
+    .hero h1 { max-width:900px; font-size:clamp(2.15rem,5vw,3.75rem); line-height:1.14; letter-spacing:-.04em; }
+    .hero h1 span { background:linear-gradient(110deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; color:transparent; }
+    .hero-copy { max-width:870px; color:var(--muted); font-size:1.03rem; margin-top:18px; }
+    .hero-meta { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; }
+    .chip { padding:6px 10px; border-radius:999px; color:#e9d5ff; background:rgba(var(--accent-rgb),.08); border:1px solid rgba(var(--accent-rgb),.24); font-size:.77rem; font-weight:750; }
+    .updated { margin-top:14px; color:#71717a; font-size:.8rem; }
+    main { padding:36px 0 80px; }
+    .intro { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:18px; margin-bottom:20px; }
+    .section-kicker { color:var(--accent); font-size:.76rem; font-weight:900; letter-spacing:.1em; }
+    .intro h2 { margin:5px 0 6px; font-size:clamp(1.5rem,3vw,2.1rem); }
+    .intro-copy { color:var(--muted); max-width:790px; }
+    .count-box { min-width:145px; padding:15px 18px; background:rgba(var(--accent-rgb),.07); border:1px solid rgba(var(--accent-rgb),.25); border-radius:13px; text-align:center; }
+    .count-box strong { display:block; color:var(--accent); font-size:1.8rem; line-height:1.1; }
+    .count-box span { color:var(--quiet); font-size:.78rem; }
+    .toolbar { position:sticky; top:70px; z-index:40; display:grid; grid-template-columns:minmax(220px,1fr) minmax(180px,260px) auto; gap:10px; padding:13px; margin-bottom:18px; background:rgba(18,23,34,.94); border:1px solid var(--line); border-radius:14px; backdrop-filter:blur(14px); }
+    .field { position:relative; }
+    .field i { position:absolute; left:13px; top:50%; color:var(--quiet); transform:translateY(-50%); pointer-events:none; }
+    .field input,.field select { width:100%; min-height:44px; color:#f8fafc; background:#0c111a; border:1px solid var(--line); border-radius:9px; }
+    .field input { padding:10px 12px 10px 39px; }
+    .field select { padding:10px 34px 10px 12px; }
+    .toolbar-actions { display:flex; gap:8px; }
+    .tool-btn { min-height:44px; padding:9px 12px; color:#e4e4e7; background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:9px; cursor:pointer; font-weight:750; }
+    .tool-btn:hover { border-color:rgba(var(--accent-rgb),.45); color:#fff; }
+    .question-list { display:grid; gap:10px; }
+    .question-card { background:linear-gradient(145deg,rgba(25,31,44,.96),rgba(15,19,27,.96)); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+    .question-card[hidden] { display:none; }
+    details[open] { border-color:rgba(var(--accent-rgb),.28); }
+    summary { position:relative; min-height:74px; display:grid; grid-template-columns:62px minmax(0,1fr) 24px; align-items:center; gap:14px; padding:15px 18px; cursor:pointer; list-style:none; }
+    summary::-webkit-details-marker { display:none; }
+    summary:hover { background:rgba(var(--accent-rgb),.035); }
+    .question-no { display:grid; place-items:center; width:52px; height:38px; border-radius:9px; color:#fff; background:linear-gradient(135deg,var(--accent),var(--accent-2)); font-size:.82rem; font-weight:900; }
+    .question-main { min-width:0; display:flex; flex-direction:column; gap:4px; }
+    .question-main .category { color:var(--accent); font-size:.73rem; font-weight:850; letter-spacing:.04em; }
+    .question-main strong { color:#f8fafc; font-size:1rem; line-height:1.5; word-break:keep-all; }
+    .chevron { width:11px; height:11px; border-right:2px solid var(--quiet); border-bottom:2px solid var(--quiet); transform:rotate(45deg); transition:transform .2s ease; }
+    details[open] .chevron { transform:rotate(225deg); }
+    .question-body { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 18px 18px 94px; }
+    .detail-block,.memo-block { padding:15px; background:rgba(255,255,255,.035); border:1px solid var(--line); border-radius:11px; }
+    .detail-block h3,.memo-block label { display:block; margin-bottom:6px; color:var(--accent); font-size:.78rem; font-weight:850; }
+    .detail-block p { color:var(--muted); font-size:.88rem; }
+    .memo-block { grid-column:1/-1; }
+    .memo { min-height:76px; padding:11px 12px; color:#e4e4e7; background:#0c111a; border:1px dashed rgba(var(--accent-rgb),.35); border-radius:8px; font-size:.86rem; white-space:pre-wrap; }
+    .memo:empty::before { content:attr(data-placeholder); color:#64748b; pointer-events:none; }
+    .empty-state { display:none; padding:42px 20px; color:var(--quiet); text-align:center; border:1px dashed var(--line); border-radius:14px; }
+    .empty-state.visible { display:block; }
+    .answer-guide { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:22px; }
+    .answer-guide div { padding:14px; text-align:center; color:#d4d4d8; background:rgba(255,255,255,.035); border:1px solid var(--line); border-radius:10px; font-size:.8rem; }
+    .answer-guide strong { display:block; color:var(--amber); font-size:1rem; }
+    .site-footer { padding:32px 20px; color:#a1a1aa; background:#09090b; border-top:1px solid rgba(255,255,255,.08); text-align:center; font-size:.82rem; line-height:1.8; }
+    .footer-in { max-width:1200px; margin:0 auto; }
+    .footer-in div + div { margin-top:6px; }
+    @media (max-width:1024px) { .toolbar { grid-template-columns:1fr 220px; } .toolbar-actions { grid-column:1/-1; } }
+    @media (max-width:768px) { html{scroll-padding-top:210px}.nav-in{padding:10px 0;align-items:flex-start;flex-direction:column}.intro{grid-template-columns:1fr}.count-box{justify-self:start}.toolbar{top:112px;grid-template-columns:1fr}.toolbar-actions{grid-column:auto;flex-wrap:wrap}.question-body{padding-left:18px}.answer-guide{grid-template-columns:1fr 1fr} }
+    @media (max-width:375px) { .container{width:calc(100% - 24px)}.hero{padding:44px 0 34px}.nav-links a{font-size:.78rem;padding:7px 8px}summary{grid-template-columns:48px minmax(0,1fr) 18px;padding:13px 12px;gap:9px}.question-no{width:43px}.question-body{grid-template-columns:1fr;padding:0 12px 12px}.memo-block{grid-column:auto}.toolbar{padding:10px}.tool-btn{flex:1}.answer-guide{grid-template-columns:1fr}}
+    @media (min-width:1440px) { .container{width:min(1240px,calc(100% - 48px))}.question-main strong{font-size:1.04rem} }
+    @media (prefers-color-scheme:light) {
+      body.allow-system-theme { --bg:#f8fafc; --panel:#fff; --panel-2:#f1f5f9; --text:#0f172a; --muted:#475569; --quiet:#64748b; --line:rgba(15,23,42,.14); background:#f8fafc; }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }
+    @media print {
+      .navbar,.toolbar,.memo-block,.site-footer { display:none!important; }
+      body { color:#111; background:#fff; font-size:10pt; }
+      .container { width:100%; }
+      .hero { padding:0 0 18px; border-bottom:2px solid #111; }
+      .hero h1 span { color:#111; -webkit-text-fill-color:#111; }
+      main { padding:18px 0; }
+      .question-list { gap:5px; }
+      .question-card { break-inside:avoid; background:#fff; border:1px solid #bbb; }
+      summary { min-height:0; padding:9px 10px; }
+      .question-no { color:#111; background:#eee; border:1px solid #bbb; }
+      .question-body { display:grid!important; padding:0 10px 10px 82px; }
+      .detail-block { background:#fff; border-color:#ccc; }
+      .detail-block h3,.question-main .category { color:#333; }
+      .detail-block p,.hero-copy,.intro-copy { color:#333; }
+      .chevron,.answer-guide { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-in">
+      <a href="index.html" class="logo">대구 SW 랜딩</a>
+      <nav aria-label="면접 질문지 이동">
+        <ul class="nav-links">
+          <li><a href="career_interview.html">면접 가이드</a></li>
+          <li><a href="career_interview_technical.html">1차 기술면접</a></li>
+          <li><a href="career_interview_executive.html" class="active" aria-current="page">2차 임원면접</a></li>
+          <li><a href="index.html">과정 홈</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="eyebrow">EXECUTIVE INTERVIEW QUESTION BANK</div>
+      <h1>신뢰와 성장 가능성을 확인하는<br><span>임원면접 50문항</span></h1>
+      <p class="hero-copy" data-pretext>지원자의 고객 중심성, 주도성과 책임, 협업 태도, 학습 민첩성, AI 윤리와 사업 이해를 확인합니다. 상황·행동·결과를 실제 경험과 연결해 답변하세요.</p>
+      <div class="hero-meta"><span class="chip">2차 면접 · 임원</span><span class="chip">총 50문항</span><span class="chip">출제 의도 포함</span><span class="chip">핵심 평가 기준 포함</span></div>
+      <div class="updated">대구 DIP SW 랜딩 면접 질문지 · Google Sheets 기준 정리</div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section aria-labelledby="question-heading">
+      <div class="intro">
+        <div><div class="section-kicker">QUESTION BANK · 50</div><h2 id="question-heading">태도와 판단 기준을 확인하는 질문</h2><p class="intro-copy" data-pretext>질문을 펼치면 지원자의 어떤 행동과 기준을 확인하려는지 볼 수 있습니다. 추상적인 포부보다 실제 경험의 상황·행동·결과를 중심으로 준비하세요.</p></div>
+        <div class="count-box" aria-live="polite"><strong id="visible-count">50</strong><span>표시 중인 질문</span></div>
+      </div>
+
+      <div class="toolbar" aria-label="질문 검색 및 필터">
+        <div class="field"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><label class="sr-only" for="question-search">질문 검색</label><input id="question-search" type="search" placeholder="질문·역량·평가 기준 검색" autocomplete="off" /></div>
+        <div class="field"><label class="sr-only" for="category-filter">평가 역량 선택</label><select id="category-filter"><option value="">전체 평가 역량</option><option value="지원동기">지원동기</option><option value="직무 이해">직무 이해</option><option value="고객 중심">고객 중심</option><option value="주도성">주도성</option><option value="책임감">책임감</option><option value="완결성">완결성</option><option value="우선순위">우선순위</option><option value="협업">협업</option><option value="경청">경청</option><option value="소통">소통</option><option value="갈등 관리">갈등 관리</option><option value="리더십">리더십</option><option value="학습 민첩성">학습 민첩성</option><option value="학습 전략">학습 전략</option><option value="실패·회복">실패·회복</option><option value="변화 대응">변화 대응</option><option value="정직성">정직성</option><option value="AI 윤리">AI 윤리</option><option value="보안·책임">보안·책임</option><option value="사업 이해">사업 이해</option><option value="의사결정">의사결정</option><option value="조직 적합성">조직 적합성</option><option value="성장·기여">성장·기여</option><option value="자기이해">자기이해</option><option value="가치관">가치관</option><option value="성과">성과</option><option value="성과 측정">성과 측정</option><option value="실행력">실행력</option><option value="문제 제기">문제 제기</option><option value="피드백">피드백</option><option value="다양성">다양성</option><option value="압박 대응">압박 대응</option><option value="회복탄력성">회복탄력성</option><option value="책임 경계">책임 경계</option><option value="자원 활용">자원 활용</option><option value="조직 변화">조직 변화</option><option value="업무 원칙">업무 원칙</option><option value="비용 의식">비용 의식</option><option value="윤리적 판단">윤리적 판단</option><option value="커리어 방향">커리어 방향</option><option value="최종 적합성">최종 적합성</option></select></div>
+        <div class="toolbar-actions"><button class="tool-btn" id="toggle-all" type="button"><i class="fa-solid fa-angles-down" aria-hidden="true"></i> 전체 펼치기</button><button class="tool-btn" id="print-page" type="button"><i class="fa-solid fa-print" aria-hidden="true"></i> 인쇄</button><a class="tool-btn" href="career_interview_technical.html">1차 기술면접</a></div>
+      </div>
+
+      <div class="question-list" id="question-list">
+<article class="question-card" data-category="지원동기" data-search="e01 지원동기 우리 회사와 이 직무에 지원한 이유를 설명해 주세요. 회사·직무를 실제로 조사했으며 개인의 성장 방향과 연결되는지 확인한다. 회사·서비스 이해, 관심을 가진 구체적 이유, 관련 경험, 기여 가능성">
+  <details open>
+    <summary>
+      <span class="question-no">E01</span>
+      <span class="question-main"><span class="category">지원동기</span><strong>우리 회사와 이 직무에 지원한 이유를 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>회사·직무를 실제로 조사했으며 개인의 성장 방향과 연결되는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>회사·서비스 이해, 관심을 가진 구체적 이유, 관련 경험, 기여 가능성</p></section>
+      <section class="memo-block"><label for="memo-E01">면접 답변 메모</label><div id="memo-E01" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E01" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="직무 이해" data-search="e02 직무 이해 본인이 생각하는 좋은 소프트웨어 개발자는 어떤 개발자입니까? 기술 능력 외에 고객·품질·협업·책임을 어떻게 바라보는지 평가한다. 문제 해결, 사용자 가치, 품질 책임, 소통, 지속적인 학습">
+  <details>
+    <summary>
+      <span class="question-no">E02</span>
+      <span class="question-main"><span class="category">직무 이해</span><strong>본인이 생각하는 좋은 소프트웨어 개발자는 어떤 개발자입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>기술 능력 외에 고객·품질·협업·책임을 어떻게 바라보는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>문제 해결, 사용자 가치, 품질 책임, 소통, 지속적인 학습</p></section>
+      <section class="memo-block"><label for="memo-E02">면접 답변 메모</label><div id="memo-E02" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E02" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="고객 중심" data-search="e03 고객 중심 기술적으로 흥미롭지만 고객에게 큰 가치가 없는 기능이라면 어떻게 판단하겠습니까? 기술 자체보다 고객 문제와 사업적 우선순위를 먼저 고려하는지 본다. 고객 문제, 기대 효과, 비용, 검증 방법, 보류·축소·대체 판단">
+  <details>
+    <summary>
+      <span class="question-no">E03</span>
+      <span class="question-main"><span class="category">고객 중심</span><strong>기술적으로 흥미롭지만 고객에게 큰 가치가 없는 기능이라면 어떻게 판단하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>기술 자체보다 고객 문제와 사업적 우선순위를 먼저 고려하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>고객 문제, 기대 효과, 비용, 검증 방법, 보류·축소·대체 판단</p></section>
+      <section class="memo-block"><label for="memo-E03">면접 답변 메모</label><div id="memo-E03" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E03" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="고객 중심" data-search="e04 고객 중심 사용자의 불편을 직접 발견하고 개선한 경험이 있습니까? 지시받은 업무만 수행하지 않고 사용자를 관찰하는 태도를 평가한다. 불편 발견 경로, 사용자 영향, 개선 행동, 결과, 후속 확인">
+  <details>
+    <summary>
+      <span class="question-no">E04</span>
+      <span class="question-main"><span class="category">고객 중심</span><strong>사용자의 불편을 직접 발견하고 개선한 경험이 있습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>지시받은 업무만 수행하지 않고 사용자를 관찰하는 태도를 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>불편 발견 경로, 사용자 영향, 개선 행동, 결과, 후속 확인</p></section>
+      <section class="memo-block"><label for="memo-E04">면접 답변 메모</label><div id="memo-E04" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E04" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="주도성" data-search="e05 주도성 아무도 지시하지 않았지만 필요하다고 판단해 스스로 시작한 일이 있습니까? 문제 발견과 실행을 연결하는 주도성을 확인한다. 문제 상황, 시작한 이유, 이해관계자 설득, 실행, 구체적 변화">
+  <details>
+    <summary>
+      <span class="question-no">E05</span>
+      <span class="question-main"><span class="category">주도성</span><strong>아무도 지시하지 않았지만 필요하다고 판단해 스스로 시작한 일이 있습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>문제 발견과 실행을 연결하는 주도성을 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>문제 상황, 시작한 이유, 이해관계자 설득, 실행, 구체적 변화</p></section>
+      <section class="memo-block"><label for="memo-E05">면접 답변 메모</label><div id="memo-E05" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E05" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="책임감" data-search="e06 책임감 본인의 판단이나 실수로 문제가 발생했던 경험과 수습 과정을 말해 주세요. 실수를 숨기거나 남 탓하지 않고 결과에 책임지는지 평가한다. 본인 책임, 즉시 조치, 공유, 원인 분석, 재발 방지">
+  <details>
+    <summary>
+      <span class="question-no">E06</span>
+      <span class="question-main"><span class="category">책임감</span><strong>본인의 판단이나 실수로 문제가 발생했던 경험과 수습 과정을 말해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>실수를 숨기거나 남 탓하지 않고 결과에 책임지는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>본인 책임, 즉시 조치, 공유, 원인 분석, 재발 방지</p></section>
+      <section class="memo-block"><label for="memo-E06">면접 답변 메모</label><div id="memo-E06" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E06" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="완결성" data-search="e07 완결성 프로젝트를 시작하는 것과 끝까지 완성하는 것 중 무엇이 더 어렵다고 생각합니까? 결과를 실제 사용자에게 전달하고 운영하는 과정을 이해하는지 본다. 마무리 단계의 어려움, 품질 기준, 일정 조정, 배포·운영 경험">
+  <details>
+    <summary>
+      <span class="question-no">E07</span>
+      <span class="question-main"><span class="category">완결성</span><strong>프로젝트를 시작하는 것과 끝까지 완성하는 것 중 무엇이 더 어렵다고 생각합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>결과를 실제 사용자에게 전달하고 운영하는 과정을 이해하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>마무리 단계의 어려움, 품질 기준, 일정 조정, 배포·운영 경험</p></section>
+      <section class="memo-block"><label for="memo-E07">면접 답변 메모</label><div id="memo-E07" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E07" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="우선순위" data-search="e08 우선순위 일정이 부족해 모든 기능을 완성할 수 없다면 무엇을 기준으로 줄이겠습니까? 제한된 자원에서 고객 가치와 위험을 기준으로 의사결정하는지 평가한다. 핵심 사용자 목표, 필수·선택 기능, 위험, 기술 부채, 관계자 합의">
+  <details>
+    <summary>
+      <span class="question-no">E08</span>
+      <span class="question-main"><span class="category">우선순위</span><strong>일정이 부족해 모든 기능을 완성할 수 없다면 무엇을 기준으로 줄이겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>제한된 자원에서 고객 가치와 위험을 기준으로 의사결정하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>핵심 사용자 목표, 필수·선택 기능, 위험, 기술 부채, 관계자 합의</p></section>
+      <section class="memo-block"><label for="memo-E08">면접 답변 메모</label><div id="memo-E08" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E08" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="협업" data-search="e09 협업 팀원과 기술적 의견이 충돌했던 경험을 설명해 주세요. 감정이나 직급이 아니라 근거와 실험으로 갈등을 해결하는지 본다. 의견 차이, 상대 관점, 비교 기준, 검증·실험, 최종 결정">
+  <details>
+    <summary>
+      <span class="question-no">E09</span>
+      <span class="question-main"><span class="category">협업</span><strong>팀원과 기술적 의견이 충돌했던 경험을 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>감정이나 직급이 아니라 근거와 실험으로 갈등을 해결하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>의견 차이, 상대 관점, 비교 기준, 검증·실험, 최종 결정</p></section>
+      <section class="memo-block"><label for="memo-E09">면접 답변 메모</label><div id="memo-E09" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E09" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="경청" data-search="e10 경청 본인의 의견이 틀렸음을 인정하고 다른 사람의 제안을 받아들인 경험이 있습니까? 자존심보다 팀의 결과를 우선하고 피드백을 수용하는지 평가한다. 최초 판단, 반대 근거, 생각이 바뀐 계기, 실행 결과, 배운 점">
+  <details>
+    <summary>
+      <span class="question-no">E10</span>
+      <span class="question-main"><span class="category">경청</span><strong>본인의 의견이 틀렸음을 인정하고 다른 사람의 제안을 받아들인 경험이 있습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>자존심보다 팀의 결과를 우선하고 피드백을 수용하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>최초 판단, 반대 근거, 생각이 바뀐 계기, 실행 결과, 배운 점</p></section>
+      <section class="memo-block"><label for="memo-E10">면접 답변 메모</label><div id="memo-E10" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E10" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="소통" data-search="e11 소통 기술을 잘 모르는 고객이나 동료에게 복잡한 문제를 어떻게 설명하겠습니까? 상대의 배경에 맞춰 핵심과 영향을 명확히 전달하는지 확인한다. 전문용어 최소화, 비유, 선택지와 영향, 이해 확인, 문서화">
+  <details>
+    <summary>
+      <span class="question-no">E11</span>
+      <span class="question-main"><span class="category">소통</span><strong>기술을 잘 모르는 고객이나 동료에게 복잡한 문제를 어떻게 설명하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>상대의 배경에 맞춰 핵심과 영향을 명확히 전달하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>전문용어 최소화, 비유, 선택지와 영향, 이해 확인, 문서화</p></section>
+      <section class="memo-block"><label for="memo-E11">면접 답변 메모</label><div id="memo-E11" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E11" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="갈등 관리" data-search="e12 갈등 관리 약속한 업무를 반복해서 지키지 않는 동료가 있다면 어떻게 대응하겠습니까? 비난보다 사실과 영향에 근거해 문제를 해결하는지 평가한다. 사실 확인, 1대1 대화, 원인 파악, 지원·기대치 합의, 필요 시 공유">
+  <details>
+    <summary>
+      <span class="question-no">E12</span>
+      <span class="question-main"><span class="category">갈등 관리</span><strong>약속한 업무를 반복해서 지키지 않는 동료가 있다면 어떻게 대응하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>비난보다 사실과 영향에 근거해 문제를 해결하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>사실 확인, 1대1 대화, 원인 파악, 지원·기대치 합의, 필요 시 공유</p></section>
+      <section class="memo-block"><label for="memo-E12">면접 답변 메모</label><div id="memo-E12" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E12" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="리더십" data-search="e13 리더십 공식적인 리더가 아니었지만 팀의 방향이나 결과에 영향을 준 경험이 있습니까? 직책 없이도 신뢰와 근거로 팀을 움직일 수 있는지 본다. 문제 인식, 제안, 구성원 참여, 조율 방식, 결과">
+  <details>
+    <summary>
+      <span class="question-no">E13</span>
+      <span class="question-main"><span class="category">리더십</span><strong>공식적인 리더가 아니었지만 팀의 방향이나 결과에 영향을 준 경험이 있습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>직책 없이도 신뢰와 근거로 팀을 움직일 수 있는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>문제 인식, 제안, 구성원 참여, 조율 방식, 결과</p></section>
+      <section class="memo-block"><label for="memo-E13">면접 답변 메모</label><div id="memo-E13" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E13" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="학습 민첩성" data-search="e14 학습 민첩성 짧은 시간 안에 새로운 기술을 익혀 실제 결과물을 만든 경험을 말해 주세요. 빠르게 학습하고 업무에 적용하는 과정을 평가한다. 학습 목표, 자료 선택, 작은 실험, 적용, 검증, 부족한 부분">
+  <details>
+    <summary>
+      <span class="question-no">E14</span>
+      <span class="question-main"><span class="category">학습 민첩성</span><strong>짧은 시간 안에 새로운 기술을 익혀 실제 결과물을 만든 경험을 말해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>빠르게 학습하고 업무에 적용하는 과정을 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>학습 목표, 자료 선택, 작은 실험, 적용, 검증, 부족한 부분</p></section>
+      <section class="memo-block"><label for="memo-E14">면접 답변 메모</label><div id="memo-E14" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E14" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="학습 전략" data-search="e15 학습 전략 기술 변화가 빠른 환경에서 무엇을 어떻게 공부할지 결정하는 기준은 무엇입니까? 유행을 좇기보다 업무 가치와 기본기를 기준으로 학습하는지 확인한다. 직무 관련성, 문제 해결 필요성, 공식 문서, 실습, 학습 기록">
+  <details>
+    <summary>
+      <span class="question-no">E15</span>
+      <span class="question-main"><span class="category">학습 전략</span><strong>기술 변화가 빠른 환경에서 무엇을 어떻게 공부할지 결정하는 기준은 무엇입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>유행을 좇기보다 업무 가치와 기본기를 기준으로 학습하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>직무 관련성, 문제 해결 필요성, 공식 문서, 실습, 학습 기록</p></section>
+      <section class="memo-block"><label for="memo-E15">면접 답변 메모</label><div id="memo-E15" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E15" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="실패·회복" data-search="e16 실패·회복 기대한 결과를 얻지 못한 프로젝트 경험과 이후 행동을 설명해 주세요. 실패를 합리화하지 않고 원인을 학습으로 전환하는지 평가한다. 기대와 실제 결과, 본인의 책임, 원인, 개선 행동, 이후 변화">
+  <details>
+    <summary>
+      <span class="question-no">E16</span>
+      <span class="question-main"><span class="category">실패·회복</span><strong>기대한 결과를 얻지 못한 프로젝트 경험과 이후 행동을 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>실패를 합리화하지 않고 원인을 학습으로 전환하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>기대와 실제 결과, 본인의 책임, 원인, 개선 행동, 이후 변화</p></section>
+      <section class="memo-block"><label for="memo-E16">면접 답변 메모</label><div id="memo-E16" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E16" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="변화 대응" data-search="e17 변화 대응 프로젝트 중간에 요구사항이나 일정이 크게 바뀐다면 어떻게 대응하겠습니까? 변화 속에서도 우선순위와 팀의 신뢰를 유지하는지 본다. 변경 이유 확인, 영향 분석, 범위 재조정, 위험 공유, 합의">
+  <details>
+    <summary>
+      <span class="question-no">E17</span>
+      <span class="question-main"><span class="category">변화 대응</span><strong>프로젝트 중간에 요구사항이나 일정이 크게 바뀐다면 어떻게 대응하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>변화 속에서도 우선순위와 팀의 신뢰를 유지하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>변경 이유 확인, 영향 분석, 범위 재조정, 위험 공유, 합의</p></section>
+      <section class="memo-block"><label for="memo-E17">면접 답변 메모</label><div id="memo-E17" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E17" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="정직성" data-search="e18 정직성 본인이 모르는 질문을 면접이나 업무에서 받으면 어떻게 대응하겠습니까? 아는 척하거나 근거 없이 추측하지 않는 태도를 평가한다. 모르는 범위 인정, 알고 있는 부분 구분, 확인 방법, 답변 시점">
+  <details>
+    <summary>
+      <span class="question-no">E18</span>
+      <span class="question-main"><span class="category">정직성</span><strong>본인이 모르는 질문을 면접이나 업무에서 받으면 어떻게 대응하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>아는 척하거나 근거 없이 추측하지 않는 태도를 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>모르는 범위 인정, 알고 있는 부분 구분, 확인 방법, 답변 시점</p></section>
+      <section class="memo-block"><label for="memo-E18">면접 답변 메모</label><div id="memo-E18" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E18" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="AI 윤리" data-search="e19 ai 윤리 프로젝트에서 ai를 사용했다면 ai와 본인이 각각 담당한 부분을 설명해 주세요. ai 결과를 자신의 성과처럼 포장하지 않고 사용 범위를 투명하게 밝히는지 본다. 사용 도구, 맡긴 범위, 직접 판단한 부분, 검증, 한계">
+  <details>
+    <summary>
+      <span class="question-no">E19</span>
+      <span class="question-main"><span class="category">AI 윤리</span><strong>프로젝트에서 AI를 사용했다면 AI와 본인이 각각 담당한 부분을 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>AI 결과를 자신의 성과처럼 포장하지 않고 사용 범위를 투명하게 밝히는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>사용 도구, 맡긴 범위, 직접 판단한 부분, 검증, 한계</p></section>
+      <section class="memo-block"><label for="memo-E19">면접 답변 메모</label><div id="memo-E19" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E19" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="AI 윤리" data-search="e20 ai 윤리 ai가 만든 결과가 빠르지만 정확성이 의심된다면 일정과 품질 사이에서 어떻게 판단하겠습니까? 속도보다 위험과 영향에 맞는 검증 수준을 설정하는지 평가한다. 오류 영향, 검증 비용, 사람의 승인, 테스트, 사용 제한">
+  <details>
+    <summary>
+      <span class="question-no">E20</span>
+      <span class="question-main"><span class="category">AI 윤리</span><strong>AI가 만든 결과가 빠르지만 정확성이 의심된다면 일정과 품질 사이에서 어떻게 판단하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>속도보다 위험과 영향에 맞는 검증 수준을 설정하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>오류 영향, 검증 비용, 사람의 승인, 테스트, 사용 제한</p></section>
+      <section class="memo-block"><label for="memo-E20">면접 답변 메모</label><div id="memo-E20" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E20" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="보안·책임" data-search="e21 보안·책임 업무상 코드나 고객 정보를 ai 도구에 입력해야 하는 상황이라면 어떻게 하겠습니까? 편의보다 보안·개인정보·회사 정책을 우선하는지 확인한다. 회사 정책 확인, 민감정보 제거, 승인된 도구, 최소 입력, 대체 방법">
+  <details>
+    <summary>
+      <span class="question-no">E21</span>
+      <span class="question-main"><span class="category">보안·책임</span><strong>업무상 코드나 고객 정보를 AI 도구에 입력해야 하는 상황이라면 어떻게 하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>편의보다 보안·개인정보·회사 정책을 우선하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>회사 정책 확인, 민감정보 제거, 승인된 도구, 최소 입력, 대체 방법</p></section>
+      <section class="memo-block"><label for="memo-E21">면접 답변 메모</label><div id="memo-E21" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E21" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="사업 이해" data-search="e22 사업 이해 개발자의 기술 선택이 회사의 비용과 매출에 어떤 영향을 줄 수 있다고 생각합니까? 기술과 사업이 분리되지 않았음을 이해하는지 평가한다. 개발·운영비, 출시 속도, 장애 비용, 고객 이탈, 장기 유지보수">
+  <details>
+    <summary>
+      <span class="question-no">E22</span>
+      <span class="question-main"><span class="category">사업 이해</span><strong>개발자의 기술 선택이 회사의 비용과 매출에 어떤 영향을 줄 수 있다고 생각합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>기술과 사업이 분리되지 않았음을 이해하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>개발·운영비, 출시 속도, 장애 비용, 고객 이탈, 장기 유지보수</p></section>
+      <section class="memo-block"><label for="memo-E22">면접 답변 메모</label><div id="memo-E22" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E22" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="의사결정" data-search="e23 의사결정 빠른 출시와 높은 완성도가 충돌할 때 어떤 기준으로 결정하겠습니까? 하나의 정답보다 위험과 고객 영향을 기준으로 균형을 잡는지 본다. 핵심 품질선, 고객 영향, 보안·결제 예외, 단계적 출시, 후속 계획">
+  <details>
+    <summary>
+      <span class="question-no">E23</span>
+      <span class="question-main"><span class="category">의사결정</span><strong>빠른 출시와 높은 완성도가 충돌할 때 어떤 기준으로 결정하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>하나의 정답보다 위험과 고객 영향을 기준으로 균형을 잡는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>핵심 품질선, 고객 영향, 보안·결제 예외, 단계적 출시, 후속 계획</p></section>
+      <section class="memo-block"><label for="memo-E23">면접 답변 메모</label><div id="memo-E23" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E23" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="조직 적합성" data-search="e24 조직 적합성 입사 후 본인의 의견과 회사의 결정이 다를 경우 어떻게 행동하겠습니까? 건설적으로 이견을 제시하면서도 합의된 결정을 실행할 수 있는지 평가한다. 근거 제시, 반대 의견 경청, 결정 과정, 실행 책임, 결과 관찰">
+  <details>
+    <summary>
+      <span class="question-no">E24</span>
+      <span class="question-main"><span class="category">조직 적합성</span><strong>입사 후 본인의 의견과 회사의 결정이 다를 경우 어떻게 행동하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>건설적으로 이견을 제시하면서도 합의된 결정을 실행할 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>근거 제시, 반대 의견 경청, 결정 과정, 실행 책임, 결과 관찰</p></section>
+      <section class="memo-block"><label for="memo-E24">면접 답변 메모</label><div id="memo-E24" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E24" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="성장·기여" data-search="e25 성장·기여 입사 후 1년 동안 어떤 개발자로 평가받고 싶으며, 이를 위해 무엇을 하겠습니까? 추상적인 포부가 아니라 조직에 필요한 구체적인 성장 계획이 있는지 본다. 직무 목표, 3·6·12개월 행동, 학습 계획, 팀 기여, 측정 가능한 결과">
+  <details>
+    <summary>
+      <span class="question-no">E25</span>
+      <span class="question-main"><span class="category">성장·기여</span><strong>입사 후 1년 동안 어떤 개발자로 평가받고 싶으며, 이를 위해 무엇을 하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>추상적인 포부가 아니라 조직에 필요한 구체적인 성장 계획이 있는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>직무 목표, 3·6·12개월 행동, 학습 계획, 팀 기여, 측정 가능한 결과</p></section>
+      <section class="memo-block"><label for="memo-E25">면접 답변 메모</label><div id="memo-E25" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E25" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="자기이해" data-search="e26 자기이해 본인의 가장 큰 강점은 무엇이며 실제 업무에서 어떻게 증명했습니까? 추상적인 자기소개가 아니라 행동과 결과로 강점을 입증하는지 평가한다. 구체적 강점, 적용 상황, 행동, 수치·피드백, 직무 기여">
+  <details>
+    <summary>
+      <span class="question-no">E26</span>
+      <span class="question-main"><span class="category">자기이해</span><strong>본인의 가장 큰 강점은 무엇이며 실제 업무에서 어떻게 증명했습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>추상적인 자기소개가 아니라 행동과 결과로 강점을 입증하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>구체적 강점, 적용 상황, 행동, 수치·피드백, 직무 기여</p></section>
+      <section class="memo-block"><label for="memo-E26">면접 답변 메모</label><div id="memo-E26" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E26" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="자기이해" data-search="e27 자기이해 본인이 개선해야 할 가장 중요한 약점은 무엇입니까? 자기 객관화와 개선 의지가 있는지 확인한다. 실제 약점, 업무 영향, 개선 행동, 현재 변화, 지속 계획">
+  <details>
+    <summary>
+      <span class="question-no">E27</span>
+      <span class="question-main"><span class="category">자기이해</span><strong>본인이 개선해야 할 가장 중요한 약점은 무엇입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>자기 객관화와 개선 의지가 있는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>실제 약점, 업무 영향, 개선 행동, 현재 변화, 지속 계획</p></section>
+      <section class="memo-block"><label for="memo-E27">면접 답변 메모</label><div id="memo-E27" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E27" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="가치관" data-search="e28 가치관 직장을 선택할 때 가장 중요하게 생각하는 기준은 무엇입니까? 개인의 가치관과 회사 환경의 적합성을 평가한다. 우선순위, 해당 기준의 이유, 경험과의 연결, 현실적 고려">
+  <details>
+    <summary>
+      <span class="question-no">E28</span>
+      <span class="question-main"><span class="category">가치관</span><strong>직장을 선택할 때 가장 중요하게 생각하는 기준은 무엇입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>개인의 가치관과 회사 환경의 적합성을 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>우선순위, 해당 기준의 이유, 경험과의 연결, 현실적 고려</p></section>
+      <section class="memo-block"><label for="memo-E28">면접 답변 메모</label><div id="memo-E28" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E28" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="가치관" data-search="e29 가치관 높은 성과와 올바른 과정이 충돌한다면 무엇을 선택하겠습니까? 단기 결과를 위해 윤리와 신뢰를 훼손할 가능성이 있는지 본다. 지켜야 할 원칙, 장기 위험, 관계자 공유, 가능한 대안">
+  <details>
+    <summary>
+      <span class="question-no">E29</span>
+      <span class="question-main"><span class="category">가치관</span><strong>높은 성과와 올바른 과정이 충돌한다면 무엇을 선택하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>단기 결과를 위해 윤리와 신뢰를 훼손할 가능성이 있는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>지켜야 할 원칙, 장기 위험, 관계자 공유, 가능한 대안</p></section>
+      <section class="memo-block"><label for="memo-E29">면접 답변 메모</label><div id="memo-E29" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E29" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="성과" data-search="e30 성과 본인이 만든 결과 중 가장 자랑스러운 것은 무엇입니까? 성과의 크기보다 본인의 기여와 결과를 명확히 설명하는지 평가한다. 목표, 본인 역할, 어려움, 핵심 행동, 결과와 영향">
+  <details>
+    <summary>
+      <span class="question-no">E30</span>
+      <span class="question-main"><span class="category">성과</span><strong>본인이 만든 결과 중 가장 자랑스러운 것은 무엇입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>성과의 크기보다 본인의 기여와 결과를 명확히 설명하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>목표, 본인 역할, 어려움, 핵심 행동, 결과와 영향</p></section>
+      <section class="memo-block"><label for="memo-E30">면접 답변 메모</label><div id="memo-E30" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E30" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="성과 측정" data-search="e31 성과 측정 자신이 잘하고 있다는 것을 어떤 기준으로 판단합니까? 활동량이 아닌 결과와 고객 가치를 중심으로 평가하는지 본다. 품질, 일정, 사용자 반응, 팀 기여, 개선 지표">
+  <details>
+    <summary>
+      <span class="question-no">E31</span>
+      <span class="question-main"><span class="category">성과 측정</span><strong>자신이 잘하고 있다는 것을 어떤 기준으로 판단합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>활동량이 아닌 결과와 고객 가치를 중심으로 평가하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>품질, 일정, 사용자 반응, 팀 기여, 개선 지표</p></section>
+      <section class="memo-block"><label for="memo-E31">면접 답변 메모</label><div id="memo-E31" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E31" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="실행력" data-search="e32 실행력 계획은 세웠지만 실행되지 않았던 경험과 그 원인을 말해 주세요. 실패 원인을 현실적으로 분석하고 실행 방식을 개선하는지 확인한다. 계획, 실행 장애, 본인 책임, 수정 방식, 이후 변화">
+  <details>
+    <summary>
+      <span class="question-no">E32</span>
+      <span class="question-main"><span class="category">실행력</span><strong>계획은 세웠지만 실행되지 않았던 경험과 그 원인을 말해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>실패 원인을 현실적으로 분석하고 실행 방식을 개선하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>계획, 실행 장애, 본인 책임, 수정 방식, 이후 변화</p></section>
+      <section class="memo-block"><label for="memo-E32">면접 답변 메모</label><div id="memo-E32" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E32" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="의사결정" data-search="e33 의사결정 정보가 충분하지 않은 상태에서 중요한 결정을 내려야 했던 경험이 있습니까? 불확실성을 관리하면서 적시에 판단할 수 있는지 평가한다. 알고 있던 정보, 모르는 부분, 위험, 판단 기준, 결과">
+  <details>
+    <summary>
+      <span class="question-no">E33</span>
+      <span class="question-main"><span class="category">의사결정</span><strong>정보가 충분하지 않은 상태에서 중요한 결정을 내려야 했던 경험이 있습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>불확실성을 관리하면서 적시에 판단할 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>알고 있던 정보, 모르는 부분, 위험, 판단 기준, 결과</p></section>
+      <section class="memo-block"><label for="memo-E33">면접 답변 메모</label><div id="memo-E33" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E33" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="의사결정" data-search="e34 의사결정 본인이 내린 결정에 반대가 많을 때 어떻게 설득하겠습니까? 강요가 아닌 근거와 경청을 통해 합의를 형성하는지 본다. 반대 이유 파악, 공통 목표, 데이터·실험, 수정 가능성">
+  <details>
+    <summary>
+      <span class="question-no">E34</span>
+      <span class="question-main"><span class="category">의사결정</span><strong>본인이 내린 결정에 반대가 많을 때 어떻게 설득하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>강요가 아닌 근거와 경청을 통해 합의를 형성하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>반대 이유 파악, 공통 목표, 데이터·실험, 수정 가능성</p></section>
+      <section class="memo-block"><label for="memo-E34">면접 답변 메모</label><div id="memo-E34" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E34" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="문제 제기" data-search="e35 문제 제기 상급자나 고객의 지시가 잘못됐다고 판단되면 어떻게 하겠습니까? 조직 질서를 지키면서도 필요한 문제를 제기할 수 있는지 평가한다. 사실 확인, 예상 영향, 존중하는 표현, 대안, 최종 결정 대응">
+  <details>
+    <summary>
+      <span class="question-no">E35</span>
+      <span class="question-main"><span class="category">문제 제기</span><strong>상급자나 고객의 지시가 잘못됐다고 판단되면 어떻게 하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>조직 질서를 지키면서도 필요한 문제를 제기할 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>사실 확인, 예상 영향, 존중하는 표현, 대안, 최종 결정 대응</p></section>
+      <section class="memo-block"><label for="memo-E35">면접 답변 메모</label><div id="memo-E35" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E35" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="피드백" data-search="e36 피드백 가장 받아들이기 어려웠던 피드백과 이를 반영한 과정을 설명해 주세요. 방어적으로 반응하지 않고 행동을 바꿀 수 있는지 확인한다. 피드백 내용, 최초 반응, 사실 확인, 변화 행동, 결과">
+  <details>
+    <summary>
+      <span class="question-no">E36</span>
+      <span class="question-main"><span class="category">피드백</span><strong>가장 받아들이기 어려웠던 피드백과 이를 반영한 과정을 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>방어적으로 반응하지 않고 행동을 바꿀 수 있는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>피드백 내용, 최초 반응, 사실 확인, 변화 행동, 결과</p></section>
+      <section class="memo-block"><label for="memo-E36">면접 답변 메모</label><div id="memo-E36" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E36" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="피드백" data-search="e37 피드백 동료에게 불편하지만 필요한 피드백을 어떻게 전달하겠습니까? 관계를 훼손하지 않으면서 성과 문제를 다룰 수 있는지 평가한다. 공개·비공개 판단, 구체적 사실, 영향, 요청사항, 후속 확인">
+  <details>
+    <summary>
+      <span class="question-no">E37</span>
+      <span class="question-main"><span class="category">피드백</span><strong>동료에게 불편하지만 필요한 피드백을 어떻게 전달하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>관계를 훼손하지 않으면서 성과 문제를 다룰 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>공개·비공개 판단, 구체적 사실, 영향, 요청사항, 후속 확인</p></section>
+      <section class="memo-block"><label for="memo-E37">면접 답변 메모</label><div id="memo-E37" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E37" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="협업" data-search="e38 협업 본인보다 경험이 적은 동료를 도와 팀 성과를 높인 경험이 있습니까? 개인 성과를 넘어 팀의 역량 향상에 기여하는지 본다. 상대의 어려움, 지원 방식, 정답 대신 사고 과정 공유, 결과">
+  <details>
+    <summary>
+      <span class="question-no">E38</span>
+      <span class="question-main"><span class="category">협업</span><strong>본인보다 경험이 적은 동료를 도와 팀 성과를 높인 경험이 있습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>개인 성과를 넘어 팀의 역량 향상에 기여하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>상대의 어려움, 지원 방식, 정답 대신 사고 과정 공유, 결과</p></section>
+      <section class="memo-block"><label for="memo-E38">면접 답변 메모</label><div id="memo-E38" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E38" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="다양성" data-search="e39 다양성 자신과 배경이나 일하는 방식이 다른 사람과 협업한 경험을 말해 주세요. 차이를 문제로만 보지 않고 조율할 수 있는지 평가한다. 차이점, 발생한 어려움, 이해 노력, 협업 규칙, 배운 점">
+  <details>
+    <summary>
+      <span class="question-no">E39</span>
+      <span class="question-main"><span class="category">다양성</span><strong>자신과 배경이나 일하는 방식이 다른 사람과 협업한 경험을 말해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>차이를 문제로만 보지 않고 조율할 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>차이점, 발생한 어려움, 이해 노력, 협업 규칙, 배운 점</p></section>
+      <section class="memo-block"><label for="memo-E39">면접 답변 메모</label><div id="memo-E39" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E39" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="압박 대응" data-search="e40 압박 대응 일정 압박이 심한 상황에서 품질과 구성원의 피로를 어떻게 관리하겠습니까? 단기 성과 때문에 품질과 팀 지속 가능성을 희생하는지 본다. 우선순위, 범위 조정, 품질 하한선, 업무 분배, 위험 공유">
+  <details>
+    <summary>
+      <span class="question-no">E40</span>
+      <span class="question-main"><span class="category">압박 대응</span><strong>일정 압박이 심한 상황에서 품질과 구성원의 피로를 어떻게 관리하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>단기 성과 때문에 품질과 팀 지속 가능성을 희생하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>우선순위, 범위 조정, 품질 하한선, 업무 분배, 위험 공유</p></section>
+      <section class="memo-block"><label for="memo-E40">면접 답변 메모</label><div id="memo-E40" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E40" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="회복탄력성" data-search="e41 회복탄력성 반복해서 문제가 해결되지 않을 때 어떻게 동기와 집중력을 유지합니까? 어려운 상황에서 감정과 업무를 관리하는 능력을 평가한다. 문제 분해, 도움 요청, 휴식·전환, 작은 진전, 회고">
+  <details>
+    <summary>
+      <span class="question-no">E41</span>
+      <span class="question-main"><span class="category">회복탄력성</span><strong>반복해서 문제가 해결되지 않을 때 어떻게 동기와 집중력을 유지합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>어려운 상황에서 감정과 업무를 관리하는 능력을 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>문제 분해, 도움 요청, 휴식·전환, 작은 진전, 회고</p></section>
+      <section class="memo-block"><label for="memo-E41">면접 답변 메모</label><div id="memo-E41" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E41" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="책임 경계" data-search="e42 책임 경계 팀의 실패가 본인의 직접적인 잘못이 아니더라도 어떤 책임을 져야 한다고 생각합니까? 개인 책임과 공동 책임을 균형 있게 이해하는지 본다. 본인의 영향 범위, 지원 가능했던 부분, 공동 대응, 재발 방지">
+  <details>
+    <summary>
+      <span class="question-no">E42</span>
+      <span class="question-main"><span class="category">책임 경계</span><strong>팀의 실패가 본인의 직접적인 잘못이 아니더라도 어떤 책임을 져야 한다고 생각합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>개인 책임과 공동 책임을 균형 있게 이해하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>본인의 영향 범위, 지원 가능했던 부분, 공동 대응, 재발 방지</p></section>
+      <section class="memo-block"><label for="memo-E42">면접 답변 메모</label><div id="memo-E42" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E42" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="자원 활용" data-search="e43 자원 활용 혼자 해결하는 것과 다른 사람에게 도움을 요청하는 기준은 무엇입니까? 독립성과 협업 사이의 적절한 균형을 평가한다. 시도한 내용, 시간 제한, 영향도, 질문 준비, 지식 공유">
+  <details>
+    <summary>
+      <span class="question-no">E43</span>
+      <span class="question-main"><span class="category">자원 활용</span><strong>혼자 해결하는 것과 다른 사람에게 도움을 요청하는 기준은 무엇입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>독립성과 협업 사이의 적절한 균형을 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>시도한 내용, 시간 제한, 영향도, 질문 준비, 지식 공유</p></section>
+      <section class="memo-block"><label for="memo-E43">면접 답변 메모</label><div id="memo-E43" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E43" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="조직 변화" data-search="e44 조직 변화 회사의 방향이나 우선순위가 갑자기 바뀌면 어떻게 적응하겠습니까? 변화에 불평만 하지 않고 새로운 목표를 이해하고 행동하는지 본다. 변경 이유 확인, 기존 업무 영향, 재우선순위, 위험 공유">
+  <details>
+    <summary>
+      <span class="question-no">E44</span>
+      <span class="question-main"><span class="category">조직 변화</span><strong>회사의 방향이나 우선순위가 갑자기 바뀌면 어떻게 적응하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>변화에 불평만 하지 않고 새로운 목표를 이해하고 행동하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>변경 이유 확인, 기존 업무 영향, 재우선순위, 위험 공유</p></section>
+      <section class="memo-block"><label for="memo-E44">면접 답변 메모</label><div id="memo-E44" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E44" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="업무 원칙" data-search="e45 업무 원칙 시간이 부족해도 절대 생략해서는 안 된다고 생각하는 업무 절차는 무엇입니까? 지원자가 중요하게 생각하는 품질·보안·소통 원칙을 확인한다. 생략 불가 항목, 이유, 위험, 최소 수행 기준, 사례">
+  <details>
+    <summary>
+      <span class="question-no">E45</span>
+      <span class="question-main"><span class="category">업무 원칙</span><strong>시간이 부족해도 절대 생략해서는 안 된다고 생각하는 업무 절차는 무엇입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>지원자가 중요하게 생각하는 품질·보안·소통 원칙을 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>생략 불가 항목, 이유, 위험, 최소 수행 기준, 사례</p></section>
+      <section class="memo-block"><label for="memo-E45">면접 답변 메모</label><div id="memo-E45" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E45" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="사업 이해" data-search="e46 사업 이해 고객의 요청을 모두 들어주는 것이 고객 중심이라고 생각합니까? 고객 중심과 무조건적인 요구 수용을 구분하는지 평가한다. 실제 문제, 장기 영향, 비용, 우선순위, 대안 제시">
+  <details>
+    <summary>
+      <span class="question-no">E46</span>
+      <span class="question-main"><span class="category">사업 이해</span><strong>고객의 요청을 모두 들어주는 것이 고객 중심이라고 생각합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>고객 중심과 무조건적인 요구 수용을 구분하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>실제 문제, 장기 영향, 비용, 우선순위, 대안 제시</p></section>
+      <section class="memo-block"><label for="memo-E46">면접 답변 메모</label><div id="memo-E46" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E46" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="비용 의식" data-search="e47 비용 의식 더 좋은 기술이지만 비용이 훨씬 높은 선택지가 있다면 어떻게 결정하겠습니까? 기술적 완성도와 사업적 타당성을 함께 판단하는지 본다. 기대 효과, 총소유비용, 사용자 규모, 단계적 도입, 측정 기준">
+  <details>
+    <summary>
+      <span class="question-no">E47</span>
+      <span class="question-main"><span class="category">비용 의식</span><strong>더 좋은 기술이지만 비용이 훨씬 높은 선택지가 있다면 어떻게 결정하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>기술적 완성도와 사업적 타당성을 함께 판단하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>기대 효과, 총소유비용, 사용자 규모, 단계적 도입, 측정 기준</p></section>
+      <section class="memo-block"><label for="memo-E47">면접 답변 메모</label><div id="memo-E47" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E47" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="윤리적 판단" data-search="e48 윤리적 판단 회사에 유리하지만 고객에게 불리한 문제를 발견하면 어떻게 행동하겠습니까? 고객 신뢰와 장기적인 회사 가치를 지키는지 평가한다. 사실 확인, 고객 영향, 내부 공유, 개선 대안, 투명한 안내">
+  <details>
+    <summary>
+      <span class="question-no">E48</span>
+      <span class="question-main"><span class="category">윤리적 판단</span><strong>회사에 유리하지만 고객에게 불리한 문제를 발견하면 어떻게 행동하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>고객 신뢰와 장기적인 회사 가치를 지키는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>사실 확인, 고객 영향, 내부 공유, 개선 대안, 투명한 안내</p></section>
+      <section class="memo-block"><label for="memo-E48">면접 답변 메모</label><div id="memo-E48" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E48" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="커리어 방향" data-search="e49 커리어 방향 3년 뒤 어떤 역할과 책임을 맡고 싶습니까? 단순한 직급이나 보상이 아니라 성장 방향이 직무와 연결되는지 본다. 발전시킬 역량, 맡고 싶은 문제, 팀 기여, 학습 계획">
+  <details>
+    <summary>
+      <span class="question-no">E49</span>
+      <span class="question-main"><span class="category">커리어 방향</span><strong>3년 뒤 어떤 역할과 책임을 맡고 싶습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>단순한 직급이나 보상이 아니라 성장 방향이 직무와 연결되는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>발전시킬 역량, 맡고 싶은 문제, 팀 기여, 학습 계획</p></section>
+      <section class="memo-block"><label for="memo-E49">면접 답변 메모</label><div id="memo-E49" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E49" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="최종 적합성" data-search="e50 최종 적합성 여러 지원자 중 회사가 본인을 선택해야 하는 이유를 한 가지 경험으로 설명해 주세요. 자기 강점을 회사와 직무의 필요에 연결해 간결하게 전달하는지 평가한다. 회사의 요구, 차별화된 역량, 대표 경험, 구체적 결과, 입사 후 기여">
+  <details>
+    <summary>
+      <span class="question-no">E50</span>
+      <span class="question-main"><span class="category">최종 적합성</span><strong>여러 지원자 중 회사가 본인을 선택해야 하는 이유를 한 가지 경험으로 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>자기 강점을 회사와 직무의 필요에 연결해 간결하게 전달하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>회사의 요구, 차별화된 역량, 대표 경험, 구체적 결과, 입사 후 기여</p></section>
+      <section class="memo-block"><label for="memo-E50">면접 답변 메모</label><div id="memo-E50" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="E50" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+      </div>
+      <div class="empty-state" id="empty-state">검색 조건에 맞는 질문이 없습니다.</div>
+      <div class="answer-guide" aria-label="STAR 답변 구조"><div><strong>S</strong>Situation<br />상황과 맥락</div><div><strong>T</strong>Task<br />본인의 책임</div><div><strong>A</strong>Action<br />행동과 판단</div><div><strong>R</strong>Result<br />결과와 학습</div></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-in">
+      <div>상호명: (주)에듀니티랩 | 대표자: 이기택 | 사업장주소: 서울 강남구 테헤란로21길 25 태림빌딩 2층</div>
+      <div>연락처: (02)6240-0053 | 사업자등록번호: 132-86-35644 | 이메일: with@edunlab.kr</div>
+      <div>Copyright ⓒ Eduniety Lab. All Rights Reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    const searchInput = document.getElementById('question-search');
+    const categoryFilter = document.getElementById('category-filter');
+    const cards = [...document.querySelectorAll('.question-card')];
+    const visibleCount = document.getElementById('visible-count');
+    const emptyState = document.getElementById('empty-state');
+    const toggleButton = document.getElementById('toggle-all');
+
+    function applyFilter() {
+      const query = searchInput.value.trim().toLowerCase();
+      const category = categoryFilter.value;
+      let count = 0;
+      cards.forEach((card) => {
+        const matchesQuery = !query || card.dataset.search.includes(query);
+        const matchesCategory = !category || card.dataset.category === category;
+        const visible = matchesQuery && matchesCategory;
+        card.hidden = !visible;
+        if (visible) count += 1;
+      });
+      visibleCount.textContent = count;
+      emptyState.classList.toggle('visible', count === 0);
+    }
+    searchInput.addEventListener('input', applyFilter);
+    categoryFilter.addEventListener('change', applyFilter);
+
+    let expanded = false;
+    toggleButton.addEventListener('click', () => {
+      expanded = !expanded;
+      cards.filter((card) => !card.hidden).forEach((card) => { card.querySelector('details').open = expanded; });
+      toggleButton.innerHTML = expanded
+        ? '<i class="fa-solid fa-angles-up" aria-hidden="true"></i> 전체 접기'
+        : '<i class="fa-solid fa-angles-down" aria-hidden="true"></i> 전체 펼치기';
+    });
+    document.getElementById('print-page').addEventListener('click', () => {
+      cards.filter((card) => !card.hidden).forEach((card) => { card.querySelector('details').open = true; });
+      window.print();
+    });
+
+    const storagePrefix = 'dip-interview-executive-';
+    document.querySelectorAll('.memo').forEach((memo) => {
+      const key = storagePrefix + memo.dataset.noteId;
+      try { memo.textContent = localStorage.getItem(key) || ''; } catch (error) {}
+      memo.addEventListener('input', () => {
+        try { localStorage.setItem(key, memo.textContent); } catch (error) {}
+      });
+    });
+
+    (async function initPretext() {
+      await document.fonts.ready;
+      const elements = [...document.querySelectorAll('[data-pretext]')];
+      try {
+        const { prepare, layout } = await import('https://esm.sh/@chenglou/pretext');
+        const prepared = new Map();
+        const prepareElement = (el) => prepared.set(el, prepare(el.textContent, getComputedStyle(el).font));
+        elements.forEach(prepareElement);
+        const relayout = () => {
+          prepared.forEach((handle, el) => {
+            const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+            const result = layout(handle, el.clientWidth, lineHeight);
+            if (result && Number.isFinite(result.height)) el.style.minHeight = result.height + 'px';
+          });
+        };
+        new ResizeObserver(relayout).observe(document.body);
+        elements.forEach((el) => new MutationObserver(() => { prepareElement(el); relayout(); }).observe(el, { characterData:true, subtree:true, childList:true }));
+        relayout();
+      } catch (error) {
+        console.info('Pretext layout fallback: native browser wrapping is active.');
+      }
+    })();
+  </script>
+  <script src="shared/notice-modal.js"></script>
+</body>
+</html>

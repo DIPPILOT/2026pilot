@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="ko" data-accent="cyan">
+<head>
+  <script id="auth-guard">
+    (function () {
+      if (location.protocol === 'file:' || location.hostname === '127.0.0.1' || location.hostname === 'localhost') return;
+      function getCookie(name) {
+        var prefix = name + '=';
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var cookie = cookies[i].trim();
+          if (cookie.indexOf(prefix) === 0) return decodeURIComponent(cookie.substring(prefix.length));
+        }
+        return null;
+      }
+      var loggedInUser = getCookie('currentUser');
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) loggedInUser = session.value;
+            else localStorage.removeItem('currentUserSession');
+          } catch (e) { console.error(e); }
+        }
+      }
+      if (!loggedInUser) window.location.href = 'login/login.html';
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI SW 기술면접 질문지 50문항과 출제 의도, 핵심 평가 기준" />
+  <title>AI SW 기술면접 질문지 | 대구 DIP SW 랜딩</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="shared/notice-modal.css" />
+  <style>
+    :root {
+      --bg:#09090b; --panel:#121722; --panel-2:#191f2c; --line:rgba(255,255,255,.1);
+      --text:#fff; --muted:#cbd5e1; --quiet:#94a3b8; --cyan:#22d3ee; --blue:#60a5fa;
+      --purple:#c084fc; --pink:#f472b6; --amber:#fbbf24; --green:#34d399;
+      --accent:var(--cyan); --accent-2:var(--blue);
+      --accent-rgb:34,211,238; --radius:15px;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; scroll-padding-top:152px; }
+    body { min-width:320px; font-family:'Pretendard',sans-serif; color:var(--text); background:radial-gradient(circle at 10% 4%,rgba(var(--accent-rgb),.13),transparent 25%),radial-gradient(circle at 90% 20%,rgba(124,58,237,.1),transparent 28%),var(--bg); line-height:1.68; }
+    a { color:inherit; }
+    button,input,select { font:inherit; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    button,a,summary,select { -webkit-tap-highlight-color:transparent; }
+    :focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+    .container { width:min(1180px,calc(100% - 36px)); margin:0 auto; }
+    .navbar { position:sticky; top:0; z-index:50; background:rgba(9,9,11,.88); border-bottom:1px solid var(--line); backdrop-filter:blur(16px); }
+    .nav-in { min-height:70px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .logo { color:#fff; text-decoration:none; font-weight:850; display:flex; align-items:center; gap:9px; }
+    .logo::before { content:''; width:8px; height:21px; border-radius:99px; background:linear-gradient(var(--accent),var(--accent-2)); }
+    .nav-links { display:flex; gap:9px; flex-wrap:wrap; list-style:none; }
+    .nav-links a { min-height:38px; display:inline-flex; align-items:center; text-decoration:none; color:#e4e4e7; background:rgba(255,255,255,.05); border:1px solid var(--line); padding:7px 11px; border-radius:8px; font-size:.84rem; font-weight:750; }
+    .nav-links a.active { color:#07111f; background:var(--accent); border-color:transparent; }
+    [data-accent="purple"] .nav-links a.active { color:#fff; }
+    .hero { padding:70px 0 48px; border-bottom:1px solid var(--line); }
+    .eyebrow { color:var(--accent); font-size:.78rem; font-weight:900; letter-spacing:.13em; margin-bottom:12px; }
+    .hero h1 { max-width:900px; font-size:clamp(2.15rem,5vw,3.75rem); line-height:1.14; letter-spacing:-.04em; }
+    .hero h1 span { background:linear-gradient(110deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; color:transparent; }
+    .hero-copy { max-width:870px; color:var(--muted); font-size:1.03rem; margin-top:18px; }
+    .hero-meta { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; }
+    .chip { padding:6px 10px; border-radius:999px; color:#bae6fd; background:rgba(var(--accent-rgb),.08); border:1px solid rgba(var(--accent-rgb),.24); font-size:.77rem; font-weight:750; }
+    .updated { margin-top:14px; color:#71717a; font-size:.8rem; }
+    main { padding:36px 0 80px; }
+    .intro { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:18px; margin-bottom:20px; }
+    .section-kicker { color:var(--accent); font-size:.76rem; font-weight:900; letter-spacing:.1em; }
+    .intro h2 { margin:5px 0 6px; font-size:clamp(1.5rem,3vw,2.1rem); }
+    .intro-copy { color:var(--muted); max-width:790px; }
+    .count-box { min-width:145px; padding:15px 18px; background:rgba(var(--accent-rgb),.07); border:1px solid rgba(var(--accent-rgb),.25); border-radius:13px; text-align:center; }
+    .count-box strong { display:block; color:var(--accent); font-size:1.8rem; line-height:1.1; }
+    .count-box span { color:var(--quiet); font-size:.78rem; }
+    .toolbar { position:sticky; top:70px; z-index:40; display:grid; grid-template-columns:minmax(220px,1fr) minmax(180px,260px) auto; gap:10px; padding:13px; margin-bottom:18px; background:rgba(18,23,34,.94); border:1px solid var(--line); border-radius:14px; backdrop-filter:blur(14px); }
+    .field { position:relative; }
+    .field i { position:absolute; left:13px; top:50%; color:var(--quiet); transform:translateY(-50%); pointer-events:none; }
+    .field input,.field select { width:100%; min-height:44px; color:#f8fafc; background:#0c111a; border:1px solid var(--line); border-radius:9px; }
+    .field input { padding:10px 12px 10px 39px; }
+    .field select { padding:10px 34px 10px 12px; }
+    .toolbar-actions { display:flex; gap:8px; }
+    .tool-btn { min-height:44px; padding:9px 12px; color:#e4e4e7; background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:9px; cursor:pointer; font-weight:750; }
+    .tool-btn:hover { border-color:rgba(var(--accent-rgb),.45); color:#fff; }
+    .question-list { display:grid; gap:10px; }
+    .question-card { background:linear-gradient(145deg,rgba(25,31,44,.96),rgba(15,19,27,.96)); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+    .question-card[hidden] { display:none; }
+    details[open] { border-color:rgba(var(--accent-rgb),.28); }
+    summary { position:relative; min-height:74px; display:grid; grid-template-columns:62px minmax(0,1fr) 24px; align-items:center; gap:14px; padding:15px 18px; cursor:pointer; list-style:none; }
+    summary::-webkit-details-marker { display:none; }
+    summary:hover { background:rgba(var(--accent-rgb),.035); }
+    .question-no { display:grid; place-items:center; width:52px; height:38px; border-radius:9px; color:#07111f; background:linear-gradient(135deg,var(--accent),var(--accent-2)); font-size:.82rem; font-weight:900; }
+    .question-main { min-width:0; display:flex; flex-direction:column; gap:4px; }
+    .question-main .category { color:var(--accent); font-size:.73rem; font-weight:850; letter-spacing:.04em; }
+    .question-main strong { color:#f8fafc; font-size:1rem; line-height:1.5; word-break:keep-all; }
+    .chevron { width:11px; height:11px; border-right:2px solid var(--quiet); border-bottom:2px solid var(--quiet); transform:rotate(45deg); transition:transform .2s ease; }
+    details[open] .chevron { transform:rotate(225deg); }
+    .question-body { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 18px 18px 94px; }
+    .detail-block,.memo-block { padding:15px; background:rgba(255,255,255,.035); border:1px solid var(--line); border-radius:11px; }
+    .detail-block h3,.memo-block label { display:block; margin-bottom:6px; color:var(--accent); font-size:.78rem; font-weight:850; }
+    .detail-block p { color:var(--muted); font-size:.88rem; }
+    .memo-block { grid-column:1/-1; }
+    .memo { min-height:76px; padding:11px 12px; color:#e4e4e7; background:#0c111a; border:1px dashed rgba(var(--accent-rgb),.35); border-radius:8px; font-size:.86rem; white-space:pre-wrap; }
+    .memo:empty::before { content:attr(data-placeholder); color:#64748b; pointer-events:none; }
+    .empty-state { display:none; padding:42px 20px; color:var(--quiet); text-align:center; border:1px dashed var(--line); border-radius:14px; }
+    .empty-state.visible { display:block; }
+    .answer-guide { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:22px; }
+    .answer-guide div { padding:14px; text-align:center; color:#d4d4d8; background:rgba(255,255,255,.035); border:1px solid var(--line); border-radius:10px; font-size:.8rem; }
+    .answer-guide strong { display:block; color:var(--amber); font-size:1rem; }
+    .site-footer { padding:32px 20px; color:#a1a1aa; background:#09090b; border-top:1px solid rgba(255,255,255,.08); text-align:center; font-size:.82rem; line-height:1.8; }
+    .footer-in { max-width:1200px; margin:0 auto; }
+    .footer-in div + div { margin-top:6px; }
+    @media (max-width:1024px) { .toolbar { grid-template-columns:1fr 220px; } .toolbar-actions { grid-column:1/-1; } }
+    @media (max-width:768px) { html{scroll-padding-top:210px}.nav-in{padding:10px 0;align-items:flex-start;flex-direction:column}.intro{grid-template-columns:1fr}.count-box{justify-self:start}.toolbar{top:112px;grid-template-columns:1fr}.toolbar-actions{grid-column:auto;flex-wrap:wrap}.question-body{padding-left:18px}.answer-guide{grid-template-columns:1fr 1fr} }
+    @media (max-width:375px) { .container{width:calc(100% - 24px)}.hero{padding:44px 0 34px}.nav-links a{font-size:.78rem;padding:7px 8px}summary{grid-template-columns:48px minmax(0,1fr) 18px;padding:13px 12px;gap:9px}.question-no{width:43px}.question-body{grid-template-columns:1fr;padding:0 12px 12px}.memo-block{grid-column:auto}.toolbar{padding:10px}.tool-btn{flex:1}.answer-guide{grid-template-columns:1fr}}
+    @media (min-width:1440px) { .container{width:min(1240px,calc(100% - 48px))}.question-main strong{font-size:1.04rem} }
+    @media (prefers-color-scheme:light) {
+      body.allow-system-theme { --bg:#f8fafc; --panel:#fff; --panel-2:#f1f5f9; --text:#0f172a; --muted:#475569; --quiet:#64748b; --line:rgba(15,23,42,.14); background:#f8fafc; }
+    }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }
+    @media print {
+      .navbar,.toolbar,.memo-block,.site-footer { display:none!important; }
+      body { color:#111; background:#fff; font-size:10pt; }
+      .container { width:100%; }
+      .hero { padding:0 0 18px; border-bottom:2px solid #111; }
+      .hero h1 span { color:#111; -webkit-text-fill-color:#111; }
+      main { padding:18px 0; }
+      .question-list { gap:5px; }
+      .question-card { break-inside:avoid; background:#fff; border:1px solid #bbb; }
+      summary { min-height:0; padding:9px 10px; }
+      .question-no { color:#111; background:#eee; border:1px solid #bbb; }
+      .question-body { display:grid!important; padding:0 10px 10px 82px; }
+      .detail-block { background:#fff; border-color:#ccc; }
+      .detail-block h3,.question-main .category { color:#333; }
+      .detail-block p,.hero-copy,.intro-copy { color:#333; }
+      .chevron,.answer-guide { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container nav-in">
+      <a href="index.html" class="logo">대구 SW 랜딩</a>
+      <nav aria-label="면접 질문지 이동">
+        <ul class="nav-links">
+          <li><a href="career_interview.html">면접 가이드</a></li>
+          <li><a href="career_interview_technical.html" class="active" aria-current="page">1차 기술면접</a></li>
+          <li><a href="career_interview_executive.html">2차 임원면접</a></li>
+          <li><a href="index.html">과정 홈</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="eyebrow">TECHNICAL INTERVIEW QUESTION BANK</div>
+      <h1>설계 판단을 증명하는<br><span>기술면접 50문항</span></h1>
+      <p class="hero-copy" data-pretext>정답 암기가 아니라 요구사항·데이터·API·보안·AI 검증을 연결해 설명하는 힘을 확인합니다. 각 질문의 출제 의도와 핵심 평가 기준을 함께 보며 프로젝트 근거로 답변을 준비하세요.</p>
+      <div class="hero-meta"><span class="chip">1차 면접 · 기술</span><span class="chip">총 50문항</span><span class="chip">출제 의도 포함</span><span class="chip">핵심 평가 기준 포함</span></div>
+      <div class="updated">대구 DIP SW 랜딩 면접 질문지 · Google Sheets 기준 정리</div>
+    </div>
+  </section>
+
+  <main class="container">
+    <section aria-labelledby="question-heading">
+      <div class="intro">
+        <div><div class="section-kicker">QUESTION BANK · 50</div><h2 id="question-heading">기술 선택과 검증 과정을 묻는 질문</h2><p class="intro-copy" data-pretext>질문을 펼치면 면접관의 출제 의도와 답변에 포함해야 할 핵심 근거를 확인할 수 있습니다. 검색과 카테고리 필터를 활용해 필요한 역량부터 연습하세요.</p></div>
+        <div class="count-box" aria-live="polite"><strong id="visible-count">50</strong><span>표시 중인 질문</span></div>
+      </div>
+
+      <div class="toolbar" aria-label="질문 검색 및 필터">
+        <div class="field"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><label class="sr-only" for="question-search">질문 검색</label><input id="question-search" type="search" placeholder="질문·역량·평가 기준 검색" autocomplete="off" /></div>
+        <div class="field"><label class="sr-only" for="category-filter">평가 역량 선택</label><select id="category-filter"><option value="">전체 평가 역량</option><option value="요구사항 분석">요구사항 분석</option><option value="도메인 설계">도메인 설계</option><option value="사용자 흐름">사용자 흐름</option><option value="시스템 설계">시스템 설계</option><option value="데이터 모델링">데이터 모델링</option><option value="데이터 정합성">데이터 정합성</option><option value="데이터 이력">데이터 이력</option><option value="API 설계">API 설계</option><option value="API 오류 처리">API 오류 처리</option><option value="API 호환성">API 호환성</option><option value="UI·UX">UI·UX</option><option value="프론트엔드 상태">프론트엔드 상태</option><option value="프론트엔드 구조">프론트엔드 구조</option><option value="디버깅">디버깅</option><option value="비즈니스 규칙">비즈니스 규칙</option><option value="트랜잭션">트랜잭션</option><option value="동시성">동시성</option><option value="인증·인가">인증·인가</option><option value="보안">보안</option><option value="결제·멱등성">결제·멱등성</option><option value="이벤트·분석">이벤트·분석</option><option value="테스트·QA">테스트·QA</option><option value="배포·운영">배포·운영</option><option value="AI 활용·검증">AI 활용·검증</option><option value="아키텍처">아키텍처</option><option value="확장성">확장성</option><option value="성능">성능</option><option value="데이터베이스">데이터베이스</option><option value="쿼리 최적화">쿼리 최적화</option><option value="캐싱">캐싱</option><option value="파일 처리">파일 처리</option><option value="메시징">메시징</option><option value="장애 대응">장애 대응</option><option value="로그·관측성">로그·관측성</option><option value="모니터링">모니터링</option><option value="테스트 설계">테스트 설계</option><option value="테스트 품질">테스트 품질</option><option value="CI/CD">CI/CD</option><option value="배포 전략">배포 전략</option><option value="환경 관리">환경 관리</option><option value="비밀정보 관리">비밀정보 관리</option><option value="개인정보">개인정보</option><option value="공급망 보안">공급망 보안</option><option value="AI 기본 소양">AI 기본 소양</option><option value="프롬프트·컨텍스트">프롬프트·컨텍스트</option><option value="RAG">RAG</option><option value="AI 평가">AI 평가</option><option value="AI Agent">AI Agent</option></select></div>
+        <div class="toolbar-actions"><button class="tool-btn" id="toggle-all" type="button"><i class="fa-solid fa-angles-down" aria-hidden="true"></i> 전체 펼치기</button><button class="tool-btn" id="print-page" type="button"><i class="fa-solid fa-print" aria-hidden="true"></i> 인쇄</button><a class="tool-btn" href="career_interview_executive.html">2차 임원면접</a></div>
+      </div>
+
+      <div class="question-list" id="question-list">
+<article class="question-card" data-category="요구사항 분석" data-search="t01 요구사항 분석 모호한 사용자 요구사항을 실제 개발 가능한 기능으로 구체화한 경험을 설명해 주세요. 요구사항을 그대로 구현하지 않고 문제·사용자·목표·데이터를 구조화할 수 있는지 평가한다. 최초 요구사항, 확인 질문, 사용자·목표·데이터 정의, 기능 범위, 완료 조건">
+  <details open>
+    <summary>
+      <span class="question-no">T01</span>
+      <span class="question-main"><span class="category">요구사항 분석</span><strong>모호한 사용자 요구사항을 실제 개발 가능한 기능으로 구체화한 경험을 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>요구사항을 그대로 구현하지 않고 문제·사용자·목표·데이터를 구조화할 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>최초 요구사항, 확인 질문, 사용자·목표·데이터 정의, 기능 범위, 완료 조건</p></section>
+      <section class="memo-block"><label for="memo-T01">면접 답변 메모</label><div id="memo-T01" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T01" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="요구사항 분석" data-search="t02 요구사항 분석 사용자가 요청한 기능이 실제 문제 해결에 적합하지 않다고 판단한 경험이 있습니까? 요청과 진짜 사용자 문제를 구분하고 근거를 들어 대안을 제안하는 능력을 본다. 요청 내용, 발견한 실제 문제, 판단 근거, 제안한 대안, 사용자 반응">
+  <details>
+    <summary>
+      <span class="question-no">T02</span>
+      <span class="question-main"><span class="category">요구사항 분석</span><strong>사용자가 요청한 기능이 실제 문제 해결에 적합하지 않다고 판단한 경험이 있습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>요청과 진짜 사용자 문제를 구분하고 근거를 들어 대안을 제안하는 능력을 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>요청 내용, 발견한 실제 문제, 판단 근거, 제안한 대안, 사용자 반응</p></section>
+      <section class="memo-block"><label for="memo-T02">면접 답변 메모</label><div id="memo-T02" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T02" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="도메인 설계" data-search="t03 도메인 설계 프로젝트의 도메인을 어떤 기준으로 나누고 각 영역의 책임을 어떻게 정했습니까? 책임 경계와 데이터 소유권을 명확하게 설계할 수 있는지 평가한다. 핵심 도메인, 경계 설정 기준, 각 영역 책임, 데이터 소유권, 변경 영향">
+  <details>
+    <summary>
+      <span class="question-no">T03</span>
+      <span class="question-main"><span class="category">도메인 설계</span><strong>프로젝트의 도메인을 어떤 기준으로 나누고 각 영역의 책임을 어떻게 정했습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>책임 경계와 데이터 소유권을 명확하게 설계할 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>핵심 도메인, 경계 설정 기준, 각 영역 책임, 데이터 소유권, 변경 영향</p></section>
+      <section class="memo-block"><label for="memo-T03">면접 답변 메모</label><div id="memo-T03" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T03" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="사용자 흐름" data-search="t04 사용자 흐름 서비스의 정상 흐름뿐 아니라 실패·취소·재시도 흐름은 어떻게 설계했습니까? 성공 시나리오만 구현하지 않고 실제 운영 상황을 고려하는지 확인한다. 정상·대안·실패 흐름, 오류 안내, 재시도, 중복 요청 방지, 복구 방식">
+  <details>
+    <summary>
+      <span class="question-no">T04</span>
+      <span class="question-main"><span class="category">사용자 흐름</span><strong>서비스의 정상 흐름뿐 아니라 실패·취소·재시도 흐름은 어떻게 설계했습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>성공 시나리오만 구현하지 않고 실제 운영 상황을 고려하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>정상·대안·실패 흐름, 오류 안내, 재시도, 중복 요청 방지, 복구 방식</p></section>
+      <section class="memo-block"><label for="memo-T04">면접 답변 메모</label><div id="memo-T04" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T04" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="시스템 설계" data-search="t05 시스템 설계 동기 처리와 비동기 처리 중 하나를 선택했던 사례와 그 이유를 설명해 주세요. 성능·일관성·사용자 경험을 고려한 기술적 판단 능력을 평가한다. 선택 방식, 응답시간 요구, 실패 처리, 타임아웃, 재시도, 대안과 단점">
+  <details>
+    <summary>
+      <span class="question-no">T05</span>
+      <span class="question-main"><span class="category">시스템 설계</span><strong>동기 처리와 비동기 처리 중 하나를 선택했던 사례와 그 이유를 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>성능·일관성·사용자 경험을 고려한 기술적 판단 능력을 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>선택 방식, 응답시간 요구, 실패 처리, 타임아웃, 재시도, 대안과 단점</p></section>
+      <section class="memo-block"><label for="memo-T05">면접 답변 메모</label><div id="memo-T05" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T05" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="데이터 모델링" data-search="t06 데이터 모델링 프로젝트의 핵심 엔티티와 관계를 어떻게 도출했습니까? 업무 규칙을 데이터 구조로 정확하게 표현할 수 있는지 본다. 핵심 엔티티, 식별자, 관계, 필수값, 제약조건, 실제 업무 규칙과의 연결">
+  <details>
+    <summary>
+      <span class="question-no">T06</span>
+      <span class="question-main"><span class="category">데이터 모델링</span><strong>프로젝트의 핵심 엔티티와 관계를 어떻게 도출했습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>업무 규칙을 데이터 구조로 정확하게 표현할 수 있는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>핵심 엔티티, 식별자, 관계, 필수값, 제약조건, 실제 업무 규칙과의 연결</p></section>
+      <section class="memo-block"><label for="memo-T06">면접 답변 메모</label><div id="memo-T06" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T06" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="데이터 정합성" data-search="t07 데이터 정합성 데이터의 중복과 불일치를 방지하기 위해 어떤 설계를 적용했습니까? 정규화와 무결성 제약을 이해하고 실무적으로 적용할 수 있는지 평가한다. 중복 가능성, 정규화 수준, pk·fk·unique 제약, 검증 로직, 예외 처리">
+  <details>
+    <summary>
+      <span class="question-no">T07</span>
+      <span class="question-main"><span class="category">데이터 정합성</span><strong>데이터의 중복과 불일치를 방지하기 위해 어떤 설계를 적용했습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>정규화와 무결성 제약을 이해하고 실무적으로 적용할 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>중복 가능성, 정규화 수준, PK·FK·Unique 제약, 검증 로직, 예외 처리</p></section>
+      <section class="memo-block"><label for="memo-T07">면접 답변 메모</label><div id="memo-T07" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T07" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="데이터 이력" data-search="t08 데이터 이력 수정·삭제되는 데이터의 과거 상태나 변경 이력을 어떻게 관리하겠습니까? 감사·복구·분석 관점에서 데이터 생명주기를 고려하는지 확인한다. 소프트 삭제, 변경 이력 테이블, 생성·수정자, 타임스탬프, 개인정보 보존기간">
+  <details>
+    <summary>
+      <span class="question-no">T08</span>
+      <span class="question-main"><span class="category">데이터 이력</span><strong>수정·삭제되는 데이터의 과거 상태나 변경 이력을 어떻게 관리하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>감사·복구·분석 관점에서 데이터 생명주기를 고려하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>소프트 삭제, 변경 이력 테이블, 생성·수정자, 타임스탬프, 개인정보 보존기간</p></section>
+      <section class="memo-block"><label for="memo-T08">면접 답변 메모</label><div id="memo-T08" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T08" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="API 설계" data-search="t09 api 설계 프로젝트의 rest api 하나를 선택해 url, method, 요청·응답 구조의 설계 이유를 설명해 주세요. api 규칙을 암기한 것이 아니라 자원과 행위를 일관되게 모델링하는지 본다. 자원 정의, http method, 요청·응답 예시, 상태 코드, 권한, 대안">
+  <details>
+    <summary>
+      <span class="question-no">T09</span>
+      <span class="question-main"><span class="category">API 설계</span><strong>프로젝트의 REST API 하나를 선택해 URL, Method, 요청·응답 구조의 설계 이유를 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>API 규칙을 암기한 것이 아니라 자원과 행위를 일관되게 모델링하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>자원 정의, HTTP Method, 요청·응답 예시, 상태 코드, 권한, 대안</p></section>
+      <section class="memo-block"><label for="memo-T09">면접 답변 메모</label><div id="memo-T09" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T09" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="API 오류 처리" data-search="t10 api 오류 처리 api 오류 응답을 어떤 형식으로 표준화했으며, 그 방식이 왜 필요했습니까? 프론트엔드·백엔드 간 계약과 운영 편의성을 이해하는지 평가한다. 오류 코드, 사용자 메시지, 개발자 메시지, 추적 id, 검증 오류 구조">
+  <details>
+    <summary>
+      <span class="question-no">T10</span>
+      <span class="question-main"><span class="category">API 오류 처리</span><strong>API 오류 응답을 어떤 형식으로 표준화했으며, 그 방식이 왜 필요했습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>프론트엔드·백엔드 간 계약과 운영 편의성을 이해하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>오류 코드, 사용자 메시지, 개발자 메시지, 추적 ID, 검증 오류 구조</p></section>
+      <section class="memo-block"><label for="memo-T10">면접 답변 메모</label><div id="memo-T10" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T10" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="API 호환성" data-search="t11 api 호환성 운영 중인 api를 변경해야 할 때 기존 클라이언트와의 호환성을 어떻게 유지하겠습니까? 변경 영향과 안정적인 배포 전략을 고려하는지 본다. 하위 호환성, 버전 관리, 점진적 폐기, 모니터링, 클라이언트 공지">
+  <details>
+    <summary>
+      <span class="question-no">T11</span>
+      <span class="question-main"><span class="category">API 호환성</span><strong>운영 중인 API를 변경해야 할 때 기존 클라이언트와의 호환성을 어떻게 유지하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>변경 영향과 안정적인 배포 전략을 고려하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>하위 호환성, 버전 관리, 점진적 폐기, 모니터링, 클라이언트 공지</p></section>
+      <section class="memo-block"><label for="memo-T11">면접 답변 메모</label><div id="memo-T11" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T11" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="UI·UX" data-search="t12 ui·ux 초보 사용자나 처음 방문한 사용자를 위해 ui를 개선한 사례를 설명해 주세요. 구현 편의보다 사용자 이해와 행동 흐름을 우선하는지 평가한다. 사용자 특성, 어려움 발견 방법, 정보구조, 안내 문구, 개선 전후 결과">
+  <details>
+    <summary>
+      <span class="question-no">T12</span>
+      <span class="question-main"><span class="category">UI·UX</span><strong>초보 사용자나 처음 방문한 사용자를 위해 UI를 개선한 사례를 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>구현 편의보다 사용자 이해와 행동 흐름을 우선하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>사용자 특성, 어려움 발견 방법, 정보구조, 안내 문구, 개선 전후 결과</p></section>
+      <section class="memo-block"><label for="memo-T12">면접 답변 메모</label><div id="memo-T12" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T12" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="프론트엔드 상태" data-search="t13 프론트엔드 상태 로딩·빈 화면·오류·성공 상태를 화면에서 어떻게 구분하고 처리했습니까? 비정상 상태를 포함한 완성도 높은 ui 상태 설계 능력을 확인한다. 상태 모델, 사용자 피드백, 재시도 버튼, 중복 클릭 방지, 접근성">
+  <details>
+    <summary>
+      <span class="question-no">T13</span>
+      <span class="question-main"><span class="category">프론트엔드 상태</span><strong>로딩·빈 화면·오류·성공 상태를 화면에서 어떻게 구분하고 처리했습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>비정상 상태를 포함한 완성도 높은 UI 상태 설계 능력을 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>상태 모델, 사용자 피드백, 재시도 버튼, 중복 클릭 방지, 접근성</p></section>
+      <section class="memo-block"><label for="memo-T13">면접 답변 메모</label><div id="memo-T13" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T13" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="프론트엔드 구조" data-search="t14 프론트엔드 구조 컴포넌트를 나누는 기준과 상태를 지역·전역으로 구분한 기준을 설명해 주세요. 유지보수 가능한 프론트엔드 구조를 설계하는지 평가한다. 책임, 재사용성, 변경 빈도, 상태 소유권, props·전역 상태 선택 기준">
+  <details>
+    <summary>
+      <span class="question-no">T14</span>
+      <span class="question-main"><span class="category">프론트엔드 구조</span><strong>컴포넌트를 나누는 기준과 상태를 지역·전역으로 구분한 기준을 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>유지보수 가능한 프론트엔드 구조를 설계하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>책임, 재사용성, 변경 빈도, 상태 소유권, props·전역 상태 선택 기준</p></section>
+      <section class="memo-block"><label for="memo-T14">면접 답변 메모</label><div id="memo-T14" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T14" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="디버깅" data-search="t15 디버깅 재현하기 어려운 오류를 발견했을 때 어떤 순서로 원인을 좁혀 가겠습니까? 추측에 의존하지 않고 관측 가능한 증거로 문제를 해결하는지 본다. 재현 조건, 로그, 입력·환경 비교, 가설 설정, 최소 재현, 수정 후 검증">
+  <details>
+    <summary>
+      <span class="question-no">T15</span>
+      <span class="question-main"><span class="category">디버깅</span><strong>재현하기 어려운 오류를 발견했을 때 어떤 순서로 원인을 좁혀 가겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>추측에 의존하지 않고 관측 가능한 증거로 문제를 해결하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>재현 조건, 로그, 입력·환경 비교, 가설 설정, 최소 재현, 수정 후 검증</p></section>
+      <section class="memo-block"><label for="memo-T15">면접 답변 메모</label><div id="memo-T15" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T15" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="비즈니스 규칙" data-search="t16 비즈니스 규칙 코드에 흩어진 비즈니스 규칙을 어떻게 관리하고 테스트하겠습니까? 핵심 업무 규칙을 ui나 db에 종속시키지 않고 명확하게 관리하는지 평가한다. 규칙 위치, 도메인·서비스 책임, 불변식, 단위 테스트, 변경 영향">
+  <details>
+    <summary>
+      <span class="question-no">T16</span>
+      <span class="question-main"><span class="category">비즈니스 규칙</span><strong>코드에 흩어진 비즈니스 규칙을 어떻게 관리하고 테스트하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>핵심 업무 규칙을 UI나 DB에 종속시키지 않고 명확하게 관리하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>규칙 위치, 도메인·서비스 책임, 불변식, 단위 테스트, 변경 영향</p></section>
+      <section class="memo-block"><label for="memo-T16">면접 답변 메모</label><div id="memo-T16" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T16" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="트랜잭션" data-search="t17 트랜잭션 여러 데이터 변경 중 일부만 성공하면 안 되는 기능을 어떻게 구현하겠습니까? 원자성·일관성·예외 처리와 외부 시스템 연동을 이해하는지 본다. 트랜잭션 범위, 롤백, 외부 api 문제, 보상 처리, 재시도 정책">
+  <details>
+    <summary>
+      <span class="question-no">T17</span>
+      <span class="question-main"><span class="category">트랜잭션</span><strong>여러 데이터 변경 중 일부만 성공하면 안 되는 기능을 어떻게 구현하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>원자성·일관성·예외 처리와 외부 시스템 연동을 이해하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>트랜잭션 범위, 롤백, 외부 API 문제, 보상 처리, 재시도 정책</p></section>
+      <section class="memo-block"><label for="memo-T17">면접 답변 메모</label><div id="memo-T17" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T17" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="동시성" data-search="t18 동시성 여러 사용자가 동시에 같은 데이터를 수정하거나 신청할 때 발생하는 문제를 어떻게 막겠습니까? 경쟁 상태와 중복 처리 위험을 인식하고 적절한 통제 방식을 선택하는지 평가한다. 경쟁 상태, 낙관·비관적 잠금, unique 제약, 충돌 안내">
+  <details>
+    <summary>
+      <span class="question-no">T18</span>
+      <span class="question-main"><span class="category">동시성</span><strong>여러 사용자가 동시에 같은 데이터를 수정하거나 신청할 때 발생하는 문제를 어떻게 막겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>경쟁 상태와 중복 처리 위험을 인식하고 적절한 통제 방식을 선택하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>경쟁 상태, 낙관·비관적 잠금, Unique 제약, 충돌 안내</p></section>
+      <section class="memo-block"><label for="memo-T18">면접 답변 메모</label><div id="memo-T18" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T18" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="인증·인가" data-search="t19 인증·인가 인증과 인가의 차이를 프로젝트 사례를 들어 설명해 주세요. 사용자 확인과 권한 검사를 구분하고 실제 요청 흐름에 적용할 수 있는지 본다. 로그인 과정, 세션·토큰, 역할·소유권 검사, 서버 검증, 실패 응답">
+  <details>
+    <summary>
+      <span class="question-no">T19</span>
+      <span class="question-main"><span class="category">인증·인가</span><strong>인증과 인가의 차이를 프로젝트 사례를 들어 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>사용자 확인과 권한 검사를 구분하고 실제 요청 흐름에 적용할 수 있는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>로그인 과정, 세션·토큰, 역할·소유권 검사, 서버 검증, 실패 응답</p></section>
+      <section class="memo-block"><label for="memo-T19">면접 답변 메모</label><div id="memo-T19" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T19" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="보안" data-search="t20 보안 다른 사용자의 데이터 id를 바꿔 접근하는 공격을 어떻게 방지하겠습니까? 클라이언트 화면 제한이 아니라 서버에서 객체 소유권을 검증하는지 평가한다. 서버 측 소유권 확인, 최소 권한, 직접 객체 참조 공격, 금지 테스트">
+  <details>
+    <summary>
+      <span class="question-no">T20</span>
+      <span class="question-main"><span class="category">보안</span><strong>다른 사용자의 데이터 ID를 바꿔 접근하는 공격을 어떻게 방지하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>클라이언트 화면 제한이 아니라 서버에서 객체 소유권을 검증하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>서버 측 소유권 확인, 최소 권한, 직접 객체 참조 공격, 금지 테스트</p></section>
+      <section class="memo-block"><label for="memo-T20">면접 답변 메모</label><div id="memo-T20" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T20" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="결제·멱등성" data-search="t21 결제·멱등성 결제나 주문 요청이 여러 번 전달돼도 중복 처리되지 않도록 어떻게 설계하겠습니까? 금전·상태 변경 기능에서 멱등성과 장애 복구를 고려하는지 본다. 멱등키, unique 제약, 요청 상태 저장, 재시도, 중복 과금 검증">
+  <details>
+    <summary>
+      <span class="question-no">T21</span>
+      <span class="question-main"><span class="category">결제·멱등성</span><strong>결제나 주문 요청이 여러 번 전달돼도 중복 처리되지 않도록 어떻게 설계하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>금전·상태 변경 기능에서 멱등성과 장애 복구를 고려하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>멱등키, Unique 제약, 요청 상태 저장, 재시도, 중복 과금 검증</p></section>
+      <section class="memo-block"><label for="memo-T21">면접 답변 메모</label><div id="memo-T21" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T21" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="이벤트·분석" data-search="t22 이벤트·분석 분석 이벤트나 로그 데이터가 실제로 신뢰할 수 있는지 어떻게 검증하겠습니까? 이벤트 전송에 그치지 않고 지표 품질을 관리하는지 평가한다. 이벤트 정의, 중복·누락 확인, 스키마, 기준 데이터 대조, 모니터링">
+  <details>
+    <summary>
+      <span class="question-no">T22</span>
+      <span class="question-main"><span class="category">이벤트·분석</span><strong>분석 이벤트나 로그 데이터가 실제로 신뢰할 수 있는지 어떻게 검증하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>이벤트 전송에 그치지 않고 지표 품질을 관리하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>이벤트 정의, 중복·누락 확인, 스키마, 기준 데이터 대조, 모니터링</p></section>
+      <section class="memo-block"><label for="memo-T22">면접 답변 메모</label><div id="memo-T22" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T22" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="테스트·QA" data-search="t23 테스트·qa 시간 제약이 있을 때 어떤 테스트부터 작성할 것인지 우선순위를 설명해 주세요. 위험 기반으로 품질과 일정을 판단하는 능력을 본다. 핵심 사용자 흐름, 장애 영향, 단위·통합·e2e 역할, 회귀 위험, 제외 근거">
+  <details>
+    <summary>
+      <span class="question-no">T23</span>
+      <span class="question-main"><span class="category">테스트·QA</span><strong>시간 제약이 있을 때 어떤 테스트부터 작성할 것인지 우선순위를 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>위험 기반으로 품질과 일정을 판단하는 능력을 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>핵심 사용자 흐름, 장애 영향, 단위·통합·E2E 역할, 회귀 위험, 제외 근거</p></section>
+      <section class="memo-block"><label for="memo-T23">면접 답변 메모</label><div id="memo-T23" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T23" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="배포·운영" data-search="t24 배포·운영 새로운 버전을 배포한 뒤 문제가 발견되면 어떻게 탐지하고 대응하겠습니까? 개발 완료 이후 관측·장애 대응·롤백까지 책임질 수 있는지 평가한다. 로그·지표·알림, 배포 기준, 점진 배포, 롤백, 장애 회고">
+  <details>
+    <summary>
+      <span class="question-no">T24</span>
+      <span class="question-main"><span class="category">배포·운영</span><strong>새로운 버전을 배포한 뒤 문제가 발견되면 어떻게 탐지하고 대응하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>개발 완료 이후 관측·장애 대응·롤백까지 책임질 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>로그·지표·알림, 배포 기준, 점진 배포, 롤백, 장애 회고</p></section>
+      <section class="memo-block"><label for="memo-T24">면접 답변 메모</label><div id="memo-T24" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T24" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="AI 활용·검증" data-search="t25 ai 활용·검증 ai가 제안한 코드나 설계를 그대로 사용하지 않고 수정하거나 거절한 사례를 설명해 주세요. ai 결과를 검증하고 최종 판단에 책임지는지를 본다. ai에 제공한 범위, 제안 내용, 발견한 오류·위험, 검증 방법, 수정·거절 이유">
+  <details>
+    <summary>
+      <span class="question-no">T25</span>
+      <span class="question-main"><span class="category">AI 활용·검증</span><strong>AI가 제안한 코드나 설계를 그대로 사용하지 않고 수정하거나 거절한 사례를 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>AI 결과를 검증하고 최종 판단에 책임지는지를 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>AI에 제공한 범위, 제안 내용, 발견한 오류·위험, 검증 방법, 수정·거절 이유</p></section>
+      <section class="memo-block"><label for="memo-T25">면접 답변 메모</label><div id="memo-T25" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T25" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="아키텍처" data-search="t26 아키텍처 프로젝트의 전체 구조를 설명하고 해당 구조를 선택한 이유를 말해 주세요. 기능 구현을 넘어 시스템 전체를 이해하고 설계했는지 평가한다. 주요 구성요소, 데이터 흐름, 계층별 책임, 선택 이유, 한계">
+  <details>
+    <summary>
+      <span class="question-no">T26</span>
+      <span class="question-main"><span class="category">아키텍처</span><strong>프로젝트의 전체 구조를 설명하고 해당 구조를 선택한 이유를 말해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>기능 구현을 넘어 시스템 전체를 이해하고 설계했는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>주요 구성요소, 데이터 흐름, 계층별 책임, 선택 이유, 한계</p></section>
+      <section class="memo-block"><label for="memo-T26">면접 답변 메모</label><div id="memo-T26" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T26" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="아키텍처" data-search="t27 아키텍처 모놀리식 구조와 마이크로서비스 구조 중 어떤 방식을 선택하겠습니까? 유행이 아니라 규모와 운영 조건에 따라 구조를 선택하는지 확인한다. 팀 규모, 서비스 복잡도, 배포 독립성, 운영비용, 전환 기준">
+  <details>
+    <summary>
+      <span class="question-no">T27</span>
+      <span class="question-main"><span class="category">아키텍처</span><strong>모놀리식 구조와 마이크로서비스 구조 중 어떤 방식을 선택하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>유행이 아니라 규모와 운영 조건에 따라 구조를 선택하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>팀 규모, 서비스 복잡도, 배포 독립성, 운영비용, 전환 기준</p></section>
+      <section class="memo-block"><label for="memo-T27">면접 답변 메모</label><div id="memo-T27" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T27" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="확장성" data-search="t28 확장성 사용자나 데이터가 10배로 증가하면 현재 시스템에서 가장 먼저 문제가 될 부분은 무엇입니까? 병목을 예측하고 확장 전략을 수립할 수 있는지 평가한다. 예상 병목, 측정 지표, db·서버·캐시 대응, 우선순위">
+  <details>
+    <summary>
+      <span class="question-no">T28</span>
+      <span class="question-main"><span class="category">확장성</span><strong>사용자나 데이터가 10배로 증가하면 현재 시스템에서 가장 먼저 문제가 될 부분은 무엇입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>병목을 예측하고 확장 전략을 수립할 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>예상 병목, 측정 지표, DB·서버·캐시 대응, 우선순위</p></section>
+      <section class="memo-block"><label for="memo-T28">면접 답변 메모</label><div id="memo-T28" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T28" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="성능" data-search="t29 성능 서비스가 느리다는 신고를 받으면 어떤 순서로 원인을 확인하겠습니까? 측정값과 증거를 이용해 성능 문제를 분석하는지 본다. 재현, 응답시간 분해, 로그·apm, db 쿼리, 네트워크, 개선 전후 측정">
+  <details>
+    <summary>
+      <span class="question-no">T29</span>
+      <span class="question-main"><span class="category">성능</span><strong>서비스가 느리다는 신고를 받으면 어떤 순서로 원인을 확인하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>측정값과 증거를 이용해 성능 문제를 분석하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>재현, 응답시간 분해, 로그·APM, DB 쿼리, 네트워크, 개선 전후 측정</p></section>
+      <section class="memo-block"><label for="memo-T29">면접 답변 메모</label><div id="memo-T29" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T29" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="데이터베이스" data-search="t30 데이터베이스 데이터베이스 인덱스의 장점과 단점을 프로젝트 사례로 설명해 주세요. 조회 성능과 저장·수정 비용의 트레이드오프를 이해하는지 확인한다. 적용 컬럼, 쿼리 패턴, 실행 계획, 쓰기 비용, 효과 측정">
+  <details>
+    <summary>
+      <span class="question-no">T30</span>
+      <span class="question-main"><span class="category">데이터베이스</span><strong>데이터베이스 인덱스의 장점과 단점을 프로젝트 사례로 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>조회 성능과 저장·수정 비용의 트레이드오프를 이해하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>적용 컬럼, 쿼리 패턴, 실행 계획, 쓰기 비용, 효과 측정</p></section>
+      <section class="memo-block"><label for="memo-T30">면접 답변 메모</label><div id="memo-T30" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T30" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="쿼리 최적화" data-search="t31 쿼리 최적화 조회 api가 느릴 때 sql과 데이터 접근 구조를 어떻게 개선하겠습니까? 실제 데이터 접근 병목을 체계적으로 분석하는 능력을 평가한다. 실행 계획, n+1 문제, 인덱스, 조회 범위, 페이지네이션, 측정 결과">
+  <details>
+    <summary>
+      <span class="question-no">T31</span>
+      <span class="question-main"><span class="category">쿼리 최적화</span><strong>조회 API가 느릴 때 SQL과 데이터 접근 구조를 어떻게 개선하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>실제 데이터 접근 병목을 체계적으로 분석하는 능력을 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>실행 계획, N+1 문제, 인덱스, 조회 범위, 페이지네이션, 측정 결과</p></section>
+      <section class="memo-block"><label for="memo-T31">면접 답변 메모</label><div id="memo-T31" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T31" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="캐싱" data-search="t32 캐싱 어떤 데이터를 캐시해야 하며 캐시를 사용하면 안 되는 경우는 언제입니까? 성능뿐 아니라 데이터 일관성과 복잡성까지 고려하는지 본다. 데이터 특성, ttl, 무효화, 캐시 미스, 최신성이 중요한 데이터">
+  <details>
+    <summary>
+      <span class="question-no">T32</span>
+      <span class="question-main"><span class="category">캐싱</span><strong>어떤 데이터를 캐시해야 하며 캐시를 사용하면 안 되는 경우는 언제입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>성능뿐 아니라 데이터 일관성과 복잡성까지 고려하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>데이터 특성, TTL, 무효화, 캐시 미스, 최신성이 중요한 데이터</p></section>
+      <section class="memo-block"><label for="memo-T32">면접 답변 메모</label><div id="memo-T32" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T32" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="파일 처리" data-search="t33 파일 처리 대용량 파일 업로드 기능을 설계한다면 어떤 문제를 고려하겠습니까? 저장공간·보안·성능·실패 복구를 함께 고려하는지 평가한다. 파일 크기 제한, 분할 업로드, 저장소, 악성 파일 검사, 재시도">
+  <details>
+    <summary>
+      <span class="question-no">T33</span>
+      <span class="question-main"><span class="category">파일 처리</span><strong>대용량 파일 업로드 기능을 설계한다면 어떤 문제를 고려하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>저장공간·보안·성능·실패 복구를 함께 고려하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>파일 크기 제한, 분할 업로드, 저장소, 악성 파일 검사, 재시도</p></section>
+      <section class="memo-block"><label for="memo-T33">면접 답변 메모</label><div id="memo-T33" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T33" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="메시징" data-search="t34 메시징 이벤트나 메시지 큐를 사용했던 경험 또는 사용이 필요한 상황을 설명해 주세요. 비동기 처리의 필요성과 전달 실패 문제를 이해하는지 확인한다. 사용 목적, 생산자·소비자, 중복 처리, 재시도, 실패 큐">
+  <details>
+    <summary>
+      <span class="question-no">T34</span>
+      <span class="question-main"><span class="category">메시징</span><strong>이벤트나 메시지 큐를 사용했던 경험 또는 사용이 필요한 상황을 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>비동기 처리의 필요성과 전달 실패 문제를 이해하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>사용 목적, 생산자·소비자, 중복 처리, 재시도, 실패 큐</p></section>
+      <section class="memo-block"><label for="memo-T34">면접 답변 메모</label><div id="memo-T34" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T34" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="장애 대응" data-search="t35 장애 대응 외부 api가 느리거나 중단됐을 때 우리 서비스가 함께 장애 나는 것을 어떻게 막겠습니까? 외부 의존성 장애를 격리하고 사용자 영향을 줄일 수 있는지 평가한다. 타임아웃, 제한된 재시도, 회로 차단, 대체 응답, 모니터링">
+  <details>
+    <summary>
+      <span class="question-no">T35</span>
+      <span class="question-main"><span class="category">장애 대응</span><strong>외부 API가 느리거나 중단됐을 때 우리 서비스가 함께 장애 나는 것을 어떻게 막겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>외부 의존성 장애를 격리하고 사용자 영향을 줄일 수 있는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>타임아웃, 제한된 재시도, 회로 차단, 대체 응답, 모니터링</p></section>
+      <section class="memo-block"><label for="memo-T35">면접 답변 메모</label><div id="memo-T35" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T35" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="로그·관측성" data-search="t36 로그·관측성 장애 원인을 추적할 수 있도록 어떤 로그를 남겨야 합니까? 운영에 필요한 관측 가능성과 개인정보 보호를 함께 고려하는지 본다. 요청 id, 주요 상태 변화, 오류 원인, 로그 수준, 민감정보 마스킹">
+  <details>
+    <summary>
+      <span class="question-no">T36</span>
+      <span class="question-main"><span class="category">로그·관측성</span><strong>장애 원인을 추적할 수 있도록 어떤 로그를 남겨야 합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>운영에 필요한 관측 가능성과 개인정보 보호를 함께 고려하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>요청 ID, 주요 상태 변화, 오류 원인, 로그 수준, 민감정보 마스킹</p></section>
+      <section class="memo-block"><label for="memo-T36">면접 답변 메모</label><div id="memo-T36" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T36" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="모니터링" data-search="t37 모니터링 서비스 상태를 판단하기 위해 어떤 지표와 알림을 설정하겠습니까? 서버 생존 여부가 아니라 사용자 경험을 측정하는지 평가한다. 오류율, 지연시간, 트래픽, 자원 사용량, 핵심 비즈니스 지표">
+  <details>
+    <summary>
+      <span class="question-no">T37</span>
+      <span class="question-main"><span class="category">모니터링</span><strong>서비스 상태를 판단하기 위해 어떤 지표와 알림을 설정하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>서버 생존 여부가 아니라 사용자 경험을 측정하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>오류율, 지연시간, 트래픽, 자원 사용량, 핵심 비즈니스 지표</p></section>
+      <section class="memo-block"><label for="memo-T37">면접 답변 메모</label><div id="memo-T37" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T37" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="테스트 설계" data-search="t38 테스트 설계 단위 테스트, 통합 테스트, e2e 테스트의 차이와 적용 기준을 설명해 주세요. 테스트 종류별 목적과 비용을 이해하는지 확인한다. 격리 범위, 검증 대상, 실행 속도, 신뢰도, 프로젝트 적용 사례">
+  <details>
+    <summary>
+      <span class="question-no">T38</span>
+      <span class="question-main"><span class="category">테스트 설계</span><strong>단위 테스트, 통합 테스트, E2E 테스트의 차이와 적용 기준을 설명해 주세요.</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>테스트 종류별 목적과 비용을 이해하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>격리 범위, 검증 대상, 실행 속도, 신뢰도, 프로젝트 적용 사례</p></section>
+      <section class="memo-block"><label for="memo-T38">면접 답변 메모</label><div id="memo-T38" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T38" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="테스트 품질" data-search="t39 테스트 품질 테스트 코드는 통과하지만 실제 서비스에서 오류가 발생할 수 있는 이유는 무엇입니까? 테스트 개수보다 시나리오와 환경의 적절성을 판단할 수 있는지 본다. 잘못된 가정, 누락 시나리오, 테스트 데이터, 환경 차이, 모킹 한계">
+  <details>
+    <summary>
+      <span class="question-no">T39</span>
+      <span class="question-main"><span class="category">테스트 품질</span><strong>테스트 코드는 통과하지만 실제 서비스에서 오류가 발생할 수 있는 이유는 무엇입니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>테스트 개수보다 시나리오와 환경의 적절성을 판단할 수 있는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>잘못된 가정, 누락 시나리오, 테스트 데이터, 환경 차이, 모킹 한계</p></section>
+      <section class="memo-block"><label for="memo-T39">면접 답변 메모</label><div id="memo-T39" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T39" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="CI/CD" data-search="t40 ci/cd 코드가 배포되기 전 자동화 파이프라인에서 어떤 검증을 수행해야 합니까? 반복 가능한 품질 관리와 안전한 배포 절차를 이해하는지 평가한다. 빌드, 정적 분석, 테스트, 보안 검사, 배포 승인, 실패 처리">
+  <details>
+    <summary>
+      <span class="question-no">T40</span>
+      <span class="question-main"><span class="category">CI/CD</span><strong>코드가 배포되기 전 자동화 파이프라인에서 어떤 검증을 수행해야 합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>반복 가능한 품질 관리와 안전한 배포 절차를 이해하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>빌드, 정적 분석, 테스트, 보안 검사, 배포 승인, 실패 처리</p></section>
+      <section class="memo-block"><label for="memo-T40">면접 답변 메모</label><div id="memo-T40" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T40" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="배포 전략" data-search="t41 배포 전략 무중단 배포 또는 점진적 배포를 어떻게 구현하고 검증하겠습니까? 변경 위험을 줄이고 이상 발생 시 빠르게 복구할 수 있는지 본다. 롤링·블루그린·카나리, 상태 확인, 트래픽 전환, 롤백">
+  <details>
+    <summary>
+      <span class="question-no">T41</span>
+      <span class="question-main"><span class="category">배포 전략</span><strong>무중단 배포 또는 점진적 배포를 어떻게 구현하고 검증하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>변경 위험을 줄이고 이상 발생 시 빠르게 복구할 수 있는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>롤링·블루그린·카나리, 상태 확인, 트래픽 전환, 롤백</p></section>
+      <section class="memo-block"><label for="memo-T41">면접 답변 메모</label><div id="memo-T41" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T41" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="환경 관리" data-search="t42 환경 관리 개발·테스트·운영 환경의 차이로 발생하는 문제를 어떻게 줄이겠습니까? 실행환경을 일관되게 관리하고 설정 오류를 방지하는지 평가한다. 설정 분리, 컨테이너, 환경변수, 데이터 차이, 운영 유사 환경">
+  <details>
+    <summary>
+      <span class="question-no">T42</span>
+      <span class="question-main"><span class="category">환경 관리</span><strong>개발·테스트·운영 환경의 차이로 발생하는 문제를 어떻게 줄이겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>실행환경을 일관되게 관리하고 설정 오류를 방지하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>설정 분리, 컨테이너, 환경변수, 데이터 차이, 운영 유사 환경</p></section>
+      <section class="memo-block"><label for="memo-T42">면접 답변 메모</label><div id="memo-T42" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T42" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="비밀정보 관리" data-search="t43 비밀정보 관리 api 키, 비밀번호, 토큰 같은 비밀정보를 코드와 배포 환경에서 어떻게 관리합니까? 보안 기본기와 비밀정보 생명주기를 이해하는지 확인한다. 저장소 제외, 비밀관리 도구, 접근 통제, 교체, 로그 노출 방지">
+  <details>
+    <summary>
+      <span class="question-no">T43</span>
+      <span class="question-main"><span class="category">비밀정보 관리</span><strong>API 키, 비밀번호, 토큰 같은 비밀정보를 코드와 배포 환경에서 어떻게 관리합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>보안 기본기와 비밀정보 생명주기를 이해하는지 확인한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>저장소 제외, 비밀관리 도구, 접근 통제, 교체, 로그 노출 방지</p></section>
+      <section class="memo-block"><label for="memo-T43">면접 답변 메모</label><div id="memo-T43" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T43" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="개인정보" data-search="t44 개인정보 개인정보를 수집·저장·조회·삭제할 때 기술적으로 무엇을 고려해야 합니까? 개인정보를 일반 데이터로 취급하지 않는지 평가한다. 최소 수집, 암호화, 접근 기록, 보존기간, 삭제, 마스킹">
+  <details>
+    <summary>
+      <span class="question-no">T44</span>
+      <span class="question-main"><span class="category">개인정보</span><strong>개인정보를 수집·저장·조회·삭제할 때 기술적으로 무엇을 고려해야 합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>개인정보를 일반 데이터로 취급하지 않는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>최소 수집, 암호화, 접근 기록, 보존기간, 삭제, 마스킹</p></section>
+      <section class="memo-block"><label for="memo-T44">면접 답변 메모</label><div id="memo-T44" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T44" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="공급망 보안" data-search="t45 공급망 보안 외부 라이브러리나 오픈소스를 도입할 때 무엇을 검토합니까? 편의성뿐 아니라 보안과 장기 유지보수 위험을 판단하는지 본다. 라이선스, 취약점, 유지보수 상태, 의존성 범위, 업데이트 정책">
+  <details>
+    <summary>
+      <span class="question-no">T45</span>
+      <span class="question-main"><span class="category">공급망 보안</span><strong>외부 라이브러리나 오픈소스를 도입할 때 무엇을 검토합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>편의성뿐 아니라 보안과 장기 유지보수 위험을 판단하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>라이선스, 취약점, 유지보수 상태, 의존성 범위, 업데이트 정책</p></section>
+      <section class="memo-block"><label for="memo-T45">면접 답변 메모</label><div id="memo-T45" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T45" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="AI 기본 소양" data-search="t46 ai 기본 소양 생성형 ai 모델의 환각이 무엇이며 서비스에서는 어떻게 통제할 수 있습니까? ai 출력을 정답으로 가정하지 않고 위험에 맞는 통제를 설계하는지 평가한다. 환각 사례, 근거 확인, 검색 연동, 출력 제약, 사람의 승인">
+  <details>
+    <summary>
+      <span class="question-no">T46</span>
+      <span class="question-main"><span class="category">AI 기본 소양</span><strong>생성형 AI 모델의 환각이 무엇이며 서비스에서는 어떻게 통제할 수 있습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>AI 출력을 정답으로 가정하지 않고 위험에 맞는 통제를 설계하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>환각 사례, 근거 확인, 검색 연동, 출력 제약, 사람의 승인</p></section>
+      <section class="memo-block"><label for="memo-T46">면접 답변 메모</label><div id="memo-T46" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T46" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="프롬프트·컨텍스트" data-search="t47 프롬프트·컨텍스트 ai에 제공하는 프롬프트와 컨텍스트 품질을 어떻게 관리하겠습니까? 입력 설계가 출력 품질과 보안에 미치는 영향을 이해하는지 본다. 역할·목표·제약, 데이터 범위, 예시, 민감정보, 버전 관리">
+  <details>
+    <summary>
+      <span class="question-no">T47</span>
+      <span class="question-main"><span class="category">프롬프트·컨텍스트</span><strong>AI에 제공하는 프롬프트와 컨텍스트 품질을 어떻게 관리하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>입력 설계가 출력 품질과 보안에 미치는 영향을 이해하는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>역할·목표·제약, 데이터 범위, 예시, 민감정보, 버전 관리</p></section>
+      <section class="memo-block"><label for="memo-T47">면접 답변 메모</label><div id="memo-T47" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T47" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="RAG" data-search="t48 rag 사내 문서를 활용하는 검색증강생성 시스템을 설계한다면 무엇을 고려하겠습니까? 검색·권한·인용·최신성 등 rag의 핵심 문제를 이해하는지 평가한다. 문서 분할, 임베딩, 검색 기준, 접근 권한, 출처 표시, 평가">
+  <details>
+    <summary>
+      <span class="question-no">T48</span>
+      <span class="question-main"><span class="category">RAG</span><strong>사내 문서를 활용하는 검색증강생성 시스템을 설계한다면 무엇을 고려하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>검색·권한·인용·최신성 등 RAG의 핵심 문제를 이해하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>문서 분할, 임베딩, 검색 기준, 접근 권한, 출처 표시, 평가</p></section>
+      <section class="memo-block"><label for="memo-T48">면접 답변 메모</label><div id="memo-T48" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T48" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="AI 평가" data-search="t49 ai 평가 ai 기능의 품질을 어떤 데이터와 지표로 평가하겠습니까? 인상적인 데모가 아니라 반복 가능한 평가 체계를 만들 수 있는지 본다. 평가 데이터셋, 정확성, 유해성, 지연시간, 비용, 사람 평가">
+  <details>
+    <summary>
+      <span class="question-no">T49</span>
+      <span class="question-main"><span class="category">AI 평가</span><strong>AI 기능의 품질을 어떤 데이터와 지표로 평가하겠습니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>인상적인 데모가 아니라 반복 가능한 평가 체계를 만들 수 있는지 본다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>평가 데이터셋, 정확성, 유해성, 지연시간, 비용, 사람 평가</p></section>
+      <section class="memo-block"><label for="memo-T49">면접 답변 메모</label><div id="memo-T49" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T49" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+<article class="question-card" data-category="AI Agent" data-search="t50 ai agent ai agent가 외부 도구를 호출하거나 작업을 자동 실행할 때 어떤 안전장치가 필요합니까? 자동화의 효율뿐 아니라 권한 상승과 오작동 위험을 통제하는지 평가한다. 최소 권한, 실행 범위, 승인 지점, 입력 검증, 감사 로그, 중단 장치">
+  <details>
+    <summary>
+      <span class="question-no">T50</span>
+      <span class="question-main"><span class="category">AI Agent</span><strong>AI Agent가 외부 도구를 호출하거나 작업을 자동 실행할 때 어떤 안전장치가 필요합니까?</strong></span>
+      <span class="chevron" aria-hidden="true"></span>
+    </summary>
+    <div class="question-body">
+      <section class="detail-block"><h3>출제 의도 및 이유</h3><p>자동화의 효율뿐 아니라 권한 상승과 오작동 위험을 통제하는지 평가한다.</p></section>
+      <section class="detail-block"><h3>핵심 평가 기준</h3><p>최소 권한, 실행 범위, 승인 지점, 입력 검증, 감사 로그, 중단 장치</p></section>
+      <section class="memo-block"><label for="memo-T50">면접 답변 메모</label><div id="memo-T50" class="memo" contenteditable="true" role="textbox" aria-multiline="true" data-note-id="T50" data-placeholder="상황 · 본인의 책임 · 행동과 판단 · 결과와 학습을 기록하세요."></div></section>
+    </div>
+  </details>
+</article>
+      </div>
+      <div class="empty-state" id="empty-state">검색 조건에 맞는 질문이 없습니다.</div>
+      <div class="answer-guide" aria-label="STAR 답변 구조"><div><strong>S</strong>Situation<br />상황과 맥락</div><div><strong>T</strong>Task<br />본인의 책임</div><div><strong>A</strong>Action<br />행동과 판단</div><div><strong>R</strong>Result<br />결과와 학습</div></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-in">
+      <div>상호명: (주)에듀니티랩 | 대표자: 이기택 | 사업장주소: 서울 강남구 테헤란로21길 25 태림빌딩 2층</div>
+      <div>연락처: (02)6240-0053 | 사업자등록번호: 132-86-35644 | 이메일: with@edunlab.kr</div>
+      <div>Copyright ⓒ Eduniety Lab. All Rights Reserved.</div>
+    </div>
+  </footer>
+
+  <script>
+    const searchInput = document.getElementById('question-search');
+    const categoryFilter = document.getElementById('category-filter');
+    const cards = [...document.querySelectorAll('.question-card')];
+    const visibleCount = document.getElementById('visible-count');
+    const emptyState = document.getElementById('empty-state');
+    const toggleButton = document.getElementById('toggle-all');
+
+    function applyFilter() {
+      const query = searchInput.value.trim().toLowerCase();
+      const category = categoryFilter.value;
+      let count = 0;
+      cards.forEach((card) => {
+        const matchesQuery = !query || card.dataset.search.includes(query);
+        const matchesCategory = !category || card.dataset.category === category;
+        const visible = matchesQuery && matchesCategory;
+        card.hidden = !visible;
+        if (visible) count += 1;
+      });
+      visibleCount.textContent = count;
+      emptyState.classList.toggle('visible', count === 0);
+    }
+    searchInput.addEventListener('input', applyFilter);
+    categoryFilter.addEventListener('change', applyFilter);
+
+    let expanded = false;
+    toggleButton.addEventListener('click', () => {
+      expanded = !expanded;
+      cards.filter((card) => !card.hidden).forEach((card) => { card.querySelector('details').open = expanded; });
+      toggleButton.innerHTML = expanded
+        ? '<i class="fa-solid fa-angles-up" aria-hidden="true"></i> 전체 접기'
+        : '<i class="fa-solid fa-angles-down" aria-hidden="true"></i> 전체 펼치기';
+    });
+    document.getElementById('print-page').addEventListener('click', () => {
+      cards.filter((card) => !card.hidden).forEach((card) => { card.querySelector('details').open = true; });
+      window.print();
+    });
+
+    const storagePrefix = 'dip-interview-technical-';
+    document.querySelectorAll('.memo').forEach((memo) => {
+      const key = storagePrefix + memo.dataset.noteId;
+      try { memo.textContent = localStorage.getItem(key) || ''; } catch (error) {}
+      memo.addEventListener('input', () => {
+        try { localStorage.setItem(key, memo.textContent); } catch (error) {}
+      });
+    });
+
+    (async function initPretext() {
+      await document.fonts.ready;
+      const elements = [...document.querySelectorAll('[data-pretext]')];
+      try {
+        const { prepare, layout } = await import('https://esm.sh/@chenglou/pretext');
+        const prepared = new Map();
+        const prepareElement = (el) => prepared.set(el, prepare(el.textContent, getComputedStyle(el).font));
+        elements.forEach(prepareElement);
+        const relayout = () => {
+          prepared.forEach((handle, el) => {
+            const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+            const result = layout(handle, el.clientWidth, lineHeight);
+            if (result && Number.isFinite(result.height)) el.style.minHeight = result.height + 'px';
+          });
+        };
+        new ResizeObserver(relayout).observe(document.body);
+        elements.forEach((el) => new MutationObserver(() => { prepareElement(el); relayout(); }).observe(el, { characterData:true, subtree:true, childList:true }));
+        relayout();
+      } catch (error) {
+        console.info('Pretext layout fallback: native browser wrapping is active.');
+      }
+    })();
+  </script>
+  <script src="shared/notice-modal.js"></script>
+</body>
+</html>
