@@ -56,6 +56,21 @@ CONVERSATION.md         # 대화 프롬프트 및 결정 이력 기록</pre>
 2) 선생님 출석 현황 실시간 모니터링 화면
 을 HTML/CSS/JS로 구현해 줘. 모바일 레이아웃과 예외 처리를 반영해 줘."</pre>
   </div>
+  <div class="card" style="border-color: rgba(192,132,252,0.35); background: #151129;">
+    <h3 style="color: #d8b4fe;">🧰 gstack으로 기획 문서 점검하기</h3>
+    <p style="color: #cbd5e1; font-size: 0.92rem;">Codex로 문서를 작성한 뒤 gstack 스킬로 문서를 검토합니다. 결과는 그대로 채택하지 말고 팀이 판단한 내용만 문서에 반영하고 CONVERSATION.md에 기록합니다.</p>
+    <pre style="color: #f5d0fe;">/office-hours        → PROJECT_BRIEF.md   문제·사용자·범위 점검 (기획 전)
+/plan-ceo-review     → SITE_SPEC.md       범위 점검 (Hold Scope / Reduction 모드)
+/plan-eng-review     → USER_FLOWS.md      예외 흐름 · 숨은 가정
+                       DATA_MODEL.md      데이터 흐름 · 필드 · 관계
+                       IMPLEMENTATION_PLAN.md  구현 순서 · 테스트 계획
+/autoplan (선택)      → 위 리뷰를 한 번에 실행, 사람이 결정할 항목만 정리
+/document-release    → 구현 완료 후 문서를 최종 코드에 맞게 업데이트
+(모든 결과 요약)      → CONVERSATION.md</pre>
+    <pre style="color: #f5d0fe;">"/plan-eng-review
+5개 기획 문서를 검토해서 문서 간 모순, studentId·QR 만료·중복 출석 처리 누락,
+요구사항 ID별 테스트 계획을 표로 정리해 줘."</pre>
+  </div>
   <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
     <div style="max-width: 1200px; margin: 0 auto;">
       <div style="margin-bottom: 6px; word-break: keep-all;">

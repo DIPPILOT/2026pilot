@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script id="auth-guard">
+    (function() {
+      function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+          if (c.indexOf(nameEQ) == 0) return decodeURIComponent(c.substring(nameEQ.length,c.length));
+        }
+        return null;
+      }
+      var loggedInUser = getCookie('currentUser');
+      if (!loggedInUser) {
+        var sessionStr = localStorage.getItem('currentUserSession');
+        if (sessionStr) {
+          try {
+            var session = JSON.parse(sessionStr);
+            if (Date.now() < session.expiresAt) {
+              loggedInUser = session.value;
+            } else {
+              localStorage.removeItem('currentUserSession');
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      var isLoginPage = window.location.pathname.indexOf('login.html') !== -1;
+      if (!isLoginPage && !loggedInUser) {
+        window.location.href = '../login/login.html';
+      }
+    })();
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Day AI 강의실 | 대구 DIP SW 랜딩</title>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --primary-soft: rgba(59, 130, 246, 0.1);
+      --accent: #06b6d4;
+      --accent-soft: rgba(6, 182, 212, 0.12);
+      --bg: #09090b;
+      --panel: #111827;
+      --text: #ffffff;
+      --muted: #e4e4e7;
+      --line: rgba(255, 255, 255, 0.08);
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Pretendard', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    a { text-decoration: none; }
+    .topbar { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); border-bottom: 1px solid #e2e8f0; }
+    .topbar-in { max-width: 1200px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo { width: 36px; height: 36px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; }
+    .brand-text h1 { font-size: 1.15rem; font-weight: 800; color: #0f172a; }
+    .brand-text p { font-size: 0.82rem; color: #64748b; }
+    .top-actions { display: flex; gap: 10px; }
+    .lecture-btn { padding: 8px 16px; background: #3b82f6; color: #fff; border-radius: 8px; font-weight: 600; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px; }
+    .back-btn { padding: 8px 16px; background: #f1f5f9; color: #334155; border-radius: 8px; font-weight: 600; font-size: 0.88rem; }
+    
+    .page-wrap { max-width: 1200px; margin: 24px auto; padding: 0 20px; }
+    .hero-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: var(--shadow); }
+    .hero-meta { display: flex; gap: 8px; margin-bottom: 12px; }
+    .chip { padding: 4px 10px; background: rgba(255,255,255,0.08); border-radius: 20px; font-size: 0.8rem; color: #93c5fd; }
+    .hero-card h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; color: #fff; }
+    .hero-card p { font-size: 1rem; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+    
+    .phase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin-top: 24px; }
+    .task-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+    .task-badge { padding: 4px 10px; background: rgba(59,130,246,0.15); color: #60a5fa; border-radius: 6px; font-size: 0.8rem; font-weight: 700; display: inline-block; margin-bottom: 10px; }
+    .task-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
+    .task-desc { font-size: 0.92rem; color: #9ca3af; line-height: 1.5; margin-bottom: 16px; }
+    .task-guide { border-top: 1px solid var(--line); padding-top: 14px; margin: 4px 0 16px; display: grid; gap: 8px; }
+    .task-guide p { color: #cbd5e1; font-size: 0.84rem; line-height: 1.5; }
+    .task-guide strong { color: #67e8f9; display: inline-block; min-width: 70px; }
+    .task-btn { display: block; width: 100%; padding: 10px; text-align: center; background: rgba(255,255,255,0.06); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); border-radius: 8px; font-weight: 600; font-size: 0.9rem; }
+    .task-btn:hover { background: var(--primary); color: #fff; }
+    .project-guide { margin-top: 24px; padding: 22px 24px; background: rgba(6,182,212,0.07); border: 1px solid rgba(6,182,212,0.22); border-radius: 14px; }
+    .project-guide h3 { color: #67e8f9; font-size: 1.05rem; margin-bottom: 10px; }
+    .project-guide ol { padding-left: 20px; color: #cbd5e1; font-size: 0.9rem; line-height: 1.75; }
+    .project-guide strong { color: #fff; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand">
+        <div class="brand-logo">P</div>
+        <div class="brand-text">
+          <h1>대구 DIP SW 랜딩</h1>
+          <p>Project Day AI Lecture Classroom</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <a href="../../../LECTURE/docs/index.html#slide-119" class="lecture-btn" target="_blank">📖 Project Day 실습 교안 보기</a>
+        <a href="../index.html" class="back-btn">← 커리큘럼 페이지로 돌아가기</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <section class="hero-card">
+      <div class="hero-meta">
+        <span class="chip">Project Day</span>
+        <span class="chip">Markdown 기획서 기반 웹사이트 구축</span>
+        <span class="chip">Codex AI 대화 실습</span>
+      </div>
+      <h2>코덱스(Codex) 대화 기반 웹사이트 제작 프로젝트</h2>
+      <p>
+        이 수업은 코덱스에 곧바로 “웹사이트 만들어 줘”라고 요청하는 대신, 
+        아이디어 대화부터 Markdown 기획서 작성, 코드 생성, 테스트 및 이력 관리까지의 6단계 정석 프로젝트 프로세스를 완수하는 실습 과정입니다.
+      </p>
+    </section>
+
+    <section class="project-guide">
+      <h3>학생 프로젝트 진행 방법</h3>
+      <ol>
+        <li><strong>한 페이즈씩 완료하세요.</strong> 앞 단계의 산출물이 다음 단계의 입력 자료가 됩니다.</li>
+        <li><strong>Codex의 결과를 그대로 채택하지 마세요.</strong> 사실, 가정, 결정, 미결 질문을 구분하고 팀이 판단한 근거를 남깁니다.</li>
+        <li><strong>각 카드의 상세 가이드를 확인하세요.</strong> 페이즈 목적, 수행 순서, 필수 결과물, 실무 고려사항과 완료 체크리스트가 제공됩니다.</li>
+        <li><strong>완성보다 검증 가능한 과정이 중요합니다.</strong> 왜 그렇게 설계했는지 문서와 테스트 증거로 설명할 수 있어야 합니다.</li>
+      </ol>
+    </section>
+
+    <div style="margin-top: 32px;">
+      <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 16px; color: #fff;">🚀 Project Day 6대 핵심 페이즈 (Tasks)</h3>
+      <div class="phase-grid">
+        
+        <div class="task-card">
+          <div>
+            <span class="task-badge">Phase 1</span>
+            <h4 class="task-title">아이디어 구체화 (Idea Definition)</h4>
+            <p class="task-desc">사이트 목적, 사용자 역할(학생/선생님), 핵심 행동을 3문장 이내로 명확히 정리합니다.</p>
+            <div class="task-guide"><p><strong>핵심 결과물</strong>문제·사용자·핵심 행동이 드러나는 프로젝트 정의문</p><p><strong>중요 기준</strong>팀원 모두가 같은 제품을 상상할 수 있는가?</p></div>
+          </div>
+          <a href="project_day-ai-classroom_detail_task.html#phase1" class="task-btn">상세 실습과제 가이드 확인</a>
+        </div>
+
+        <div class="task-card">
+          <div>
+            <span class="task-badge">Phase 2</span>
+            <h4 class="task-title">기획 문서화 (Markdown Specs)</h4>
+            <p class="task-desc">SITE_SPEC, USER_FLOWS, DATA_MODEL, IMPLEMENTATION_PLAN, CONVERSATION 문서 팩을 작성합니다.</p>
+            <div class="task-guide"><p><strong>핵심 결과물</strong>서로 모순 없이 연결되는 5개 Markdown 기획 문서</p><p><strong>중요 기준</strong>개발자가 추가 질문 없이 첫 구현을 시작할 수 있는가?</p></div>
+          </div>
+          <a href="project_day-ai-classroom_detail_task.html#phase2" class="task-btn">기획서 요약서 작성 가이드</a>
+        </div>
+
+        <div class="task-card">
+          <div>
+            <span class="task-badge">Phase 3</span>
+            <h4 class="task-title">코덱스 기반 웹사이트 구현</h4>
+            <p class="task-desc">코덱스에 문서를 먼저 읽게 한 뒤 website/ 폴더 아래 반응형 웹사이트 코드 생성을 요청합니다.</p>
+            <div class="task-guide"><p><strong>핵심 결과물</strong>실행 가능한 웹사이트와 구현·검증 기록</p><p><strong>중요 기준</strong>문서의 완료 기준이 코드에 실제 반영됐는가?</p></div>
+          </div>
+          <a href="project_day-ai-classroom_detail_task.html#phase3" class="task-btn">구현 요청 프롬프트 예시</a>
+        </div>
+
+        <div class="task-card">
+          <div>
+            <span class="task-badge">Phase 4</span>
+            <h4 class="task-title">기능 및 시나리오 테스트</h4>
+            <p class="task-desc">학생 QR 생성/스캔 출석과 선생님 대시보드 실시간 현황 및 예외 방어 처리를 테스트합니다.</p>
+            <div class="task-guide"><p><strong>핵심 결과물</strong>정상·예외 시나리오 테스트 결과와 결함 목록</p><p><strong>중요 기준</strong>성공 화면뿐 아니라 실패 상황도 안전하게 처리하는가?</p></div>
+          </div>
+          <a href="project_day-ai-classroom_detail_task.html#phase4" class="task-btn">테스트 시나리오 확인</a>
+        </div>
+
+        <div class="task-card">
+          <div>
+            <span class="task-badge">Phase 5</span>
+            <h4 class="task-title">사이트·문서 연쇄 개선</h4>
+            <p class="task-desc">변경 요청을 기획 문서에 먼저 반영(Spec-First)한 뒤 코덱스를 통해 사이트를 개선합니다.</p>
+            <div class="task-guide"><p><strong>핵심 결과물</strong>변경 명세, 영향 분석, 수정 코드와 회귀 테스트</p><p><strong>중요 기준</strong>변경으로 기존 기능이 깨지지 않았음을 증명했는가?</p></div>
+          </div>
+          <a href="project_day-ai-classroom_detail_task.html#phase5" class="task-btn">개선 가이드 확인</a>
+        </div>
+
+        <div class="task-card">
+          <div>
+            <span class="task-badge">Phase 6</span>
+            <h4 class="task-title">작업 이력 기록 및 회고 발표</h4>
+            <p class="task-desc">CONVERSATION.md에 프롬프트 및 결정 이력을 기록하고 5분 최종 발표를 진행합니다.</p>
+            <div class="task-guide"><p><strong>핵심 결과물</strong>재현 가능한 작업 기록과 5분 프로젝트 발표</p><p><strong>중요 기준</strong>무엇을 만들었는지보다 왜 그렇게 판단했는지 설명하는가?</p></div>
+          </div>
+          <a href="project_day-ai-classroom_detail_task.html#phase6" class="task-btn">회고 및 발표 가이드</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer" style="background: #09090b; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 32px 20px; text-align: center; color: #a1a1aa; font-size: 0.82rem; line-height: 1.8; position: relative; z-index: 10;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="margin-bottom: 6px; word-break: keep-all;">
+        <span>상호명: (주)에듀니티랩</span> | <span>대표자: 이기택</span> | <span>사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</span>
+      </div>
+      <div style="margin-bottom: 10px; word-break: keep-all;">
+        <span>연락처: (02)6240-0053</span> | <span>사업자등록번호: 132-86-35644</span> | <span>통신판매업신고번호: 제2024-서울강남-01134호</span> | <span>이메일: with@edunlab.kr</span>
+      </div>
+      <div style="color: #71717a; font-size: 0.8rem; font-weight: 500;">
+        Copyright ⓒ Eduniety Lab. All Rights Reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

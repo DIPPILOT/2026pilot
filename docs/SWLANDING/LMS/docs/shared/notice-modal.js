@@ -17,14 +17,72 @@
 
   const BASE_PATH = getBasePath();
 
-  // Notices data: Notice 10 is Interview Battle & Tech/Exec Interview (Slide 0), Notice 7 is Must-Read (Slide 1), Notice 9 is 11/10 online learning guide (Slide 2), Notice 8 is 3rd-week gstack guide (Slide 3), Notice 6 is Slide 4, Notice 5 is Slide 5, Notice 4 is Slide 6, Notice 3 is Slide 7, Notice 2 is Slide 8, Notice 1 is Slide 9
+  // Notices data: Notice 11 is Final Interview Battle Method (Slide 0), Notice 10 is Interview Battle & Tech/Exec Interview (Slide 1), Notice 7 is Must-Read (Slide 2), Notice 9 is 11/10 online learning guide (Slide 3), Notice 8 is 3rd-week gstack guide (Slide 4), Notice 6 is Slide 5, Notice 5 is Slide 6, Notice 4 is Slide 7, Notice 3 is Slide 8, Notice 2 is Slide 9, Notice 1 is Slide 10
   const NOTICES_DATA = [
     {
-      id: 10,
+      id: 11,
       isNew: true,
-      tag: '🎤 실전 면접 · 최신 공지',
+      tag: '🎯 마지막 면접 배틀 · 진행 방법',
       tagClass: 'tag-urgent',
-      tabLabel: '🎤 1. 면접 배틀 · 기술/임원면접 안내',
+      tabLabel: '🎯 1. 마지막 면접 배틀 진행 방법',
+      title: '📢 [SW랜딩] 마지막 면접 배틀 (모의면접 → 리얼 면접) 진행 방법 안내',
+      contentHtml: `
+        <div style="margin-bottom: 18px; padding: 15px 18px; border-radius: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(59, 130, 246, 0.18)); border: 1.5px solid rgba(52, 211, 153, 0.5); display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.5rem; line-height: 1;">🎯</span>
+          <div style="color: #ecfdf5; font-size: 0.98rem; font-weight: 700; line-height: 1.58;">
+            <span style="display: inline-block; padding: 2px 8px; border-radius: 6px; background: linear-gradient(135deg, #10b981, #2563eb); color: #fff; font-size: 0.78rem; font-weight: 800; margin-right: 6px; vertical-align: middle;">진행 가이드</span>
+            마지막 면접 배틀 진행 방법입니다! 팀을 나누어 실전처럼 연습하고, 마지막에는 전문 면접관과 리얼 면접을 진행합니다.
+          </div>
+        </div>
+
+        <!-- 4단계 진행 순서 -->
+        <div class="notice-card-box highlight-blue" style="margin: 16px 0;">
+          <h4 class="notice-box-title">📋 모의면접 배틀 4단계 진행 방법</h4>
+          <ul class="notice-check-list" style="gap: 10px;">
+            <li>
+              <span class="check-icon">1️⃣</span>
+              <span><strong>팀 구성 (면접관팀 vs 면접자팀):</strong> 면접관팀과 면접자팀으로 팀을 나누고, 각 팀은 역할을 정해 면접 질문·답변을 준비합니다.</span>
+            </li>
+            <li>
+              <span class="check-icon">2️⃣</span>
+              <span><strong>1차 면접 진행:</strong> 먼저 면접관팀과 면접자팀으로 마주 앉아 실제 면접처럼 날카롭게 질문하고 논리적으로 답변합니다.</span>
+            </li>
+            <li>
+              <span class="check-icon">3️⃣</span>
+              <span><strong>공수교대 (역할 교대!):</strong> 이후 <strong>면접관팀 ↔ 면접자팀</strong> 역할을 서로 바꿔 다시 한 번 면접을 진행합니다.</span>
+            </li>
+            <li>
+              <span class="check-icon">4️⃣</span>
+              <span><strong>리얼 면접 진행 (기술면접 → 임원면접):</strong> 마지막에는 <strong>전문 기술 면접관</strong>과 <strong>전문 임원 면접관</strong>이 직접 참여하여 실제 채용 면접처럼 <strong>기술면접 → 임원면접</strong> 순서로 진행합니다.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 핵심 포인트 -->
+        <div class="notice-card-box highlight-amber" style="margin-bottom: 18px;">
+          <h4 class="notice-box-title">💡 이번 면접 배틀의 핵심 포인트!</h4>
+          <p class="notice-text-p" style="color: #fde68a; font-weight: 700; margin: 0; line-height: 1.7;">
+            🎯 <strong>질문하는 경험(면접관 시선)</strong>과 <strong>답변하는 경험(지원자 시선)</strong>을 모두 해본 뒤, 마지막에 전문 면접관과의 <strong>리얼 면접(기술면접 → 임원면접)</strong>까지 완주합니다!
+          </p>
+        </div>
+
+        <!-- 첨부 인포그래픽 이미지 -->
+        <div class="notice-attachment-wrap" style="text-align: center; margin-top: 18px;">
+          <div class="attachment-label">
+            <span>📎 첨부파일: <strong>모의면접 진행 방법 (1. 팀 구성 → 2. 1차 면접 → 3. 공수교대 → 4. 리얼 면접)</strong></span>
+            <span style="font-size: 0.78rem; color: #38bdf8;">클릭 시 원본 크기로 확대</span>
+          </div>
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 14px; display: inline-block; max-width: 100%;">
+            <img src="${BASE_PATH}img/notice_mock_interview_method.jpg" alt="모의면접 진행 방법 안내 인포그래픽" class="notice-team-img notice-zoomable-img" style="max-height: 600px; width: auto; max-width: 100%; border-radius: 10px; cursor: zoom-in; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" data-zoom-src="${BASE_PATH}img/notice_mock_interview_method.jpg" title="클릭하여 원본 크기로 보기" />
+          </div>
+        </div>
+      `
+    },
+    {
+      id: 10,
+      tag: '🎤 실전 면접 안내',
+      tagClass: 'tag-urgent',
+      tabLabel: '🎤 2. 면접 배틀 · 기술/임원면접 안내',
       title: '📢 [SW랜딩] 모의 면접 배틀 & 기술면접 · 임원면접 실시 안내',
       contentHtml: `
         <div style="margin-bottom: 18px; padding: 15px 18px; border-radius: 12px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.22), rgba(139, 92, 246, 0.16)); border: 1.5px solid rgba(96, 165, 250, 0.5); display: flex; align-items: center; gap: 12px;">
@@ -99,7 +157,7 @@
       isMustRead: true,
       tag: '🚨 필독 공지 · 저작권 및 배포 주의',
       tagClass: 'tag-urgent',
-      tabLabel: '🚨 2. [필독] 저작권/Git 배포 안내',
+      tabLabel: '🚨 3. [필독] 저작권/Git 배포 안내',
       title: '[공지] LMS 교육 콘텐츠 무단 복사 및 Git 배포 관련 안내',
       contentHtml: `
         <div style="margin-bottom: 18px; padding: 14px 18px; border-radius: 12px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.22), rgba(185, 28, 28, 0.14)); border: 1.5px solid rgba(239, 68, 68, 0.55); display: flex; align-items: center; gap: 12px;">
@@ -171,7 +229,7 @@
       id: 9,
       tag: '온라인 학습',
       tagClass: 'tag-urgent',
-      tabLabel: '📢 3. 11/10 온라인 학습 안내',
+      tabLabel: '📢 4. 11/10 온라인 학습 안내',
       title: '📢 [SW랜딩] 11월 10일(화) 온라인 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -254,7 +312,7 @@
       id: 8,
       tag: '3주차 교육 안내 · gstack 실습',
       tagClass: 'tag-faculty',
-      tabLabel: '⚡ 4. [3주차] gstack 프로젝트 실습 안내',
+      tabLabel: '⚡ 5. [3주차] gstack 프로젝트 실습 안내',
       title: '📢 [3주차 교육 안내] gstack을 활용한 프로젝트 설계·진행 강의 및 실습',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; line-height: 1.7;">
@@ -342,7 +400,7 @@
       id: 6,
       tag: '온라인 학습',
       tagClass: 'tag-urgent',
-      tabLabel: '📢 5. 11/3 온라인 학습 안내',
+      tabLabel: '📢 6. 11/3 온라인 학습 안내',
       title: '📢 [SW랜딩] 11월 3일(화) 온라인 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -425,7 +483,7 @@
       id: 5,
       tag: '팀 편성',
       tagClass: 'tag-urgent',
-      tabLabel: '👥 6. 팀 재배정 안내',
+      tabLabel: '👥 7. 팀 재배정 안내',
       title: '📢 [2026 SW 랜딩] 팀 재배정 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc; line-height: 1.7;">
@@ -516,7 +574,7 @@
       id: 4,
       tag: '온라인 학습',
       tagClass: 'tag-urgent',
-      tabLabel: '📢 7. 10/27 온라인 학습 안내',
+      tabLabel: '📢 8. 10/27 온라인 학습 안내',
       title: '📢 [SW랜딩] 10월 27일(화) 온라인 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -599,7 +657,7 @@
       id: 3,
       tag: '운영 안내',
       tagClass: 'tag-urgent',
-      tabLabel: '🚗 8. 교육시설/주차 안내',
+      tabLabel: '🚗 9. 교육시설/주차 안내',
       title: '📢 [SW랜딩] 교육시설 이용 및 주차 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.02rem; font-weight: 600; color: #f8fafc;">
@@ -649,7 +707,7 @@
       id: 2,
       tag: '교수진 공지 · 팀 편성',
       tagClass: 'tag-faculty',
-      tabLabel: '👥 9. 초기 팀 구성 안내',
+      tabLabel: '👥 10. 초기 팀 구성 안내',
       title: '[공지] 학습 모듈별 팀 구성 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -700,7 +758,7 @@
       id: 1,
       tag: '학습 안내 · 모듈 1',
       tagClass: 'tag-learning',
-      tabLabel: '🚀 10. 모듈 1 학습 안내',
+      tabLabel: '🚀 11. 모듈 1 학습 안내',
       title: '🚀 [SW랜딩] 모듈 1 첫 번째 학습 안내',
       contentHtml: `
         <p class="notice-text-p" style="font-size: 1.05rem; font-weight: 700; color: #f8fafc;">
@@ -932,7 +990,7 @@
     if (arrowNext) arrowNext.disabled = isLast;
   }
 
-  const DONT_SHOW_STORAGE_KEY = 'swlanding_notice_hide_20261110_interview';
+  const DONT_SHOW_STORAGE_KEY = 'swlanding_notice_hide_20261113_interview_method';
 
   function openNotice(slideIndex = 0) {
     createModalDOM();
