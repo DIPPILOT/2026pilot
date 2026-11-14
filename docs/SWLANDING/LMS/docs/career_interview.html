@@ -101,7 +101,7 @@
     .interview-panel > p { color:var(--muted); font-size:.89rem; }
     .interview-panel ul { padding-left:20px; color:#d4d4d8; font-size:.87rem; margin:15px 0; }
     .interview-panel li + li { margin-top:7px; }
-    .download-btn { width:100%; margin-top:5px; padding:12px 14px; border:0; border-radius:10px; color:#07111f; background:linear-gradient(135deg,var(--cyan),var(--blue)); font-weight:850; cursor:pointer; }
+    .download-btn { display:block; width:100%; margin-top:5px; padding:12px 14px; border:0; border-radius:10px; color:#07111f; background:linear-gradient(135deg,var(--cyan),var(--blue)); font-weight:850; text-align:center; text-decoration:none; cursor:pointer; }
     .executive .download-btn { color:#fff; background:linear-gradient(135deg,#7c3aed,#db2777); }
     .download-note { color:#71717a!important; margin-top:7px; font-size:.75rem!important; text-align:center; }
     .answer-framework { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px; }
@@ -223,19 +223,19 @@
     </section>
 
     <section class="section" id="executive">
-      <header class="section-head"><div class="section-kicker">06 · TECHNICAL &amp; EXECUTIVE INTERVIEW</div><h2>질문지와 답변 준비 방향</h2><p>질문지 파일은 내용 검토 후 연결할 예정입니다. 현재는 다운로드 버튼의 위치와 사용자 흐름만 준비했습니다.</p></header>
+      <header class="section-head"><div class="section-kicker">06 · TECHNICAL &amp; EXECUTIVE INTERVIEW</div><h2>질문지와 답변 준비 방향</h2><p>기술면접과 임원면접 질문지를 확인하고, 각 질문의 평가 의도와 본인만의 프로젝트 근거를 연결해 답변을 준비하세요.</p></header>
       <div class="interview-grid">
         <article class="interview-panel technical">
           <div class="panel-label">TECHNICAL INTERVIEW</div><h3>기술면접</h3><p>정답 암기보다 설계 판단, 구현 과정, 오류를 찾은 방법과 검증 증거를 중심으로 평가합니다.</p>
           <ul><li>요구사항을 기술 설계로 번역하는 능력</li><li>데이터·API·UI·보안을 연결하는 시스템 사고</li><li>오류 재현, 원인 분석, 테스트와 회귀 검증</li><li>AI 생성 결과의 수용·수정·거절 판단</li><li>기술 선택의 장단점과 대안을 설명하는 능력</li></ul>
-          <button class="download-btn" type="button" onclick="showDownloadNotice('기술면접')">⬇ 기술면접 질문지 다운로드</button>
-          <p class="download-note">질문지 내용 검토 후 파일이 연결될 예정입니다.</p>
+          <a class="download-btn" href="career_interview_technical.html">⬇ 기술면접 질문지 다운로드</a>
+          <p class="download-note">1차 기술면접 질문지 페이지로 이동합니다.</p>
         </article>
         <article class="interview-panel executive">
           <div class="panel-label">EXECUTIVE INTERVIEW</div><h3>임원면접</h3><p>회사의 방향과 함께 성장하며 신뢰할 수 있는 동료인지, 어려운 상황에서 어떤 기준으로 행동하는지를 확인합니다.</p>
           <ul><li><strong>고객 중심:</strong> 기술보다 해결할 사용자 문제를 먼저 보는가</li><li><strong>주도성과 책임:</strong> 문제를 발견하고 끝까지 결과를 확인하는가</li><li><strong>협업과 소통:</strong> 다른 의견을 듣고 갈등을 근거로 해결하는가</li><li><strong>학습 민첩성:</strong> 빠른 기술 변화 속에서 스스로 학습하고 적용하는가</li><li><strong>정직과 AI 윤리:</strong> AI 사용 범위와 한계를 투명하게 밝히는가</li><li><strong>사업 이해:</strong> 자신의 일이 비용·품질·고객 가치에 미치는 영향을 보는가</li></ul>
-          <button class="download-btn" type="button" onclick="showDownloadNotice('임원면접')">⬇ 임원면접 질문지 다운로드</button>
-          <p class="download-note">질문지 내용 검토 후 파일이 연결될 예정입니다.</p>
+          <a class="download-btn" href="career_interview_executive.html">⬇ 임원면접 질문지 다운로드</a>
+          <p class="download-note">2차 임원면접 질문지 페이지로 이동합니다.</p>
         </article>
       </div>
       <div class="answer-framework">
