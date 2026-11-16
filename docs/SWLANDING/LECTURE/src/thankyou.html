@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>감사의 인사를 전합니다 | 대구·경북 지역인재양성 · (주)에듀니티랩</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --bg-deep: #070b14;
+      --bg-card: rgba(17, 25, 40, 0.82);
+      --line: rgba(148, 163, 184, 0.18);
+      --line-strong: rgba(56, 189, 248, 0.35);
+      --text-main: #f8fafc;
+      --text-body: #e2e8f0;
+      --text-muted: #94a3b8;
+      --cyan: #38bdf8;
+      --blue: #60a5fa;
+      --amber: #fbbf24;
+      --emerald: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(56, 189, 248, 0.16), transparent 34%),
+        radial-gradient(circle at 82% 18%, rgba(99, 102, 241, 0.15), transparent 36%),
+        radial-gradient(circle at 50% 88%, rgba(251, 191, 36, 0.1), transparent 40%),
+        var(--bg-deep);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      line-height: 1.8;
+      word-break: keep-all;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      width: min(880px, calc(100% - 36px));
+      margin: 56px auto 64px;
+    }
+
+    .thankyou-card {
+      position: relative;
+      padding: clamp(32px, 5vw, 56px);
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .thankyou-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue), var(--amber));
+    }
+
+    .badge-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #bae6fd;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-size: clamp(1.85rem, 4vw, 2.75rem);
+      font-weight: 900;
+      line-height: 1.3;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+
+    h1 span {
+      background: linear-gradient(120deg, #7dd3fc, #93c5fd, #fde68a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+
+    .lead {
+      font-size: 1.08rem;
+      color: var(--text-muted);
+      margin-bottom: 34px;
+      padding-bottom: 26px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .message-section {
+      display: grid;
+      gap: 22px;
+    }
+
+    .message-box {
+      padding: 26px 28px;
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.68);
+      border: 1px solid var(--line);
+    }
+
+    .message-box.students {
+      border-left: 4px solid var(--cyan);
+    }
+
+    .message-box.dip {
+      border-left: 4px solid var(--emerald);
+    }
+
+    .message-box.special {
+      border-left: 4px solid var(--amber);
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.11), rgba(15, 23, 42, 0.78));
+      border-color: rgba(251, 191, 36, 0.32);
+    }
+
+    .box-kicker {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin-bottom: 8px;
+    }
+
+    .message-box.dip .box-kicker {
+      color: var(--emerald);
+    }
+
+    .message-box.special .box-kicker {
+      color: var(--amber);
+    }
+
+    .message-box h2 {
+      font-size: 1.28rem;
+      font-weight: 850;
+      color: #fff;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .message-box p {
+      font-size: 1.04rem;
+      color: var(--text-body);
+      line-height: 1.85;
+    }
+
+    .message-box p + p {
+      margin-top: 12px;
+    }
+
+    .message-box strong {
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .message-box.special strong {
+      color: #fde68a;
+    }
+
+    .closing-sign {
+      margin-top: 36px;
+      padding-top: 26px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .closing-text {
+      font-size: 1.02rem;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .closing-org {
+      font-size: 1.08rem;
+      font-weight: 850;
+      color: #fff;
+    }
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 28px 20px;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.82rem;
+      line-height: 1.75;
+      background: rgba(7, 11, 20, 0.9);
+    }
+
+    @media (max-width: 640px) {
+      main {
+        margin: 28px auto 40px;
+      }
+      .message-box {
+        padding: 20px;
+      }
+      .closing-sign {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <article class="thankyou-card">
+      <div class="badge-row">✨ 3 YEARS OF REGIONAL TALENT DEVELOPMENT · THANK YOU</div>
+      <h1>
+        지난 3년의 여정을 함께해 주신<br />
+        <span>모든 분께 진심으로 감사드립니다</span>
+      </h1>
+      <p class="lead">
+        본 교육 과정의 모든 학습 페이지 운영이 종료되었습니다. 그동안 뜨거운 열정으로 함께해 주신 교육생 여러분과 관계자분들께 깊은 감사의 마음을 전합니다.
+      </p>
+
+      <div class="message-section">
+        <section class="message-box students">
+          <span class="box-kicker">TO OUR STUDENTS · 대구·경북 교육생 여러분께</span>
+          <h2>에듀니티랩을 거쳐 간 모든 대구·경북 학생들에게 감사 인사를 전합니다</h2>
+          <p>
+            지난 <strong>3년 동안 지역인재양성 과정</strong>을 진행하며, <strong>에듀니티랩을 거쳐 간 모든 대구·경북 학생 여러분</strong>과 함께 호흡하고 성장할 수 있어 더없이 영광이었습니다.
+          </p>
+          <p>
+            낯선 기술과 어려운 과제 앞에서도 끝까지 포기하지 않고 동료들과 치열하게 고민하며 실력을 쌓아 올린 여러분의 열정은 저희에게도 가장 큰 감동이자 자부심이었습니다. 이곳에서의 배움과 만남이 든든한 밑거름이 되어, <strong>여러분 모두 언제나 행복하고 사회를 빛내는 훌륭한 인재로 성장하기를</strong> 진심으로 응원하고 기원합니다.
+          </p>
+        </section>
+
+        <section class="message-box dip">
+          <span class="box-kicker">APPRECIATION · 대구디지털혁신진흥원(DIP)</span>
+          <h2>DIP 관계자 여러분들께 깊은 감사의 인사를 전합니다</h2>
+          <p>
+            대구·경북 지역의 청년들과 미래 SW 인재들이 더 넓은 세상에서 꿈을 펼칠 수 있도록, 지난 3년간 아낌없는 지원과 따뜻한 격려로 함께해 주신 <strong>대구디지털혁신진흥원(DIP) 관계자 여러분들께 진심 어린 감사의 인사</strong>를 드립니다.
+          </p>
+        </section>
+
+        <section class="message-box special">
+          <span class="box-kicker">SPECIAL THANKS · 특별 감사 인사</span>
+          <h2>김재진 님께 무한한 감사를 전합니다</h2>
+          <p>
+            <strong>특히, 교육 과정의 시작부터 마지막 순간까지 남다른 애정과 헌신으로 현장을 지켜주시고 이끌어 주신 김재진 님께는 개인적으로 무한한 감사를 전합니다.</strong>
+          </p>
+        </section>
+      </div>
+
+      <div class="closing-sign">
+        <div class="closing-text">여러분의 빛나는 앞날과 건승을 언제나 마음 깊이 응원하겠습니다. 감사합니다.</div>
+        <div class="closing-org">(주)에듀니티랩 드림</div>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <div>상호명: (주)에듀니티랩 | 대표자: 이기택 | 사업장주소: 서울 강남구 테헤란로21길 25 (역삼동, 태림빌딩) 태림빌딩 2층</div>
+    <div>Copyright ⓒ Eduniety Lab. All Rights Reserved.</div>
+  </footer>
+</body>
+</html>
