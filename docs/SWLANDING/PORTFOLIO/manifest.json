@@ -1,0 +1,121 @@
+[
+  {
+    "no": 1,
+    "name": "강모세",
+    "file": "01_kang_mose_2026swlanding.html",
+    "learningStyle": "시각형 · 적극형 · 총체적",
+    "team": "2팀"
+  },
+  {
+    "no": 2,
+    "name": "권태주",
+    "file": "02_kwon_taeju_2026swlanding.html",
+    "learningStyle": "시각형 · 적극형 · 총체적",
+    "team": "3팀"
+  },
+  {
+    "no": 3,
+    "name": "김나연",
+    "file": "03_kim_nayeon_2026swlanding.html",
+    "learningStyle": "시각형 · 숙고형 · 순차적",
+    "team": "2팀"
+  },
+  {
+    "no": 4,
+    "name": "김예원",
+    "file": "04_kim_yewon_2026swlanding.html",
+    "learningStyle": "시각형 · 균형형 · 총체적",
+    "team": "4팀"
+  },
+  {
+    "no": 5,
+    "name": "김지훈",
+    "file": "05_kim_jihun_2026swlanding.html",
+    "learningStyle": "시각형 · 균형형 · 총체적",
+    "team": "2팀"
+  },
+  {
+    "no": 6,
+    "name": "서상호",
+    "file": "06_seo_sangho_2026swlanding.html",
+    "learningStyle": "신체감각형 · 균형형 · 총체적",
+    "team": "2팀"
+  },
+  {
+    "no": 7,
+    "name": "석지윤",
+    "file": "07_seok_jiyoon_2026swlanding.html",
+    "learningStyle": "청각형 · 숙고형 · 순차적",
+    "team": "1팀"
+  },
+  {
+    "no": 8,
+    "name": "손영준",
+    "file": "08_son_youngjun_2026swlanding.html",
+    "learningStyle": "시각형 · 균형형 · 순차적",
+    "team": "1팀"
+  },
+  {
+    "no": 9,
+    "name": "유승혁",
+    "file": "09_yoo_seunghyuk_2026swlanding.html",
+    "learningStyle": "신체감각형 · 적극형 · 순차적",
+    "team": "3팀"
+  },
+  {
+    "no": 10,
+    "name": "은대영",
+    "file": "10_eun_daeyoung_2026swlanding.html",
+    "learningStyle": "학습성향 미응답",
+    "team": "3팀"
+  },
+  {
+    "no": 11,
+    "name": "이윤지",
+    "file": "11_lee_yoonji_2026swlanding.html",
+    "learningStyle": "학습성향 미응답",
+    "team": "X"
+  },
+  {
+    "no": 12,
+    "name": "이지민",
+    "file": "12_lee_jimin_2026swlanding.html",
+    "learningStyle": "학습성향 미응답",
+    "team": "4팀"
+  },
+  {
+    "no": 13,
+    "name": "이진녕",
+    "file": "13_lee_jinnyeong_2026swlanding.html",
+    "learningStyle": "혼합형 · 균형형 · 총체적",
+    "team": "4팀"
+  },
+  {
+    "no": 14,
+    "name": "최영찬",
+    "file": "14_choi_youngchan_2026swlanding.html",
+    "learningStyle": "청각형 · 균형형 · 총체적",
+    "team": "1팀"
+  },
+  {
+    "no": 15,
+    "name": "최윤",
+    "file": "15_choi_yoon_2026swlanding.html",
+    "learningStyle": "혼합형 · 균형형 · 총체적",
+    "team": "2팀"
+  },
+  {
+    "no": 16,
+    "name": "하정무",
+    "file": "16_ha_jeongmu_2026swlanding.html",
+    "learningStyle": "시각형 · 균형형 · 총체적",
+    "team": "3팀"
+  },
+  {
+    "no": 17,
+    "name": "허동후",
+    "file": "17_heo_donghoo_2026swlanding.html",
+    "learningStyle": "시각형 · 숙고형 · 총체적",
+    "team": "1팀"
+  }
+]
